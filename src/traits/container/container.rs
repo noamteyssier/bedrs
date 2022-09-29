@@ -1,4 +1,4 @@
-use super::Coordinates;
+use crate::traits::Coordinates;
 
 pub trait Container<T, I: Coordinates<T>> {
     fn records(&self) -> &Vec<I>;

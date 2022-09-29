@@ -1,6 +1,5 @@
-mod container;
-mod coordinates;
-mod overlap;
+pub mod container;
+pub mod interval;
+
 pub use container::Container;
-pub use coordinates::Coordinates;
-pub use overlap::Overlap;
+pub use interval::{Coordinates, Overlap};
