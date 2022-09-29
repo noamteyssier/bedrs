@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 use crate::traits::{container::Merge, Container};
 use crate::types::Interval;
 use anyhow::{bail, Result};
@@ -21,7 +23,7 @@ where
 
 impl<T> Merge<T, Interval<T>> for IntervalSet<T>
 where
-    T: Copy + PartialOrd + Ord,
+    T: Copy + PartialOrd + Ord + Debug,
     Interval<T>: Ord,
 {
 }

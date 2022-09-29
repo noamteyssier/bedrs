@@ -47,8 +47,8 @@ impl<T: Ord> PartialOrd for Interval<T> {
 
 #[cfg(test)]
 mod testing {
-    use super::Interval;
-    use crate::traits::Coordinates;
+    use crate::{traits::Coordinates, types::Interval};
+    use std::cmp::Ordering;
 
     #[test]
     fn test_interval_init() {
@@ -58,5 +58,30 @@ mod testing {
 
         assert_eq!(interval.start(), &start);
         assert_eq!(interval.end(), &end);
+    }
+
+    #[test]
+    fn test_interval_ordering_gt() {
+        let a = Interval::new(10, 100);
+        let b = Interval::new(5, 100);
+        assert_eq!(a.cmp(&b), Ordering::Greater);
+    }
+
+    #[test]
+    fn test_interval_ordering_lt() {
+        let a = Interval::new(5, 100);
+        let b = Interval::new(10, 100);
+        assert_eq!(a.cmp(&b), Ordering::Less);
+    }
+
+    #[test]
+    fn test_interval_ordering_eq() {
+        let a = Interval::new(5, 100);
+        let b = Interval::new(5, 100);
+        assert_eq!(a.cmp(&b), Ordering::Equal);
+
+        let a = Interval::new(5, 100);
+        let b = Interval::new(5, 90);
+        assert_eq!(a.cmp(&b), Ordering::Equal);
     }
 }

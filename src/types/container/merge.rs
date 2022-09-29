@@ -1,40 +1,45 @@
-use crate::{traits::Container, types::Interval};
+use crate::traits::{Container, Coordinates};
+use std::marker::PhantomData;
 
-pub struct MergeResults<T> {
-    intervals: Vec<Interval<T>>,
+pub struct MergeResults<T, I>
+where
+    I: Coordinates<T>,
+{
+    intervals: Vec<I>,
     clusters: Vec<usize>,
     n_clusters: usize,
+    phantom: PhantomData<T>,
 }
 
-impl<T> Container<T, Interval<T>> for MergeResults<T>
+impl<T, I> Container<T, I> for MergeResults<T, I>
 where
-    Interval<T>: Ord,
+    I: Coordinates<T> + Ord,
 {
-    fn records(&self) -> &Vec<Interval<T>> {
+    fn records(&self) -> &Vec<I> {
         &self.intervals
     }
-    fn records_mut(&mut self) -> &mut Vec<Interval<T>> {
+    fn records_mut(&mut self) -> &mut Vec<I> {
         &mut self.intervals
     }
 }
 
-impl<T> MergeResults<T> {
-    pub fn new(intervals: Vec<Interval<T>>, clusters: Vec<usize>) -> Self {
+impl<T, I> MergeResults<T, I>
+where
+    I: Coordinates<T>,
+{
+    pub fn new(intervals: Vec<I>, clusters: Vec<usize>) -> Self {
         let n_clusters = clusters.iter().max().unwrap_or(&0) + 1;
         Self::from_raw_parts(intervals, clusters, n_clusters)
     }
-    pub fn from_raw_parts(
-        intervals: Vec<Interval<T>>,
-        clusters: Vec<usize>,
-        n_clusters: usize,
-    ) -> Self {
+    pub fn from_raw_parts(intervals: Vec<I>, clusters: Vec<usize>, n_clusters: usize) -> Self {
         Self {
             intervals,
             clusters,
             n_clusters,
+            phantom: PhantomData,
         }
     }
-    pub fn intervals(&self) -> &Vec<Interval<T>> {
+    pub fn intervals(&self) -> &Vec<I> {
         &self.intervals
     }
     pub fn clusters(&self) -> &Vec<usize> {
