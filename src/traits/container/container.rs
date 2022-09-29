@@ -2,7 +2,7 @@ use crate::traits::Coordinates;
 
 pub trait Container<T, I: Coordinates<T>>
 where
-    I: Ord + Coordinates<T>
+    I: Ord + Coordinates<T>,
 {
     fn records(&self) -> &Vec<I>;
     fn records_mut(&mut self) -> &mut Vec<I>;
@@ -33,9 +33,7 @@ mod testing {
 
     #[test]
     fn test_custom_container_init() {
-        let records = vec![
-            Interval::new(10, 100); 4
-        ];
+        let records = vec![Interval::new(10, 100); 4];
         let container = CustomContainer { records };
         assert_eq!(container.len(), 4);
         assert_eq!(container.records()[0].start(), &10);

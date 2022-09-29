@@ -8,7 +8,7 @@ pub struct MergeResults<T> {
 
 impl<T> Container<T, Interval<T>> for MergeResults<T>
 where
-    Interval<T>: Ord
+    Interval<T>: Ord,
 {
     fn records(&self) -> &Vec<Interval<T>> {
         &self.intervals

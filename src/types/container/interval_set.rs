@@ -9,7 +9,7 @@ pub struct IntervalSet<T> {
 
 impl<T> Container<T, Interval<T>> for IntervalSet<T>
 where
-    Interval<T>: Ord
+    Interval<T>: Ord,
 {
     fn records(&self) -> &Vec<Interval<T>> {
         &self.records
@@ -20,10 +20,11 @@ where
 }
 
 impl<T> Merge<T, Interval<T>> for IntervalSet<T>
-where 
+where
     T: Copy + PartialOrd + Ord,
-    Interval<T>: Ord
-{}
+    Interval<T>: Ord,
+{
+}
 
 impl<T> IntervalSet<T>
 where
