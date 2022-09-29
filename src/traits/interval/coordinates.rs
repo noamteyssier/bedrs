@@ -3,6 +3,10 @@ pub trait Coordinates<T> {
     fn end(&self) -> &T;
 }
 
+pub trait GenomicCoordinates<T>: Coordinates<T> {
+    fn chr(&self) -> &T;
+}
+
 #[cfg(test)]
 mod testing {
     use crate::traits::Coordinates;
