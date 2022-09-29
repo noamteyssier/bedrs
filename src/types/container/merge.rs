@@ -4,6 +4,7 @@ use std::marker::PhantomData;
 pub struct MergeResults<T, I>
 where
     I: Coordinates<T>,
+    T: Copy,
 {
     intervals: Vec<I>,
     clusters: Vec<usize>,
@@ -14,6 +15,7 @@ where
 impl<T, I> Container<T, I> for MergeResults<T, I>
 where
     I: Coordinates<T> + Ord,
+    T: Copy,
 {
     fn records(&self) -> &Vec<I> {
         &self.intervals
@@ -26,6 +28,7 @@ where
 impl<T, I> MergeResults<T, I>
 where
     I: Coordinates<T>,
+    T: Copy,
 {
     pub fn new(intervals: Vec<I>, clusters: Vec<usize>) -> Self {
         let n_clusters = clusters.iter().max().unwrap_or(&0) + 1;

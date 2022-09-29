@@ -1,9 +1,16 @@
-pub trait Coordinates<T> {
+pub trait Coordinates<T>
+where
+    T: Copy,
+{
     fn start(&self) -> &T;
     fn end(&self) -> &T;
+    fn from(other: &Self) -> Self;
 }
 
-pub trait GenomicCoordinates<T>: Coordinates<T> {
+pub trait GenomicCoordinates<T>: Coordinates<T>
+where
+    T: Copy,
+{
     fn chr(&self) -> &T;
 }
 
@@ -23,20 +30,39 @@ mod testing {
         fn end(&self) -> &usize {
             &self.right
         }
+        fn from(other: &Self) -> Self {
+            Self {
+                left: *other.start(),
+                right: *other.end(),
+            }
+        }
     }
 
     // define a custom interval struct for testing
-    struct CustomIntervalMeta<'a> {
+    struct CustomIntervalMeta {
         left: usize,
         right: usize,
-        _meta: &'a str,
+        meta: String,
     }
-    impl<'a> Coordinates<usize> for CustomIntervalMeta<'a> {
+    impl CustomIntervalMeta {
+        pub fn meta(&self) -> &str {
+            &self.meta
+        }
+
+    }
+    impl Coordinates<usize> for CustomIntervalMeta {
         fn start(&self) -> &usize {
             &self.left
         }
         fn end(&self) -> &usize {
             &self.right
+        }
+        fn from(other: &Self) -> Self {
+            Self {
+                left: *other.start(),
+                right: *other.end(),
+                meta: other.meta().to_string(),
+            }
         }
     }
 
@@ -53,11 +79,11 @@ mod testing {
     fn test_custom_interval_with_meta() {
         let left = 10;
         let right = 100;
-        let meta = "some_meta";
+        let meta = "some_meta".to_string();
         let a = CustomIntervalMeta {
             left,
             right,
-            _meta: meta,
+            meta,
         };
         assert_eq!(a.start(), &10);
         assert_eq!(a.end(), &100);

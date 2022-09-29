@@ -1,6 +1,6 @@
 use crate::traits::{Coordinates, Overlap};
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy)]
 pub struct Interval<T> {
     start: T,
     end: T,
@@ -25,21 +25,40 @@ where
         self.end = *value;
     }
 }
-impl<T> Coordinates<T> for Interval<T> {
+impl<T> Coordinates<T> for Interval<T>
+where
+    T: Copy,
+{
     fn start(&self) -> &T {
         &self.start
     }
     fn end(&self) -> &T {
         &self.end
     }
+    fn from(other: &Self) -> Self {
+        Self {
+            start: *other.start(),
+            end: *other.end(),
+        }
+    }
 }
-impl<T: PartialOrd> Overlap<T> for Interval<T> {}
-impl<T: Eq + Ord> Ord for Interval<T> {
+impl<T: PartialOrd> Overlap<T> for Interval<T> 
+where
+    T: Copy + PartialOrd,
+{
+}
+impl<T> Ord for Interval<T>
+where
+    T: Eq + Ord + Copy,
+{
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
         self.start().cmp(other.start())
     }
 }
-impl<T: Ord> PartialOrd for Interval<T> {
+impl<T> PartialOrd for Interval<T>
+where
+    T: Ord + Copy,
+{
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
         self.start().partial_cmp(other.start())
     }

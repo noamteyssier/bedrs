@@ -10,6 +10,8 @@ pub struct IntervalMetaSet<T, M> {
 impl<T, M> Container<T, IntervalMeta<T, M>> for IntervalMetaSet<T, M>
 where
     IntervalMeta<T, M>: Ord,
+    M: Copy,
+    T: Copy,
 {
     fn records(&self) -> &Vec<IntervalMeta<T, M>> {
         &self.records

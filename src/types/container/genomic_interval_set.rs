@@ -11,7 +11,8 @@ pub struct GenomicIntervalSet<T> {
 }
 impl<T> Container<T, GenomicInterval<T>> for GenomicIntervalSet<T>
 where
-    GenomicInterval<T>: Ord,
+    GenomicInterval<T>: Copy + Ord,
+    T: Copy,
 {
     fn records(&self) -> &Vec<GenomicInterval<T>> {
         &self.records

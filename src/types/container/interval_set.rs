@@ -11,7 +11,8 @@ pub struct IntervalSet<T> {
 
 impl<T> Container<T, Interval<T>> for IntervalSet<T>
 where
-    Interval<T>: Ord,
+    Interval<T>: Copy + Ord,
+    T: Copy,
 {
     fn records(&self) -> &Vec<Interval<T>> {
         &self.records

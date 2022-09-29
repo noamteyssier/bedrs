@@ -1,13 +1,19 @@
 use super::{Coordinates, GenomicCoordinates};
 
-pub trait Overlap<T: PartialOrd>: Coordinates<T> {
+pub trait Overlap<T: PartialOrd>: Coordinates<T>
+where
+    T: Copy,
+{
     fn overlaps<I: Coordinates<T>>(&self, other: &I) -> bool {
         (other.start() >= self.start() && other.start() <= self.end())
             || (other.end() >= self.start() && (other.end() <= self.end()))
     }
 }
 
-pub trait GenomicOverlap<T: PartialOrd>: GenomicCoordinates<T> + Coordinates<T> {
+pub trait GenomicOverlap<T: PartialOrd>: GenomicCoordinates<T> + Coordinates<T>
+where
+    T: Copy,
+{
     fn overlaps<I: GenomicCoordinates<T>>(&self, other: &I) -> bool {
         (self.chr() == other.chr())
             && ((other.start() >= self.start() && other.start() <= self.end())

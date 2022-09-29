@@ -2,28 +2,44 @@ use std::cmp::Ordering;
 
 use crate::traits::{Coordinates, GenomicCoordinates, GenomicOverlap};
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq, Copy)]
 pub struct GenomicInterval<T> {
     chr: T,
     start: T,
     end: T,
 }
 
-impl<T> Coordinates<T> for GenomicInterval<T> {
+impl<T> Coordinates<T> for GenomicInterval<T>
+where
+    T: Copy,
+{
     fn start(&self) -> &T {
         &self.start
     }
     fn end(&self) -> &T {
         &self.end
     }
+    fn from(other: &Self) -> Self {
+        Self {
+            chr: *other.chr(),
+            start: *other.start(),
+            end: *other.end(),
+        }
+    }
 }
 
-impl<T> GenomicCoordinates<T> for GenomicInterval<T> {
+impl<T> GenomicCoordinates<T> for GenomicInterval<T>
+where
+    T: Copy,
+{
     fn chr(&self) -> &T {
         &self.chr
     }
 }
-impl<T: PartialOrd> GenomicOverlap<T> for GenomicInterval<T> {}
+impl<T> GenomicOverlap<T> for GenomicInterval<T> 
+where
+    T: Copy + PartialOrd
+{}
 
 impl<T> GenomicInterval<T>
 where
@@ -49,7 +65,7 @@ where
 
 impl<T> Ord for GenomicInterval<T>
 where
-    T: Eq + Ord,
+    T: Eq + Ord + Copy,
 {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
         match self.chr().cmp(other.chr()) {
@@ -61,7 +77,7 @@ where
 
 impl<T> PartialOrd for GenomicInterval<T>
 where
-    T: Ord,
+    T: Ord + Copy,
 {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         match self.chr().partial_cmp(other.chr()) {
