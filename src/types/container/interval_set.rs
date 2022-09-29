@@ -11,6 +11,9 @@ impl<T> Container<T, Interval<T>> for IntervalSet<T> {
     fn records(&self) -> &Vec<Interval<T>> {
         &self.records
     }
+    fn records_mut(&mut self) -> &mut Vec<Interval<T>> {
+        &mut self.records
+    }
 }
 
 impl<T> Merge<T, Interval<T>> for IntervalSet<T> where T: Copy + PartialOrd + Ord {}

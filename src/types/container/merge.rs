@@ -5,6 +5,16 @@ pub struct MergeResults<T> {
     clusters: Vec<usize>,
     n_clusters: usize,
 }
+
+impl<T> Container<T, Interval<T>> for MergeResults<T> {
+    fn records(&self) -> &Vec<Interval<T>> {
+        &self.intervals
+    }
+    fn records_mut(&mut self) -> &mut Vec<Interval<T>> {
+        &mut self.intervals
+    }
+}
+
 impl<T> MergeResults<T> {
     pub fn new(intervals: Vec<Interval<T>>, clusters: Vec<usize>) -> Self {
         let n_clusters = clusters.iter().max().unwrap_or(&0) + 1;
@@ -29,10 +39,5 @@ impl<T> MergeResults<T> {
     }
     pub fn n_clusters(&self) -> usize {
         self.n_clusters
-    }
-}
-impl<T> Container<T, Interval<T>> for MergeResults<T> {
-    fn records(&self) -> &Vec<Interval<T>> {
-        &self.intervals
     }
 }

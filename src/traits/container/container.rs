@@ -2,6 +2,7 @@ use crate::traits::Coordinates;
 
 pub trait Container<T, I: Coordinates<T>> {
     fn records(&self) -> &Vec<I>;
+    fn records_mut(&mut self) -> &mut Vec<I>;
     fn len(&self) -> usize {
         self.records().len()
     }
@@ -18,6 +19,9 @@ mod testing {
     impl Container<usize, CustomInterval> for CustomContainer {
         fn records(&self) -> &Vec<CustomInterval> {
             &self.records
+        }
+        fn records_mut(&mut self) -> &mut Vec<CustomInterval> {
+            &mut self.records
         }
     }
 

@@ -11,6 +11,9 @@ impl<T, M> Container<T, IntervalMeta<T, M>> for IntervalMetaSet<T, M> {
     fn records(&self) -> &Vec<IntervalMeta<T, M>> {
         &self.records
     }
+    fn records_mut(&mut self) -> &mut Vec<IntervalMeta<T, M>> {
+        &mut self.records
+    }
 }
 
 impl<T, M> IntervalMetaSet<T, M>
