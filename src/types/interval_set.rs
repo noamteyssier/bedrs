@@ -44,7 +44,7 @@ where
 mod testing {
     use crate::{
         traits::Container,
-        types::{Interval, IntervalSet}
+        types::{Interval, IntervalSet},
     };
 
     #[test]
