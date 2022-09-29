@@ -1,23 +1,28 @@
-use crate::traits::Container;
-use super::IntervalMeta;
+use crate::traits::{Container, container::Merge};
+use crate::types::Interval;
 use anyhow::{bail, Result};
 
 #[derive(Debug, Clone)]
-pub struct IntervalMetaSet<T, M> {
-    records: Vec<IntervalMeta<T, M>>,
+pub struct IntervalSet<T> {
+    records: Vec<Interval<T>>,
 }
 
-impl<T, M> Container<T, IntervalMeta<T, M>> for IntervalMetaSet<T, M> {
-    fn records(&self) -> &Vec<IntervalMeta<T, M>> {
+impl<T> Container<T, Interval<T>> for IntervalSet<T> {
+    fn records(&self) -> &Vec<Interval<T>> {
         &self.records
     }
 }
 
-impl<T, M> IntervalMetaSet<T, M>
+impl<T> Merge<T, Interval<T>> for IntervalSet<T>
 where
-    T: Copy,
+    T: Copy + PartialOrd + Ord
+{}
+
+impl<T> IntervalSet<T>
+where
+    T: Copy
 {
-    pub fn new(records: Vec<IntervalMeta<T, M>>) -> Self {
+    pub fn new(records: Vec<Interval<T>>) -> Self {
         Self { records }
     }
 
@@ -33,7 +38,7 @@ where
         let records = starts
             .iter()
             .zip(ends.iter())
-            .map(|(x, y)| IntervalMeta::new(*x, *y, None))
+            .map(|(x, y)| Interval::new(*x, *y))
             .collect();
         Self { records }
     }
@@ -43,41 +48,41 @@ where
 mod testing {
     use crate::{
         traits::Container,
-        types::{IntervalMeta, IntervalMetaSet},
+        types::{Interval, IntervalSet},
     };
 
     #[test]
-    fn test_interval_meta_set_init_from_records() {
+    fn test_interval_set_init_from_records() {
         let n_intervals = 10;
-        let records = vec![IntervalMeta::new(10, 100, None); n_intervals];
-        let set = IntervalMetaSet::<usize, usize>::new(records);
+        let records = vec![Interval::new(10, 100); n_intervals];
+        let set = IntervalSet::new(records);
         assert_eq!(set.len(), n_intervals);
     }
 
     #[test]
-    fn test_interval_meta_set_init_from_endpoints() {
+    fn test_interval_set_init_from_endpoints() {
         let n_intervals = 10;
         let starts = vec![10; n_intervals];
         let ends = vec![100; n_intervals];
-        let set = IntervalMetaSet::<usize, usize>::from_endpoints(&starts, &ends).unwrap();
+        let set = IntervalSet::from_endpoints(&starts, &ends).unwrap();
         assert_eq!(set.len(), n_intervals);
     }
 
     #[test]
-    fn test_interval_meta_set_init_from_endpoints_unequal() {
+    fn test_interval_set_init_from_endpoints_unequal() {
         let n_intervals = 10;
         let starts = vec![10; n_intervals];
         let ends = vec![100; n_intervals + 3];
-        let set = IntervalMetaSet::<usize, usize>::from_endpoints(&starts, &ends);
+        let set = IntervalSet::from_endpoints(&starts, &ends);
         assert!(set.is_err());
     }
 
     #[test]
-    fn test_interval_meta_set_init_from_endpoints_unequal_unchecked() {
+    fn test_interval_set_init_from_endpoints_unequal_unchecked() {
         let n_intervals = 10;
         let starts = vec![10; n_intervals];
         let ends = vec![100; n_intervals + 3];
-        let set = IntervalMetaSet::<usize, usize>::from_endpoints_unchecked(&starts, &ends);
+        let set = IntervalSet::from_endpoints_unchecked(&starts, &ends);
         assert_eq!(set.len(), n_intervals);
     }
 }
