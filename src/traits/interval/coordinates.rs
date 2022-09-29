@@ -2,8 +2,8 @@ pub trait Coordinates<T>
 where
     T: Copy,
 {
-    fn start(&self) -> &T;
-    fn end(&self) -> &T;
+    fn start(&self) -> T;
+    fn end(&self) -> T;
     fn from(other: &Self) -> Self;
 }
 
@@ -11,7 +11,7 @@ pub trait GenomicCoordinates<T>: Coordinates<T>
 where
     T: Copy,
 {
-    fn chr(&self) -> &T;
+    fn chr(&self) -> T;
 }
 
 #[cfg(test)]
@@ -24,16 +24,16 @@ mod testing {
         right: usize,
     }
     impl Coordinates<usize> for CustomInterval {
-        fn start(&self) -> &usize {
-            &self.left
+        fn start(&self) -> usize {
+            self.left
         }
-        fn end(&self) -> &usize {
-            &self.right
+        fn end(&self) -> usize {
+            self.right
         }
         fn from(other: &Self) -> Self {
             Self {
-                left: *other.start(),
-                right: *other.end(),
+                left: other.start(),
+                right: other.end(),
             }
         }
     }
@@ -51,16 +51,16 @@ mod testing {
 
     }
     impl Coordinates<usize> for CustomIntervalMeta {
-        fn start(&self) -> &usize {
-            &self.left
+        fn start(&self) -> usize {
+            self.left
         }
-        fn end(&self) -> &usize {
-            &self.right
+        fn end(&self) -> usize {
+            self.right
         }
         fn from(other: &Self) -> Self {
             Self {
-                left: *other.start(),
-                right: *other.end(),
+                left: other.start(),
+                right: other.end(),
                 meta: other.meta().to_string(),
             }
         }
@@ -71,8 +71,8 @@ mod testing {
         let left = 10;
         let right = 100;
         let a = CustomInterval { left, right };
-        assert_eq!(a.start(), &10);
-        assert_eq!(a.end(), &100);
+        assert_eq!(a.start(), 10);
+        assert_eq!(a.end(), 100);
     }
 
     #[test]
@@ -85,7 +85,7 @@ mod testing {
             right,
             meta,
         };
-        assert_eq!(a.start(), &10);
-        assert_eq!(a.end(), &100);
+        assert_eq!(a.start(), 10);
+        assert_eq!(a.end(), 100);
     }
 }

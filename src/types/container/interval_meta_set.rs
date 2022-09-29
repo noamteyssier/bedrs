@@ -3,7 +3,11 @@ use crate::types::IntervalMeta;
 use anyhow::{bail, Result};
 
 #[derive(Debug, Clone)]
-pub struct IntervalMetaSet<T, M> {
+pub struct IntervalMetaSet<T, M>
+where
+    T: Copy,
+    M: Copy,
+{
     records: Vec<IntervalMeta<T, M>>,
 }
 
@@ -24,6 +28,7 @@ where
 impl<T, M> IntervalMetaSet<T, M>
 where
     T: Copy,
+    M: Copy,
 {
     pub fn new(records: Vec<IntervalMeta<T, M>>) -> Self {
         Self { records }

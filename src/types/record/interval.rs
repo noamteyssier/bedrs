@@ -1,21 +1,24 @@
 use crate::traits::{Coordinates, Overlap};
 
 #[derive(Debug, Clone, Eq, PartialEq, Copy)]
-pub struct Interval<T> {
+pub struct Interval<T>
+where
+    T: Copy + Into<usize> + From<usize>
+{
     start: T,
     end: T,
 }
 impl<T> Interval<T>
 where
-    T: Copy,
+    T: Copy + Into<usize> + From<usize>,
 {
     pub fn new(start: T, end: T) -> Self {
         Self { start, end }
     }
     pub fn from<I: Coordinates<T>>(other: &I) -> Self {
         Self {
-            start: *other.start(),
-            end: *other.end(),
+            start: other.start(),
+            end: other.end(),
         }
     }
     pub fn update_start(&mut self, value: &T) {
@@ -27,40 +30,40 @@ where
 }
 impl<T> Coordinates<T> for Interval<T>
 where
-    T: Copy,
+    T: Copy + Into<usize> + From<usize>,
 {
-    fn start(&self) -> &T {
-        &self.start
+    fn start(&self) -> T {
+        self.start
     }
-    fn end(&self) -> &T {
-        &self.end
+    fn end(&self) -> T {
+        self.end
     }
     fn from(other: &Self) -> Self {
         Self {
-            start: *other.start(),
-            end: *other.end(),
+            start: other.start(),
+            end: other.end(),
         }
     }
 }
 impl<T: PartialOrd> Overlap<T> for Interval<T> 
 where
-    T: Copy + PartialOrd,
+    T: Copy + PartialOrd + Into<usize> + From<usize>,
 {
 }
 impl<T> Ord for Interval<T>
 where
-    T: Eq + Ord + Copy,
+    T: Eq + Ord + Copy + Into<usize> + From<usize>,
 {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        self.start().cmp(other.start())
+        self.start().cmp(&other.start())
     }
 }
 impl<T> PartialOrd for Interval<T>
 where
-    T: Ord + Copy,
+    T: Ord + Copy + Into<usize> + From<usize>,
 {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        self.start().partial_cmp(other.start())
+        self.start().partial_cmp(&other.start())
     }
 }
 
@@ -75,8 +78,8 @@ mod testing {
         let end = 100;
         let interval = Interval::new(start, end);
 
-        assert_eq!(interval.start(), &start);
-        assert_eq!(interval.end(), &end);
+        assert_eq!(interval.start(), start);
+        assert_eq!(interval.end(), end);
     }
 
     #[test]

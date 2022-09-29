@@ -37,8 +37,8 @@ mod testing {
         let records = vec![Interval::new(10, 100); 4];
         let container = CustomContainer { records };
         assert_eq!(container.len(), 4);
-        assert_eq!(container.records()[0].start(), &10);
-        assert_eq!(container.records()[0].end(), &100);
+        assert_eq!(container.records()[0].start(), 10);
+        assert_eq!(container.records()[0].end(), 100);
     }
 
     #[test]
@@ -50,8 +50,8 @@ mod testing {
         ];
         let mut container = CustomContainer { records };
         container.sort();
-        assert_eq!(container.records()[0].start(), &10);
-        assert_eq!(container.records()[1].start(), &15);
-        assert_eq!(container.records()[2].start(), &20);
+        assert_eq!(container.records()[0].start(), 10);
+        assert_eq!(container.records()[1].start(), 15);
+        assert_eq!(container.records()[2].start(), 20);
     }
 }

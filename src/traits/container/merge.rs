@@ -8,7 +8,7 @@ use crate::{
 
 pub trait Merge<T, I>: Container<T, I>
 where
-    T: Copy + PartialOrd + Ord + Debug,
+    T: Copy + PartialOrd + Ord + Debug + From<usize> + Into<usize>,
     I: Coordinates<T> + Ord,
 {
     fn merge(&self) -> MergeResults<T, Interval<T>> {
@@ -20,8 +20,8 @@ where
 
         for interval in self.records().iter() {
             if base_interval.overlaps(interval) {
-                let new_min = *base_interval.start().min(interval.start());
-                let new_max = *base_interval.end().max(interval.end());
+                let new_min = base_interval.start().min(interval.start());
+                let new_max = base_interval.end().max(interval.end());
                 base_interval.update_start(&new_min);
                 base_interval.update_end(&new_max);
             } else {
@@ -50,8 +50,8 @@ where
 
         for interval in self.records().iter() {
             if base_interval.overlaps(interval) {
-                let new_min = *base_interval.start().min(interval.start());
-                let new_max = *base_interval.end().max(interval.end());
+                let new_min = base_interval.start().min(interval.start());
+                let new_max = base_interval.end().max(interval.end());
                 base_interval.update_start(&new_min);
                 base_interval.update_end(&new_max);
             } else {
@@ -82,8 +82,8 @@ mod testing {
         let merge_set = set.merge();
         assert_eq!(merge_set.n_clusters(), 1);
         assert_eq!(merge_set.clusters(), &vec![0, 0, 0]);
-        assert_eq!(merge_set.intervals()[0].start(), &10);
-        assert_eq!(merge_set.intervals()[0].end(), &30);
+        assert_eq!(merge_set.intervals()[0].start(), 10);
+        assert_eq!(merge_set.intervals()[0].end(), 30);
     }
 
     #[test]
@@ -94,10 +94,10 @@ mod testing {
         let merge_set = set.merge();
         assert_eq!(merge_set.n_clusters(), 2);
         assert_eq!(merge_set.clusters(), &vec![0, 0, 0, 1, 1]);
-        assert_eq!(merge_set.intervals()[0].start(), &10);
-        assert_eq!(merge_set.intervals()[0].end(), &30);
-        assert_eq!(merge_set.intervals()[1].start(), &35);
-        assert_eq!(merge_set.intervals()[1].end(), &50);
+        assert_eq!(merge_set.intervals()[0].start(), 10);
+        assert_eq!(merge_set.intervals()[0].end(), 30);
+        assert_eq!(merge_set.intervals()[1].start(), 35);
+        assert_eq!(merge_set.intervals()[1].end(), 50);
     }
 
     #[test]
@@ -109,8 +109,8 @@ mod testing {
         let merge_set = set.merge();
         assert_eq!(merge_set.n_clusters(), 1);
         assert_eq!(merge_set.clusters(), &vec![0, 0, 0]);
-        assert_eq!(merge_set.intervals()[0].start(), &10);
-        assert_eq!(merge_set.intervals()[0].end(), &30);
+        assert_eq!(merge_set.intervals()[0].start(), 10);
+        assert_eq!(merge_set.intervals()[0].end(), 30);
     }
 
     #[test]
@@ -122,7 +122,7 @@ mod testing {
         let merge_set = set.merge();
         assert_eq!(merge_set.n_clusters(), 2);
         assert_eq!(merge_set.clusters(), &vec![0, 0, 1]);
-        assert_eq!(merge_set.intervals()[0].start(), &10);
-        assert_eq!(merge_set.intervals()[0].end(), &30);
+        assert_eq!(merge_set.intervals()[0].start(), 10);
+        assert_eq!(merge_set.intervals()[0].end(), 30);
     }
 }
