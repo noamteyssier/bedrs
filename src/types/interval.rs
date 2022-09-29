@@ -5,26 +5,35 @@ pub struct Interval<T> {
     start: T,
     end: T,
 }
-impl<T> Interval<T> {
+impl<T> Interval<T>
+where
+    T: Copy
+{
     pub fn new(start: T, end: T) -> Self {
         Self {
             start,
             end,
         }
     }
-    pub fn start(&self) -> &T {
-        &self.start
+    pub fn from<I: Coordinates<T>>(other: &I) -> Self {
+        Self {
+            start: *other.start(),
+            end: *other.end(),
+        }
     }
-    pub fn end(&self) -> &T {
-        &self.end
+    pub fn update_start(&mut self, value: &T) {
+        self.start = *value;
+    }
+    pub fn update_end(&mut self, value: &T) {
+        self.end = *value;
     }
 }
 impl<T> Coordinates<T> for Interval<T> {
     fn start(&self) -> &T {
-        self.start()
+        &self.start
     }
     fn end(&self) -> &T {
-        self.end()
+        &self.end
     }
 }
 impl<T: PartialOrd> Overlap<T> for Interval<T> {}
@@ -32,6 +41,7 @@ impl<T: PartialOrd> Overlap<T> for Interval<T> {}
 #[cfg(test)]
 mod testing {
     use super::Interval;
+    use crate::traits::Coordinates;
 
     #[test]
     fn test_interval_init() {
