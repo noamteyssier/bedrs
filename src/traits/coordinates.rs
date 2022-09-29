@@ -5,7 +5,7 @@ pub trait Coordinates<T> {
 
 #[cfg(test)]
 mod testing {
-    use crate::functions::Coordinates;
+    use crate::traits::Coordinates;
 
     // define a custom interval struct for testing
     struct CustomInterval {

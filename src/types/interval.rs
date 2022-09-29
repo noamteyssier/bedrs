@@ -1,4 +1,4 @@
-use crate::functions::{Overlap, Coordinates};
+use crate::traits::{Overlap, Coordinates};
 
 #[derive(Debug, Clone)]
 pub struct Interval<T, M> {
