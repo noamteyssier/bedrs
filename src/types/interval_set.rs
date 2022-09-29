@@ -1,5 +1,4 @@
-use crate::traits::Container;
-
+use crate::traits::{Container, container::Merge};
 use super::Interval;
 use anyhow::{bail, Result};
 
@@ -13,6 +12,11 @@ impl<T> Container<T, Interval<T>> for IntervalSet<T> {
         &self.records
     }
 }
+
+impl<T> Merge<T, Interval<T>> for IntervalSet<T>
+where
+    T: Copy + PartialOrd + Ord
+{}
 
 impl<T> IntervalSet<T>
 where
