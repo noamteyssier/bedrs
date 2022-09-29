@@ -1,0 +1,45 @@
+name: CI
+on: push
+env:
+  CARGO_TERM_COLOR: always
+jobs:
+
+  ci:
+    needs: [test, docs, coverage]
+    name: CI
+    runs-on: 'ubuntu-latest'
+    steps:
+      - name: Done
+        run: exit 0
+
+  test:
+    name: Test
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build
+        run: cargo build --verbose
+      - name: Test
+        run: cargo test --verbose
+
+  docs:
+    name: Docs
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: actions/checkout@v3
+      - run: cargo doc --verbose
+
+  coverage:
+    name: Coverage
+    runs-on: 'ubuntu-latest'
+    steps:
+    - uses: actions/checkout@v3
+    - name: Install LLVM-Coverage
+      uses: taiki-e/install-action@cargo-llvm-cov
+    - name: Measure Coverage
+      run: cargo llvm-cov --lcov --output-path coverage.lcov
+    - name: Upload Coverage
+      uses: codecov/codecov-action@v3
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: ./coverage.lcov
