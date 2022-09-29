@@ -1,66 +1,58 @@
 use crate::traits::Coordinates;
 
-pub trait Container<T, I: Coordinates<T>> {
+pub trait Container<T, I: Coordinates<T>>
+where
+    I: Ord + Coordinates<T>
+{
     fn records(&self) -> &Vec<I>;
     fn records_mut(&mut self) -> &mut Vec<I>;
     fn len(&self) -> usize {
         self.records().len()
+    }
+    fn sort(&mut self) {
+        self.records_mut().sort_unstable();
     }
 }
 
 #[cfg(test)]
 mod testing {
     use super::Container;
-    use crate::traits::Coordinates;
+    use crate::{traits::Coordinates, types::Interval};
 
     struct CustomContainer {
-        records: Vec<CustomInterval>,
+        records: Vec<Interval<usize>>,
     }
-    impl Container<usize, CustomInterval> for CustomContainer {
-        fn records(&self) -> &Vec<CustomInterval> {
+    impl Container<usize, Interval<usize>> for CustomContainer {
+        fn records(&self) -> &Vec<Interval<usize>> {
             &self.records
         }
-        fn records_mut(&mut self) -> &mut Vec<CustomInterval> {
+        fn records_mut(&mut self) -> &mut Vec<Interval<usize>> {
             &mut self.records
         }
     }
 
-    struct CustomInterval {
-        start: usize,
-        end: usize,
-    }
-    impl Coordinates<usize> for CustomInterval {
-        fn start(&self) -> &usize {
-            &self.start
-        }
-        fn end(&self) -> &usize {
-            &self.end
-        }
-    }
-
     #[test]
-    fn test_custom_container() {
+    fn test_custom_container_init() {
         let records = vec![
-            CustomInterval {
-                start: 10,
-                end: 100,
-            },
-            CustomInterval {
-                start: 10,
-                end: 100,
-            },
-            CustomInterval {
-                start: 10,
-                end: 100,
-            },
-            CustomInterval {
-                start: 10,
-                end: 100,
-            },
+            Interval::new(10, 100); 4
         ];
         let container = CustomContainer { records };
         assert_eq!(container.len(), 4);
         assert_eq!(container.records()[0].start(), &10);
         assert_eq!(container.records()[0].end(), &100);
+    }
+
+    #[test]
+    fn test_custom_container_sort() {
+        let records = vec![
+            Interval::new(20, 30), // 3
+            Interval::new(10, 20), // 1
+            Interval::new(15, 25), // 2
+        ];
+        let mut container = CustomContainer { records };
+        container.sort();
+        assert_eq!(container.records()[0].start(), &10);
+        assert_eq!(container.records()[1].start(), &15);
+        assert_eq!(container.records()[2].start(), &20);
     }
 }

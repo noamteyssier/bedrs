@@ -7,7 +7,9 @@ pub struct IntervalMetaSet<T, M> {
     records: Vec<IntervalMeta<T, M>>,
 }
 
-impl<T, M> Container<T, IntervalMeta<T, M>> for IntervalMetaSet<T, M> {
+impl<T, M> Container<T, IntervalMeta<T, M>> for IntervalMetaSet<T, M>
+where IntervalMeta<T, M>: Ord
+{
     fn records(&self) -> &Vec<IntervalMeta<T, M>> {
         &self.records
     }

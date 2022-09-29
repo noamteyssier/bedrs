@@ -7,7 +7,7 @@ use crate::{
 pub trait Merge<T, I>: Container<T, I>
 where
     T: Copy + PartialOrd + Ord,
-    I: Coordinates<T>,
+    I: Coordinates<T> + Ord,
 {
     fn merge(&self) -> MergeResults<T> {
         let mut base_interval = Interval::from(&self.records()[0]);

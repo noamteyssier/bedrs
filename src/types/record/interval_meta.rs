@@ -1,6 +1,6 @@
 use crate::traits::{Coordinates, Overlap};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct IntervalMeta<T, M> {
     start: T,
     end: T,
@@ -33,6 +33,16 @@ impl<T, M> Coordinates<T> for IntervalMeta<T, M> {
     }
 }
 impl<T: PartialOrd, M> Overlap<T> for IntervalMeta<T, M> {}
+impl<T: Eq + Ord, M: Eq> Ord for IntervalMeta<T, M> {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        self.start().cmp(other.start())
+    }
+}
+impl<T: Ord, M: Eq> PartialOrd for IntervalMeta<T, M> {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        self.start().partial_cmp(other.start())
+    }
+}
 
 #[cfg(test)]
 mod testing {
