@@ -1,5 +1,6 @@
+use std::fmt::Debug;
 use anyhow::{bail, Result};
-use crate::{types::GenomicInterval, traits::Container};
+use crate::{types::GenomicInterval, traits::{Container, container::GenomicMerge}};
 
 #[derive(Debug, Clone)]
 pub struct GenomicIntervalSet<T> {
@@ -41,6 +42,12 @@ where
             .collect();
         Self { records }
     }
+}
+impl<T> GenomicMerge<T, GenomicInterval<T>> for GenomicIntervalSet<T>
+where
+    T: Copy + PartialOrd + Ord + Debug,
+    GenomicInterval<T>: Ord,
+{
 }
 
 #[cfg(test)]
