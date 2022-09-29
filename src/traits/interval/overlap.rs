@@ -1,7 +1,7 @@
 use super::Coordinates;
 
 pub trait Overlap<T: PartialOrd>: Coordinates<T> {
-    fn overlaps(&self, other: &Self) -> bool {
+    fn overlaps<I: Coordinates<T>>(&self, other: &I) -> bool {
         (other.start() >= self.start() && other.start() <= self.end())
             || (other.end() >= self.start() && (other.end() <= self.end()))
     }
