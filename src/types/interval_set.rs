@@ -1,3 +1,5 @@
+use crate::traits::Container;
+
 use super::Interval;
 use anyhow::{bail, Result};
 
@@ -5,6 +7,13 @@ use anyhow::{bail, Result};
 pub struct IntervalSet<T, M> {
     records: Vec<Interval<T, M>>,
 }
+
+impl<T, M> Container<T, Interval<T, M>> for IntervalSet<T, M> {
+    fn records(&self) -> &Vec<Interval<T, M>> {
+        &self.records
+    }
+}
+
 impl<T, M> IntervalSet<T, M>
 where
     T: Copy,
@@ -29,15 +38,14 @@ where
             .collect();
         Self { records }
     }
-
-    pub fn len(&self) -> usize {
-        self.records.len()
-    }
 }
 
 #[cfg(test)]
 mod testing {
-    use crate::types::{Interval, IntervalSet};
+    use crate::{
+        traits::Container,
+        types::{Interval, IntervalSet}
+    };
 
     #[test]
     fn test_interval_set_init_from_records() {
