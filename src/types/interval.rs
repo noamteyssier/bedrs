@@ -1,3 +1,5 @@
+use crate::functions::{Overlap, Coordinates};
+
 #[derive(Debug, Clone)]
 pub struct Interval<T, M> {
     start: T,
@@ -8,16 +10,21 @@ impl<T, M> Interval<T, M> {
     pub fn new(start: T, end: T, metadata: Option<M>) -> Self {
         Self { start, end, metadata}
     }
+    pub fn metadata(&self) -> &Option<M> {
+        &self.metadata
+    }
     pub fn start(&self) -> &T {
         &self.start
     }
     pub fn end(&self) -> &T {
         &self.end
     }
-    pub fn metadata(&self) -> &Option<M> {
-        &self.metadata
-    }
 }
+impl<T, M> Coordinates<T> for Interval<T, M> {
+    fn start(&self) -> &T { self.start() }
+    fn end(&self) -> &T { self.end() }
+}
+impl<T: PartialOrd, M> Overlap<T> for Interval<T, M> {}
 
 #[cfg(test)]
 mod testing {
