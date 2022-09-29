@@ -1,5 +1,8 @@
-use crate::{traits::{Coordinates, Overlap}, types::Interval};
 use super::Container;
+use crate::{
+    traits::{Coordinates, Overlap},
+    types::Interval,
+};
 
 pub struct MergeResults<T> {
     intervals: Vec<Interval<T>>,
@@ -11,7 +14,11 @@ impl<T> MergeResults<T> {
         let n_clusters = clusters.iter().max().unwrap_or(&0) + 1;
         Self::from_raw_parts(intervals, clusters, n_clusters)
     }
-    pub fn from_raw_parts(intervals: Vec<Interval<T>>, clusters: Vec<usize>, n_clusters: usize) -> Self {
+    pub fn from_raw_parts(
+        intervals: Vec<Interval<T>>,
+        clusters: Vec<usize>,
+        n_clusters: usize,
+    ) -> Self {
         Self {
             intervals,
             clusters,
@@ -37,7 +44,7 @@ impl<T> Container<T, Interval<T>> for MergeResults<T> {
 pub trait Merge<T, I>: Container<T, I>
 where
     T: Copy + PartialOrd + Ord,
-    I: Coordinates<T>
+    I: Coordinates<T>,
 {
     fn merge(&self) -> MergeResults<T> {
         let mut base_interval = Interval::from(&self.records()[0]);
@@ -67,21 +74,13 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::{types::IntervalSet, traits::Coordinates};
     use super::Merge;
+    use crate::{traits::Coordinates, types::IntervalSet};
 
     #[test]
     fn test_merging_one_cluster() {
-        let starts = vec![
-            10,
-            15,
-            25,
-        ];
-        let ends = vec![
-            30,
-            20,
-            30,
-        ];
+        let starts = vec![10, 15, 25];
+        let ends = vec![30, 20, 30];
         let set = IntervalSet::from_endpoints_unchecked(&starts, &ends);
         let merge_set = set.merge();
         assert_eq!(merge_set.n_clusters(), 1);
@@ -92,20 +91,8 @@ mod testing {
 
     #[test]
     fn test_merging_two_clusters() {
-        let starts = vec![
-            10,
-            15,
-            25,
-            35,
-            40,
-        ];
-        let ends = vec![
-            30,
-            20,
-            30,
-            50,
-            45,
-        ];
+        let starts = vec![10, 15, 25, 35, 40];
+        let ends = vec![30, 20, 30, 50, 45];
         let set = IntervalSet::from_endpoints_unchecked(&starts, &ends);
         let merge_set = set.merge();
         assert_eq!(merge_set.n_clusters(), 2);

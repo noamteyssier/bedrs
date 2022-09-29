@@ -1,5 +1,4 @@
-mod interval_set;
 mod interval_meta_set;
-pub use interval_set::IntervalSet;
+mod interval_set;
 pub use interval_meta_set::IntervalMetaSet;
-
+pub use interval_set::IntervalSet;

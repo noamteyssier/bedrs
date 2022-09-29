@@ -7,13 +7,10 @@ pub struct Interval<T> {
 }
 impl<T> Interval<T>
 where
-    T: Copy
+    T: Copy,
 {
     pub fn new(start: T, end: T) -> Self {
-        Self {
-            start,
-            end,
-        }
+        Self { start, end }
     }
     pub fn from<I: Coordinates<T>>(other: &I) -> Self {
         Self {

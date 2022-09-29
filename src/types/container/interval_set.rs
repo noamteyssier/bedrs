@@ -1,4 +1,4 @@
-use crate::traits::{Container, container::Merge};
+use crate::traits::{container::Merge, Container};
 use crate::types::Interval;
 use anyhow::{bail, Result};
 
@@ -13,14 +13,11 @@ impl<T> Container<T, Interval<T>> for IntervalSet<T> {
     }
 }
 
-impl<T> Merge<T, Interval<T>> for IntervalSet<T>
-where
-    T: Copy + PartialOrd + Ord
-{}
+impl<T> Merge<T, Interval<T>> for IntervalSet<T> where T: Copy + PartialOrd + Ord {}
 
 impl<T> IntervalSet<T>
 where
-    T: Copy
+    T: Copy,
 {
     pub fn new(records: Vec<Interval<T>>) -> Self {
         Self { records }
