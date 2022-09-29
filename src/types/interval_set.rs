@@ -1,15 +1,14 @@
-use anyhow::{Result, bail};
 use super::Interval;
+use anyhow::{bail, Result};
 
 #[derive(Debug, Clone)]
-pub struct IntervalSet<T, M> 
-{
-    records: Vec<Interval<T, M>>
+pub struct IntervalSet<T, M> {
+    records: Vec<Interval<T, M>>,
 }
-impl<T, M> IntervalSet<T, M> 
-where T: Copy
+impl<T, M> IntervalSet<T, M>
+where
+    T: Copy,
 {
-
     pub fn new(records: Vec<Interval<T, M>>) -> Self {
         Self { records }
     }
@@ -28,7 +27,7 @@ where T: Copy
             .zip(ends.iter())
             .map(|(x, y)| Interval::new(*x, *y, None))
             .collect();
-        Self{records}
+        Self { records }
     }
 
     pub fn len(&self) -> usize {
@@ -61,7 +60,7 @@ mod testing {
     fn test_interval_set_init_from_endpoints_unequal() {
         let n_intervals = 10;
         let starts = vec![10; n_intervals];
-        let ends = vec![100; n_intervals+3];
+        let ends = vec![100; n_intervals + 3];
         let set = IntervalSet::<usize, usize>::from_endpoints(&starts, &ends);
         assert!(set.is_err());
     }
@@ -70,7 +69,7 @@ mod testing {
     fn test_interval_set_init_from_endpoints_unequal_unchecked() {
         let n_intervals = 10;
         let starts = vec![10; n_intervals];
-        let ends = vec![100; n_intervals+3];
+        let ends = vec![100; n_intervals + 3];
         let set = IntervalSet::<usize, usize>::from_endpoints_unchecked(&starts, &ends);
         assert_eq!(set.len(), n_intervals);
     }
