@@ -4,21 +4,21 @@ use super::Interval;
 use anyhow::{bail, Result};
 
 #[derive(Debug, Clone)]
-pub struct IntervalSet<T, M> {
-    records: Vec<Interval<T, M>>,
+pub struct IntervalSet<T> {
+    records: Vec<Interval<T>>,
 }
 
-impl<T, M> Container<T, Interval<T, M>> for IntervalSet<T, M> {
-    fn records(&self) -> &Vec<Interval<T, M>> {
+impl<T> Container<T, Interval<T>> for IntervalSet<T> {
+    fn records(&self) -> &Vec<Interval<T>> {
         &self.records
     }
 }
 
-impl<T, M> IntervalSet<T, M>
+impl<T> IntervalSet<T>
 where
-    T: Copy,
+    T: Copy
 {
-    pub fn new(records: Vec<Interval<T, M>>) -> Self {
+    pub fn new(records: Vec<Interval<T>>) -> Self {
         Self { records }
     }
 
@@ -34,7 +34,7 @@ where
         let records = starts
             .iter()
             .zip(ends.iter())
-            .map(|(x, y)| Interval::new(*x, *y, None))
+            .map(|(x, y)| Interval::new(*x, *y))
             .collect();
         Self { records }
     }
@@ -50,8 +50,8 @@ mod testing {
     #[test]
     fn test_interval_set_init_from_records() {
         let n_intervals = 10;
-        let records = vec![Interval::new(10, 100, None); n_intervals];
-        let set = IntervalSet::<usize, usize>::new(records);
+        let records = vec![Interval::new(10, 100); n_intervals];
+        let set = IntervalSet::new(records);
         assert_eq!(set.len(), n_intervals);
     }
 
@@ -60,7 +60,7 @@ mod testing {
         let n_intervals = 10;
         let starts = vec![10; n_intervals];
         let ends = vec![100; n_intervals];
-        let set = IntervalSet::<usize, usize>::from_endpoints(&starts, &ends).unwrap();
+        let set = IntervalSet::from_endpoints(&starts, &ends).unwrap();
         assert_eq!(set.len(), n_intervals);
     }
 
@@ -69,7 +69,7 @@ mod testing {
         let n_intervals = 10;
         let starts = vec![10; n_intervals];
         let ends = vec![100; n_intervals + 3];
-        let set = IntervalSet::<usize, usize>::from_endpoints(&starts, &ends);
+        let set = IntervalSet::from_endpoints(&starts, &ends);
         assert!(set.is_err());
     }
 
@@ -78,7 +78,7 @@ mod testing {
         let n_intervals = 10;
         let starts = vec![10; n_intervals];
         let ends = vec![100; n_intervals + 3];
-        let set = IntervalSet::<usize, usize>::from_endpoints_unchecked(&starts, &ends);
+        let set = IntervalSet::from_endpoints_unchecked(&starts, &ends);
         assert_eq!(set.len(), n_intervals);
     }
 }

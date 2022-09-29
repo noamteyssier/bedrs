@@ -1,5 +1,4 @@
-use crate::traits::{Container, container::Merge};
-
+use crate::traits::Container;
 use super::IntervalMeta;
 use anyhow::{bail, Result};
 
@@ -13,9 +12,6 @@ impl<T, M> Container<T, IntervalMeta<T, M>> for IntervalMetaSet<T, M> {
         &self.records
     }
 }
-
-impl<T, M> Merge<T, IntervalMeta<T, M>> for IntervalMetaSet<T, M>
-{}
 
 impl<T, M> IntervalMetaSet<T, M>
 where

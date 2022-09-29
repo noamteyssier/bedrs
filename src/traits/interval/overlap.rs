@@ -14,23 +14,23 @@ mod testing {
 
     #[test]
     fn test_overlap_reciprocity() {
-        let a = Interval::<usize, usize>::new(10, 20, None);
-        let b = Interval::<usize, usize>::new(15, 25, None);
+        let a = Interval::new(10, 20);
+        let b = Interval::new(15, 25);
         assert!(a.overlaps(&b));
 
-        let a = Interval::<usize, usize>::new(15, 25, None);
-        let b = Interval::<usize, usize>::new(10, 20, None);
+        let a = Interval::new(15, 25);
+        let b = Interval::new(10, 20);
         assert!(a.overlaps(&b));
     }
 
     #[test]
     fn test_overlap_negative_reciprocity() {
-        let a = Interval::<usize, usize>::new(10, 20, None);
-        let b = Interval::<usize, usize>::new(25, 35, None);
+        let a = Interval::new(10, 20);
+        let b = Interval::new(25, 35);
         assert!(!a.overlaps(&b));
 
-        let a = Interval::<usize, usize>::new(25, 35, None);
-        let b = Interval::<usize, usize>::new(10, 20, None);
+        let a = Interval::new(25, 35);
+        let b = Interval::new(10, 20);
         assert!(!a.overlaps(&b));
     }
 }

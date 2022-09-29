@@ -1,21 +1,16 @@
 use crate::traits::{Coordinates, Overlap};
 
 #[derive(Debug, Clone)]
-pub struct Interval<T, M> {
+pub struct Interval<T> {
     start: T,
     end: T,
-    metadata: Option<M>,
 }
-impl<T, M> Interval<T, M> {
-    pub fn new(start: T, end: T, metadata: Option<M>) -> Self {
+impl<T> Interval<T> {
+    pub fn new(start: T, end: T) -> Self {
         Self {
             start,
             end,
-            metadata,
         }
-    }
-    pub fn metadata(&self) -> &Option<M> {
-        &self.metadata
     }
     pub fn start(&self) -> &T {
         &self.start
@@ -24,7 +19,7 @@ impl<T, M> Interval<T, M> {
         &self.end
     }
 }
-impl<T, M> Coordinates<T> for Interval<T, M> {
+impl<T> Coordinates<T> for Interval<T> {
     fn start(&self) -> &T {
         self.start()
     }
@@ -32,7 +27,7 @@ impl<T, M> Coordinates<T> for Interval<T, M> {
         self.end()
     }
 }
-impl<T: PartialOrd, M> Overlap<T> for Interval<T, M> {}
+impl<T: PartialOrd> Overlap<T> for Interval<T> {}
 
 #[cfg(test)]
 mod testing {
@@ -42,11 +37,9 @@ mod testing {
     fn test_interval_init() {
         let start = 10;
         let end = 100;
-        let metadata: Option<usize> = None;
-        let interval = Interval::new(start, end, metadata);
+        let interval = Interval::new(start, end);
 
         assert_eq!(interval.start(), &start);
         assert_eq!(interval.end(), &end);
-        assert_eq!(interval.metadata(), &metadata);
     }
 }
