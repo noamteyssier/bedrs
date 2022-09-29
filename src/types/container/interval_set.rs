@@ -7,13 +7,24 @@ pub struct IntervalSet<T> {
     records: Vec<Interval<T>>,
 }
 
-impl<T> Container<T, Interval<T>> for IntervalSet<T> {
+impl<T> Container<T, Interval<T>> for IntervalSet<T>
+where
+    Interval<T>: Ord,
+{
     fn records(&self) -> &Vec<Interval<T>> {
         &self.records
     }
+    fn records_mut(&mut self) -> &mut Vec<Interval<T>> {
+        &mut self.records
+    }
 }
 
-impl<T> Merge<T, Interval<T>> for IntervalSet<T> where T: Copy + PartialOrd + Ord {}
+impl<T> Merge<T, Interval<T>> for IntervalSet<T>
+where
+    T: Copy + PartialOrd + Ord,
+    Interval<T>: Ord,
+{
+}
 
 impl<T> IntervalSet<T>
 where
