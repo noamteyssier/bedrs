@@ -47,8 +47,8 @@ impl<T: Ord> PartialOrd for Interval<T> {
 
 #[cfg(test)]
 mod testing {
-    use std::cmp::Ordering;
     use crate::{traits::Coordinates, types::Interval};
+    use std::cmp::Ordering;
 
     #[test]
     fn test_interval_init() {

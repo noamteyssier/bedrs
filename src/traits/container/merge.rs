@@ -2,8 +2,8 @@ use std::fmt::Debug;
 
 use super::Container;
 use crate::{
-    traits::{Coordinates, GenomicOverlap, Overlap, GenomicCoordinates},
-    types::{Interval, MergeResults, GenomicInterval},
+    traits::{Coordinates, GenomicCoordinates, GenomicOverlap, Overlap},
+    types::{GenomicInterval, Interval, MergeResults},
 };
 
 pub trait Merge<T, I>: Container<T, I>
@@ -68,8 +68,11 @@ where
 
 #[cfg(test)]
 mod testing {
-    use super::{Merge, GenomicMerge};
-    use crate::{traits::Coordinates, types::{IntervalSet, GenomicIntervalSet}};
+    use super::{GenomicMerge, Merge};
+    use crate::{
+        traits::Coordinates,
+        types::{GenomicIntervalSet, IntervalSet},
+    };
 
     #[test]
     fn test_merging_one_cluster() {

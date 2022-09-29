@@ -1,10 +1,13 @@
-use std::fmt::Debug;
+use crate::{
+    traits::{container::GenomicMerge, Container},
+    types::GenomicInterval,
+};
 use anyhow::{bail, Result};
-use crate::{types::GenomicInterval, traits::{Container, container::GenomicMerge}};
+use std::fmt::Debug;
 
 #[derive(Debug, Clone)]
 pub struct GenomicIntervalSet<T> {
-    records: Vec<GenomicInterval<T>>
+    records: Vec<GenomicInterval<T>>,
 }
 impl<T> Container<T, GenomicInterval<T>> for GenomicIntervalSet<T>
 where
@@ -19,7 +22,7 @@ where
 }
 impl<T> GenomicIntervalSet<T>
 where
-    T: Copy
+    T: Copy,
 {
     pub fn new(records: Vec<GenomicInterval<T>>) -> Self {
         Self { records }
@@ -54,7 +57,7 @@ where
 mod testing {
     use crate::{
         traits::Container,
-        types::{GenomicInterval, GenomicIntervalSet}
+        types::{GenomicInterval, GenomicIntervalSet},
     };
 
     #[test]

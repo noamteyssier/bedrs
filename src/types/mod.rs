@@ -1,4 +1,4 @@
 pub mod container;
 pub mod record;
-pub use container::{IntervalMetaSet, IntervalSet, GenomicIntervalSet ,MergeResults};
-pub use record::{Interval, IntervalMeta, GenomicInterval};
+pub use container::{GenomicIntervalSet, IntervalMetaSet, IntervalSet, MergeResults};
+pub use record::{GenomicInterval, Interval, IntervalMeta};

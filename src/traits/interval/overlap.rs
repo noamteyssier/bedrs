@@ -9,17 +9,16 @@ pub trait Overlap<T: PartialOrd>: Coordinates<T> {
 
 pub trait GenomicOverlap<T: PartialOrd>: GenomicCoordinates<T> + Coordinates<T> {
     fn overlaps<I: GenomicCoordinates<T>>(&self, other: &I) -> bool {
-        (self.chr() == other.chr()) && (
-            (other.start() >= self.start() && other.start() <= self.end())
-                || (other.end() >= self.start() && (other.end() <= self.end())) 
-        )
+        (self.chr() == other.chr())
+            && ((other.start() >= self.start() && other.start() <= self.end())
+                || (other.end() >= self.start() && (other.end() <= self.end())))
     }
 }
 
 #[cfg(test)]
 mod testing {
-    use super::{Overlap, GenomicOverlap};
-    use crate::types::{Interval, record::GenomicInterval};
+    use super::{GenomicOverlap, Overlap};
+    use crate::types::{record::GenomicInterval, Interval};
 
     #[test]
     fn test_overlap_self() {

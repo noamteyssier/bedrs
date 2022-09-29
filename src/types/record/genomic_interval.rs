@@ -30,7 +30,7 @@ where
     T: Copy,
 {
     pub fn new(chr: T, start: T, end: T) -> Self {
-        Self {chr, start, end}
+        Self { chr, start, end }
     }
     pub fn from<I: GenomicCoordinates<T>>(other: &I) -> Self {
         Self {
@@ -53,10 +53,8 @@ where
 {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
         match self.chr().cmp(other.chr()) {
-            Ordering::Equal => {
-                self.start().cmp(other.start())
-            },
-            order => order
+            Ordering::Equal => self.start().cmp(other.start()),
+            order => order,
         }
     }
 }
@@ -69,22 +67,20 @@ where
         match self.chr().partial_cmp(other.chr()) {
             None => None,
             Some(order) => match order {
-                Ordering::Equal => {
-                    self.start().partial_cmp(other.start())
-                },
-                some_order => Some(some_order)
-            }
+                Ordering::Equal => self.start().partial_cmp(other.start()),
+                some_order => Some(some_order),
+            },
         }
     }
 }
 
 #[cfg(test)]
 mod testing {
-    use std::cmp::Ordering;
     use crate::{
         traits::{Coordinates, GenomicCoordinates},
-        types::GenomicInterval
+        types::GenomicInterval,
     };
+    use std::cmp::Ordering;
 
     #[test]
     fn test_interval_init() {
