@@ -1,6 +1,6 @@
 use crate::traits::Coordinates;
 
-pub trait Container<T, I: Coordinates<T>>
+pub trait Container<T, I>
 where
     I: Ord + Coordinates<T>,
     T: Copy + Default,
