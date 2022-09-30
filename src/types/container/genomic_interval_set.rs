@@ -5,6 +5,7 @@ use crate::{
 use anyhow::{bail, Result};
 use std::fmt::Debug;
 
+/// A collection of [GenomicInterval]
 #[derive(Debug, Clone)]
 pub struct GenomicIntervalSet<T> {
     records: Vec<GenomicInterval<T>>,

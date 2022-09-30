@@ -1,5 +1,19 @@
 use crate::traits::{Coordinates, Overlap, ValueBounds};
 
+/// A representation of a classic Interval.
+///
+/// Has two coordinates: `start` and `end`.
+///
+/// ```
+/// use bedrs::{Coordinates, Interval, Overlap};
+///
+/// let a = Interval::new(20, 30);
+/// assert_eq!(a.start(), 20);
+/// assert_eq!(a.end(), 30);
+///
+/// let b = Interval::new(25, 35);
+/// assert!(a.overlaps(&b));
+/// ```
 #[derive(Debug, Clone, Eq, PartialEq, Copy)]
 pub struct Interval<T>
 where

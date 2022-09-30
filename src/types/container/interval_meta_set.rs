@@ -2,6 +2,7 @@ use crate::traits::{Container, IntervalBounds, ValueBounds};
 use crate::types::IntervalMeta;
 use anyhow::{bail, Result};
 
+/// A collection of [IntervalMeta]
 #[derive(Debug, Clone)]
 pub struct IntervalMetaSet<T, M>
 where
