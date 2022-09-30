@@ -38,7 +38,6 @@ where
     }
 }
 
-
 #[cfg(test)]
 mod testing {
     use super::Find;

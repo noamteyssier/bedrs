@@ -1,5 +1,5 @@
-use std::marker::PhantomData;
 use crate::traits::{IntervalBounds, ValueBounds};
+use std::marker::PhantomData;
 
 pub struct FindIter<'a, T, I>
 where
@@ -11,7 +11,7 @@ where
     offset: usize,
     phantom_t: PhantomData<T>,
 }
-impl<'a, T, I> FindIter<'a, T, I> 
+impl<'a, T, I> FindIter<'a, T, I>
 where
     I: IntervalBounds<T>,
     T: ValueBounds,
@@ -41,7 +41,6 @@ where
         }
         None
     }
-
 }
 
 pub struct FindIterSorted<'a, T, I>
@@ -54,7 +53,7 @@ where
     offset: usize,
     phantom_t: PhantomData<T>,
 }
-impl<'a, T, I> FindIterSorted<'a, T, I> 
+impl<'a, T, I> FindIterSorted<'a, T, I>
 where
     I: IntervalBounds<T>,
     T: ValueBounds,
@@ -80,13 +79,10 @@ where
             self.offset += 1;
             if interval.overlaps(self.query) {
                 return Some(interval);
-            }
-            else if interval.start() >= self.query.end() {
+            } else if interval.start() >= self.query.end() {
                 break;
             }
         }
         None
     }
-
 }
-
