@@ -1,5 +1,5 @@
 use crate::{
-    traits::{container::Merge, Container, IntervalBounds, ValueBounds, Find},
+    traits::{container::Merge, Container, Find, IntervalBounds, ValueBounds},
     types::GenomicInterval,
 };
 use anyhow::{bail, Result};
@@ -65,7 +65,6 @@ where
 {
     type ContainerType = Self;
 }
-
 
 #[cfg(test)]
 mod testing {

@@ -1,22 +1,22 @@
-use bedrs::{types::{Interval, IntervalSet, GenomicInterval, GenomicIntervalSet}, traits::{Find, Container}};
+use bedrs::{
+    traits::{Container, Find},
+    types::{GenomicInterval, GenomicIntervalSet, Interval, IntervalSet},
+};
 use criterion::Criterion;
-
 
 pub fn find_base(c: &mut Criterion) {
     let records = (0..100)
-        .map(|x| (x, x+50))
+        .map(|x| (x, x + 50))
         .map(|(x, y)| Interval::new(x, y))
         .collect();
     let query = Interval::new(20, 30);
     let set = IntervalSet::new(records);
-    c.bench_function("find-base", |bench| {
-        bench.iter(|| set.find(&query))
-    });
+    c.bench_function("find-base", |bench| bench.iter(|| set.find(&query)));
 }
 
 pub fn find_iter_base(c: &mut Criterion) {
     let records = (0..100)
-        .map(|x| (x, x+50))
+        .map(|x| (x, x + 50))
         .map(|(x, y)| Interval::new(x, y))
         .collect();
     let query = Interval::new(20, 30);
@@ -28,7 +28,7 @@ pub fn find_iter_base(c: &mut Criterion) {
 
 pub fn find_iter_sort_base(c: &mut Criterion) {
     let records = (0..100)
-        .map(|x| (x, x+50))
+        .map(|x| (x, x + 50))
         .map(|(x, y)| Interval::new(x, y))
         .collect();
     let query = Interval::new(20, 30);
@@ -41,19 +41,17 @@ pub fn find_iter_sort_base(c: &mut Criterion) {
 
 pub fn find_genomic(c: &mut Criterion) {
     let records = (0..100)
-        .map(|x| (x, x+50, x%5))
+        .map(|x| (x, x + 50, x % 5))
         .map(|(x, y, z)| GenomicInterval::new(z, x, y))
         .collect();
     let query = GenomicInterval::new(2, 20, 30);
     let set = GenomicIntervalSet::new(records);
-    c.bench_function("find-genomic", |bench| {
-        bench.iter(|| set.find(&query))
-    });
+    c.bench_function("find-genomic", |bench| bench.iter(|| set.find(&query)));
 }
 
 pub fn find_iter_genomic(c: &mut Criterion) {
     let records = (0..100)
-        .map(|x| (x, x+50, x%5))
+        .map(|x| (x, x + 50, x % 5))
         .map(|(x, y, z)| GenomicInterval::new(z, x, y))
         .collect();
     let query = GenomicInterval::new(2, 20, 30);
@@ -65,7 +63,7 @@ pub fn find_iter_genomic(c: &mut Criterion) {
 
 pub fn find_iter_sort_genomic(c: &mut Criterion) {
     let records = (0..100)
-        .map(|x| (x, x+50, x%5))
+        .map(|x| (x, x + 50, x % 5))
         .map(|(x, y, z)| GenomicInterval::new(z, x, y))
         .collect();
     let query = GenomicInterval::new(2, 20, 30);
