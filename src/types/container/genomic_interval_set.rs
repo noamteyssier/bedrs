@@ -1,5 +1,5 @@
 use crate::{
-    traits::{container::Merge, Container, IntervalBounds, ValueBounds},
+    traits::{container::Merge, Container, IntervalBounds, ValueBounds, Find},
     types::GenomicInterval,
 };
 use anyhow::{bail, Result};
@@ -58,6 +58,14 @@ where
     GenomicInterval<T>: IntervalBounds<T>,
 {
 }
+impl<T> Find<T, GenomicInterval<T>> for GenomicIntervalSet<T>
+where
+    T: ValueBounds,
+    GenomicInterval<T>: IntervalBounds<T>,
+{
+    type ContainerType = Self;
+}
+
 
 #[cfg(test)]
 mod testing {
