@@ -8,6 +8,7 @@ use std::fmt::Debug;
 #[derive(Debug, Clone)]
 pub struct GenomicIntervalSet<T> {
     records: Vec<GenomicInterval<T>>,
+    is_sorted: bool,
 }
 impl<T> Container<T, GenomicInterval<T>> for GenomicIntervalSet<T>
 where
@@ -15,13 +16,19 @@ where
     T: ValueBounds,
 {
     fn new(records: Vec<GenomicInterval<T>>) -> Self {
-        Self { records }
+        Self { records, is_sorted: false }
     }
     fn records(&self) -> &Vec<GenomicInterval<T>> {
         &self.records
     }
     fn records_mut(&mut self) -> &mut Vec<GenomicInterval<T>> {
         &mut self.records
+    }
+    fn is_sorted(&self) -> bool {
+        self.is_sorted
+    }
+    fn set_sorted(&mut self) {
+        self.is_sorted = true;
     }
 }
 impl<T> GenomicIntervalSet<T>
@@ -30,7 +37,7 @@ where
 {
     #[must_use]
     pub fn new(records: Vec<GenomicInterval<T>>) -> Self {
-        Self { records }
+        Self { records, is_sorted: false }
     }
 
     pub fn from_endpoints(chrs: &[T], starts: &[T], ends: &[T]) -> Result<Self> {
@@ -48,7 +55,7 @@ where
             .zip(ends.iter())
             .map(|((c, x), y)| GenomicInterval::new(*c, *x, *y))
             .collect();
-        Self { records }
+        Self { records, is_sorted: false }
     }
 }
 //

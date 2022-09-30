@@ -11,6 +11,7 @@ where
     T: ValueBounds,
 {
     records: Vec<Interval<T>>,
+    is_sorted: bool,
 }
 
 impl<T> Container<T, Interval<T>> for IntervalSet<T>
@@ -19,13 +20,19 @@ where
     T: ValueBounds,
 {
     fn new(records: Vec<Interval<T>>) -> Self {
-        Self { records }
+        Self { records, is_sorted: false }
     }
     fn records(&self) -> &Vec<Interval<T>> {
         &self.records
     }
     fn records_mut(&mut self) -> &mut Vec<Interval<T>> {
         &mut self.records
+    }
+    fn is_sorted(&self) -> bool {
+        self.is_sorted
+    }
+    fn set_sorted(&mut self) {
+        self.is_sorted = true;
     }
 }
 
@@ -50,7 +57,7 @@ where
 {
     #[must_use]
     pub fn new(records: Vec<Interval<T>>) -> Self {
-        Self { records }
+        Self { records, is_sorted: false }
     }
 
     pub fn from_endpoints(starts: &[T], ends: &[T]) -> Result<Self> {
@@ -66,7 +73,7 @@ where
             .zip(ends.iter())
             .map(|(x, y)| Interval::new(*x, *y))
             .collect();
-        Self { records }
+        Self { records, is_sorted: false }
     }
 }
 

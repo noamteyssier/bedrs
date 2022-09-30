@@ -9,6 +9,7 @@ where
     M: Copy,
 {
     records: Vec<IntervalMeta<T, M>>,
+    is_sorted: bool,
 }
 
 impl<T, M> Container<T, IntervalMeta<T, M>> for IntervalMetaSet<T, M>
@@ -18,13 +19,19 @@ where
     M: Copy,
 {
     fn new(records: Vec<IntervalMeta<T, M>>) -> Self {
-        Self { records }
+        Self { records, is_sorted: false }
     }
     fn records(&self) -> &Vec<IntervalMeta<T, M>> {
         &self.records
     }
     fn records_mut(&mut self) -> &mut Vec<IntervalMeta<T, M>> {
         &mut self.records
+    }
+    fn is_sorted(&self) -> bool {
+        self.is_sorted
+    }
+    fn set_sorted(&mut self) {
+        self.is_sorted = true;
     }
 }
 
@@ -35,7 +42,7 @@ where
 {
     #[must_use]
     pub fn new(records: Vec<IntervalMeta<T, M>>) -> Self {
-        Self { records }
+        Self { records, is_sorted: false }
     }
 
     pub fn from_endpoints(starts: &[T], ends: &[T]) -> Result<Self> {
@@ -51,7 +58,7 @@ where
             .zip(ends.iter())
             .map(|(x, y)| IntervalMeta::new(*x, *y, None))
             .collect();
-        Self { records }
+        Self { records, is_sorted: false }
     }
 }
 
