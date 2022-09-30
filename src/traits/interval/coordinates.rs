@@ -20,6 +20,10 @@ where
         self.update_start(&other.start());
         self.update_end(&other.end());
     }
+    fn update_all(&mut self, chr: &T, start: &T, end: &T) {
+        self.update_chr(chr);
+        self.update_endpoints(start, end);
+    }
     fn update_endpoints(&mut self, start: &T, end: &T) {
         self.update_start(start);
         self.update_end(end);
