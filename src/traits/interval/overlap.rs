@@ -4,17 +4,15 @@ pub trait Overlap<T>: Coordinates<T>
 where
     T: Copy + Default + PartialOrd,
 {
-    fn bounded_start<I: Coordinates<T>>(&self, other: &I) -> bool {
-        other.start() >= self.start() && other.start() <= self.end()
-    }
-    fn bounded_end<I: Coordinates<T>>(&self, other: &I) -> bool {
-        other.end() >= self.start() && other.end() <= self.end()
-    }
     fn bounded_chr<I: Coordinates<T>>(&self, other: &I) -> bool {
         other.chr() == self.chr()
     }
+    fn interval_overlap<I: Coordinates<T>>(&self, other: &I) -> bool {
+        self.start() < other.end()
+            && self.end() > other.start()
+    }
     fn overlaps<I: Coordinates<T>>(&self, other: &I) -> bool {
-        self.bounded_chr(other) && (self.bounded_start(other) || self.bounded_end(other))
+        self.bounded_chr(other) && self.interval_overlap(other)
     }
 }
 
@@ -47,6 +45,16 @@ mod testing {
         assert!(!a.overlaps(&b));
 
         let a = Interval::new(25, 35);
+        let b = Interval::new(10, 20);
+        assert!(!a.overlaps(&b));
+    }
+
+    #[test]
+    fn test_overlap_boundary() {
+        let a = Interval::new(10, 20);
+        let b = Interval::new(20, 30);
+        assert!(!a.overlaps(&b));
+        let a = Interval::new(20, 30);
         let b = Interval::new(10, 20);
         assert!(!a.overlaps(&b));
     }
