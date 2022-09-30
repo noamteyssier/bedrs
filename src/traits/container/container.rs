@@ -10,6 +10,9 @@ where
     fn len(&self) -> usize {
         self.records().len()
     }
+    fn is_empty(&self) -> bool {
+        self.records().is_empty()
+    }
     fn sort(&mut self) {
         self.records_mut().sort_unstable();
     }
