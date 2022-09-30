@@ -76,6 +76,15 @@ mod testing {
     }
 
     #[test]
+    fn test_merging_one_cluster_unsort() {
+        let starts = vec![10, 15, 25];
+        let ends = vec![30, 20, 30];
+        let set = IntervalSet::from_endpoints_unchecked(&starts, &ends);
+        let merge_set = set.merge();
+        assert!(merge_set.is_none());
+    }
+
+    #[test]
     fn test_merging_one_cluster_genomic() {
         let chrs = vec![1, 1, 1];
         let starts = vec![10, 15, 25];
