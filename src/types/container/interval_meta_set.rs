@@ -17,6 +17,9 @@ where
     M: Copy,
     T: Copy + Default,
 {
+    fn new(records: Vec<IntervalMeta<T, M>>) -> Self {
+        Self { records }
+    }
     fn records(&self) -> &Vec<IntervalMeta<T, M>> {
         &self.records
     }

@@ -14,6 +14,9 @@ where
     GenomicInterval<T>: Copy + Ord,
     T: Copy + Default,
 {
+    fn new(records: Vec<GenomicInterval<T>>) -> Self {
+        Self { records }
+    }
     fn records(&self) -> &Vec<GenomicInterval<T>> {
         &self.records
     }
