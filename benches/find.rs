@@ -35,7 +35,7 @@ pub fn find_iter_sort_base(c: &mut Criterion) {
     let mut set = IntervalSet::new(records);
     set.sort();
     c.bench_function("find-iter-sort-base", |bench| {
-        bench.iter(|| set.find_iter_sorted(&query).count())
+        bench.iter(|| set.find_iter_sorted_unchecked(&query).count())
     });
 }
 
@@ -70,6 +70,6 @@ pub fn find_iter_sort_genomic(c: &mut Criterion) {
     let mut set = GenomicIntervalSet::new(records);
     set.sort();
     c.bench_function("find-iter-sort-genomic", |bench| {
-        bench.iter(|| set.find_iter_sorted(&query).count())
+        bench.iter(|| set.find_iter_sorted_unchecked(&query).count())
     });
 }

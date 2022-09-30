@@ -30,10 +30,21 @@ where
         FindIter::new(self.records(), query)
     }
 
+    /// Creates an Optional Iterator that finds all overlapping regions
+    ///
+    /// First checks to see if container is sorted
+    fn find_iter_sorted<'a>(&'a self, query: &'a I) -> Option<FindIterSorted<'_, T, I>> {
+        if self.is_sorted() {
+            Some(self.find_iter_sorted_unchecked(query))
+        } else {
+            None
+        }
+    }
+
     /// Creates an Iterator that finds all overlapping regions
     ///
     /// Assumes a sorted Container.
-    fn find_iter_sorted<'a>(&'a self, query: &'a I) -> FindIterSorted<'_, T, I> {
+    fn find_iter_sorted_unchecked<'a>(&'a self, query: &'a I) -> FindIterSorted<'_, T, I> {
         FindIterSorted::new(self.records(), query)
     }
 }
@@ -73,7 +84,7 @@ mod testing {
         let ends = vec![40, 45, 50, 55];
         let mut set = IntervalSet::from_endpoints_unchecked(&starts, &ends);
         set.sort();
-        let num_overlaps = set.find_iter_sorted(&query).count();
+        let num_overlaps = set.find_iter_sorted(&query).unwrap().count();
         assert_eq!(num_overlaps, 1);
     }
 
@@ -83,7 +94,7 @@ mod testing {
         let starts = vec![15, 20, 25, 10];
         let ends = vec![45, 50, 55, 40];
         let set = IntervalSet::from_endpoints_unchecked(&starts, &ends);
-        let num_overlaps = set.find_iter_sorted(&query).count();
-        assert_eq!(num_overlaps, 0);
+        let overlaps = set.find_iter_sorted(&query);
+        assert!(overlaps.is_none());
     }
 }
