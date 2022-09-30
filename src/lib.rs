@@ -13,20 +13,20 @@
 //! I wanted some bedtools-like functionality in rust and I made this tool to both
 //! learn how to implement genomic arithmetic as well as get more comfortable with
 //! generics and traits in rust.
-//! 
+//!
 //! This library will eventually be focused towards genome-specific arithmetic
 //! and focuses around a base [Coordinates] trait which includes methods to
 //! retrieve `<chr, start, stop>` and a base [Container] trait which includes
 //! methods to perform set operations.
-//! 
+//!
 //! This is a work in progress and is subject to heavy changes.
-//! 
+//!
 //! If you want a more robust interval library I recommend the following:
-//! 
+//!
 //! - [rust_lapper](https://crates.io/crates/rust-lapper)
 //! - [COITrees](https://crates.io/crates/coitrees)
 //! - [rampart](https://crates.io/crates/rampart)
-//! 
+//!
 //! This library is heavily inspired from those above.
 //!
 //! ## Traits
@@ -53,7 +53,7 @@
 //!
 //! ```
 //! use bedrs::{Overlap, Interval};
-//! 
+//!
 //! let a = Interval::new(10, 20);
 //! let b = Interval::new(15, 25);
 //! let c = Interval::new(20, 30);
@@ -85,9 +85,5 @@
 pub mod traits;
 pub mod types;
 
-pub use traits::{
-    Overlap, Merge, Find, Container, Coordinates
-};
-pub use types::{
-    GenomicInterval, GenomicIntervalSet, Interval, IntervalSet
-};
+pub use traits::{Container, Coordinates, Find, Merge, Overlap};
+pub use types::{GenomicInterval, GenomicIntervalSet, Interval, IntervalSet};
