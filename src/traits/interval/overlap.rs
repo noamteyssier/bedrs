@@ -1,6 +1,7 @@
 use super::Coordinates;
 use crate::traits::ValueBounds;
 
+/// A trait to measure overlaps between intervals implementing `Coordinates`
 pub trait Overlap<T>: Coordinates<T>
 where
     T: ValueBounds,

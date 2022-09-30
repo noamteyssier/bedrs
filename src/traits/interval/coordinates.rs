@@ -1,5 +1,6 @@
 use crate::traits::ValueBounds;
 
+/// The main trait representing an interval.
 pub trait Coordinates<T>
 where
     T: ValueBounds,
