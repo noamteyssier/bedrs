@@ -68,7 +68,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use super::{GenomicMerge, Merge};
+    use super::Merge;
     use crate::{
         traits::Coordinates,
         types::{GenomicIntervalSet, IntervalSet},

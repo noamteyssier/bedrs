@@ -1,5 +1,5 @@
 use crate::{
-    traits::{container::GenomicMerge, Container},
+    traits::{Container, container::Merge},
     types::GenomicInterval,
 };
 use anyhow::{bail, Result};
