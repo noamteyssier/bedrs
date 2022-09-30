@@ -38,6 +38,15 @@ where
     fn end(&self) -> T {
         self.end
     }
+    fn chr(&self) -> T {
+        T::default()
+    }
+    fn update_start(&mut self, val: &T) {
+        self.start = *val;
+    }
+    fn update_end(&mut self, val: &T) {
+        self.end = *val;
+    }
     fn from(other: &Self) -> Self {
         Self {
             start: other.start(),

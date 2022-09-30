@@ -26,6 +26,15 @@ mod testing {
         fn end(&self) -> usize {
             self.right
         }
+        fn chr(&self) -> usize {
+            0
+        }
+        fn update_start(&mut self, val: &usize) {
+            self.left = *val;
+        }
+        fn update_end(&mut self, val: &usize) {
+            self.right = *val;
+        }
         fn from(other: &Self) -> Self {
             Self {
                 left: other.start(),
@@ -52,6 +61,15 @@ mod testing {
         }
         fn end(&self) -> usize {
             self.right
+        }
+        fn chr(&self) -> usize {
+            0
+        }
+        fn update_start(&mut self, val: &usize) {
+            self.left = *val;
+        }
+        fn update_end(&mut self, val: &usize) {
+            self.right = *val;
         }
         fn from(other: &Self) -> Self {
             Self {
