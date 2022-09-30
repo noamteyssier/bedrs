@@ -1,6 +1,9 @@
  #![warn(
      clippy::pedantic,
-     clippy::cargo,
+     clippy::perf,
+ )]
+ #![allow(
+     clippy::module_inception
  )]
 
 pub mod traits;
