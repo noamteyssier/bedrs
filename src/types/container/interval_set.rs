@@ -20,7 +20,10 @@ where
     T: ValueBounds,
 {
     fn new(records: Vec<Interval<T>>) -> Self {
-        Self { records, is_sorted: false }
+        Self {
+            records,
+            is_sorted: false,
+        }
     }
     fn records(&self) -> &Vec<Interval<T>> {
         &self.records
@@ -57,7 +60,10 @@ where
 {
     #[must_use]
     pub fn new(records: Vec<Interval<T>>) -> Self {
-        Self { records, is_sorted: false }
+        Self {
+            records,
+            is_sorted: false,
+        }
     }
 
     pub fn from_endpoints(starts: &[T], ends: &[T]) -> Result<Self> {
@@ -73,7 +79,10 @@ where
             .zip(ends.iter())
             .map(|(x, y)| Interval::new(*x, *y))
             .collect();
-        Self { records, is_sorted: false }
+        Self {
+            records,
+            is_sorted: false,
+        }
     }
 }
 

@@ -16,7 +16,10 @@ where
     T: ValueBounds,
 {
     fn new(records: Vec<GenomicInterval<T>>) -> Self {
-        Self { records, is_sorted: false }
+        Self {
+            records,
+            is_sorted: false,
+        }
     }
     fn records(&self) -> &Vec<GenomicInterval<T>> {
         &self.records
@@ -37,7 +40,10 @@ where
 {
     #[must_use]
     pub fn new(records: Vec<GenomicInterval<T>>) -> Self {
-        Self { records, is_sorted: false }
+        Self {
+            records,
+            is_sorted: false,
+        }
     }
 
     pub fn from_endpoints(chrs: &[T], starts: &[T], ends: &[T]) -> Result<Self> {
@@ -55,7 +61,10 @@ where
             .zip(ends.iter())
             .map(|((c, x), y)| GenomicInterval::new(*c, *x, *y))
             .collect();
-        Self { records, is_sorted: false }
+        Self {
+            records,
+            is_sorted: false,
+        }
     }
 }
 //

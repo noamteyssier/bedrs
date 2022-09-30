@@ -18,7 +18,13 @@ criterion_group!(
     find_iter_genomic,
     find_iter_sort_genomic
 );
-criterion_group!(merge, merge_base, merge_genomic, merge_unchecked_base, merge_unchecked_genomic);
+criterion_group!(
+    merge,
+    merge_base,
+    merge_genomic,
+    merge_unchecked_base,
+    merge_unchecked_genomic
+);
 criterion_group!(
     overlap,
     overlap_base,

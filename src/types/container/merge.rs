@@ -24,7 +24,7 @@ where
             clusters: Vec::new(),
             n_clusters: 0,
             phantom: PhantomData,
-            is_sorted: true
+            is_sorted: true,
         }
     }
     fn records(&self) -> &Vec<I> {

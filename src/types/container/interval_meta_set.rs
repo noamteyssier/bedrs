@@ -19,7 +19,10 @@ where
     M: Copy,
 {
     fn new(records: Vec<IntervalMeta<T, M>>) -> Self {
-        Self { records, is_sorted: false }
+        Self {
+            records,
+            is_sorted: false,
+        }
     }
     fn records(&self) -> &Vec<IntervalMeta<T, M>> {
         &self.records
@@ -42,7 +45,10 @@ where
 {
     #[must_use]
     pub fn new(records: Vec<IntervalMeta<T, M>>) -> Self {
-        Self { records, is_sorted: false }
+        Self {
+            records,
+            is_sorted: false,
+        }
     }
 
     pub fn from_endpoints(starts: &[T], ends: &[T]) -> Result<Self> {
@@ -58,7 +64,10 @@ where
             .zip(ends.iter())
             .map(|(x, y)| IntervalMeta::new(*x, *y, None))
             .collect();
-        Self { records, is_sorted: false }
+        Self {
+            records,
+            is_sorted: false,
+        }
     }
 }
 

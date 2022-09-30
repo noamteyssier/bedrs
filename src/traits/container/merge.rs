@@ -45,7 +45,10 @@ where
 #[cfg(test)]
 mod testing {
     use super::Merge;
-    use crate::{types::{GenomicIntervalSet, IntervalSet}, traits::{Container, Coordinates}};
+    use crate::{
+        traits::{Container, Coordinates},
+        types::{GenomicIntervalSet, IntervalSet},
+    };
 
     #[test]
     fn test_merging_one_cluster() {

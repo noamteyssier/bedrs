@@ -33,7 +33,10 @@ mod testing {
     }
     impl Container<usize, Interval<usize>> for CustomContainer {
         fn new(records: Vec<Interval<usize>>) -> Self {
-            Self { records, is_sorted: false }
+            Self {
+                records,
+                is_sorted: false,
+            }
         }
         fn records(&self) -> &Vec<Interval<usize>> {
             &self.records
@@ -52,7 +55,10 @@ mod testing {
     #[test]
     fn test_custom_container_init() {
         let records = vec![Interval::new(10, 100); 4];
-        let container = CustomContainer { records, is_sorted: false };
+        let container = CustomContainer {
+            records,
+            is_sorted: false,
+        };
         assert_eq!(container.len(), 4);
         assert_eq!(container.records()[0].start(), 10);
         assert_eq!(container.records()[0].end(), 100);
@@ -65,7 +71,10 @@ mod testing {
             Interval::new(10, 20), // 1
             Interval::new(15, 25), // 2
         ];
-        let mut container = CustomContainer { records, is_sorted: false};
+        let mut container = CustomContainer {
+            records,
+            is_sorted: false,
+        };
         container.sort();
         assert_eq!(container.records()[0].start(), 10);
         assert_eq!(container.records()[1].start(), 15);
@@ -75,7 +84,10 @@ mod testing {
     #[test]
     fn test_custom_container_empty() {
         let records = Vec::new();
-        let container = CustomContainer { records, is_sorted: false};
+        let container = CustomContainer {
+            records,
+            is_sorted: false,
+        };
         assert!(container.is_empty());
     }
 }
