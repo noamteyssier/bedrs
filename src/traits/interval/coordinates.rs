@@ -86,8 +86,34 @@ mod testing {
         let a = CustomInterval { left, right };
         assert_eq!(a.start(), 10);
         assert_eq!(a.end(), 100);
+        assert_eq!(a.chr(), 0);
     }
 
+    #[test]
+    fn test_custom_interval_update() {
+        let mut a = CustomInterval {
+            left: 10,
+            right: 100,
+        };
+        assert_eq!(a.start(), 10);
+        assert_eq!(a.end(), 100);
+        a.update_start(&30);
+        a.update_end(&120);
+        assert_eq!(a.start(), 30);
+        assert_eq!(a.end(), 120);
+    }
+
+    #[test]
+    fn test_custom_interval_transcode() {
+        let a = CustomInterval {
+            left: 10,
+            right: 100,
+        };
+        let b = Coordinates::from(&a);
+        assert_eq!(a.start(), b.start());
+        assert_eq!(a.end(), b.end());
+        assert_eq!(a.chr(), b.chr());
+    }
     #[test]
     fn test_custom_interval_with_meta() {
         let left = 10;
@@ -96,5 +122,34 @@ mod testing {
         let a = CustomIntervalMeta { left, right, meta };
         assert_eq!(a.start(), 10);
         assert_eq!(a.end(), 100);
+        assert_eq!(a.chr(), 0);
+    }
+
+    #[test]
+    fn test_custom_interval_meta_update() {
+        let mut a = CustomIntervalMeta {
+            left: 10,
+            right: 100,
+            meta: String::from("hello"),
+        };
+        assert_eq!(a.start(), 10);
+        assert_eq!(a.end(), 100);
+        a.update_start(&30);
+        a.update_end(&120);
+        assert_eq!(a.start(), 30);
+        assert_eq!(a.end(), 120);
+    }
+
+    #[test]
+    fn test_custom_interval_meta_transcode() {
+        let a = CustomIntervalMeta {
+            left: 10,
+            right: 100,
+            meta: String::from("hello"),
+        };
+        let b = Coordinates::from(&a);
+        assert_eq!(a.start(), b.start());
+        assert_eq!(a.end(), b.end());
+        assert_eq!(a.chr(), b.chr());
     }
 }

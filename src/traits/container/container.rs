@@ -57,4 +57,11 @@ mod testing {
         assert_eq!(container.records()[1].start(), 15);
         assert_eq!(container.records()[2].start(), 20);
     }
+
+    #[test]
+    fn test_custom_container_empty() {
+        let records = Vec::new();
+        let container = CustomContainer { records };
+        assert!(container.is_empty());
+    }
 }
