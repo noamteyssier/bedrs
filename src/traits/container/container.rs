@@ -1,5 +1,8 @@
 use crate::traits::{IntervalBounds, ValueBounds};
 
+/// The main trait representing a container of intervals.
+///
+/// Each of the intervals: `I` must impl the `Coordinates` trait.
 pub trait Container<T, I>
 where
     I: IntervalBounds<T>,

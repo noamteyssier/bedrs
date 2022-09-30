@@ -4,6 +4,7 @@ use crate::{
     types::{FindIter, FindIterSorted},
 };
 
+/// A trait to query set overlaps through a container
 pub trait Find<T, I>: Container<T, I>
 where
     T: ValueBounds,

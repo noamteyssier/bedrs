@@ -4,6 +4,7 @@ use crate::{
     types::MergeResults,
 };
 
+/// A trait to merge overlapping interval regions within a container
 pub trait Merge<T, I>: Container<T, I>
 where
     T: ValueBounds,

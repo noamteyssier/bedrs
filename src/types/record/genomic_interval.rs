@@ -1,6 +1,21 @@
 use crate::traits::{Coordinates, Overlap, ValueBounds};
 use std::cmp::Ordering;
 
+/// A representation of a Genomic Interval.
+///
+/// Has three coordinates: `chr`, `start`, and `end`.
+///
+/// ```
+/// use bedrs::{Coordinates, GenomicInterval, Overlap};
+///
+/// let a = GenomicInterval::new(1, 20, 30);
+/// assert_eq!(a.chr(), 1);
+/// assert_eq!(a.start(), 20);
+/// assert_eq!(a.end(), 30);
+///
+/// let b = GenomicInterval::new(1, 20, 30);
+/// assert!(a.overlaps(&b));
+/// ```
 #[derive(Debug, Clone, Eq, PartialEq, Copy)]
 pub struct GenomicInterval<T> {
     chr: T,

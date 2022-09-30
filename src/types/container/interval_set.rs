@@ -5,6 +5,7 @@ use crate::traits::{Find, IntervalBounds, ValueBounds};
 use crate::types::Interval;
 use anyhow::{bail, Result};
 
+/// A collection of [Interval]
 #[derive(Debug, Clone)]
 pub struct IntervalSet<T>
 where
