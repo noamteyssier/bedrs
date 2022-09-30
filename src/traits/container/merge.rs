@@ -21,11 +21,10 @@ where
             if base_interval.overlaps(interval) {
                 let new_min = base_interval.start().min(interval.start());
                 let new_max = base_interval.end().max(interval.end());
-                base_interval.update_start(&new_min);
-                base_interval.update_end(&new_max);
+                base_interval.update_endpoints(&new_min, &new_max);
             } else {
                 cluster_intervals.push(base_interval.to_owned());
-                base_interval = I::from(interval);
+                base_interval.update_all_from(interval);
                 current_id += 1;
             }
             cluster_ids.push(current_id);

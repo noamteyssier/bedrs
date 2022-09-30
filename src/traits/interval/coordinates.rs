@@ -10,7 +10,24 @@ where
     fn chr(&self) -> T;
     fn update_start(&mut self, val: &T);
     fn update_end(&mut self, val: &T);
+    fn update_chr(&mut self, val: &T);
     fn from(other: &Self) -> Self;
+    fn update_all_from(&mut self, other: &Self) {
+        self.update_chr(&other.chr());
+        self.update_endpoints(&other.start(), &other.end());
+    }
+    fn update_endpoints_from(&mut self, other: &Self) {
+        self.update_start(&other.start());
+        self.update_end(&other.end());
+    }
+    fn update_all(&mut self, chr: &T, start: &T, end: &T) {
+        self.update_chr(chr);
+        self.update_endpoints(start, end);
+    }
+    fn update_endpoints(&mut self, start: &T, end: &T) {
+        self.update_start(start);
+        self.update_end(end);
+    }
 }
 
 #[cfg(test)]
@@ -38,6 +55,8 @@ mod testing {
         fn update_end(&mut self, val: &usize) {
             self.right = *val;
         }
+        #[allow(unused)]
+        fn update_chr(&mut self, val: &usize) {}
         fn from(other: &Self) -> Self {
             Self {
                 left: other.start(),
@@ -73,6 +92,8 @@ mod testing {
         fn update_end(&mut self, val: &usize) {
             self.right = *val;
         }
+        #[allow(unused)]
+        fn update_chr(&mut self, val: &usize) {}
         fn from(other: &Self) -> Self {
             Self {
                 left: other.start(),

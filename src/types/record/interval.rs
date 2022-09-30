@@ -61,6 +61,8 @@ where
     fn update_end(&mut self, val: &T) {
         self.end = *val;
     }
+    #[allow(unused)]
+    fn update_chr(&mut self, val: &T) {}
     fn from(other: &Self) -> Self {
         Self {
             start: other.start(),

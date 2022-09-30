@@ -42,6 +42,9 @@ where
     fn update_end(&mut self, val: &T) {
         self.end = *val;
     }
+    fn update_chr(&mut self, val: &T) {
+        self.chr = *val;
+    }
     fn from(other: &Self) -> Self {
         Self {
             chr: other.chr(),
