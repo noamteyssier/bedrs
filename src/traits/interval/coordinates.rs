@@ -12,10 +12,17 @@ where
     fn update_end(&mut self, val: &T);
     fn update_chr(&mut self, val: &T);
     fn from(other: &Self) -> Self;
-    fn update_all(&mut self, other: &Self) {
+    fn update_all_from(&mut self, other: &Self) {
+        self.update_chr(&other.chr());
+        self.update_endpoints(&other.start(), &other.end());
+    }
+    fn update_endpoints_from(&mut self, other: &Self) {
         self.update_start(&other.start());
         self.update_end(&other.end());
-        self.update_chr(&other.chr());
+    }
+    fn update_endpoints(&mut self, start: &T, end: &T) {
+        self.update_start(start);
+        self.update_end(end);
     }
 }
 
