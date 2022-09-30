@@ -12,8 +12,9 @@ I wanted some bedtools-like functionality in rust and I made this tool to both
 learn how to implement genomic arithmetic as well as get more comfortable with
 generics and traits in rust.
 
-This library will eventually be focuse towards genome-specific arithmetic
-and focuses around a base `Interval` type which includes <chr, start, stop>.
+This library will eventually be focused towards genome-specific arithmetic
+and focuses around a base `Coordinates` trait which includes functions to
+retrieve `<chr, start, stop>`.
 
 This is a work in progress and is subject to heavy changes.
 
@@ -22,6 +23,8 @@ If you want a more robust interval library I recommend the following:
 - [rust_lapper](https://crates.io/crates/rust-lapper)
 - [COITrees](https://crates.io/crates/coitrees)
 - [rampart](https://crates.io/crates/rampart)
+
+This library is heavily inspired from those above.
 
 ## Usage
 
