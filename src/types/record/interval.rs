@@ -1,21 +1,24 @@
 use crate::traits::{Coordinates, Overlap};
 
-#[derive(Debug, Clone, Eq, PartialEq)]
-pub struct Interval<T> {
+#[derive(Debug, Clone, Eq, PartialEq, Copy)]
+pub struct Interval<T>
+where
+    T: Copy + Default,
+{
     start: T,
     end: T,
 }
 impl<T> Interval<T>
 where
-    T: Copy,
+    T: Copy + Default,
 {
     pub fn new(start: T, end: T) -> Self {
         Self { start, end }
     }
     pub fn from<I: Coordinates<T>>(other: &I) -> Self {
         Self {
-            start: *other.start(),
-            end: *other.end(),
+            start: other.start(),
+            end: other.end(),
         }
     }
     pub fn update_start(&mut self, value: &T) {
@@ -25,23 +28,47 @@ where
         self.end = *value;
     }
 }
-impl<T> Coordinates<T> for Interval<T> {
-    fn start(&self) -> &T {
-        &self.start
+impl<T> Coordinates<T> for Interval<T>
+where
+    T: Copy + Default,
+{
+    fn start(&self) -> T {
+        self.start
     }
-    fn end(&self) -> &T {
-        &self.end
+    fn end(&self) -> T {
+        self.end
+    }
+    fn chr(&self) -> T {
+        T::default()
+    }
+    fn update_start(&mut self, val: &T) {
+        self.start = *val;
+    }
+    fn update_end(&mut self, val: &T) {
+        self.end = *val;
+    }
+    fn from(other: &Self) -> Self {
+        Self {
+            start: other.start(),
+            end: other.end(),
+        }
     }
 }
-impl<T: PartialOrd> Overlap<T> for Interval<T> {}
-impl<T: Eq + Ord> Ord for Interval<T> {
+impl<T: PartialOrd> Overlap<T> for Interval<T> where T: Copy + PartialOrd + Default {}
+impl<T> Ord for Interval<T>
+where
+    T: Eq + Ord + Copy + Default,
+{
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        self.start().cmp(other.start())
+        self.start().cmp(&other.start())
     }
 }
-impl<T: Ord> PartialOrd for Interval<T> {
+impl<T> PartialOrd for Interval<T>
+where
+    T: Ord + Copy + Default,
+{
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        self.start().partial_cmp(other.start())
+        self.start().partial_cmp(&other.start())
     }
 }
 
@@ -56,8 +83,8 @@ mod testing {
         let end = 100;
         let interval = Interval::new(start, end);
 
-        assert_eq!(interval.start(), &start);
-        assert_eq!(interval.end(), &end);
+        assert_eq!(interval.start(), start);
+        assert_eq!(interval.end(), end);
     }
 
     #[test]

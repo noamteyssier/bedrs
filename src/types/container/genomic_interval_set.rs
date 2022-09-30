@@ -1,5 +1,5 @@
 use crate::{
-    traits::{container::GenomicMerge, Container},
+    traits::{container::Merge, Container},
     types::GenomicInterval,
 };
 use anyhow::{bail, Result};
@@ -11,7 +11,8 @@ pub struct GenomicIntervalSet<T> {
 }
 impl<T> Container<T, GenomicInterval<T>> for GenomicIntervalSet<T>
 where
-    GenomicInterval<T>: Ord,
+    GenomicInterval<T>: Copy + Ord,
+    T: Copy + Default,
 {
     fn records(&self) -> &Vec<GenomicInterval<T>> {
         &self.records
@@ -22,7 +23,7 @@ where
 }
 impl<T> GenomicIntervalSet<T>
 where
-    T: Copy,
+    T: Copy + Default,
 {
     pub fn new(records: Vec<GenomicInterval<T>>) -> Self {
         Self { records }
@@ -46,9 +47,10 @@ where
         Self { records }
     }
 }
-impl<T> GenomicMerge<T, GenomicInterval<T>> for GenomicIntervalSet<T>
+//
+impl<T> Merge<T, GenomicInterval<T>> for GenomicIntervalSet<T>
 where
-    T: Copy + PartialOrd + Ord + Debug,
+    T: Copy + PartialOrd + Ord + Debug + Default,
     GenomicInterval<T>: Ord,
 {
 }

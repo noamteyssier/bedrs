@@ -1,23 +1,26 @@
-use super::{Coordinates, GenomicCoordinates};
+use super::Coordinates;
 
-pub trait Overlap<T: PartialOrd>: Coordinates<T> {
-    fn overlaps<I: Coordinates<T>>(&self, other: &I) -> bool {
-        (other.start() >= self.start() && other.start() <= self.end())
-            || (other.end() >= self.start() && (other.end() <= self.end()))
+pub trait Overlap<T>: Coordinates<T>
+where
+    T: Copy + Default + PartialOrd,
+{
+    fn bounded_start<I: Coordinates<T>>(&self, other: &I) -> bool {
+        other.start() >= self.start() && other.start() <= self.end()
     }
-}
-
-pub trait GenomicOverlap<T: PartialOrd>: GenomicCoordinates<T> + Coordinates<T> {
-    fn overlaps<I: GenomicCoordinates<T>>(&self, other: &I) -> bool {
-        (self.chr() == other.chr())
-            && ((other.start() >= self.start() && other.start() <= self.end())
-                || (other.end() >= self.start() && (other.end() <= self.end())))
+    fn bounded_end<I: Coordinates<T>>(&self, other: &I) -> bool {
+        other.end() >= self.start() && other.end() <= self.end()
+    }
+    fn bounded_chr<I: Coordinates<T>>(&self, other: &I) -> bool {
+        other.chr() == self.chr()
+    }
+    fn overlaps<I: Coordinates<T>>(&self, other: &I) -> bool {
+        self.bounded_chr(other) && (self.bounded_start(other) || self.bounded_end(other))
     }
 }
 
 #[cfg(test)]
 mod testing {
-    use super::{GenomicOverlap, Overlap};
+    use super::Overlap;
     use crate::types::{record::GenomicInterval, Interval};
 
     #[test]

@@ -1,10 +1,13 @@
-pub trait Coordinates<T> {
-    fn start(&self) -> &T;
-    fn end(&self) -> &T;
-}
-
-pub trait GenomicCoordinates<T>: Coordinates<T> {
-    fn chr(&self) -> &T;
+pub trait Coordinates<T>
+where
+    T: Copy + Default,
+{
+    fn start(&self) -> T;
+    fn end(&self) -> T;
+    fn chr(&self) -> T;
+    fn update_start(&mut self, val: &T);
+    fn update_end(&mut self, val: &T);
+    fn from(other: &Self) -> Self;
 }
 
 #[cfg(test)]
@@ -17,26 +20,62 @@ mod testing {
         right: usize,
     }
     impl Coordinates<usize> for CustomInterval {
-        fn start(&self) -> &usize {
-            &self.left
+        fn start(&self) -> usize {
+            self.left
         }
-        fn end(&self) -> &usize {
-            &self.right
+        fn end(&self) -> usize {
+            self.right
+        }
+        fn chr(&self) -> usize {
+            0
+        }
+        fn update_start(&mut self, val: &usize) {
+            self.left = *val;
+        }
+        fn update_end(&mut self, val: &usize) {
+            self.right = *val;
+        }
+        fn from(other: &Self) -> Self {
+            Self {
+                left: other.start(),
+                right: other.end(),
+            }
         }
     }
 
     // define a custom interval struct for testing
-    struct CustomIntervalMeta<'a> {
+    struct CustomIntervalMeta {
         left: usize,
         right: usize,
-        _meta: &'a str,
+        meta: String,
     }
-    impl<'a> Coordinates<usize> for CustomIntervalMeta<'a> {
-        fn start(&self) -> &usize {
-            &self.left
+    impl CustomIntervalMeta {
+        pub fn meta(&self) -> &str {
+            &self.meta
         }
-        fn end(&self) -> &usize {
-            &self.right
+    }
+    impl Coordinates<usize> for CustomIntervalMeta {
+        fn start(&self) -> usize {
+            self.left
+        }
+        fn end(&self) -> usize {
+            self.right
+        }
+        fn chr(&self) -> usize {
+            0
+        }
+        fn update_start(&mut self, val: &usize) {
+            self.left = *val;
+        }
+        fn update_end(&mut self, val: &usize) {
+            self.right = *val;
+        }
+        fn from(other: &Self) -> Self {
+            Self {
+                left: other.start(),
+                right: other.end(),
+                meta: other.meta().to_string(),
+            }
         }
     }
 
@@ -45,21 +84,17 @@ mod testing {
         let left = 10;
         let right = 100;
         let a = CustomInterval { left, right };
-        assert_eq!(a.start(), &10);
-        assert_eq!(a.end(), &100);
+        assert_eq!(a.start(), 10);
+        assert_eq!(a.end(), 100);
     }
 
     #[test]
     fn test_custom_interval_with_meta() {
         let left = 10;
         let right = 100;
-        let meta = "some_meta";
-        let a = CustomIntervalMeta {
-            left,
-            right,
-            _meta: meta,
-        };
-        assert_eq!(a.start(), &10);
-        assert_eq!(a.end(), &100);
+        let meta = "some_meta".to_string();
+        let a = CustomIntervalMeta { left, right, meta };
+        assert_eq!(a.start(), 10);
+        assert_eq!(a.end(), 100);
     }
 }
