@@ -1,5 +1,5 @@
 use super::Container;
-use crate::traits::{ValueBounds, IntervalBounds};
+use crate::traits::{IntervalBounds, ValueBounds};
 
 pub trait Find<T, I>: Container<T, I>
 where

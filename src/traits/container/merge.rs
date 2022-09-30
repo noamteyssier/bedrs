@@ -1,6 +1,6 @@
 use super::Container;
 use crate::{
-    traits::{ValueBounds, IntervalBounds},
+    traits::{IntervalBounds, ValueBounds},
     types::MergeResults,
 };
 

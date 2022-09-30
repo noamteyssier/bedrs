@@ -1,7 +1,7 @@
 use std::fmt::Debug;
 
-use crate::traits::{ValueBounds, IntervalBounds, Find};
 use crate::traits::{container::Merge, Container};
+use crate::traits::{Find, IntervalBounds, ValueBounds};
 use crate::types::Interval;
 use anyhow::{bail, Result};
 
