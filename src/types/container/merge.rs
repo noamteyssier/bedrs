@@ -18,7 +18,7 @@ where
     T: Copy + Default,
 {
     fn new(records: Vec<I>) -> Self {
-        Self { 
+        Self {
             intervals: records,
             clusters: Vec::new(),
             n_clusters: 0,

@@ -1,7 +1,6 @@
-use std::fmt::Debug;
 use super::Container;
 use crate::traits::{Coordinates, Overlap};
-
+use std::fmt::Debug;
 
 pub trait Find<T, I>: Container<T, I>
 where
@@ -10,7 +9,8 @@ where
 {
     type ContainerType: Container<T, I>;
     fn find(&self, query: &I) -> Self::ContainerType {
-        let records = self.records()
+        let records = self
+            .records()
             .iter()
             .filter(|x| x.overlaps(query))
             .map(|x| x.to_owned())
@@ -21,12 +21,11 @@ where
 
 #[cfg(test)]
 mod testing {
+    use super::Find;
     use crate::{
         traits::Container,
         types::{Interval, IntervalSet},
     };
-    use super::Find;
-
 
     #[test]
     fn test_find() {

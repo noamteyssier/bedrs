@@ -8,8 +8,7 @@ where
         other.chr() == self.chr()
     }
     fn interval_overlap<I: Coordinates<T>>(&self, other: &I) -> bool {
-        self.start() < other.end()
-            && self.end() > other.start()
+        self.start() < other.end() && self.end() > other.start()
     }
     fn overlaps<I: Coordinates<T>>(&self, other: &I) -> bool {
         self.bounded_chr(other) && self.interval_overlap(other)
