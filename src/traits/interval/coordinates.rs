@@ -1,6 +1,8 @@
+use crate::traits::ValueBounds;
+
 pub trait Coordinates<T>
 where
-    T: Copy + Default,
+    T: ValueBounds,
 {
     fn start(&self) -> T;
     fn end(&self) -> T;

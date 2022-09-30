@@ -5,7 +5,7 @@ use anyhow::{bail, Result};
 #[derive(Debug, Clone)]
 pub struct IntervalMetaSet<T, M>
 where
-    T: Copy,
+    T: ValueBounds,
     M: Copy,
 {
     records: Vec<IntervalMeta<T, M>>,
@@ -30,7 +30,7 @@ where
 
 impl<T, M> IntervalMetaSet<T, M>
 where
-    T: Copy,
+    T: ValueBounds,
     M: Copy,
 {
     #[must_use]

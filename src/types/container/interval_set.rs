@@ -8,7 +8,7 @@ use anyhow::{bail, Result};
 #[derive(Debug, Clone)]
 pub struct IntervalSet<T>
 where
-    T: Copy + Default,
+    T: ValueBounds,
 {
     records: Vec<Interval<T>>,
 }
@@ -46,7 +46,7 @@ where
 
 impl<T> IntervalSet<T>
 where
-    T: Copy + Default,
+    T: ValueBounds,
 {
     #[must_use]
     pub fn new(records: Vec<Interval<T>>) -> Self {

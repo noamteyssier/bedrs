@@ -26,7 +26,7 @@ where
 }
 impl<T> GenomicIntervalSet<T>
 where
-    T: Copy + Default,
+    T: ValueBounds,
 {
     #[must_use]
     pub fn new(records: Vec<GenomicInterval<T>>) -> Self {
@@ -54,8 +54,8 @@ where
 //
 impl<T> Merge<T, GenomicInterval<T>> for GenomicIntervalSet<T>
 where
-    T: Copy + PartialOrd + Ord + Debug + Default,
-    GenomicInterval<T>: Ord,
+    T: ValueBounds,
+    GenomicInterval<T>: IntervalBounds<T>,
 {
 }
 
