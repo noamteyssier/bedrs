@@ -1,9 +1,9 @@
-use crate::traits::Coordinates;
+use crate::traits::{IntervalBounds, ValueBounds};
 
 pub trait Container<T, I>
 where
-    I: Ord + Coordinates<T>,
-    T: Copy + Default,
+    I: IntervalBounds<T>,
+    T: ValueBounds,
 {
     fn new(records: Vec<I>) -> Self;
     fn records(&self) -> &Vec<I>;

@@ -1,10 +1,10 @@
-use crate::traits::{Container, Coordinates};
+use crate::traits::{Container, IntervalBounds, ValueBounds};
 use std::marker::PhantomData;
 
 pub struct MergeResults<T, I>
 where
-    I: Coordinates<T>,
-    T: Copy + Default,
+    I: IntervalBounds<T>,
+    T: ValueBounds,
 {
     intervals: Vec<I>,
     clusters: Vec<usize>,
@@ -14,8 +14,8 @@ where
 
 impl<T, I> Container<T, I> for MergeResults<T, I>
 where
-    I: Coordinates<T> + Ord,
-    T: Copy + Default,
+    I: IntervalBounds<T>,
+    T: ValueBounds,
 {
     fn new(records: Vec<I>) -> Self {
         Self {
@@ -35,8 +35,8 @@ where
 
 impl<T, I> MergeResults<T, I>
 where
-    I: Coordinates<T>,
-    T: Copy + Default,
+    I: IntervalBounds<T>,
+    T: ValueBounds,
 {
     #[must_use]
     pub fn new(intervals: Vec<I>, clusters: Vec<usize>) -> Self {

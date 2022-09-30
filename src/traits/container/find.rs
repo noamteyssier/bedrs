@@ -1,11 +1,10 @@
 use super::Container;
-use crate::traits::{Coordinates, Overlap};
-use std::fmt::Debug;
+use crate::traits::{ValueBounds, IntervalBounds};
 
 pub trait Find<T, I>: Container<T, I>
 where
-    T: Copy + PartialOrd + Ord + Debug + Default,
-    I: Coordinates<T> + Ord + Clone + Overlap<T>,
+    T: ValueBounds,
+    I: IntervalBounds<T>,
 {
     type ContainerType: Container<T, I>;
     fn find(&self, query: &I) -> Self::ContainerType {

@@ -1,6 +1,6 @@
 use std::fmt::Debug;
 
-use crate::traits::container::Find;
+use crate::traits::{ValueBounds, IntervalBounds, Find};
 use crate::traits::{container::Merge, Container};
 use crate::types::Interval;
 use anyhow::{bail, Result};
@@ -15,8 +15,8 @@ where
 
 impl<T> Container<T, Interval<T>> for IntervalSet<T>
 where
-    Interval<T>: Copy + Ord,
-    T: Copy + Default,
+    Interval<T>: IntervalBounds<T>,
+    T: ValueBounds,
 {
     fn new(records: Vec<Interval<T>>) -> Self {
         Self { records }
@@ -31,15 +31,15 @@ where
 
 impl<T> Merge<T, Interval<T>> for IntervalSet<T>
 where
-    T: Copy + PartialOrd + Ord + Debug + Default,
-    Interval<T>: Ord,
+    T: ValueBounds,
+    Interval<T>: IntervalBounds<T>,
 {
 }
 
 impl<T> Find<T, Interval<T>> for IntervalSet<T>
 where
-    T: Copy + PartialOrd + Ord + Debug + Default,
-    Interval<T>: Ord,
+    T: ValueBounds,
+    Interval<T>: IntervalBounds<T>,
 {
     type ContainerType = Self;
 }
