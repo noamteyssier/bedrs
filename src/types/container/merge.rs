@@ -10,6 +10,7 @@ where
     clusters: Vec<usize>,
     n_clusters: usize,
     phantom: PhantomData<T>,
+    is_sorted: bool,
 }
 
 impl<T, I> Container<T, I> for MergeResults<T, I>
@@ -23,6 +24,7 @@ where
             clusters: Vec::new(),
             n_clusters: 0,
             phantom: PhantomData,
+            is_sorted: true,
         }
     }
     fn records(&self) -> &Vec<I> {
@@ -30,6 +32,12 @@ where
     }
     fn records_mut(&mut self) -> &mut Vec<I> {
         &mut self.intervals
+    }
+    fn is_sorted(&self) -> bool {
+        self.is_sorted
+    }
+    fn set_sorted(&mut self) {
+        self.is_sorted = true;
     }
 }
 
@@ -50,6 +58,7 @@ where
             clusters,
             n_clusters,
             phantom: PhantomData,
+            is_sorted: true,
         }
     }
     #[must_use]
