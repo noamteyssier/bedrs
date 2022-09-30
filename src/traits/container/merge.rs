@@ -2,17 +2,17 @@ use std::fmt::Debug;
 
 use super::Container;
 use crate::{
-    traits::{Coordinates, GenomicCoordinates, GenomicOverlap, Overlap},
-    types::{GenomicInterval, Interval, MergeResults},
+    traits::{Coordinates, Overlap},
+    types::MergeResults,
 };
 
 pub trait Merge<T, I>: Container<T, I>
 where
-    T: Copy + PartialOrd + Ord + Debug + From<usize> + Into<usize>,
-    I: Coordinates<T> + Ord,
+    T: Copy + PartialOrd + Ord + Debug + Default,
+    I: Coordinates<T> + Ord + Clone + Overlap<T>,
 {
-    fn merge(&self) -> MergeResults<T, Interval<T>> {
-        let mut base_interval = Interval::from(&self.records()[0]);
+    fn merge(&self) -> MergeResults<T, I> {
+        let mut base_interval = I::from(&self.records()[0]);
 
         let mut cluster_intervals = Vec::with_capacity(self.len());
         let mut cluster_ids = Vec::with_capacity(self.len());
@@ -26,37 +26,7 @@ where
                 base_interval.update_end(&new_max);
             } else {
                 cluster_intervals.push(base_interval.to_owned());
-                base_interval = Interval::from(interval);
-                current_id += 1;
-            }
-            cluster_ids.push(current_id);
-        }
-        cluster_intervals.push(base_interval.to_owned());
-        MergeResults::new(cluster_intervals, cluster_ids)
-    }
-}
-
-pub trait GenomicMerge<T, I>: Container<T, I>
-where
-    T: Copy + PartialOrd + Ord + Debug,
-    I: GenomicCoordinates<T> + Ord,
-{
-    fn merge(&self) -> MergeResults<T, GenomicInterval<T>> {
-        let mut base_interval = GenomicInterval::from(&self.records()[0]);
-
-        let mut cluster_intervals = Vec::with_capacity(self.len());
-        let mut cluster_ids = Vec::with_capacity(self.len());
-        let mut current_id = 0;
-
-        for interval in self.records().iter() {
-            if base_interval.overlaps(interval) {
-                let new_min = base_interval.start().min(interval.start());
-                let new_max = base_interval.end().max(interval.end());
-                base_interval.update_start(&new_min);
-                base_interval.update_end(&new_max);
-            } else {
-                cluster_intervals.push(base_interval.to_owned());
-                base_interval = GenomicInterval::from(interval);
+                base_interval = I::from(interval);
                 current_id += 1;
             }
             cluster_ids.push(current_id);
