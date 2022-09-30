@@ -82,7 +82,10 @@
 //! assert!(!b.overlaps(&c));
 //! ```
 
+/// Traits used within the library
 pub mod traits;
+
+/// Types used within the library
 pub mod types;
 
 pub use traits::{Container, Coordinates, Find, Merge, Overlap};
