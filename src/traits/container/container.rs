@@ -5,6 +5,7 @@ where
     I: Ord + Coordinates<T>,
     T: Copy + Default,
 {
+    fn new(records: Vec<I>) -> Self;
     fn records(&self) -> &Vec<I>;
     fn records_mut(&mut self) -> &mut Vec<I>;
     fn len(&self) -> usize {
@@ -27,6 +28,9 @@ mod testing {
         records: Vec<Interval<usize>>,
     }
     impl Container<usize, Interval<usize>> for CustomContainer {
+        fn new(records: Vec<Interval<usize>>) -> Self {
+            Self { records }
+        }
         fn records(&self) -> &Vec<Interval<usize>> {
             &self.records
         }
