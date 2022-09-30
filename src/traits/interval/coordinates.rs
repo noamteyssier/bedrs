@@ -91,7 +91,10 @@ mod testing {
 
     #[test]
     fn test_custom_interval_update() {
-        let mut a = CustomInterval { left: 10, right: 100 };
+        let mut a = CustomInterval {
+            left: 10,
+            right: 100,
+        };
         assert_eq!(a.start(), 10);
         assert_eq!(a.end(), 100);
         a.update_start(&30);
@@ -102,7 +105,10 @@ mod testing {
 
     #[test]
     fn test_custom_interval_transcode() {
-        let a = CustomInterval { left: 10, right: 100 };
+        let a = CustomInterval {
+            left: 10,
+            right: 100,
+        };
         let b = Coordinates::from(&a);
         assert_eq!(a.start(), b.start());
         assert_eq!(a.end(), b.end());
@@ -121,7 +127,11 @@ mod testing {
 
     #[test]
     fn test_custom_interval_meta_update() {
-        let mut a =  CustomIntervalMeta { left: 10, right: 100, meta: String::from("hello")};
+        let mut a = CustomIntervalMeta {
+            left: 10,
+            right: 100,
+            meta: String::from("hello"),
+        };
         assert_eq!(a.start(), 10);
         assert_eq!(a.end(), 100);
         a.update_start(&30);
@@ -132,7 +142,11 @@ mod testing {
 
     #[test]
     fn test_custom_interval_meta_transcode() {
-        let a =  CustomIntervalMeta { left: 10, right: 100, meta: String::from("hello")};
+        let a = CustomIntervalMeta {
+            left: 10,
+            right: 100,
+            meta: String::from("hello"),
+        };
         let b = Coordinates::from(&a);
         assert_eq!(a.start(), b.start());
         assert_eq!(a.end(), b.end());
