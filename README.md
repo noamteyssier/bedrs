@@ -19,8 +19,9 @@ This is a work in progress and is subject to heavy changes.
 
 If you want a more robust interval library I recommend the following:
 
-- COITrees
-- rust_lapper
+- [rust_lapper](https://crates.io/crates/rust-lapper)
+- [COITrees](https://crates.io/crates/coitrees)
+- [rampart](https://crates.io/crates/rampart)
 
 ## Usage
 
