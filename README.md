@@ -98,10 +98,7 @@ It still implements the `chr()` method, but will return the
 default of its generic type.
 
 ```rust
-use bedrs::{
-    traits::Overlap,
-    types::Interval,
-};
+use bedrs::{Overlap, Interval};
 
 let a = Interval::new(10, 20);
 let b = Interval::new(15, 25);
@@ -114,10 +111,7 @@ This is the bread and butter of genomic arithmetic.
 It is a 3-attribute struct of `[chr, start, stop]`.
 
 ```rust
-use bedrs::{
-    traits::Overlap,
-    types::GenomicInterval,
-};
+use bedrs::{Overlap, GenomicInterval};
 
 // Initializing two intervals on the same Chr
 let a = GenomicInterval::new(1, 10, 20);
