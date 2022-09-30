@@ -36,7 +36,8 @@ impl<T> IntervalSet<T>
 where
     T: Copy + Default,
 {
-    #[must_use] pub fn new(records: Vec<Interval<T>>) -> Self {
+    #[must_use]
+    pub fn new(records: Vec<Interval<T>>) -> Self {
         Self { records }
     }
 

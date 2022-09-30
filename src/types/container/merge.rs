@@ -30,11 +30,13 @@ where
     I: Coordinates<T>,
     T: Copy + Default,
 {
-    #[must_use] pub fn new(intervals: Vec<I>, clusters: Vec<usize>) -> Self {
+    #[must_use]
+    pub fn new(intervals: Vec<I>, clusters: Vec<usize>) -> Self {
         let n_clusters = clusters.iter().max().unwrap_or(&0) + 1;
         Self::from_raw_parts(intervals, clusters, n_clusters)
     }
-    #[must_use] pub fn from_raw_parts(intervals: Vec<I>, clusters: Vec<usize>, n_clusters: usize) -> Self {
+    #[must_use]
+    pub fn from_raw_parts(intervals: Vec<I>, clusters: Vec<usize>, n_clusters: usize) -> Self {
         Self {
             intervals,
             clusters,
@@ -42,13 +44,16 @@ where
             phantom: PhantomData,
         }
     }
-    #[must_use] pub fn intervals(&self) -> &Vec<I> {
+    #[must_use]
+    pub fn intervals(&self) -> &Vec<I> {
         &self.intervals
     }
-    #[must_use] pub fn clusters(&self) -> &Vec<usize> {
+    #[must_use]
+    pub fn clusters(&self) -> &Vec<usize> {
         &self.clusters
     }
-    #[must_use] pub fn n_clusters(&self) -> usize {
+    #[must_use]
+    pub fn n_clusters(&self) -> usize {
         self.n_clusters
     }
 }

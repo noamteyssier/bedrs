@@ -30,7 +30,8 @@ where
     T: Copy,
     M: Copy,
 {
-    #[must_use] pub fn new(records: Vec<IntervalMeta<T, M>>) -> Self {
+    #[must_use]
+    pub fn new(records: Vec<IntervalMeta<T, M>>) -> Self {
         Self { records }
     }
 
