@@ -52,8 +52,7 @@ mod testing {
             self.right = *val;
         }
         #[allow(unused)]
-        fn update_chr(&mut self, val: &usize) {
-        }
+        fn update_chr(&mut self, val: &usize) {}
         fn from(other: &Self) -> Self {
             Self {
                 left: other.start(),
@@ -90,8 +89,7 @@ mod testing {
             self.right = *val;
         }
         #[allow(unused)]
-        fn update_chr(&mut self, val: &usize) {
-        }
+        fn update_chr(&mut self, val: &usize) {}
         fn from(other: &Self) -> Self {
             Self {
                 left: other.start(),
