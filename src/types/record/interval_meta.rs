@@ -28,7 +28,7 @@ where
 }
 impl<T, M> Coordinates<T> for IntervalMeta<T, M> 
 where
-    T: Copy,
+    T: Copy + Default,
     M: Copy
 {
     fn start(&self) -> T {
@@ -47,13 +47,13 @@ where
 }
 impl<T, M> Overlap<T> for IntervalMeta<T, M>
 where
-    T: Copy + PartialOrd,
+    T: Copy + PartialOrd + Default,
     M: Copy,
 {}
 
 impl<T, M> Ord for IntervalMeta<T, M>
 where
-    T: Eq + Ord + Copy + Into<usize> + From<usize>,
+    T: Eq + Ord + Copy + Default,
     M: Eq + Copy,
 {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
@@ -63,7 +63,7 @@ where
 
 impl<T, M> PartialOrd for IntervalMeta<T, M> 
 where
-    T: Ord + Copy + Into<usize> + From<usize>,
+    T: Ord + Copy + Default,
     M: Eq + Copy,
 {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {

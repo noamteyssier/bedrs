@@ -1,17 +1,13 @@
 pub trait Coordinates<T>
 where
-    T: Copy,
+    T: Copy + Default,
 {
     fn start(&self) -> T;
     fn end(&self) -> T;
-    fn from(other: &Self) -> Self;
-}
-
-pub trait GenomicCoordinates<T>: Coordinates<T>
-where
-    T: Copy,
-{
     fn chr(&self) -> T;
+    fn update_start(&mut self, val: &T);
+    fn update_end(&mut self, val: &T);
+    fn from(other: &Self) -> Self;
 }
 
 #[cfg(test)]

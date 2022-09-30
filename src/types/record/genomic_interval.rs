@@ -11,7 +11,7 @@ pub struct GenomicInterval<T> {
 
 impl<T> Coordinates<T> for GenomicInterval<T>
 where
-    T: Copy,
+    T: Copy + Default,
 {
     fn start(&self) -> T {
         self.start
@@ -28,44 +28,18 @@ where
     }
 }
 
-impl<T> GenomicCoordinates<T> for GenomicInterval<T>
-where
-    T: Copy,
-{
-    fn chr(&self) -> T {
-        self.chr
-    }
-}
-impl<T> GenomicOverlap<T> for GenomicInterval<T> 
-where
-    T: Copy + PartialOrd
-{}
-
 impl<T> GenomicInterval<T>
 where
-    T: Copy,
+    T: Copy + Default,
 {
     pub fn new(chr: T, start: T, end: T) -> Self {
         Self { chr, start, end }
-    }
-    pub fn from<I: GenomicCoordinates<T>>(other: &I) -> Self {
-        Self {
-            chr: other.chr(),
-            start: other.start(),
-            end: other.end(),
-        }
-    }
-    pub fn update_start(&mut self, value: &T) {
-        self.start = *value;
-    }
-    pub fn update_end(&mut self, value: &T) {
-        self.end = *value;
     }
 }
 
 impl<T> Ord for GenomicInterval<T>
 where
-    T: Eq + Ord + Copy,
+    T: Eq + Ord + Copy + Default,
 {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
         match self.chr().cmp(&other.chr()) {
@@ -77,7 +51,7 @@ where
 
 impl<T> PartialOrd for GenomicInterval<T>
 where
-    T: Ord + Copy,
+    T: Ord + Copy + Default,
 {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         match self.chr().partial_cmp(&other.chr()) {

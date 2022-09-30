@@ -3,7 +3,7 @@ use crate::traits::Coordinates;
 pub trait Container<T, I: Coordinates<T>>
 where
     I: Ord + Coordinates<T>,
-    T: Copy,
+    T: Copy + Default,
 {
     fn records(&self) -> &Vec<I>;
     fn records_mut(&mut self) -> &mut Vec<I>;

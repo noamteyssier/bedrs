@@ -7,7 +7,7 @@ use anyhow::{bail, Result};
 #[derive(Debug, Clone)]
 pub struct IntervalSet<T>
 where
-    T: Copy + Into<usize> + From<usize> 
+    T: Copy + Default 
 {
     records: Vec<Interval<T>>,
 }
@@ -15,7 +15,7 @@ where
 impl<T> Container<T, Interval<T>> for IntervalSet<T>
 where
     Interval<T>: Copy + Ord,
-    T: Copy + Into<usize> + From<usize>,
+    T: Copy + Default,
 {
     fn records(&self) -> &Vec<Interval<T>> {
         &self.records
@@ -27,14 +27,14 @@ where
 
 impl<T> Merge<T, Interval<T>> for IntervalSet<T>
 where
-    T: Copy + PartialOrd + Ord + Debug + Into<usize> + From<usize>,
+    T: Copy + PartialOrd + Ord + Debug + Default,
     Interval<T>: Ord,
 {
 }
 
 impl<T> IntervalSet<T>
 where
-    T: Copy + Into<usize> + From<usize>,
+    T: Copy + Default,
 {
     pub fn new(records: Vec<Interval<T>>) -> Self {
         Self { records }

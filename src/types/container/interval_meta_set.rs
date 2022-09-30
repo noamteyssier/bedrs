@@ -15,7 +15,7 @@ impl<T, M> Container<T, IntervalMeta<T, M>> for IntervalMetaSet<T, M>
 where
     IntervalMeta<T, M>: Ord,
     M: Copy,
-    T: Copy,
+    T: Copy + Default,
 {
     fn records(&self) -> &Vec<IntervalMeta<T, M>> {
         &self.records
