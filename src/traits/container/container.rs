@@ -1,6 +1,6 @@
 use crate::traits::Coordinates;
 
-pub trait Container<T, I: Coordinates<T>>
+pub trait Container<T, I>
 where
     I: Ord + Coordinates<T>,
     T: Copy + Default,
@@ -9,6 +9,9 @@ where
     fn records_mut(&mut self) -> &mut Vec<I>;
     fn len(&self) -> usize {
         self.records().len()
+    }
+    fn is_empty(&self) -> bool {
+        self.records().is_empty()
     }
     fn sort(&mut self) {
         self.records_mut().sort_unstable();

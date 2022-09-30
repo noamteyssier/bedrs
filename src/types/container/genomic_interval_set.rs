@@ -25,6 +25,7 @@ impl<T> GenomicIntervalSet<T>
 where
     T: Copy + Default,
 {
+    #[must_use]
     pub fn new(records: Vec<GenomicInterval<T>>) -> Self {
         Self { records }
     }

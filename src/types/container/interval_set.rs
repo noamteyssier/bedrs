@@ -36,6 +36,7 @@ impl<T> IntervalSet<T>
 where
     T: Copy + Default,
 {
+    #[must_use]
     pub fn new(records: Vec<Interval<T>>) -> Self {
         Self { records }
     }
@@ -43,9 +44,8 @@ where
     pub fn from_endpoints(starts: &[T], ends: &[T]) -> Result<Self> {
         if starts.len() != ends.len() {
             bail!("Unequal array lengths")
-        } else {
-            Ok(Self::from_endpoints_unchecked(starts, ends))
         }
+        Ok(Self::from_endpoints_unchecked(starts, ends))
     }
 
     pub fn from_endpoints_unchecked(starts: &[T], ends: &[T]) -> Self {

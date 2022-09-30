@@ -54,7 +54,7 @@ where
         }
     }
 }
-impl<T: PartialOrd> Overlap<T> for Interval<T> where T: Copy + PartialOrd + Default {}
+impl<T> Overlap<T> for Interval<T> where T: Copy + PartialOrd + Default {}
 impl<T> Ord for Interval<T>
 where
     T: Eq + Ord + Copy + Default,
