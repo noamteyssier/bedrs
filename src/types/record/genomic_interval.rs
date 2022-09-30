@@ -1,5 +1,5 @@
-use std::cmp::Ordering;
 use crate::traits::{Coordinates, Overlap};
+use std::cmp::Ordering;
 
 #[derive(Debug, Clone, Eq, PartialEq, Copy)]
 pub struct GenomicInterval<T> {
@@ -72,18 +72,11 @@ where
     }
 }
 
-impl<T> Overlap<T> for GenomicInterval<T>
-where
-    T: Copy + Default + Ord,
-{
-}
+impl<T> Overlap<T> for GenomicInterval<T> where T: Copy + Default + Ord {}
 
 #[cfg(test)]
 mod testing {
-    use crate::{
-        traits::Coordinates,
-        types::GenomicInterval,
-    };
+    use crate::{traits::Coordinates, types::GenomicInterval};
     use std::cmp::Ordering;
 
     #[test]

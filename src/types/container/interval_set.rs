@@ -7,7 +7,7 @@ use anyhow::{bail, Result};
 #[derive(Debug, Clone)]
 pub struct IntervalSet<T>
 where
-    T: Copy + Default 
+    T: Copy + Default,
 {
     records: Vec<Interval<T>>,
 }

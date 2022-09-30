@@ -14,9 +14,7 @@ where
         other.chr() == self.chr()
     }
     fn overlaps<I: Coordinates<T>>(&self, other: &I) -> bool {
-        self.bounded_chr(other) && (
-            self.bounded_start(other) || self.bounded_end(other)
-        )
+        self.bounded_chr(other) && (self.bounded_start(other) || self.bounded_end(other))
     }
 }
 

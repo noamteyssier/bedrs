@@ -1,7 +1,7 @@
 use crate::traits::{Coordinates, Overlap};
 
 #[derive(Debug, Clone, Eq, PartialEq, Copy)]
-pub struct IntervalMeta<T, M> 
+pub struct IntervalMeta<T, M>
 where
     T: Copy,
     M: Copy,
@@ -26,10 +26,10 @@ where
         &self.metadata
     }
 }
-impl<T, M> Coordinates<T> for IntervalMeta<T, M> 
+impl<T, M> Coordinates<T> for IntervalMeta<T, M>
 where
     T: Copy + Default,
-    M: Copy
+    M: Copy,
 {
     fn start(&self) -> T {
         self.start
@@ -50,7 +50,7 @@ where
         Self {
             start: other.start(),
             end: other.end(),
-            metadata: *other.metadata()
+            metadata: *other.metadata(),
         }
     }
 }
@@ -58,7 +58,8 @@ impl<T, M> Overlap<T> for IntervalMeta<T, M>
 where
     T: Copy + PartialOrd + Default,
     M: Copy,
-{}
+{
+}
 
 impl<T, M> Ord for IntervalMeta<T, M>
 where
@@ -70,7 +71,7 @@ where
     }
 }
 
-impl<T, M> PartialOrd for IntervalMeta<T, M> 
+impl<T, M> PartialOrd for IntervalMeta<T, M>
 where
     T: Ord + Copy + Default,
     M: Eq + Copy,

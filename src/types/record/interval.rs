@@ -3,14 +3,14 @@ use crate::traits::{Coordinates, Overlap};
 #[derive(Debug, Clone, Eq, PartialEq, Copy)]
 pub struct Interval<T>
 where
-    T: Copy + Default
+    T: Copy + Default,
 {
     start: T,
     end: T,
 }
 impl<T> Interval<T>
 where
-    T: Copy + Default
+    T: Copy + Default,
 {
     pub fn new(start: T, end: T) -> Self {
         Self { start, end }
@@ -30,7 +30,7 @@ where
 }
 impl<T> Coordinates<T> for Interval<T>
 where
-    T: Copy + Default
+    T: Copy + Default,
 {
     fn start(&self) -> T {
         self.start
@@ -54,11 +54,7 @@ where
         }
     }
 }
-impl<T: PartialOrd> Overlap<T> for Interval<T> 
-where
-    T: Copy + PartialOrd + Default,
-{
-}
+impl<T: PartialOrd> Overlap<T> for Interval<T> where T: Copy + PartialOrd + Default {}
 impl<T> Ord for Interval<T>
 where
     T: Eq + Ord + Copy + Default,

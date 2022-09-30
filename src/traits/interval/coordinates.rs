@@ -53,7 +53,6 @@ mod testing {
         pub fn meta(&self) -> &str {
             &self.meta
         }
-
     }
     impl Coordinates<usize> for CustomIntervalMeta {
         fn start(&self) -> usize {
@@ -94,11 +93,7 @@ mod testing {
         let left = 10;
         let right = 100;
         let meta = "some_meta".to_string();
-        let a = CustomIntervalMeta {
-            left,
-            right,
-            meta,
-        };
+        let a = CustomIntervalMeta { left, right, meta };
         assert_eq!(a.start(), 10);
         assert_eq!(a.end(), 100);
     }
