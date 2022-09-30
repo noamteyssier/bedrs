@@ -1,5 +1,5 @@
-use crate::traits::ValueBounds;
 use super::Coordinates;
+use crate::traits::ValueBounds;
 
 pub trait Overlap<T>: Coordinates<T>
 where
