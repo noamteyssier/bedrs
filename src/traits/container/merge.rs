@@ -9,7 +9,7 @@ where
     T: ValueBounds,
     I: IntervalBounds<T>,
 {
-    fn merge(&self) -> MergeResults<T, I> {
+    fn merge_unchecked(&self) -> MergeResults<T, I> {
         let mut base_interval = I::from(&self.records()[0]);
 
         let mut cluster_intervals = Vec::with_capacity(self.len());
@@ -32,22 +32,28 @@ where
         cluster_intervals.push(base_interval.to_owned());
         MergeResults::new(cluster_intervals, cluster_ids)
     }
+
+    fn merge(&self) -> Option<MergeResults<T, I>> {
+        if self.is_sorted() {
+            Some(self.merge_unchecked())
+        } else {
+            None
+        }
+    }
 }
 
 #[cfg(test)]
 mod testing {
     use super::Merge;
-    use crate::{
-        traits::Coordinates,
-        types::{GenomicIntervalSet, IntervalSet},
-    };
+    use crate::{types::{GenomicIntervalSet, IntervalSet}, traits::{Container, Coordinates}};
 
     #[test]
     fn test_merging_one_cluster() {
         let starts = vec![10, 15, 25];
         let ends = vec![30, 20, 30];
-        let set = IntervalSet::from_endpoints_unchecked(&starts, &ends);
-        let merge_set = set.merge();
+        let mut set = IntervalSet::from_endpoints_unchecked(&starts, &ends);
+        set.sort();
+        let merge_set = set.merge().unwrap();
         assert_eq!(merge_set.n_clusters(), 1);
         assert_eq!(merge_set.clusters(), &vec![0, 0, 0]);
         assert_eq!(merge_set.intervals()[0].start(), 10);
@@ -58,8 +64,9 @@ mod testing {
     fn test_merging_two_clusters() {
         let starts = vec![10, 15, 25, 35, 40];
         let ends = vec![30, 20, 30, 50, 45];
-        let set = IntervalSet::from_endpoints_unchecked(&starts, &ends);
-        let merge_set = set.merge();
+        let mut set = IntervalSet::from_endpoints_unchecked(&starts, &ends);
+        set.sort();
+        let merge_set = set.merge().unwrap();
         assert_eq!(merge_set.n_clusters(), 2);
         assert_eq!(merge_set.clusters(), &vec![0, 0, 0, 1, 1]);
         assert_eq!(merge_set.intervals()[0].start(), 10);
@@ -73,8 +80,9 @@ mod testing {
         let chrs = vec![1, 1, 1];
         let starts = vec![10, 15, 25];
         let ends = vec![30, 20, 30];
-        let set = GenomicIntervalSet::from_endpoints_unchecked(&chrs, &starts, &ends);
-        let merge_set = set.merge();
+        let mut set = GenomicIntervalSet::from_endpoints_unchecked(&chrs, &starts, &ends);
+        set.sort();
+        let merge_set = set.merge().unwrap();
         assert_eq!(merge_set.n_clusters(), 1);
         assert_eq!(merge_set.clusters(), &vec![0, 0, 0]);
         assert_eq!(merge_set.intervals()[0].start(), 10);
@@ -86,8 +94,9 @@ mod testing {
         let chrs = vec![1, 1, 2];
         let starts = vec![10, 15, 25];
         let ends = vec![30, 20, 30];
-        let set = GenomicIntervalSet::from_endpoints_unchecked(&chrs, &starts, &ends);
-        let merge_set = set.merge();
+        let mut set = GenomicIntervalSet::from_endpoints_unchecked(&chrs, &starts, &ends);
+        set.sort();
+        let merge_set = set.merge().unwrap();
         assert_eq!(merge_set.n_clusters(), 2);
         assert_eq!(merge_set.clusters(), &vec![0, 0, 1]);
         assert_eq!(merge_set.intervals()[0].start(), 10);
