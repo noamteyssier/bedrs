@@ -1,4 +1,4 @@
-use crate::traits::{Coordinates, Overlap};
+use crate::traits::{Coordinates, Overlap, ValueBounds};
 use std::cmp::Ordering;
 
 #[derive(Debug, Clone, Eq, PartialEq, Copy)]
@@ -10,7 +10,7 @@ pub struct GenomicInterval<T> {
 
 impl<T> Coordinates<T> for GenomicInterval<T>
 where
-    T: Copy + Default,
+    T: ValueBounds,
 {
     fn start(&self) -> T {
         self.start
@@ -38,7 +38,7 @@ where
 
 impl<T> GenomicInterval<T>
 where
-    T: Copy + Default,
+    T: ValueBounds,
 {
     pub fn new(chr: T, start: T, end: T) -> Self {
         Self { chr, start, end }
@@ -47,7 +47,7 @@ where
 
 impl<T> Ord for GenomicInterval<T>
 where
-    T: Eq + Ord + Copy + Default,
+    T: ValueBounds,
 {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
         match self.chr().cmp(&other.chr()) {
@@ -59,7 +59,7 @@ where
 
 impl<T> PartialOrd for GenomicInterval<T>
 where
-    T: Ord + Copy + Default,
+    T: ValueBounds,
 {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         match self.chr().partial_cmp(&other.chr()) {
@@ -72,7 +72,7 @@ where
     }
 }
 
-impl<T> Overlap<T> for GenomicInterval<T> where T: Copy + Default + Ord {}
+impl<T> Overlap<T> for GenomicInterval<T> where T: ValueBounds {}
 
 #[cfg(test)]
 mod testing {

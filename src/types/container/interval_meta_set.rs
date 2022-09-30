@@ -1,11 +1,11 @@
-use crate::traits::Container;
+use crate::traits::{Container, IntervalBounds, ValueBounds};
 use crate::types::IntervalMeta;
 use anyhow::{bail, Result};
 
 #[derive(Debug, Clone)]
 pub struct IntervalMetaSet<T, M>
 where
-    T: Copy,
+    T: ValueBounds,
     M: Copy,
 {
     records: Vec<IntervalMeta<T, M>>,
@@ -13,9 +13,9 @@ where
 
 impl<T, M> Container<T, IntervalMeta<T, M>> for IntervalMetaSet<T, M>
 where
-    IntervalMeta<T, M>: Ord,
+    IntervalMeta<T, M>: IntervalBounds<T>,
+    T: ValueBounds,
     M: Copy,
-    T: Copy + Default,
 {
     fn new(records: Vec<IntervalMeta<T, M>>) -> Self {
         Self { records }
@@ -30,7 +30,7 @@ where
 
 impl<T, M> IntervalMetaSet<T, M>
 where
-    T: Copy,
+    T: ValueBounds,
     M: Copy,
 {
     #[must_use]

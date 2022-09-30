@@ -1,15 +1,13 @@
-use std::fmt::Debug;
-
 use super::Container;
 use crate::{
-    traits::{Coordinates, Overlap},
+    traits::{IntervalBounds, ValueBounds},
     types::MergeResults,
 };
 
 pub trait Merge<T, I>: Container<T, I>
 where
-    T: Copy + PartialOrd + Ord + Debug + Default,
-    I: Coordinates<T> + Ord + Clone + Overlap<T>,
+    T: ValueBounds,
+    I: IntervalBounds<T>,
 {
     fn merge(&self) -> MergeResults<T, I> {
         let mut base_interval = I::from(&self.records()[0]);

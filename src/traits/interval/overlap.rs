@@ -1,8 +1,9 @@
 use super::Coordinates;
+use crate::traits::ValueBounds;
 
 pub trait Overlap<T>: Coordinates<T>
 where
-    T: Copy + Default + PartialOrd,
+    T: ValueBounds,
 {
     fn bounded_chr<I: Coordinates<T>>(&self, other: &I) -> bool {
         other.chr() == self.chr()
