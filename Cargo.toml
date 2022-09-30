@@ -2,6 +2,12 @@
 name = "bedrs"
 version = "0.0.12"
 edition = "2021"
+license = "MIT"
+description = "Genomic interval library in rust"
+repository = "https://github.com/noamteyssier/bedrs"
+documentation = "https://docs.rs/bedrs"
+categories = ["science"]
+keywords = ["interval", "bioinformatics", "ranges", "genomic", "bed"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
