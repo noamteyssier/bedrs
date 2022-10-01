@@ -35,6 +35,15 @@ where
             order => order,
         }
     }
+    fn lt(&self, other: &Self) -> bool {
+        self.coord_cmp(other) == Ordering::Less
+    }
+    fn gt(&self, other: &Self) -> bool {
+        self.coord_cmp(other) == Ordering::Greater
+    }
+    fn eq(&self, other: &Self) -> bool {
+        self.coord_cmp(other) == Ordering::Equal
+    }
 }
 
 impl<I, T> Overlap<T> for I
@@ -46,7 +55,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::traits::Coordinates;
+    use crate::{traits::Coordinates, Interval};
 
     // define a custom interval struct for testing
     struct CustomInterval {
@@ -189,5 +198,15 @@ mod testing {
         assert_eq!(a.start(), b.start());
         assert_eq!(a.end(), b.end());
         assert_eq!(a.chr(), b.chr());
+    }
+
+    #[test]
+    fn test_convenience_methods() {
+        let a = Interval::new(10, 20);
+        let b = Interval::new(30, 50);
+        let c = Interval::new(30, 50);
+        assert!(a.lt(&b));
+        assert!(b.gt(&a));
+        assert!(b.eq(&c));
     }
 }
