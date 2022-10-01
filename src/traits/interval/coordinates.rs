@@ -35,6 +35,15 @@ where
             order => order,
         }
     }
+    fn lt(&self, other: &Self) -> bool {
+        self.coord_cmp(other) == Ordering::Less
+    }
+    fn gt(&self, other: &Self) -> bool {
+        self.coord_cmp(other) == Ordering::Greater
+    }
+    fn eq(&self, other: &Self) -> bool {
+        self.coord_cmp(other) == Ordering::Equal
+    }
 }
 
 impl<I, T> Overlap<T> for I
