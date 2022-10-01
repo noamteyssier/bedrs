@@ -1,4 +1,7 @@
-use crate::{traits::{IntervalBounds, ValueBounds}, Merge, Find};
+use crate::{
+    traits::{IntervalBounds, ValueBounds},
+    Find, Merge,
+};
 
 /// The main trait representing a container of intervals.
 ///
@@ -25,12 +28,13 @@ where
     }
 }
 
-impl<C, T, I> Merge<T, I> for C 
+impl<C, T, I> Merge<T, I> for C
 where
     C: Container<T, I>,
     I: IntervalBounds<T>,
     T: ValueBounds,
-{}
+{
+}
 
 impl<C, T, I> Find<T, I> for C
 where
@@ -40,7 +44,6 @@ where
 {
     type ContainerType = C;
 }
-
 
 #[cfg(test)]
 mod testing {

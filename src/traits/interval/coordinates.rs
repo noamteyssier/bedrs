@@ -1,5 +1,5 @@
-use std::cmp::Ordering;
 use crate::{traits::ValueBounds, Overlap};
+use std::cmp::Ordering;
 
 /// The main trait representing an interval.
 pub trait Coordinates<T>
