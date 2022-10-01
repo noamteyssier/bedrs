@@ -1,7 +1,6 @@
-use crate::{traits::ValueBounds, Overlap};
+use crate::{traits::ValueBounds, Overlap, Intersect, Subtract};
 use std::cmp::Ordering;
 
-use super::{Intersect, subtract::Subtract};
 
 /// The main trait representing an interval.
 pub trait Coordinates<T>

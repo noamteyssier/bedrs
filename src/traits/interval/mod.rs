@@ -6,3 +6,4 @@ mod subtract;
 pub use coordinates::Coordinates;
 pub use intersect::Intersect;
 pub use overlap::Overlap;
+pub use subtract::Subtract;
