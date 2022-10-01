@@ -1,4 +1,4 @@
-use crate::traits::{Coordinates, Overlap, ValueBounds};
+use crate::traits::{Coordinates, ValueBounds};
 
 /// A representation of a Genomic Interval.
 ///
@@ -61,8 +61,6 @@ where
         Self { chr, start, end }
     }
 }
-
-impl<T> Overlap<T> for GenomicInterval<T> where T: ValueBounds {}
 
 #[cfg(test)]
 mod testing {
