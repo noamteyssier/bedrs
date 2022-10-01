@@ -1,9 +1,8 @@
 use crate::{
     traits::{IntervalBounds, ValueBounds},
-    Find, Merge,
+    Find, Merge, Bound
 };
 
-use super::Bound;
 
 /// The main trait representing a container of intervals.
 ///
