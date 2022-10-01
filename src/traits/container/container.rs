@@ -20,7 +20,7 @@ where
         self.records().is_empty()
     }
     fn sort(&mut self) {
-        self.records_mut().sort_unstable();
+        self.records_mut().sort_unstable_by(|a, b| a.coord_cmp(b));
         self.set_sorted();
     }
 }

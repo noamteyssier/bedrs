@@ -1,3 +1,5 @@
+use std::cmp::Ordering;
+
 use crate::traits::ValueBounds;
 
 /// The main trait representing an interval.
@@ -27,6 +29,12 @@ where
     fn update_endpoints(&mut self, start: &T, end: &T) {
         self.update_start(start);
         self.update_end(end);
+    }
+    fn coord_cmp(&self, other: &Self) -> Ordering {
+        match self.chr().cmp(&other.chr()) {
+            Ordering::Equal => self.start().cmp(&other.start()),
+            order => order
+        }
     }
 }
 
