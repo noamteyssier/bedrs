@@ -33,7 +33,7 @@ where
     fn coord_cmp(&self, other: &Self) -> Ordering {
         match self.chr().cmp(&other.chr()) {
             Ordering::Equal => self.start().cmp(&other.start()),
-            order => order
+            order => order,
         }
     }
 }
