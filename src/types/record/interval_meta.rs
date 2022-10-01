@@ -63,26 +63,6 @@ where
 {
 }
 
-impl<T, M> Ord for IntervalMeta<T, M>
-where
-    T: ValueBounds,
-    M: Eq + Copy,
-{
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        self.start().cmp(&other.start())
-    }
-}
-
-impl<T, M> PartialOrd for IntervalMeta<T, M>
-where
-    T: ValueBounds,
-    M: Eq + Copy,
-{
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        self.start().partial_cmp(&other.start())
-    }
-}
-
 #[cfg(test)]
 mod testing {
     use super::IntervalMeta;
