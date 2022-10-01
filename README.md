@@ -4,6 +4,7 @@
 ![actions status](https://github.com/noamteyssier/bedrs/workflows/CI/badge.svg)
 [![codecov](https://codecov.io/gh/noamteyssier/bedrs/branch/main/graph/badge.svg?token=CZANC7RKWP)](https://codecov.io/gh/noamteyssier/bedrs)
 [![Crates.io](https://img.shields.io/crates/v/bedrs)](https://crates.io/crates/bedrs)
+[![docs.rs](https://img.shields.io/docsrs/bedrs/latest)](https://docs.rs/bedrs/latest/bedrs/)
 
 bedtools-like functionality for interval sets in rust
 
