@@ -1,5 +1,6 @@
 use crate::{traits::ValueBounds, Overlap, Coordinates};
 
+/// Trait for performing subtraction with coordinates
 pub trait Subtract<T>: Coordinates<T> + Overlap<T>
 where
     T: ValueBounds,
@@ -38,6 +39,83 @@ where
         sub.update_all(&other.chr(), &start, &end);
         vec![sub]
     }
+    /// Perform subtraction between two coordinates.
+    /// 
+    /// Returns a vector of intersections, as depending on the 
+    /// containment status there could either zero, one, or two
+    /// subtraction intervals for any overlapping intervals.
+    ///
+    /// ## Left Overlap
+    /// ```
+    /// use bedrs::{Coordinates, Subtract, Interval};
+    ///
+    /// // (a)       x-------y
+    /// // (b)   i-----j
+    /// // ======================
+    /// // (s)         j----y
+    ///
+    /// let a = Interval::new(20, 30);
+    /// let b = Interval::new(15, 25);
+    /// let s = a.subtract(&b).unwrap();
+    /// assert_eq!(s.len(), 1);
+    /// assert_eq!(s[0].start(), 25);
+    /// assert_eq!(s[0].end(), 30);
+    /// ```
+    ///
+    /// ## Right Overlap
+    /// ```
+    /// use bedrs::{Coordinates, Subtract, Interval};
+    ///
+    /// // (a)   x-----y
+    /// // (b)       i-------j
+    /// // =======================
+    /// // (s)   x---i
+    ///
+    /// let a = Interval::new(15, 25);
+    /// let b = Interval::new(20, 30);
+    /// let s = a.subtract(&b).unwrap();
+    /// assert_eq!(s.len(), 1);
+    /// assert_eq!(s[0].start(), 15);
+    /// assert_eq!(s[0].end(), 20);
+    /// ```
+    ///
+    /// ## Contains
+    /// ```
+    /// use bedrs::{Coordinates, Subtract, Interval};
+    ///
+    /// // (a)   x-----------y
+    /// // (b)       i--j
+    /// // =======================
+    /// // (s)   x---i  j----y
+    ///
+    /// let a = Interval::new(10, 40);
+    /// let b = Interval::new(20, 30);
+    /// let s = a.subtract(&b).unwrap();
+    /// assert_eq!(s.len(), 2);
+    /// assert_eq!(s[0].start(), 10);
+    /// assert_eq!(s[0].end(), 20);
+    /// assert_eq!(s[1].start(), 30);
+    /// assert_eq!(s[1].end(), 40);
+    /// ```
+    ///
+    /// ## Contained by
+    /// ```
+    /// use bedrs::{Coordinates, Subtract, Interval};
+    ///
+    /// // (a)       i--j
+    /// // (b)   x-----------y
+    /// // =======================
+    /// // (s)   i---x  j----y
+    ///
+    /// let a = Interval::new(20, 30);
+    /// let b = Interval::new(10, 40);
+    /// let s = a.subtract(&b).unwrap();
+    /// assert_eq!(s.len(), 2);
+    /// assert_eq!(s[0].start(), 10);
+    /// assert_eq!(s[0].end(), 20);
+    /// assert_eq!(s[1].start(), 30);
+    /// assert_eq!(s[1].end(), 40);
+    /// ```
     fn subtract<I: Coordinates<T>>(&self, other: &I) -> Option<Vec<I>> {
         if self.overlaps(other) {
             if self.eq(other) {
@@ -60,9 +138,8 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::{Interval, Coordinates};
+    use crate::{Interval, Coordinates, GenomicInterval};
     use super::Subtract;
-
 
     #[test]
     ///      x-------y
@@ -72,6 +149,20 @@ mod testing {
     fn subtraction_case_a() {
         let a = Interval::new(20, 30);
         let b = Interval::new(15, 25);
+        let sub = a.subtract(&b).unwrap();
+        assert_eq!(sub.len(), 1);
+        assert_eq!(sub[0].start(), 25);
+        assert_eq!(sub[0].end(), 30);
+    }
+
+    #[test]
+    ///      x-------y
+    ///   i-----j
+    /// ==================
+    ///         j----y
+    fn subtraction_genomic_a() {
+        let a = GenomicInterval::new(1, 20, 30);
+        let b = GenomicInterval::new(1, 15, 25);
         let sub = a.subtract(&b).unwrap();
         assert_eq!(sub.len(), 1);
         assert_eq!(sub[0].start(), 25);
@@ -132,6 +223,30 @@ mod testing {
     fn subtraction_case_e() {
         let a = Interval::new(10, 30);
         let b = Interval::new(10, 30);
+        let sub = a.subtract(&b);
+        assert!(sub.is_none());
+    }
+
+    #[test]
+    ///     x--y
+    ///     i--j
+    /// ==================
+    /// none
+    fn subtraction_genomic_e() {
+        let a = GenomicInterval::new(1, 10, 30);
+        let b = GenomicInterval::new(1, 10, 30);
+        let sub = a.subtract(&b);
+        assert!(sub.is_none());
+    }
+
+    #[test]
+    ///     x--y
+    ///     i--j
+    /// ==================
+    /// none
+    fn subtraction_genomic_e_wrong_chr() {
+        let a = GenomicInterval::new(1, 10, 30);
+        let b = GenomicInterval::new(2, 10, 30);
         let sub = a.subtract(&b);
         assert!(sub.is_none());
     }
