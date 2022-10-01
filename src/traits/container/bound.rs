@@ -123,7 +123,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::{Container, Bound, GenomicInterval, GenomicIntervalSet, Interval, IntervalSet};
+    use crate::{Bound, Container, GenomicInterval, GenomicIntervalSet, Interval, IntervalSet};
 
     #[test]
     fn bsearch_base_low() {

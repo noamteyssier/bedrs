@@ -1,8 +1,7 @@
 use crate::{
     traits::{IntervalBounds, ValueBounds},
-    Find, Merge, Bound
+    Bound, Find, Merge,
 };
-
 
 /// The main trait representing a container of intervals.
 ///
