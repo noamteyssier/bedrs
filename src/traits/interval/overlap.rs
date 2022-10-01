@@ -135,4 +135,11 @@ mod testing {
         assert!(!a.contains(&e));
         assert!(!e.contained_by(&a));
     }
+
+    #[test]
+    fn test_overlap_identity() {
+        let a = Interval::new(10, 20);
+        let b = Interval::new(10, 20);
+        assert!(a.overlaps(&b));
+    }
 }
