@@ -8,6 +8,49 @@ where
     I: IntervalBounds<T>,
     T: ValueBounds,
 {
+    /// Identifies the lower bound on the [Container] via a binary tree search
+    /// for a provided query.
+    ///
+    /// This first checks if the [Container] is sorted
+    ///
+    /// ## On base coordinates
+    ///
+    /// ```
+    /// use bedrs::{Bound, Container, Interval, IntervalSet};
+    ///
+    /// let records = vec![
+    ///     Interval::new(10, 20),
+    ///     Interval::new(20, 30), // <- min
+    ///     Interval::new(30, 40),
+    ///     Interval::new(40, 50),
+    ///     Interval::new(50, 60),
+    /// ];
+    /// let query = Interval::new(17, 27);
+    /// let mut set = IntervalSet::new(records);
+    /// set.sort();
+    /// let bound = set.lower_bound(&query);
+    /// assert_eq!(bound, Some(1));
+    /// ```
+    ///
+    /// ## On genomic coordinates
+    ///
+    /// ```
+    /// use bedrs::{Bound, Container, GenomicInterval, GenomicIntervalSet};
+    ///
+    /// let records = vec![
+    ///     GenomicInterval::new(1, 10, 20),
+    ///     GenomicInterval::new(2, 10, 20),
+    ///     GenomicInterval::new(3, 10, 20), // <- min
+    ///     GenomicInterval::new(3, 20, 20),
+    ///     GenomicInterval::new(3, 30, 20),
+    ///     GenomicInterval::new(4, 10, 20),
+    /// ];
+    /// let mut set = GenomicIntervalSet::new(records);
+    /// set.sort();
+    /// let query = GenomicInterval::new(3, 10, 20);
+    /// let bound = set.lower_bound(&query);
+    /// assert_eq!(bound, Some(2));
+    /// ```
     fn lower_bound(&self, query: &I) -> Option<usize> {
         if self.is_sorted() {
             Some(self.lower_bound_unchecked(query))
@@ -16,6 +59,48 @@ where
         }
     }
 
+    /// Identifies the lower bound on the [Container] via a binary tree search
+    /// for a provided query.
+    ///
+    /// Does not perform a check if it is sorted beforehand.
+    /// Use at your own risk.
+    ///
+    /// ## On base coordinates
+    ///
+    /// ```
+    /// use bedrs::{Bound, Interval, IntervalSet};
+    ///
+    /// let records = vec![
+    ///     Interval::new(10, 20),
+    ///     Interval::new(20, 30), // <- min
+    ///     Interval::new(30, 40),
+    ///     Interval::new(40, 50),
+    ///     Interval::new(50, 60),
+    /// ];
+    /// let query = Interval::new(17, 27);
+    /// let set = IntervalSet::new(records);
+    /// let bound = set.lower_bound_unchecked(&query);
+    /// assert_eq!(bound, 1);
+    /// ```
+    ///
+    /// ## On genomic coordinates
+    ///
+    /// ```
+    /// use bedrs::{Bound, GenomicInterval, GenomicIntervalSet};
+    ///
+    /// let records = vec![
+    ///     GenomicInterval::new(1, 10, 20),
+    ///     GenomicInterval::new(2, 10, 20),
+    ///     GenomicInterval::new(3, 10, 20), // <- min
+    ///     GenomicInterval::new(3, 20, 20),
+    ///     GenomicInterval::new(3, 30, 20),
+    ///     GenomicInterval::new(4, 10, 20),
+    /// ];
+    /// let set = GenomicIntervalSet::new(records);
+    /// let query = GenomicInterval::new(3, 10, 20);
+    /// let bound = set.lower_bound_unchecked(&query);
+    /// assert_eq!(bound, 2);
+    /// ```
     fn lower_bound_unchecked(&self, query: &I) -> usize {
         let mut high = self.len();
         let mut low = 0;
@@ -38,8 +123,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use super::Bound;
-    use crate::{Container, GenomicInterval, GenomicIntervalSet, Interval, IntervalSet};
+    use crate::{Container, Bound, GenomicInterval, GenomicIntervalSet, Interval, IntervalSet};
 
     #[test]
     fn bsearch_base_low() {
