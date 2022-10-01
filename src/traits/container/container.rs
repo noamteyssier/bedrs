@@ -55,7 +55,6 @@ where
 {
 }
 
-
 #[cfg(test)]
 mod testing {
     use super::Container;

@@ -1,9 +1,12 @@
-use crate::{traits::{IntervalBounds, ValueBounds}, Container};
+use crate::{
+    traits::{IntervalBounds, ValueBounds},
+    Container,
+};
 
 pub trait Bound<T, I>: Container<T, I>
 where
     I: IntervalBounds<T>,
-    T: ValueBounds
+    T: ValueBounds,
 {
     fn lower_bound(&self, query: &I) -> Option<usize> {
         if self.is_sorted() {
@@ -35,14 +38,12 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::{Interval, IntervalSet, Container, GenomicInterval, GenomicIntervalSet};
     use super::Bound;
+    use crate::{Container, GenomicInterval, GenomicIntervalSet, Interval, IntervalSet};
 
     #[test]
     fn bsearch_base_low() {
-        let records = (0..500)
-            .map(|x| Interval::new(x, x + 50))
-            .collect();
+        let records = (0..500).map(|x| Interval::new(x, x + 50)).collect();
         let mut set = IntervalSet::new(records);
         set.sort();
         let query = Interval::new(10, 20);
@@ -52,9 +53,7 @@ mod testing {
 
     #[test]
     fn bsearch_base_high() {
-        let records = (0..500)
-            .map(|x| Interval::new(x, x + 50))
-            .collect();
+        let records = (0..500).map(|x| Interval::new(x, x + 50)).collect();
         let mut set = IntervalSet::new(records);
         set.sort();
         let query = Interval::new(300, 320);
@@ -84,7 +83,7 @@ mod testing {
         let records = vec![
             GenomicInterval::new(1, 10, 20),
             GenomicInterval::new(2, 10, 20),
-            GenomicInterval::new(3, 10, 20), 
+            GenomicInterval::new(3, 10, 20),
             GenomicInterval::new(3, 20, 20),
             GenomicInterval::new(3, 30, 20), // <- min
             GenomicInterval::new(4, 10, 20),
@@ -98,9 +97,7 @@ mod testing {
 
     #[test]
     fn bsearch_unsorted() {
-        let records = (0..500)
-            .map(|x| Interval::new(x, x + 50))
-            .collect();
+        let records = (0..500).map(|x| Interval::new(x, x + 50)).collect();
         let set = IntervalSet::new(records);
         let query = Interval::new(10, 20);
         let bound = set.lower_bound(&query);
