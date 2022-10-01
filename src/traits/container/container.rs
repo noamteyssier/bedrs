@@ -3,6 +3,8 @@ use crate::{
     Find, Merge,
 };
 
+use super::Bound;
+
 /// The main trait representing a container of intervals.
 ///
 /// Each of the intervals: `I` must impl the `Coordinates` trait.
@@ -44,6 +46,15 @@ where
 {
     type ContainerType = C;
 }
+
+impl<C, T, I> Bound<T, I> for C
+where
+    C: Container<T, I>,
+    I: IntervalBounds<T>,
+    T: ValueBounds,
+{
+}
+
 
 #[cfg(test)]
 mod testing {
