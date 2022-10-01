@@ -1,9 +1,9 @@
 use crate::{traits::ValueBounds, Coordinates, Overlap};
 
 /// Calculates the intersection between two coordinates.
-pub trait Intersect<T> : Coordinates<T> + Overlap<T>
+pub trait Intersect<T>: Coordinates<T> + Overlap<T>
 where
-    T: ValueBounds
+    T: ValueBounds,
 {
     fn build_intersection_interval<I: Coordinates<T>>(&self, other: &I) -> I {
         let chr = self.chr();
@@ -13,7 +13,7 @@ where
         interval.update_all(&chr, &start, &end);
         interval
     }
-    
+
     /// Calculates the intersection between two coordinates if they overlap.
     ///
     /// ```
@@ -38,8 +38,8 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::{Interval, Coordinates};
     use super::Intersect;
+    use crate::{Coordinates, Interval};
 
     #[test]
     ///       x-------y
@@ -69,7 +69,7 @@ mod testing {
 
     #[test]
     ///    x--------y
-    ///       i--j 
+    ///       i--j
     /// ==================
     ///       i--j
     fn intersection_case_c() {
@@ -81,7 +81,7 @@ mod testing {
     }
 
     #[test]
-    ///       x--y 
+    ///       x--y
     ///    i--------j
     /// ==================
     ///       x--y
@@ -94,7 +94,7 @@ mod testing {
     }
 
     #[test]
-    ///       x--y 
+    ///       x--y
     ///       i--j
     /// ==================
     ///       x--y
@@ -107,7 +107,7 @@ mod testing {
     }
 
     #[test]
-    ///    x--y 
+    ///    x--y
     ///         i--j
     /// ==================
     ///       none
@@ -117,5 +117,4 @@ mod testing {
         let ix = a.intersect(&b);
         assert!(ix.is_none());
     }
-
 }
