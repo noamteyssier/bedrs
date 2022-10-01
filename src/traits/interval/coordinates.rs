@@ -1,7 +1,5 @@
-use crate::{traits::ValueBounds, Overlap};
+use crate::{traits::ValueBounds, Intersect, Overlap, Subtract};
 use std::cmp::Ordering;
-
-use super::Intersect;
 
 /// The main trait representing an interval.
 pub trait Coordinates<T>
@@ -15,14 +13,6 @@ where
     fn update_end(&mut self, val: &T);
     fn update_chr(&mut self, val: &T);
     fn from(other: &Self) -> Self;
-    fn update_all_from(&mut self, other: &Self) {
-        self.update_chr(&other.chr());
-        self.update_endpoints(&other.start(), &other.end());
-    }
-    fn update_endpoints_from(&mut self, other: &Self) {
-        self.update_start(&other.start());
-        self.update_end(&other.end());
-    }
     fn update_all(&mut self, chr: &T, start: &T, end: &T) {
         self.update_chr(chr);
         self.update_endpoints(start, end);
@@ -31,19 +21,27 @@ where
         self.update_start(start);
         self.update_end(end);
     }
-    fn coord_cmp(&self, other: &Self) -> Ordering {
+    fn update_all_from<I: Coordinates<T>>(&mut self, other: &I) {
+        self.update_chr(&other.chr());
+        self.update_endpoints(&other.start(), &other.end());
+    }
+    fn update_endpoints_from<I: Coordinates<T>>(&mut self, other: &I) {
+        self.update_start(&other.start());
+        self.update_end(&other.end());
+    }
+    fn coord_cmp<I: Coordinates<T>>(&self, other: &I) -> Ordering {
         match self.chr().cmp(&other.chr()) {
             Ordering::Equal => self.start().cmp(&other.start()),
             order => order,
         }
     }
-    fn lt(&self, other: &Self) -> bool {
+    fn lt<I: Coordinates<T>>(&self, other: &I) -> bool {
         self.coord_cmp(other) == Ordering::Less
     }
-    fn gt(&self, other: &Self) -> bool {
+    fn gt<I: Coordinates<T>>(&self, other: &I) -> bool {
         self.coord_cmp(other) == Ordering::Greater
     }
-    fn eq(&self, other: &Self) -> bool {
+    fn eq<I: Coordinates<T>>(&self, other: &I) -> bool {
         self.coord_cmp(other) == Ordering::Equal
     }
 }
@@ -56,6 +54,13 @@ where
 }
 
 impl<I, T> Intersect<T> for I
+where
+    I: Coordinates<T>,
+    T: ValueBounds,
+{
+}
+
+impl<I, T> Subtract<T> for I
 where
     I: Coordinates<T>,
     T: ValueBounds,
