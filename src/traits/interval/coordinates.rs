@@ -1,6 +1,8 @@
 use crate::{traits::ValueBounds, Overlap};
 use std::cmp::Ordering;
 
+use super::Intersect;
+
 /// The main trait representing an interval.
 pub trait Coordinates<T>
 where
@@ -47,6 +49,13 @@ where
 }
 
 impl<I, T> Overlap<T> for I
+where
+    I: Coordinates<T>,
+    T: ValueBounds,
+{
+}
+
+impl<I, T> Intersect<T> for I
 where
     I: Coordinates<T>,
     T: ValueBounds,

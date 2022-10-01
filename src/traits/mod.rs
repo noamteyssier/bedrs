@@ -3,7 +3,7 @@ use std::fmt::Debug;
 pub mod container;
 pub mod interval;
 pub use container::{Bound, Container, Find, Merge};
-pub use interval::{Coordinates, Overlap};
+pub use interval::{Coordinates, Intersect, Overlap};
 
 pub trait ValueBounds
 where
