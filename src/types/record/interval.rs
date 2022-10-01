@@ -14,7 +14,7 @@ use crate::traits::{Coordinates, Overlap, ValueBounds};
 /// let b = Interval::new(25, 35);
 /// assert!(a.overlaps(&b));
 /// ```
-#[derive(Debug, Clone, Eq, PartialEq, Copy)]
+#[derive(Debug, Clone, Copy)]
 pub struct Interval<T>
 where
     T: ValueBounds,
@@ -71,22 +71,6 @@ where
     }
 }
 impl<T> Overlap<T> for Interval<T> where T: ValueBounds {}
-impl<T> Ord for Interval<T>
-where
-    T: ValueBounds,
-{
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        self.start().cmp(&other.start())
-    }
-}
-impl<T> PartialOrd for Interval<T>
-where
-    T: ValueBounds,
-{
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        self.start().partial_cmp(&other.start())
-    }
-}
 
 #[cfg(test)]
 mod testing {
@@ -107,24 +91,24 @@ mod testing {
     fn test_interval_ordering_gt() {
         let a = Interval::new(10, 100);
         let b = Interval::new(5, 100);
-        assert_eq!(a.cmp(&b), Ordering::Greater);
+        assert_eq!(a.coord_cmp(&b), Ordering::Greater);
     }
 
     #[test]
     fn test_interval_ordering_lt() {
         let a = Interval::new(5, 100);
         let b = Interval::new(10, 100);
-        assert_eq!(a.cmp(&b), Ordering::Less);
+        assert_eq!(a.coord_cmp(&b), Ordering::Less);
     }
 
     #[test]
     fn test_interval_ordering_eq() {
         let a = Interval::new(5, 100);
         let b = Interval::new(5, 100);
-        assert_eq!(a.cmp(&b), Ordering::Equal);
+        assert_eq!(a.coord_cmp(&b), Ordering::Equal);
 
         let a = Interval::new(5, 100);
         let b = Interval::new(5, 90);
-        assert_eq!(a.cmp(&b), Ordering::Equal);
+        assert_eq!(a.coord_cmp(&b), Ordering::Equal);
     }
 }

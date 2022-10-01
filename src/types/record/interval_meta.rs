@@ -1,10 +1,9 @@
 use crate::traits::{Coordinates, Overlap, ValueBounds};
 
-#[derive(Debug, Clone, Eq, PartialEq, Copy)]
+#[derive(Debug, Clone, Copy)]
 pub struct IntervalMeta<T, M>
 where
     T: ValueBounds,
-    M: Copy,
 {
     start: T,
     end: T,
@@ -61,26 +60,6 @@ where
     T: ValueBounds,
     M: Copy,
 {
-}
-
-impl<T, M> Ord for IntervalMeta<T, M>
-where
-    T: ValueBounds,
-    M: Eq + Copy,
-{
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        self.start().cmp(&other.start())
-    }
-}
-
-impl<T, M> PartialOrd for IntervalMeta<T, M>
-where
-    T: ValueBounds,
-    M: Eq + Copy,
-{
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        self.start().partial_cmp(&other.start())
-    }
 }
 
 #[cfg(test)]

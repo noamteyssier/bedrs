@@ -1,5 +1,4 @@
 use crate::traits::{Coordinates, Overlap, ValueBounds};
-use std::cmp::Ordering;
 
 /// A representation of a Genomic Interval.
 ///
@@ -16,7 +15,7 @@ use std::cmp::Ordering;
 /// let b = GenomicInterval::new(1, 20, 30);
 /// assert!(a.overlaps(&b));
 /// ```
-#[derive(Debug, Clone, Eq, PartialEq, Copy)]
+#[derive(Debug, Clone, Copy)]
 pub struct GenomicInterval<T> {
     chr: T,
     start: T,
@@ -63,33 +62,6 @@ where
     }
 }
 
-impl<T> Ord for GenomicInterval<T>
-where
-    T: ValueBounds,
-{
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        match self.chr().cmp(&other.chr()) {
-            Ordering::Equal => self.start().cmp(&other.start()),
-            order => order,
-        }
-    }
-}
-
-impl<T> PartialOrd for GenomicInterval<T>
-where
-    T: ValueBounds,
-{
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        match self.chr().partial_cmp(&other.chr()) {
-            None => None,
-            Some(order) => match order {
-                Ordering::Equal => self.start().partial_cmp(&other.start()),
-                some_order => Some(some_order),
-            },
-        }
-    }
-}
-
 impl<T> Overlap<T> for GenomicInterval<T> where T: ValueBounds {}
 
 #[cfg(test)]
@@ -109,36 +81,36 @@ mod testing {
     fn test_interval_ordering_gt() {
         let a = GenomicInterval::new(1, 10, 100);
         let b = GenomicInterval::new(1, 5, 100);
-        assert_eq!(a.cmp(&b), Ordering::Greater);
+        assert_eq!(a.coord_cmp(&b), Ordering::Greater);
 
         let a = GenomicInterval::new(2, 10, 100);
         let b = GenomicInterval::new(1, 10, 100);
-        assert_eq!(a.cmp(&b), Ordering::Greater);
+        assert_eq!(a.coord_cmp(&b), Ordering::Greater);
     }
 
     #[test]
     fn test_interval_ordering_lt() {
         let a = GenomicInterval::new(1, 5, 100);
         let b = GenomicInterval::new(1, 10, 100);
-        assert_eq!(a.cmp(&b), Ordering::Less);
+        assert_eq!(a.coord_cmp(&b), Ordering::Less);
 
         let a = GenomicInterval::new(1, 10, 100);
         let b = GenomicInterval::new(2, 10, 100);
-        assert_eq!(a.cmp(&b), Ordering::Less);
+        assert_eq!(a.coord_cmp(&b), Ordering::Less);
     }
 
     #[test]
     fn test_interval_ordering_eq() {
         let a = GenomicInterval::new(1, 5, 100);
         let b = GenomicInterval::new(1, 5, 100);
-        assert_eq!(a.cmp(&b), Ordering::Equal);
+        assert_eq!(a.coord_cmp(&b), Ordering::Equal);
 
         let a = GenomicInterval::new(1, 5, 100);
         let b = GenomicInterval::new(1, 5, 90);
-        assert_eq!(a.cmp(&b), Ordering::Equal);
+        assert_eq!(a.coord_cmp(&b), Ordering::Equal);
 
         let a = GenomicInterval::new(2, 5, 100);
         let b = GenomicInterval::new(2, 5, 100);
-        assert_eq!(a.cmp(&b), Ordering::Equal);
+        assert_eq!(a.coord_cmp(&b), Ordering::Equal);
     }
 }
