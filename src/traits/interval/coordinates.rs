@@ -1,6 +1,5 @@
-use crate::{traits::ValueBounds, Overlap, Intersect, Subtract};
+use crate::{traits::ValueBounds, Intersect, Overlap, Subtract};
 use std::cmp::Ordering;
-
 
 /// The main trait representing an interval.
 pub trait Coordinates<T>
@@ -67,7 +66,6 @@ where
     T: ValueBounds,
 {
 }
-
 
 #[cfg(test)]
 mod testing {

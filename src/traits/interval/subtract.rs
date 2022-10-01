@@ -1,4 +1,4 @@
-use crate::{traits::ValueBounds, Overlap, Coordinates};
+use crate::{traits::ValueBounds, Coordinates, Overlap};
 
 /// Trait for performing subtraction with coordinates
 pub trait Subtract<T>: Coordinates<T> + Overlap<T>
@@ -40,8 +40,8 @@ where
         vec![sub]
     }
     /// Perform subtraction between two coordinates.
-    /// 
-    /// Returns a vector of intersections, as depending on the 
+    ///
+    /// Returns a vector of intersections, as depending on the
     /// containment status there could either zero, one, or two
     /// subtraction intervals for any overlapping intervals.
     ///
@@ -132,14 +132,13 @@ where
         } else {
             None
         }
-
     }
 }
 
 #[cfg(test)]
 mod testing {
-    use crate::{Interval, Coordinates, GenomicInterval};
     use super::Subtract;
+    use crate::{Coordinates, GenomicInterval, Interval};
 
     #[test]
     ///      x-------y
