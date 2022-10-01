@@ -1,4 +1,7 @@
-use crate::traits::{IntervalBounds, ValueBounds};
+use crate::{
+    traits::{IntervalBounds, ValueBounds},
+    Find, Merge,
+};
 
 /// The main trait representing a container of intervals.
 ///
@@ -23,6 +26,23 @@ where
         self.records_mut().sort_unstable_by(|a, b| a.coord_cmp(b));
         self.set_sorted();
     }
+}
+
+impl<C, T, I> Merge<T, I> for C
+where
+    C: Container<T, I>,
+    I: IntervalBounds<T>,
+    T: ValueBounds,
+{
+}
+
+impl<C, T, I> Find<T, I> for C
+where
+    C: Container<T, I>,
+    I: IntervalBounds<T>,
+    T: ValueBounds,
+{
+    type ContainerType = C;
 }
 
 #[cfg(test)]

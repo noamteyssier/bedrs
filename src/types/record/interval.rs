@@ -1,4 +1,4 @@
-use crate::traits::{Coordinates, Overlap, ValueBounds};
+use crate::traits::{Coordinates, ValueBounds};
 
 /// A representation of a classic Interval.
 ///
@@ -29,18 +29,6 @@ where
     pub fn new(start: T, end: T) -> Self {
         Self { start, end }
     }
-    pub fn from<I: Coordinates<T>>(other: &I) -> Self {
-        Self {
-            start: other.start(),
-            end: other.end(),
-        }
-    }
-    pub fn update_start(&mut self, value: &T) {
-        self.start = *value;
-    }
-    pub fn update_end(&mut self, value: &T) {
-        self.end = *value;
-    }
 }
 impl<T> Coordinates<T> for Interval<T>
 where
@@ -70,7 +58,6 @@ where
         }
     }
 }
-impl<T> Overlap<T> for Interval<T> where T: ValueBounds {}
 
 #[cfg(test)]
 mod testing {

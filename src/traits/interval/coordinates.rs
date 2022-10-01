@@ -1,6 +1,5 @@
+use crate::{traits::ValueBounds, Overlap};
 use std::cmp::Ordering;
-
-use crate::traits::ValueBounds;
 
 /// The main trait representing an interval.
 pub trait Coordinates<T>
@@ -36,6 +35,13 @@ where
             order => order,
         }
     }
+}
+
+impl<I, T> Overlap<T> for I
+where
+    I: Coordinates<T>,
+    T: ValueBounds,
+{
 }
 
 #[cfg(test)]

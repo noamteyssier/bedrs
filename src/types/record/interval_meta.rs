@@ -1,4 +1,4 @@
-use crate::traits::{Coordinates, Overlap, ValueBounds};
+use crate::traits::{Coordinates, ValueBounds};
 
 #[derive(Debug, Clone, Copy)]
 pub struct IntervalMeta<T, M>
@@ -54,12 +54,6 @@ where
             metadata: *other.metadata(),
         }
     }
-}
-impl<T, M> Overlap<T> for IntervalMeta<T, M>
-where
-    T: ValueBounds,
-    M: Copy,
-{
 }
 
 #[cfg(test)]
