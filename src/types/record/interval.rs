@@ -14,7 +14,7 @@ use crate::traits::{Coordinates, Overlap, ValueBounds};
 /// let b = Interval::new(25, 35);
 /// assert!(a.overlaps(&b));
 /// ```
-#[derive(Debug, Clone, Eq, PartialEq, Copy)]
+#[derive(Debug, Clone, Copy)]
 pub struct Interval<T>
 where
     T: ValueBounds,

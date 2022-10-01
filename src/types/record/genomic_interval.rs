@@ -15,7 +15,7 @@ use crate::traits::{Coordinates, Overlap, ValueBounds};
 /// let b = GenomicInterval::new(1, 20, 30);
 /// assert!(a.overlaps(&b));
 /// ```
-#[derive(Debug, Clone, Eq, PartialEq, Copy)]
+#[derive(Debug, Clone, Copy)]
 pub struct GenomicInterval<T> {
     chr: T,
     start: T,

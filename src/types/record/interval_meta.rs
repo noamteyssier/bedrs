@@ -1,10 +1,9 @@
 use crate::traits::{Coordinates, Overlap, ValueBounds};
 
-#[derive(Debug, Clone, Eq, PartialEq, Copy)]
+#[derive(Debug, Clone, Copy)]
 pub struct IntervalMeta<T, M>
 where
     T: ValueBounds,
-    M: Copy,
 {
     start: T,
     end: T,
