@@ -1,7 +1,7 @@
 use std::fmt::Debug;
 
-use crate::traits::{container::Merge, Container};
-use crate::traits::{Find, IntervalBounds, ValueBounds};
+use crate::traits::Container;
+use crate::traits::{IntervalBounds, ValueBounds};
 use crate::types::Interval;
 use anyhow::{bail, Result};
 
@@ -38,21 +38,6 @@ where
     fn set_sorted(&mut self) {
         self.is_sorted = true;
     }
-}
-
-impl<T> Merge<T, Interval<T>> for IntervalSet<T>
-where
-    T: ValueBounds,
-    Interval<T>: IntervalBounds<T>,
-{
-}
-
-impl<T> Find<T, Interval<T>> for IntervalSet<T>
-where
-    T: ValueBounds,
-    Interval<T>: IntervalBounds<T>,
-{
-    type ContainerType = Self;
 }
 
 impl<T> IntervalSet<T>
