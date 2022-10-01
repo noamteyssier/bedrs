@@ -14,13 +14,13 @@ impl<T: Copy + Default + Ord + Debug> ValueBounds for T {}
 
 pub trait IntervalBounds<T>
 where
-    Self: Ord + Coordinates<T> + Clone + Overlap<T>,
+    Self: Coordinates<T> + Clone + Overlap<T>,
     T: ValueBounds,
 {
 }
 impl<I, T> IntervalBounds<T> for I
 where
-    I: Ord + Coordinates<T> + Clone + Overlap<T>,
+    I: Coordinates<T> + Clone + Overlap<T>,
     T: ValueBounds,
 {
 }
