@@ -103,10 +103,10 @@ where
     /// ```
     /// use bedrs::{Coordinates, Subtract, Interval};
     ///
-    /// // (a)       i--j
-    /// // (b)   x-----------y
+    /// // (a)       x--y
+    /// // (b)   i-----------j
     /// // =======================
-    /// // (s)   i---x  j----y
+    /// // (s)   i---x  y----j
     ///
     /// let a = Interval::new(20, 30);
     /// let b = Interval::new(10, 40);
@@ -116,6 +116,38 @@ where
     /// assert_eq!(s[0].end(), 20);
     /// assert_eq!(s[1].start(), 30);
     /// assert_eq!(s[1].end(), 40);
+    /// ```
+    ///
+    /// ## Complete Overlap
+    /// ```
+    /// use bedrs::{Coordinates, Subtract, Interval};
+    ///
+    /// // (a)       x--y
+    /// // (b)       i--j
+    /// // =======================
+    /// // (s) None
+    ///
+    /// let a = Interval::new(10, 30);
+    /// let b = Interval::new(10, 30);
+    /// let s = a.subtract(&b);
+    /// assert!(s.is_none());
+    /// ```
+    ///
+    /// ## No Overlap
+    /// ```
+    /// use bedrs::{Coordinates, Subtract, Interval};
+    ///
+    /// // (a)  x--y
+    /// // (b)       i--j
+    /// // =======================
+    /// // (s)  x--y
+    ///
+    /// let a = Interval::new(10, 20);
+    /// let b = Interval::new(30, 40);
+    /// let s = a.subtract(&b).unwrap();
+    /// assert_eq!(s.len(), 1);
+    /// assert_eq!(s[0].start(), 10);
+    /// assert_eq!(s[0].end(), 20);
     /// ```
     fn subtract<I: Coordinates<T>>(&self, other: &I) -> Option<Vec<I>> {
         if self.overlaps(other) {
