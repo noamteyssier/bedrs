@@ -26,17 +26,18 @@ where
         ]
     }
     fn build_gt<I: Coordinates<T>>(&self, other: &I) -> Vec<I> {
-        let start = other.end();
-        let end = self.end();
         let mut sub = I::from(other);
-        sub.update_all(&other.chr(), &start, &end);
+        sub.update_all(&other.chr(), &other.end(), &self.end());
         vec![sub]
     }
     fn build_lt<I: Coordinates<T>>(&self, other: &I) -> Vec<I> {
-        let start = self.start();
-        let end = other.start();
         let mut sub = I::from(other);
-        sub.update_all(&other.chr(), &start, &end);
+        sub.update_all(&other.chr(), &self.start(), &other.start());
+        vec![sub]
+    }
+    fn build_self<I: Coordinates<T>>(&self, other: &I) -> Vec<I> {
+        let mut sub = I::from(&other);
+        sub.update_all(&other.chr(), &self.start(), &self.end());
         vec![sub]
     }
     /// Perform subtraction between two coordinates.
@@ -102,10 +103,10 @@ where
     /// ```
     /// use bedrs::{Coordinates, Subtract, Interval};
     ///
-    /// // (a)       i--j
-    /// // (b)   x-----------y
+    /// // (a)       x--y
+    /// // (b)   i-----------j
     /// // =======================
-    /// // (s)   i---x  j----y
+    /// // (s)   i---x  y----j
     ///
     /// let a = Interval::new(20, 30);
     /// let b = Interval::new(10, 40);
@@ -115,6 +116,38 @@ where
     /// assert_eq!(s[0].end(), 20);
     /// assert_eq!(s[1].start(), 30);
     /// assert_eq!(s[1].end(), 40);
+    /// ```
+    ///
+    /// ## Complete Overlap
+    /// ```
+    /// use bedrs::{Coordinates, Subtract, Interval};
+    ///
+    /// // (a)       x--y
+    /// // (b)       i--j
+    /// // =======================
+    /// // (s) None
+    ///
+    /// let a = Interval::new(10, 30);
+    /// let b = Interval::new(10, 30);
+    /// let s = a.subtract(&b);
+    /// assert!(s.is_none());
+    /// ```
+    ///
+    /// ## No Overlap
+    /// ```
+    /// use bedrs::{Coordinates, Subtract, Interval};
+    ///
+    /// // (a)  x--y
+    /// // (b)       i--j
+    /// // =======================
+    /// // (s)  x--y
+    ///
+    /// let a = Interval::new(10, 20);
+    /// let b = Interval::new(30, 40);
+    /// let s = a.subtract(&b).unwrap();
+    /// assert_eq!(s.len(), 1);
+    /// assert_eq!(s[0].start(), 10);
+    /// assert_eq!(s[0].end(), 20);
     /// ```
     fn subtract<I: Coordinates<T>>(&self, other: &I) -> Option<Vec<I>> {
         if self.overlaps(other) {
@@ -130,7 +163,7 @@ where
                 todo!()
             }
         } else {
-            None
+            Some(self.build_self(other))
         }
     }
 }
@@ -239,26 +272,30 @@ mod testing {
     }
 
     #[test]
-    ///     x--y
-    ///     i--j
+    ///     x--y  <- chr1
+    ///     i--j  <- chr2
     /// ==================
-    /// none
+    ///     x--y
     fn subtraction_genomic_e_wrong_chr() {
         let a = GenomicInterval::new(1, 10, 30);
         let b = GenomicInterval::new(2, 10, 30);
-        let sub = a.subtract(&b);
-        assert!(sub.is_none());
+        let sub = a.subtract(&b).unwrap();
+        assert_eq!(sub.len(), 1);
+        assert_eq!(sub[0].start(), 10);
+        assert_eq!(sub[0].end(), 30);
     }
 
     #[test]
     ///   x--y
     ///        i--j
     /// ==================
-    /// none
+    ///   x--y
     fn subtraction_case_f() {
         let a = Interval::new(10, 20);
         let b = Interval::new(30, 40);
-        let sub = a.subtract(&b);
-        assert!(sub.is_none());
+        let sub = a.subtract(&b).unwrap();
+        assert_eq!(sub.len(), 1);
+        assert_eq!(sub[0].start(), 10);
+        assert_eq!(sub[0].end(), 20);
     }
 }
