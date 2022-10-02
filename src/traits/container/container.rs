@@ -1,3 +1,5 @@
+use anyhow::bail;
+
 use crate::{
     traits::{IntervalBounds, ValueBounds},
     Bound, Find, Merge,
@@ -49,7 +51,19 @@ where
     }
 
     /// Creates a new container from presorted intervals
-    fn from_sorted(records: Vec<I>) -> Self {
+    ///
+    /// First this validates that the intervals are truly presorted.
+    fn from_sorted(records: Vec<I>) -> anyhow::Result<Self> {
+        if Self::valid_interval_sorting(&records) {
+            Ok(Self::from_sorted_unchecked(records))
+        } else {
+            bail!("Intervals are unsorted!")
+        }
+    }
+
+    /// Creates a new container from presorted intervals without
+    /// validating if the intervals are truly presorted.
+    fn from_sorted_unchecked(records: Vec<I>) -> Self {
         let mut set = Self::new(records);
         set.set_sorted();
         set
@@ -62,11 +76,6 @@ where
         set
     }
 
-    /// Validates that the internal records are sorted
-    fn valid_internal_sorting(&self) -> bool {
-        Self::valid_interval_sorting(self.records())
-    }
-
     /// Validates that a set of intervals are sorted
     fn valid_interval_sorting(records: &Vec<I>) -> bool {
         records
@@ -74,7 +83,7 @@ where
             .enumerate()
             .skip(1)
             .map(|(idx, rec)| (rec, &records[idx-1]))
-            .all(|(a, b)| a.coord_cmp(b).is_le())
+            .all(|(a, b)| a.coord_cmp(b).is_ge())
     }
 }
 
@@ -193,7 +202,7 @@ mod testing {
             Interval::new(10, 15),
             Interval::new(15, 20),
         ];
-        let set = IntervalSet::from_sorted(records);
+        let set = IntervalSet::from_sorted(records).unwrap();
         assert_eq!(set.len(), 3);
         assert!(set.is_sorted());
         assert!(!set.is_empty());
@@ -222,10 +231,6 @@ mod testing {
             Interval::new(15, 20),
         ];
         let set = IntervalSet::from_sorted(records);
-        assert_eq!(set.len(), 3);
-        assert!(set.is_sorted());
-        assert!(!set.is_empty());
-        assert_eq!(set.records()[0].start(), 10);
-        assert!(!set.valid_internal_sorting())
+        assert!(set.is_err());
     }
 }
