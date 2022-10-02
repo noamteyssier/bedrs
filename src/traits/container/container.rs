@@ -19,10 +19,10 @@ where
 
     /// Returns a reference to the internal interval vector
     fn records(&self) -> &Vec<I>;
-    
+
     /// Returns a mutable reference to the internal interval vector
     fn records_mut(&mut self) -> &mut Vec<I>;
-    
+
     /// Returns `true` if the internal vector is sorted
     fn is_sorted(&self) -> bool;
 
@@ -38,7 +38,7 @@ where
     fn len(&self) -> usize {
         self.records().len()
     }
-    
+
     /// Returns `true` if the container has no intervals
     fn is_empty(&self) -> bool {
         self.records().is_empty()
@@ -82,7 +82,7 @@ where
             .iter()
             .enumerate()
             .skip(1)
-            .map(|(idx, rec)| (rec, &records[idx-1]))
+            .map(|(idx, rec)| (rec, &records[idx - 1]))
             .all(|(a, b)| a.coord_cmp(b).is_ge())
     }
 }
