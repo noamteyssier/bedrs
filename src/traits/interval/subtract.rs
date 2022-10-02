@@ -26,17 +26,18 @@ where
         ]
     }
     fn build_gt<I: Coordinates<T>>(&self, other: &I) -> Vec<I> {
-        let start = other.end();
-        let end = self.end();
         let mut sub = I::from(other);
-        sub.update_all(&other.chr(), &start, &end);
+        sub.update_all(&other.chr(), &other.end(), &self.end());
         vec![sub]
     }
     fn build_lt<I: Coordinates<T>>(&self, other: &I) -> Vec<I> {
-        let start = self.start();
-        let end = other.start();
         let mut sub = I::from(other);
-        sub.update_all(&other.chr(), &start, &end);
+        sub.update_all(&other.chr(), &self.start(), &other.start());
+        vec![sub]
+    }
+    fn build_self<I: Coordinates<T>>(&self, other: &I) -> Vec<I> {
+        let mut sub = I::from(&other);
+        sub.update_all(&other.chr(), &self.start(), &self.end());
         vec![sub]
     }
     /// Perform subtraction between two coordinates.
