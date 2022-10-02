@@ -61,6 +61,21 @@ where
         set.sort();
         set
     }
+
+    /// Validates that the internal records are sorted
+    fn valid_internal_sorting(&self) -> bool {
+        Self::valid_interval_sorting(self.records())
+    }
+
+    /// Validates that a set of intervals are sorted
+    fn valid_interval_sorting(records: &Vec<I>) -> bool {
+        records
+            .iter()
+            .enumerate()
+            .skip(1)
+            .map(|(idx, rec)| (rec, &records[idx-1]))
+            .all(|(a, b)| a.coord_cmp(b).is_le())
+    }
 }
 
 impl<C, T, I> Merge<T, I> for C
@@ -197,5 +212,20 @@ mod testing {
         assert!(set.is_sorted());
         assert!(!set.is_empty());
         assert_eq!(set.records()[0].start(), 5);
+    }
+
+    #[test]
+    fn test_container_init_from_sorted_false_sorting() {
+        let records = vec![
+            Interval::new(10, 15),
+            Interval::new(5, 10),
+            Interval::new(15, 20),
+        ];
+        let set = IntervalSet::from_sorted(records);
+        assert_eq!(set.len(), 3);
+        assert!(set.is_sorted());
+        assert!(!set.is_empty());
+        assert_eq!(set.records()[0].start(), 10);
+        assert!(!set.valid_internal_sorting())
     }
 }
