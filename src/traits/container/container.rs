@@ -91,7 +91,7 @@ where
 #[cfg(test)]
 mod testing {
     use super::Container;
-    use crate::{traits::Coordinates, types::Interval};
+    use crate::{traits::Coordinates, types::Interval, IntervalSet};
 
     struct CustomContainer {
         records: Vec<Interval<usize>>,
@@ -155,5 +155,47 @@ mod testing {
             is_sorted: false,
         };
         assert!(container.is_empty());
+    }
+
+    #[test]
+    fn test_container_init_new() {
+        let records = vec![
+            Interval::new(15, 25),
+            Interval::new(10, 20),
+            Interval::new(5, 15),
+        ];
+        let set = IntervalSet::new(records);
+        assert_eq!(set.len(), 3);
+        assert!(!set.is_sorted());
+        assert!(!set.is_empty());
+        assert_eq!(set.records()[0].start(), 15);
+    }
+
+    #[test]
+    fn test_container_init_from_sorted() {
+        let records = vec![
+            Interval::new(5, 10),
+            Interval::new(10, 15),
+            Interval::new(15, 20),
+        ];
+        let set = IntervalSet::from_sorted(records);
+        assert_eq!(set.len(), 3);
+        assert!(set.is_sorted());
+        assert!(!set.is_empty());
+        assert_eq!(set.records()[0].start(), 5);
+    }
+
+    #[test]
+    fn test_container_init_from_unsorted() {
+        let records = vec![
+            Interval::new(15, 25),
+            Interval::new(10, 20),
+            Interval::new(5, 15),
+        ];
+        let set = IntervalSet::from_unsorted(records);
+        assert_eq!(set.len(), 3);
+        assert!(set.is_sorted());
+        assert!(!set.is_empty());
+        assert_eq!(set.records()[0].start(), 5);
     }
 }
