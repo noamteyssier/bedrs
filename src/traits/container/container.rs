@@ -8,23 +8,58 @@ use crate::{
 /// Each of the intervals: `I` must impl the `Coordinates` trait.
 pub trait Container<T, I>
 where
+    Self: Sized,
     I: IntervalBounds<T>,
     T: ValueBounds,
 {
+    /// Creates a new container from intervals (assumed unsorted)
     fn new(records: Vec<I>) -> Self;
+
+    /// Returns a reference to the internal interval vector
     fn records(&self) -> &Vec<I>;
+    
+    /// Returns a mutable reference to the internal interval vector
     fn records_mut(&mut self) -> &mut Vec<I>;
+    
+    /// Returns `true` if the internal vector is sorted
     fn is_sorted(&self) -> bool;
+
+    /// Sets the internal state to sorted
+    ///
+    /// >> This would likely not be used directly by the user.
+    /// >> If you are creating an interval set from presorted
+    /// >> intervals use the `from_sorted()` method instead of
+    /// >> the `new()` method.
     fn set_sorted(&mut self);
+
+    /// Returns the number of records in the container
     fn len(&self) -> usize {
         self.records().len()
     }
+    
+    /// Returns `true` if the container has no intervals
     fn is_empty(&self) -> bool {
         self.records().is_empty()
     }
+
+    /// Sorts the internal interval vector on the chromosome and start position of the intervals.
     fn sort(&mut self) {
         self.records_mut().sort_unstable_by(|a, b| a.coord_cmp(b));
         self.set_sorted();
+    }
+
+    /// Creates a new container from presorted intervals
+    fn from_sorted(records: Vec<I>) -> Self {
+        let mut set = Self::new(records);
+        set.set_sorted();
+        set
+    }
+
+    /// Creates a new *sorted* container from unsorted intervals
+    fn from_unsorted(records: Vec<I>) -> Self {
+        let mut set = Self::new(records);
+        set.sort();
+        set
     }
 }
 
