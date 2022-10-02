@@ -163,7 +163,7 @@ where
                 todo!()
             }
         } else {
-            None
+            Some(self.build_self(other))
         }
     }
 }
@@ -272,26 +272,30 @@ mod testing {
     }
 
     #[test]
-    ///     x--y
-    ///     i--j
+    ///     x--y  <- chr1
+    ///     i--j  <- chr2
     /// ==================
-    /// none
+    ///     x--y
     fn subtraction_genomic_e_wrong_chr() {
         let a = GenomicInterval::new(1, 10, 30);
         let b = GenomicInterval::new(2, 10, 30);
-        let sub = a.subtract(&b);
-        assert!(sub.is_none());
+        let sub = a.subtract(&b).unwrap();
+        assert_eq!(sub.len(), 1);
+        assert_eq!(sub[0].start(), 10);
+        assert_eq!(sub[0].end(), 30);
     }
 
     #[test]
     ///   x--y
     ///        i--j
     /// ==================
-    /// none
+    ///   x--y
     fn subtraction_case_f() {
         let a = Interval::new(10, 20);
         let b = Interval::new(30, 40);
-        let sub = a.subtract(&b);
-        assert!(sub.is_none());
+        let sub = a.subtract(&b).unwrap();
+        assert_eq!(sub.len(), 1);
+        assert_eq!(sub[0].start(), 10);
+        assert_eq!(sub[0].end(), 20);
     }
 }
