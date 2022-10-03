@@ -56,6 +56,8 @@ mod testing {
 
         let iv = subset.next().unwrap();
         assert!(iv.eq(&Interval::new(70, 100)));
+
+        assert!(subset.next().is_none());
     }
 
     #[test]
@@ -83,6 +85,8 @@ mod testing {
 
         let iv = subset.next().unwrap();
         assert!(iv.eq(&Interval::new(50, 60)));
+
+        assert!(subset.next().is_none());
     }
 
     #[test]
@@ -106,6 +110,8 @@ mod testing {
 
         let iv = subset.next().unwrap();
         assert!(iv.eq(&Interval::new(50, 60)));
+
+        assert!(subset.next().is_none());
     }
 
     #[test]
@@ -124,10 +130,6 @@ mod testing {
         let c = Interval::new(45, 55);
         let d = Interval::new(70, 80);
         let set = IntervalSet::from_sorted(vec![b, c, d]).unwrap();
-        let subset = set.subtract(&a).unwrap();
-        for s in subset {
-            println!("{:?}", s);
-        }
 
         let mut subset = set.subtract(&a).unwrap();
         let iv = subset.next().unwrap();
