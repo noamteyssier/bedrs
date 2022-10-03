@@ -8,7 +8,6 @@ where
 {
     inner: &'a Vec<I>,
     remainder: I,
-    queued: Option<I>,
     offset: usize,
     send_remainder: bool,
     phantom_t: PhantomData<T>,
@@ -22,7 +21,6 @@ where
         Self {
             inner,
             remainder: query.to_owned(),
-            queued: None,
             offset: 0,
             send_remainder: true,
             phantom_t: PhantomData,
