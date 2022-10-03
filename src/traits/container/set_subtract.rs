@@ -4,11 +4,43 @@ use crate::{
     Container,
 };
 
+/// Performs interval subtraction at the set level.
 pub trait SetSubtract<T, I>: Container<T, I>
 where
     T: ValueBounds,
     I: IntervalBounds<T>,
 {
+    /// Subtract a query interval from the set. 
+    ///
+    /// # Example
+    ///
+    /// ```
+    ///
+    /// // (q)       x------y
+    /// // (a)  i--j
+    /// // (b)         k--l
+    /// // (c)                m--n        
+    /// // ==========================
+    /// // (s1) i--j
+    /// // (s2)               m--n
+    ///
+    /// use bedrs::{Container, Coordinates, SetSubtract, Interval, IntervalSet};
+    ///
+    /// let q = Interval::new(20, 40);
+    /// let a = Interval::new(10, 15);
+    /// let b = Interval::new(25, 35);
+    /// let c = Interval::new(45, 50);
+    /// let set = IntervalSet::from_sorted(vec![a, b, c]).unwrap();
+    /// let mut subset = set.subtract(&q).unwrap();
+    ///
+    /// let iv = subset.next().unwrap();
+    /// assert!(iv.eq(&Interval::new(10, 15)));
+    ///
+    /// let iv = subset.next().unwrap();
+    /// assert!(iv.eq(&Interval::new(45, 50)));
+    ///
+    /// assert!(subset.next().is_none());
+    /// ```
     fn subtract<'a>(&'a self, query: &'a I) -> Option<SubtractIter<T, I>> {
         if self.is_sorted() {
             Some(self.subtract_unchecked(query))
@@ -17,10 +49,44 @@ where
         }
     }
 
+    /// Unchecked version of [subtract](Self::subtract).
+    ///
+    /// Does not check if the container is sorted
     fn subtract_unchecked<'a>(&'a self, query: &'a I) -> SubtractIter<T, I> {
         SubtractIter::new(self.records(), query)
     }
 
+    /// Subtract the set from a query interval.
+    ///
+    /// # Example
+    /// ```
+    /// // (q)  x----------------y
+    /// // (a)     i--j
+    /// // (b)            k--l
+    /// // ==========================
+    /// // (s1) x--i
+    /// // (s2)       j---k
+    /// // (s3)              l---y
+    ///
+    /// use bedrs::{Container, Coordinates, Interval, IntervalSet, SetSubtract};
+    ///
+    /// let q = Interval::new(20, 40);
+    /// let a = Interval::new(25, 27);
+    /// let b = Interval::new(32, 35);
+    /// let set = IntervalSet::from_sorted(vec![a, b]).unwrap();
+    /// 
+    /// let mut subset = set.subtract_from(&q).unwrap();
+    /// let iv = subset.next().unwrap();
+    /// assert!(iv.eq(&Interval::new(20, 25)));
+    /// 
+    /// let iv = subset.next().unwrap();
+    /// assert!(iv.eq(&Interval::new(27, 32)));
+    /// 
+    /// let iv = subset.next().unwrap();
+    /// assert!(iv.eq(&Interval::new(35, 40)));
+    /// 
+    /// assert!(subset.next().is_none());
+    /// ```
     fn subtract_from<'a>(&'a self, query: &'a I) -> Option<SubtractFromIter<T, I>> {
         if self.is_sorted() {
             Some(self.subtract_from_unchecked(query))
@@ -29,6 +95,9 @@ where
         }
     }
 
+    /// Unchecked version of [subtract_from](Self::subtract_from).
+    ///
+    /// Does not check if the container is sorted
     fn subtract_from_unchecked<'a>(&'a self, query: &'a I) -> SubtractFromIter<T, I> {
         SubtractFromIter::new(self, query)
     }
