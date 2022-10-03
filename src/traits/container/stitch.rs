@@ -1,5 +1,8 @@
-use crate::{traits::{ValueBounds, IntervalBounds}, Container, types::iterator::StitchIter};
-
+use crate::{
+    traits::{IntervalBounds, ValueBounds},
+    types::iterator::StitchIter,
+    Container,
+};
 
 pub trait Stitch<T, I>: Container<T, I>
 where

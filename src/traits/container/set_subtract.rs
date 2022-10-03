@@ -1,7 +1,7 @@
 use crate::{
     traits::{IntervalBounds, ValueBounds},
-    types::{SubtractIter, SubtractFromIter},
-    Container
+    types::{SubtractFromIter, SubtractIter},
+    Container,
 };
 
 pub trait SetSubtract<T, I>: Container<T, I>
@@ -37,7 +37,7 @@ where
 #[cfg(test)]
 mod testing {
     use super::SetSubtract;
-    use crate::{Container, Interval, IntervalSet, Coordinates};
+    use crate::{Container, Coordinates, Interval, IntervalSet};
 
     #[test]
     /// (q)       x------y

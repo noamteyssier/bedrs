@@ -1,6 +1,7 @@
 use crate::{
     traits::{IntervalBounds, ValueBounds},
-    Subtract, Container, Merge, types::MergeResults,
+    types::MergeResults,
+    Container, Merge, Subtract,
 };
 use std::marker::PhantomData;
 
@@ -42,21 +43,20 @@ where
 
             // skips interval if it is equal to query
             if iv.eq(self.query) {
-                continue
+                continue;
             }
 
             // skips interval if it is contained by query
             if iv.contained_by(self.query) {
-                continue
+                continue;
             }
 
             // Perform the subtraction
             let mut sub = iv.subtract(self.query).unwrap();
-            return sub.pop()
+            return sub.pop();
         }
         None
     }
-
 }
 
 pub struct SubtractFromIter<T, I>
@@ -94,9 +94,8 @@ where
     type Item = I;
     fn next(&mut self) -> Option<Self::Item> {
         while self.offset < self.inner.len() {
-
-            // draw the next interval either from the process 
-            // stack or from the internal stockpile 
+            // draw the next interval either from the process
+            // stack or from the internal stockpile
             if self.stack.is_none() {
                 let iv = &self.inner.records()[self.offset];
                 self.offset += 1;
@@ -104,7 +103,9 @@ where
             }
             let iv = match &self.stack {
                 Some(iv) => iv,
-                None => {break;}
+                None => {
+                    break;
+                }
             };
 
             // println!("====");
@@ -142,14 +143,14 @@ where
                     // to reflect the endpoints of the cut interval
                     if siv.lt(remainder) {
                         if siv.end().ge(&remainder.start()) {
-                            remainder.update_start(&iv.end()); 
+                            remainder.update_start(&iv.end());
                         } else {
                             self.stack = None;
                             continue;
                         }
                     // Otherwise we can just return the right-shifted cut interval
                     } else {
-                        return Some(siv)
+                        return Some(siv);
                     }
                 // If the interval is contained by the interval then there are two cut
                 // sub intervals.
@@ -172,7 +173,7 @@ where
         if let Some(ref remainder) = self.remainder {
             let tmp = remainder.clone();
             self.remainder = None;
-            return Some(tmp)
+            return Some(tmp);
         }
 
         // terminal case

@@ -47,7 +47,8 @@ mod testing {
     use super::Merge;
     use crate::{
         traits::{Container, Coordinates},
-        types::{GenomicIntervalSet, IntervalSet}, Interval,
+        types::{GenomicIntervalSet, IntervalSet},
+        Interval,
     };
 
     #[test]

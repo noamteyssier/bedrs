@@ -1,7 +1,6 @@
 mod find;
-mod subtract;
 mod stitch;
+mod subtract;
 pub use find::{FindIter, FindIterSorted};
-pub use subtract::{SubtractIter, SubtractFromIter};
 pub use stitch::StitchIter;
-
+pub use subtract::{SubtractFromIter, SubtractIter};

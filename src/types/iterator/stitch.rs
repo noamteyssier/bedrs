@@ -49,7 +49,6 @@ where
 
             // case where there is no overlap
             if !iv.overlaps(&self.remainder) {
-
                 // if the interval is right shifted
                 // make sure to store the current interval
                 // and send any remainder
@@ -58,9 +57,9 @@ where
                         let some_iv = self.remainder.to_owned();
                         self.remainder = iv.to_owned();
                         return Some(some_iv);
-                    } 
+                    }
                 }
-                return Some(iv.to_owned())
+                return Some(iv.to_owned());
             }
 
             // perform the subtraction
@@ -98,4 +97,3 @@ where
         }
     }
 }
-
