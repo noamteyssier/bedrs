@@ -47,9 +47,20 @@ where
                 continue;
             }
 
-            // break the loop if we've gone past the query
-            if !iv.overlaps(&self.remainder) && iv.gt(&self.remainder) {
-                break;
+            // case where there is no overlap
+            if !iv.overlaps(&self.remainder) {
+
+                // if the interval is right shifted
+                // make sure to store the current interval
+                // and send any remainder
+                if iv.gt(&self.remainder) {
+                    if self.send_remainder {
+                        let some_iv = self.remainder.to_owned();
+                        self.remainder = iv.to_owned();
+                        return Some(some_iv);
+                    } 
+                }
+                return Some(iv.to_owned())
             }
 
             // perform the subtraction
@@ -78,7 +89,7 @@ where
             return return_iv;
         }
 
-        // sends any relevant remainder
+        // sends any remaining remainder
         if self.send_remainder {
             self.send_remainder = false;
             Some(self.remainder.to_owned())
