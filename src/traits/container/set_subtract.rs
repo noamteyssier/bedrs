@@ -1,6 +1,10 @@
-use crate::{Container, traits::{ValueBounds, IntervalBounds}, types::iterator::SubtractIter};
+use crate::{
+    traits::{IntervalBounds, ValueBounds},
+    types::iterator::SubtractIter,
+    Container,
+};
 
-pub trait SetSubtract<T, I>: Container<T,I>
+pub trait SetSubtract<T, I>: Container<T, I>
 where
     T: ValueBounds,
     I: IntervalBounds<T>,
@@ -12,7 +16,7 @@ where
             None
         }
     }
-    
+
     fn subtract_unchecked(&self, query: &I) -> SubtractIter<T, I> {
         SubtractIter::new(self.records(), query)
     }
@@ -20,8 +24,8 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::{Interval, IntervalSet, Container, Coordinates};
     use super::SetSubtract;
+    use crate::{Container, Coordinates, Interval, IntervalSet};
 
     #[test]
     /// (a)   x--------------------y

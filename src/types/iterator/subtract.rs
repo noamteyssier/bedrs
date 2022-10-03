@@ -1,4 +1,7 @@
-use crate::{traits::{IntervalBounds, ValueBounds}, Subtract};
+use crate::{
+    traits::{IntervalBounds, ValueBounds},
+    Subtract,
+};
 use std::marker::PhantomData;
 
 pub struct SubtractIter<'a, T, I>
@@ -34,9 +37,7 @@ where
 {
     type Item = I;
     fn next(&mut self) -> Option<Self::Item> {
-
         while self.offset < self.inner.len() {
-
             // draw the next interval
             let iv = &self.inner[self.offset];
             self.offset += 1;
@@ -52,8 +53,7 @@ where
             }
 
             // perform the subtraction
-            let mut sub_intervals = self.remainder.subtract(iv)
-                .expect("in subtraction set");
+            let mut sub_intervals = self.remainder.subtract(iv).expect("in subtraction set");
 
             // case where interval is interally overlapped
             if sub_intervals.len().eq(&2) {
