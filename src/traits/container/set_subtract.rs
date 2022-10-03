@@ -40,6 +40,28 @@ mod testing {
     use crate::{Container, Coordinates, Interval, IntervalSet};
 
     #[test]
+    fn set_subtract_unsorted() {
+        let q = Interval::new(20, 40);
+        let a = Interval::new(10, 15);
+        let b = Interval::new(25, 35);
+        let c = Interval::new(45, 50);
+        let set = IntervalSet::new(vec![a, b, c]);
+        let subset = set.subtract(&q);
+        assert!(subset.is_none());
+    }
+
+    #[test]
+    fn set_subtract_from_unsorted() {
+        let q = Interval::new(20, 40);
+        let a = Interval::new(10, 15);
+        let b = Interval::new(25, 35);
+        let c = Interval::new(45, 50);
+        let set = IntervalSet::new(vec![a, b, c]);
+        let subset = set.subtract_from(&q);
+        assert!(subset.is_none());
+    }
+
+    #[test]
     /// (q)       x------y
     /// (a)  i--j
     /// (b)         k--l
