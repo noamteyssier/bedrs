@@ -88,5 +88,5 @@ pub mod traits;
 /// Types used within the library
 pub mod types;
 
-pub use traits::{Bound, Container, Coordinates, Find, Intersect, Merge, Overlap, Subtract};
+pub use traits::{Bound, Container, Coordinates, Find, Intersect, Merge, Overlap, Subtract, SetSubtract};
 pub use types::{GenomicInterval, GenomicIntervalSet, Interval, IntervalSet};
