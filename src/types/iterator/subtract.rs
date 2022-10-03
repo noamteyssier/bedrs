@@ -38,7 +38,6 @@ where
 {
     type Item = I;
     fn next(&mut self) -> Option<Self::Item> {
-
         if let Some(ref remainder) = self.remainder {
             let tmp = remainder.clone();
             self.remainder = None;
