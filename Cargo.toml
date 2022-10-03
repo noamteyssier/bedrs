@@ -1,6 +1,6 @@
 [package]
 name = "bedrs"
-version = "0.0.24"
+version = "0.0.25"
 edition = "2021"
 license = "MIT"
 description = "Genomic interval library in rust"
