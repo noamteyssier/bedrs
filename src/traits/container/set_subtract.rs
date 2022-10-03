@@ -144,5 +144,37 @@ mod testing {
         let iv = subset.next().unwrap();
         assert!(iv.eq(&Interval::new(70, 80)));
 
+        assert!(subset.next().is_none());
+    }
+
+    #[test]
+    /// (a)    x------y
+    /// (b)  i-j
+    /// (c)      k--l
+    /// (d)           m--n
+    /// ==================================
+    /// (s1) i-j
+    /// (s2)   x-k
+    /// (s3)        l-y
+    /// (s4)          m--n
+    fn test_set_subtraction_e() {
+        let a = Interval::new(40, 60);
+        let b = Interval::new(30, 40);
+        let c = Interval::new(45, 55);
+        let d = Interval::new(60, 70);
+        let set = IntervalSet::from_sorted(vec![b, c, d]).unwrap();
+
+        let mut subset = set.subtract(&a).unwrap();
+        let iv = subset.next().unwrap();
+        assert!(iv.eq(&Interval::new(30, 40)));
+
+        let iv = subset.next().unwrap();
+        assert!(iv.eq(&Interval::new(40, 45)));
+
+        let iv = subset.next().unwrap();
+        assert!(iv.eq(&Interval::new(55, 60)));
+
+        let iv = subset.next().unwrap();
+        assert!(iv.eq(&Interval::new(60, 70)));
     }
 }
