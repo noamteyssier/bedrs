@@ -162,6 +162,37 @@ mod testing {
     }
 
     #[test]
+    /// (q)     x----y
+    /// (a)  i----------j
+    /// (b)  j----------k
+    /// ====================
+    /// (s1) i--x
+    /// (s2)         y--j
+    /// (s3) i--x
+    /// (s4)         y--j
+    fn set_subtract_e() {
+        let q = Interval::new(20, 40);
+        let a = Interval::new(10, 50);
+        let b = Interval::new(10, 50);
+        let set = IntervalSet::from_sorted_unchecked(vec![a, b]);
+        let mut subset = set.subtract(&q).unwrap();
+
+        let iv = subset.next().unwrap();
+        assert!(iv.eq(&Interval::new(10, 20)));
+
+        let iv = subset.next().unwrap();
+        assert!(iv.eq(&Interval::new(40, 50)));
+
+        let iv = subset.next().unwrap();
+        assert!(iv.eq(&Interval::new(10, 20)));
+
+        let iv = subset.next().unwrap();
+        assert!(iv.eq(&Interval::new(40, 50)));
+
+        assert!(subset.next().is_none());
+    }
+
+    #[test]
     /// (q)       x------y
     /// (a)  i--j
     /// (b)         k--l
