@@ -18,7 +18,7 @@ where
         let mut current_id = 0;
 
         for interval in self.records().iter() {
-            if base_interval.overlaps(interval) {
+            if base_interval.overlaps(interval) || base_interval.borders(interval) {
                 let new_min = base_interval.start().min(interval.start());
                 let new_max = base_interval.end().max(interval.end());
                 base_interval.update_endpoints(&new_min, &new_max);
@@ -48,6 +48,7 @@ mod testing {
     use crate::{
         traits::{Container, Coordinates},
         types::{GenomicIntervalSet, IntervalSet},
+        Interval,
     };
 
     #[test]
@@ -113,5 +114,19 @@ mod testing {
         assert_eq!(merge_set.clusters(), &vec![0, 0, 1]);
         assert_eq!(merge_set.intervals()[0].start(), 10);
         assert_eq!(merge_set.intervals()[0].end(), 30);
+    }
+
+    #[test]
+    fn merging_base_borders() {
+        let records = vec![
+            Interval::new(10, 20),
+            Interval::new(20, 30),
+            Interval::new(30, 40),
+        ];
+        let set = IntervalSet::from_sorted_unchecked(records);
+        let merge_set = set.merge_unchecked();
+        assert_eq!(merge_set.n_clusters(), 1);
+        assert_eq!(merge_set.intervals()[0].start(), 10);
+        assert_eq!(merge_set.intervals()[0].end(), 40);
     }
 }

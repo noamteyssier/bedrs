@@ -2,7 +2,7 @@ use std::fmt::Debug;
 
 pub mod container;
 pub mod interval;
-pub use container::{Bound, Container, Find, Merge};
+pub use container::{Bound, Container, Find, Merge, SetSubtract};
 pub use interval::{Coordinates, Intersect, Overlap, Subtract};
 
 pub trait ValueBounds

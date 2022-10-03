@@ -2,7 +2,7 @@ use anyhow::bail;
 
 use crate::{
     traits::{IntervalBounds, ValueBounds},
-    Bound, Find, Merge,
+    Bound, Find, Merge, SetSubtract,
 };
 
 /// The main trait representing a container of intervals.
@@ -105,6 +105,14 @@ where
 }
 
 impl<C, T, I> Bound<T, I> for C
+where
+    C: Container<T, I>,
+    I: IntervalBounds<T>,
+    T: ValueBounds,
+{
+}
+
+impl<C, T, I> SetSubtract<T, I> for C
 where
     C: Container<T, I>,
     I: IntervalBounds<T>,
