@@ -12,6 +12,7 @@ where
 {
     inner: &'a Vec<I>,
     query: &'a I,
+    remainder: Option<I>,
     offset: usize,
     phantom_t: PhantomData<T>,
 }
@@ -24,6 +25,7 @@ where
         Self {
             inner,
             query,
+            remainder: None,
             offset: 0,
             phantom_t: PhantomData,
         }
@@ -36,6 +38,13 @@ where
 {
     type Item = I;
     fn next(&mut self) -> Option<Self::Item> {
+
+        if let Some(ref remainder) = self.remainder {
+            let tmp = remainder.clone();
+            self.remainder = None;
+            return Some(tmp);
+        }
+
         while self.offset < self.inner.len() {
             // draw the next interval
             let iv = &self.inner[self.offset];
@@ -53,6 +62,11 @@ where
 
             // Perform the subtraction
             let mut sub = iv.subtract(self.query).unwrap();
+
+            // store the remainder if there is one
+            if sub.len() == 2 {
+                self.remainder = sub.pop();
+            }
             return sub.pop();
         }
         None
