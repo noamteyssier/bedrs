@@ -38,7 +38,6 @@ where
     type Item = I;
     fn next(&mut self) -> Option<Self::Item> {
         while self.offset < self.inner.len() {
-
             // draw the next interval
             let iv = &self.inner[self.offset];
             self.offset += 1;
@@ -60,17 +59,15 @@ where
             let return_iv = if sub_intervals.len().eq(&2) {
                 self.remainder = sub_intervals.pop().unwrap();
                 sub_intervals.pop()
-
             } else {
-
                 // pop the interval for inspection
                 let some_iv = sub_intervals.pop().unwrap();
 
                 // case where interval is left-shifted to query
                 if some_iv.gt(&self.remainder) {
                     self.remainder.update_start(&some_iv.start());
-                    continue
- 
+                    continue;
+
                 // case where interval is right-shifted to query
                 } else {
                     self.send_remainder = false;
@@ -78,7 +75,7 @@ where
                 }
             };
 
-            return return_iv
+            return return_iv;
         }
 
         // sends any relevant remainder

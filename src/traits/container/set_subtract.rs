@@ -91,7 +91,7 @@ mod testing {
     /// (c)          k--l
     /// (d)                  m--------n
     /// ==================================
-    /// (s1)     j--k 
+    /// (s1)     j--k
     /// (s2)            l----m
     fn test_set_subtraction_c() {
         let a = Interval::new(10, 100);
@@ -106,6 +106,5 @@ mod testing {
 
         let iv = subset.next().unwrap();
         assert!(iv.eq(&Interval::new(50, 60)));
-
     }
 }
