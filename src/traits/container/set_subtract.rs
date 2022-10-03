@@ -414,5 +414,4 @@ mod testing {
 
         assert!(subset.next().is_none());
     }
-
 }
