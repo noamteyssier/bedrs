@@ -258,4 +258,161 @@ mod testing {
 
         assert!(subset.next().is_none());
     }
+
+    #[test]
+    /// (a)   x--------------------y
+    /// (b)       i--j
+    /// (c)            k--l
+    /// (d)                  m--n
+    /// ==================================
+    /// (s1)  x--i
+    /// (s2)         j-k
+    /// (s3)              l--m
+    /// (s4)                    n--y
+    fn set_subtract_from_e() {
+        let a = Interval::new(10, 100);
+        let b = Interval::new(20, 30);
+        let c = Interval::new(40, 50);
+        let d = Interval::new(60, 70);
+        let set = IntervalSet::from_sorted(vec![b, c, d]).unwrap();
+
+        let mut subset = set.subtract_from(&a).unwrap();
+        let iv = subset.next().unwrap();
+        assert!(iv.eq(&Interval::new(10, 20)));
+
+        let iv = subset.next().unwrap();
+        assert!(iv.eq(&Interval::new(30, 40)));
+
+        let iv = subset.next().unwrap();
+        assert!(iv.eq(&Interval::new(50, 60)));
+
+        let iv = subset.next().unwrap();
+        assert!(iv.eq(&Interval::new(70, 100)));
+
+        assert!(subset.next().is_none());
+    }
+
+    #[test]
+    /// (a)   x--------------------y
+    /// (b)       i--j
+    /// (c)            k--l
+    /// (d)                  m-------n
+    /// ==================================
+    /// (s1)  x--i
+    /// (s2)         j-k
+    /// (s3)              l--m
+    fn set_subtract_from_f() {
+        let a = Interval::new(10, 100);
+        let b = Interval::new(20, 30);
+        let c = Interval::new(40, 50);
+        let d = Interval::new(60, 110);
+        let set = IntervalSet::from_sorted(vec![b, c, d]).unwrap();
+
+        let mut subset = set.subtract_from(&a).unwrap();
+        let iv = subset.next().unwrap();
+        // println!("{:?}", iv);
+        assert!(iv.eq(&Interval::new(10, 20)));
+
+        let iv = subset.next().unwrap();
+        // println!("{:?}", iv);
+        assert!(iv.eq(&Interval::new(30, 40)));
+
+        let iv = subset.next().unwrap();
+        // println!("{:?}", iv);
+        assert!(iv.eq(&Interval::new(50, 60)));
+
+        assert!(subset.next().is_none());
+    }
+
+    #[test]
+    /// (a)    x--------------------y
+    /// (b)  i---j
+    /// (c)          k--l
+    /// (d)                  m--------n
+    /// ==================================
+    /// (s1)     j--k
+    /// (s2)            l----m
+    fn set_subtract_from_g() {
+        let a = Interval::new(10, 100);
+        let b = Interval::new(5, 15);
+        let c = Interval::new(40, 50);
+        let d = Interval::new(60, 110);
+        let set = IntervalSet::from_sorted(vec![b, c, d]).unwrap();
+
+        let mut subset = set.subtract_from(&a).unwrap();
+        let iv = subset.next().unwrap();
+        assert!(iv.eq(&Interval::new(15, 40)));
+
+        let iv = subset.next().unwrap();
+        assert!(iv.eq(&Interval::new(50, 60)));
+
+        assert!(subset.next().is_none());
+    }
+
+    #[test]
+    /// (a)        x------y
+    /// (b)  i-j
+    /// (c)          k--l
+    /// (d)                  m--n
+    /// ==================================
+    /// (s1)       x-k
+    /// (s2)            l-y
+    fn set_subtract_from_h() {
+        let a = Interval::new(40, 60);
+        let b = Interval::new(20, 30);
+        let c = Interval::new(45, 55);
+        let d = Interval::new(70, 80);
+        let set = IntervalSet::from_sorted(vec![b, c, d]).unwrap();
+
+        let mut subset = set.subtract_from(&a).unwrap();
+        let iv = subset.next().unwrap();
+        assert!(iv.eq(&Interval::new(40, 45)));
+
+        let iv = subset.next().unwrap();
+        assert!(iv.eq(&Interval::new(55, 60)));
+
+        assert!(subset.next().is_none());
+    }
+
+    #[test]
+    /// (a)    x------y
+    /// (b)  i-j
+    /// (c)      k--l
+    /// (d)           m--n
+    /// ==================================
+    /// (s1)   x-k
+    /// (s2)        l-y
+    fn set_subtract_from_i() {
+        let a = Interval::new(40, 60);
+        let b = Interval::new(30, 40);
+        let c = Interval::new(45, 55);
+        let d = Interval::new(60, 70);
+        let set = IntervalSet::from_sorted(vec![b, c, d]).unwrap();
+
+        let mut subset = set.subtract_from(&a).unwrap();
+        let iv = subset.next().unwrap();
+        assert!(iv.eq(&Interval::new(40, 45)));
+
+        let iv = subset.next().unwrap();
+        assert!(iv.eq(&Interval::new(55, 60)));
+
+        assert!(subset.next().is_none());
+    }
+
+    #[test]
+    /// (a)    x------y
+    /// (b)  i----------j
+    /// (c)  j----------k
+    /// ==================================
+    /// None
+    fn set_subtract_from_j() {
+        let a = Interval::new(40, 60);
+        let b = Interval::new(30, 70);
+        let c = Interval::new(30, 70);
+        let set = IntervalSet::from_sorted(vec![b, c]).unwrap();
+        let mut subset = set.subtract_from(&a).unwrap();
+
+        assert!(subset.next().is_none());
+    }
+
 }
