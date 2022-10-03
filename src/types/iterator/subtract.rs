@@ -10,12 +10,67 @@ where
     T: ValueBounds + 'a,
 {
     inner: &'a Vec<I>,
+    query: &'a I,
+    offset: usize,
+    phantom_t: PhantomData<T>,
+}
+impl<'a, T, I> SubtractIter<'a, T, I>
+where
+    I: IntervalBounds<T>,
+    T: ValueBounds,
+{
+    pub fn new(inner: &'a Vec<I>, query: &'a I) -> Self {
+        Self {
+            inner,
+            query,
+            offset: 0,
+            phantom_t: PhantomData,
+        }
+    }
+}
+impl<'a, T, I> Iterator for SubtractIter<'a, T, I>
+where
+    I: IntervalBounds<T>,
+    T: ValueBounds,
+{
+    type Item = I;
+    fn next(&mut self) -> Option<Self::Item> {
+        while self.offset < self.inner.len() {
+            // draw the next interval
+            let iv = &self.inner[self.offset];
+            self.offset += 1;
+
+            // skips interval if it is equal to query
+            if iv.eq(self.query) {
+                continue
+            }
+
+            // skips interval if it is contained by query
+            if iv.contained_by(self.query) {
+                continue
+            }
+
+            // Perform the subtraction
+            let mut sub = iv.subtract(self.query).unwrap();
+            return sub.pop()
+        }
+        None
+    }
+
+}
+
+pub struct SubtractFromIter<'a, T, I>
+where
+    I: IntervalBounds<T> + 'a,
+    T: ValueBounds + 'a,
+{
+    inner: &'a Vec<I>,
     remainder: I,
     offset: usize,
     send_remainder: bool,
     phantom_t: PhantomData<T>,
 }
-impl<'a, T, I> SubtractIter<'a, T, I>
+impl<'a, T, I> SubtractFromIter<'a, T, I>
 where
     I: IntervalBounds<T>,
     T: ValueBounds,
@@ -30,7 +85,7 @@ where
         }
     }
 }
-impl<'a, T, I> Iterator for SubtractIter<'a, T, I>
+impl<'a, T, I> Iterator for SubtractFromIter<'a, T, I>
 where
     I: IntervalBounds<T>,
     T: ValueBounds,
