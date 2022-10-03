@@ -1,7 +1,7 @@
 use crate::{
     traits::{IntervalBounds, ValueBounds},
     types::{SubtractIter, SubtractFromIter},
-    Container,
+    Container
 };
 
 pub trait SetSubtract<T, I>: Container<T, I>

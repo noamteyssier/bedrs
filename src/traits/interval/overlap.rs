@@ -16,6 +16,9 @@ where
     fn interval_contains<I: Coordinates<T>>(&self, other: &I) -> bool {
         self.start() < other.start() && self.end() > other.end()
     }
+    fn interval_borders<I: Coordinates<T>>(&self, other: &I) -> bool {
+        self.start().eq(&other.end()) || self.end().eq(&other.start())
+    }
     fn overlaps<I: Coordinates<T>>(&self, other: &I) -> bool {
         self.bounded_chr(other) && self.interval_overlap(other)
     }
@@ -24,6 +27,9 @@ where
     }
     fn contained_by<I: Coordinates<T>>(&self, other: &I) -> bool {
         other.contains(self)
+    }
+    fn borders<I: Coordinates<T>>(&self, other: &I) -> bool {
+        self.bounded_chr(other) && self.interval_borders(other)
     }
 }
 
@@ -141,5 +147,24 @@ mod testing {
         let a = Interval::new(10, 20);
         let b = Interval::new(10, 20);
         assert!(a.overlaps(&b));
+    }
+
+    #[test]
+    fn base_borders() {
+        let a = Interval::new(10, 20);
+        let b = Interval::new(20, 30);
+        assert!(a.borders(&b));
+        assert!(b.borders(&a));
+    }
+
+    #[test]
+    fn genomic_borders() {
+        let a = GenomicInterval::new(1, 10, 20);
+        let b = GenomicInterval::new(1, 20, 30);
+        let c = GenomicInterval::new(2, 20, 30);
+        assert!(a.borders(&b));
+        assert!(b.borders(&a));
+        assert!(!a.borders(&c));
+        assert!(!c.borders(&a));
     }
 }
