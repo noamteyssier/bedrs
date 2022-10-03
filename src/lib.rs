@@ -81,6 +81,148 @@
 //! assert!(!a.overlaps(&c));
 //! assert!(!b.overlaps(&c));
 //! ```
+//!
+//! ## Interval Operations
+//!
+//! The following operations with be shown with the base [Interval], but
+//! the same operations can be done with a [GenomicInterval] or any other
+//! custom type which implements the [Coordinates] trait.
+//!
+//! ### Overlap
+//! ```
+//! use bedrs::{Overlap, Interval};
+//!
+//! let a = Interval::new(10, 20);
+//! let b = Interval::new(15, 25);
+//! assert!(a.overlaps(&b));
+//! ```
+//!
+//! ### Containment
+//!
+//! Whether an interval is contained by another.
+//!
+//! ```
+//! use bedrs::{Overlap, Interval};
+//!
+//! let a = Interval::new(10, 30);
+//! let b = Interval::new(15, 25);
+//! assert!(a.contains(&b));
+//! assert!(b.contained_by(&a));
+//! ```
+//!
+//! ### Borders
+//!
+//! Whether an interval is bordered by another.
+//!
+//! ```
+//! use bedrs::{Overlap, Interval};
+//!
+//! let a = Interval::new(10, 30);
+//! let b = Interval::new(30, 50);
+//! assert!(a.borders(&b));
+//! ```
+//!
+//! ## Interval Functions
+//!
+//! The following are active functions to generate more intervals using
+//! some query intervals.
+//!
+//! ### Intersect
+//!
+//! Here is an example of a positive intersect
+//!
+//! ```
+//! use bedrs::{Interval, Coordinates, Intersect};
+//!
+//! let a = Interval::new(10, 30);
+//! let b = Interval::new(20, 40);
+//! let ix = a.intersect(&b).unwrap();
+//! assert_eq!(ix.start(), 20);
+//! assert_eq!(ix.end(), 30);
+//! ```
+//!
+//! Here is an example of a negative intersect
+//!
+//! ```
+//! use bedrs::{Interval, Coordinates, Intersect};
+//!
+//! let a = Interval::new(10, 30);
+//! let b = Interval::new(30, 40);
+//! let ix = a.intersect(&b);
+//! assert!(ix.is_none());
+//! ```
+//!
+//! ### Subtract
+//!
+//! The following method subtracts an interval from another.
+//! This returns a vector of intervals, as there could be 
+//! either zero, one, or two possible interval returned.
+//!
+//! #### Left-Hand Subtraction
+//!
+//! ```
+//! use bedrs::{Interval, Coordinates, Subtract};
+//!
+//! let a = Interval::new(10, 30);
+//! let b = Interval::new(20, 40);
+//! let sub = a.subtract(&b).unwrap();
+//! assert_eq!(sub.len(), 1);
+//! assert_eq!(sub[0].start(), 10);
+//! assert_eq!(sub[0].end(), 20);
+//! ```
+//!
+//! #### Right-Hand Subtraction
+//!
+//! ```
+//! use bedrs::{Interval, Coordinates, Subtract};
+//!
+//! let a = Interval::new(20, 40);
+//! let b = Interval::new(10, 30);
+//! let sub = a.subtract(&b).unwrap();
+//! assert_eq!(sub.len(), 1);
+//! assert_eq!(sub[0].start(), 30);
+//! assert_eq!(sub[0].end(), 40);
+//! ```
+//!
+//! #### Contained Subtraction
+//!
+//! ```
+//! use bedrs::{Interval, Coordinates, Subtract};
+//!
+//! let a = Interval::new(10, 40);
+//! let b = Interval::new(20, 30);
+//! let sub = a.subtract(&b).unwrap();
+//! assert_eq!(sub.len(), 2);
+//! assert_eq!(sub[0].start(), 10);
+//! assert_eq!(sub[0].end(), 20);
+//! assert_eq!(sub[1].start(), 30);
+//! assert_eq!(sub[1].end(), 40);
+//! ```
+//!
+//! #### Contained-By Subtraction
+//!
+//! ```
+//! use bedrs::{Interval, Coordinates, Subtract};
+//!
+//! let a = Interval::new(20, 30);
+//! let b = Interval::new(10, 40);
+//! let sub = a.subtract(&b);
+//! assert!(sub.is_none());
+//! ```
+//!
+//! #### No Overlap Subtraction
+//!
+//! ```
+//! use bedrs::{Interval, Coordinates, Subtract};
+//!
+//! let a = Interval::new(10, 20);
+//! let b = Interval::new(20, 30);
+//! let sub = a.subtract(&b).unwrap();
+//! assert_eq!(sub.len(), 1);
+//! assert_eq!(sub[0].start(), 10);
+//! assert_eq!(sub[0].end(), 20);
+//! ```
+
 
 /// Traits used within the library
 pub mod traits;
