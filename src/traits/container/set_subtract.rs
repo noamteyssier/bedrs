@@ -177,4 +177,39 @@ mod testing {
         let iv = subset.next().unwrap();
         assert!(iv.eq(&Interval::new(60, 70)));
     }
+
+    // #[test]
+    // /// (a)    x------y
+    // /// (b)  i----------j
+    // /// (c)  j----------k
+    // /// ==================================
+    // /// (s1) i-x
+    // /// (s2)          y-j
+    // /// (s1) j-x
+    // /// (s2)          y-k
+    // fn test_set_subtraction_f() {
+    //     let a = Interval::new(40, 60);
+    //     let b = Interval::new(30, 70);
+    //     let c = Interval::new(30, 70);
+    //     let set = IntervalSet::from_sorted(vec![b, c]).unwrap();
+
+    //     for s in set.subtract(&a).unwrap() {
+    //         println!("{:?}", s);
+    //     }
+    //     assert!(false);
+
+    //     // let mut subset = set.subtract(&a).unwrap();
+
+    //     // let iv = subset.next().unwrap();
+    //     // assert!(iv.eq(&Interval::new(30, 40)));
+
+    //     // let iv = subset.next().unwrap();
+    //     // assert!(iv.eq(&Interval::new(60, 70)));
+
+    //     // let iv = subset.next().unwrap();
+    //     // assert!(iv.eq(&Interval::new(30, 40)));
+
+    //     // let iv = subset.next().unwrap();
+    //     // assert!(iv.eq(&Interval::new(60, 70)));
+    // }
 }

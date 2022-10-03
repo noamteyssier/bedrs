@@ -5,7 +5,7 @@ use crate::{
     Bound, Find, Merge,
 };
 
-use super::SetSubtract;
+use super::{SetSubtract, Stitch};
 
 /// The main trait representing a container of intervals.
 ///
@@ -115,6 +115,14 @@ where
 }
 
 impl<C, T, I> SetSubtract<T, I> for C
+where
+    C: Container<T, I>,
+    I: IntervalBounds<T>,
+    T: ValueBounds,
+{
+}
+
+impl<C, T, I> Stitch<T, I> for C
 where
     C: Container<T, I>,
     I: IntervalBounds<T>,
