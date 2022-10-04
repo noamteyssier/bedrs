@@ -58,11 +58,11 @@ where
     I: IntervalBounds<T>,
     T: ValueBounds,
 {
-    pub fn new(inner: &'a Vec<I>, query: &'a I) -> Self {
+    pub fn new(inner: &'a Vec<I>, query: &'a I, offset: usize) -> Self {
         Self {
             inner,
             query,
-            offset: 0,
+            offset,
             phantom_t: PhantomData,
         }
     }
