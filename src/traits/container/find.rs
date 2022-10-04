@@ -1,7 +1,8 @@
 use super::Container;
 use crate::{
     traits::{IntervalBounds, ValueBounds},
-    types::{FindIter, FindIterSorted}, Bound,
+    types::{FindIter, FindIterSorted},
+    Bound,
 };
 
 /// A trait to query set overlaps through a container

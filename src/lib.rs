@@ -155,7 +155,7 @@
 //! ### Subtract
 //!
 //! The following method subtracts an interval from another.
-//! This returns a vector of intervals, as there could be 
+//! This returns a vector of intervals, as there could be
 //! either zero, one, or two possible interval returned.
 //!
 //! #### Left-Hand Subtraction
@@ -222,7 +222,6 @@
 //! assert_eq!(sub[0].start(), 10);
 //! assert_eq!(sub[0].end(), 20);
 //! ```
-
 
 /// Traits used within the library
 pub mod traits;
