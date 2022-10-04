@@ -1,7 +1,7 @@
 use super::Container;
 use crate::{
     traits::{IntervalBounds, ValueBounds},
-    types::{FindIter, FindIterSorted},
+    types::{FindIter, FindIterSorted}, Bound,
 };
 
 /// A trait to query set overlaps through a container
@@ -46,7 +46,7 @@ where
     ///
     /// Assumes a sorted Container.
     fn find_iter_sorted_unchecked<'a>(&'a self, query: &'a I) -> FindIterSorted<'_, T, I> {
-        FindIterSorted::new(self.records(), query)
+        FindIterSorted::new(self.records(), query, self.lower_bound_unchecked(query))
     }
 }
 
