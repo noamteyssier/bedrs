@@ -188,4 +188,19 @@ mod testing {
         let bound = set.lower_bound(&query);
         assert!(bound.is_none());
     }
+
+    #[test]
+    fn bsearch_equality() {
+        let records = vec![
+            Interval::new(10, 20),
+            Interval::new(20, 30), // <- min
+            Interval::new(30, 40),
+            Interval::new(40, 50),
+            Interval::new(50, 60),
+        ];
+        let query = Interval::new(20, 25);
+        let set = IntervalSet::new(records);
+        let bound = set.lower_bound_unchecked(&query);
+        assert_eq!(bound, 1);
+    }
 }

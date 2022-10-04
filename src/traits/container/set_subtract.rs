@@ -10,7 +10,7 @@ where
     T: ValueBounds,
     I: IntervalBounds<T>,
 {
-    /// Subtract a query interval from the set. 
+    /// Subtract a query interval from the set.
     ///
     /// # Example
     ///
@@ -74,17 +74,17 @@ where
     /// let a = Interval::new(25, 27);
     /// let b = Interval::new(32, 35);
     /// let set = IntervalSet::from_sorted(vec![a, b]).unwrap();
-    /// 
+    ///
     /// let mut subset = set.subtract_from(&q).unwrap();
     /// let iv = subset.next().unwrap();
     /// assert!(iv.eq(&Interval::new(20, 25)));
-    /// 
+    ///
     /// let iv = subset.next().unwrap();
     /// assert!(iv.eq(&Interval::new(27, 32)));
-    /// 
+    ///
     /// let iv = subset.next().unwrap();
     /// assert!(iv.eq(&Interval::new(35, 40)));
-    /// 
+    ///
     /// assert!(subset.next().is_none());
     /// ```
     fn subtract_from<'a>(&'a self, query: &'a I) -> Option<SubtractFromIter<T, I>> {
