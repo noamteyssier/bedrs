@@ -1,4 +1,4 @@
-use anyhow::bail;
+use anyhow::{bail, Result};
 
 use crate::{
     traits::{IntervalBounds, ValueBounds},
@@ -92,6 +92,13 @@ where
         F: Fn(&mut I),
     {
         self.records_mut().iter_mut().for_each(f);
+    }
+
+    /// Calculates the span of the container and creates a new interval
+    /// representing the span. This must be implemented by the user for
+    /// custom containers.
+    fn span(&self) -> Result<I> {
+        unimplemented!("Span is not implemented generically - you will need to implement it for your custom container")
     }
 }
 
