@@ -1,3 +1,4 @@
+use crate::Coordinates;
 use crate::traits::{Container, IntervalBounds, ValueBounds};
 use crate::types::IntervalMeta;
 use anyhow::{bail, Result};
@@ -49,6 +50,47 @@ where
     }
     fn set_sorted(&mut self) {
         self.is_sorted = true;
+    }
+    
+    /// Get the span of the interval set
+    /// Does not copy the meta field of the first and last interval
+    ///
+    /// # Errors
+    /// * If the interval set is empty
+    /// * If the interval set is not sorted
+    ///
+    /// # Examples
+    /// ```
+    /// use bedrs::{
+    ///    traits::{Container, Coordinates},
+    ///    types::{IntervalMeta, IntervalMetaSet},
+    /// };
+    /// 
+    /// let mut ivs = IntervalMetaSet::from_iter(vec![
+    ///     IntervalMeta::new(1, 10, Some(1)),
+    ///     IntervalMeta::new(2, 20, Some(2)),
+    ///     IntervalMeta::new(3, 30, Some(3)),
+    ///     IntervalMeta::new(4, 40, Some(4)),
+    ///     IntervalMeta::new(5, 50, Some(5)),
+    /// ]);
+    /// ivs.set_sorted();
+    ///
+    /// let span = ivs.span().unwrap();
+    /// assert_eq!(span.start(), 1);
+    /// assert_eq!(span.end(), 50);
+    /// assert!(span.metadata().is_none());
+    /// ```
+    fn span(&self) -> Result<IntervalMeta<T, M>> {
+        if self.is_empty() {
+            bail!("Cannot get span of empty interval set")
+        } else if !self.is_sorted() {
+            bail!("Cannot get span of unsorted interval set")
+        } else {
+            let first = self.records().first().unwrap();
+            let last = self.records().last().unwrap();
+            let iv = IntervalMeta::new(first.start(), last.end(), None);
+            Ok(iv)
+        }
     }
 }
 

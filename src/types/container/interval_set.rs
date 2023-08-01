@@ -1,5 +1,6 @@
 use std::fmt::Debug;
 
+use crate::Coordinates;
 use crate::traits::Container;
 use crate::traits::{IntervalBounds, ValueBounds};
 use crate::types::Interval;
@@ -49,6 +50,44 @@ where
     }
     fn set_sorted(&mut self) {
         self.is_sorted = true;
+    }
+
+    /// Get the span of the interval set
+    ///
+    /// # Errors
+    /// * If the interval set is empty
+    /// * If the interval set is not sorted
+    ///
+    /// # Examples
+    /// ```
+    /// use bedrs::{
+    ///     traits::{Container, Coordinates},
+    ///     types::{Interval, IntervalSet},
+    /// };
+    ///
+    /// let mut ivs = IntervalSet::from_iter(vec![
+    ///     Interval::new(1, 10),
+    ///     Interval::new(2, 20),
+    ///     Interval::new(3, 30),
+    ///     Interval::new(4, 40),
+    ///     Interval::new(5, 50),
+    /// ]);
+    /// ivs.set_sorted();
+    ///
+    /// let span = ivs.span().unwrap();
+    /// assert_eq!(span.start(), 1);
+    /// assert_eq!(span.end(), 50);
+    fn span(&self) -> Result<Interval<T>> {
+        if self.records.is_empty() {
+            bail!("Interval set is empty")
+        } else if !self.is_sorted() {
+            bail!("Cannot get span of unsorted interval set")
+        } else {
+            let first = self.records.first().unwrap();
+            let last = self.records.last().unwrap();
+            let iv = Interval::new(first.start(), last.end());
+            Ok(iv)
+        }
     }
 }
 

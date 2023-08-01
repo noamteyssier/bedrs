@@ -1,6 +1,6 @@
 use crate::{
     traits::{Container, IntervalBounds, ValueBounds},
-    types::GenomicInterval,
+    types::GenomicInterval, Coordinates,
 };
 use anyhow::{bail, Result};
 use std::fmt::Debug;
@@ -41,6 +41,49 @@ where
     }
     fn set_sorted(&mut self) {
         self.is_sorted = true;
+    }
+
+    /// Get the span of the interval set
+    ///
+    /// # Errors
+    /// * If the interval set is empty
+    /// * If the interval set is not sorted
+    /// * If the interval set spans multiple chromosomes
+    ///
+    /// # Examples
+    /// ```
+    /// use bedrs::{
+    ///     traits::{Container, Coordinates},
+    ///     types::{GenomicInterval, GenomicIntervalSet},
+    /// };
+    ///
+    /// let mut ivs = GenomicIntervalSet::from_iter(vec![
+    ///     GenomicInterval::new(1, 10, 100),
+    ///     GenomicInterval::new(1, 200, 300),
+    ///     GenomicInterval::new(1, 400, 500),
+    /// ]);
+    /// ivs.set_sorted();
+    ///
+    /// let span = ivs.span().unwrap();
+    /// assert_eq!(span.chr(), 1);
+    /// assert_eq!(span.start(), 10);
+    /// assert_eq!(span.end(), 500);
+    /// ```
+    fn span(&self) -> Result<GenomicInterval<T>> {
+        if self.is_empty() {
+            bail!("Cannot get span of empty interval set")
+        } else if !self.is_sorted() {
+            bail!("Cannot get span of unsorted interval set")
+        } else {
+            let first = self.records().first().unwrap();
+            let last = self.records().last().unwrap();
+            if first.chr() != last.chr() {
+                bail!("Cannot get span of interval set spanning multiple chromosomes")
+            } else {
+                let iv = GenomicInterval::new(first.chr(), first.start(), last.end());
+                Ok(iv)
+            }
+        }
     }
 }
 impl<T> GenomicIntervalSet<T>
