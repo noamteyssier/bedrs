@@ -29,6 +29,16 @@ where
         self.update_start(&other.start());
         self.update_end(&other.end());
     }
+    fn extend_left(&mut self, val: &T) {
+        self.update_start(&self.start().sub(*val));
+    }
+    fn extend_right(&mut self, val: &T) {
+        self.update_end(&self.end().add(*val));
+    }
+    fn extend(&mut self, val: &T) {
+        self.extend_left(val);
+        self.extend_right(val);
+    }
     fn coord_cmp<I: Coordinates<T>>(&self, other: &I) -> Ordering {
         match self.chr().cmp(&other.chr()) {
             Ordering::Equal => self.start().cmp(&other.start()),
@@ -222,5 +232,32 @@ mod testing {
         assert!(a.lt(&b));
         assert!(b.gt(&a));
         assert!(b.eq(&c));
+    }
+
+    #[test]
+    fn test_extend_left() {
+        let mut a = Interval::new(10, 20);
+        let val = 5;
+        a.extend_left(&val);
+        assert_eq!(a.start(), 5);
+        assert_eq!(a.end(), 20);
+    }
+
+    #[test]
+    fn test_extend_right() {
+        let mut a = Interval::new(10, 20);
+        let val = 5;
+        a.extend_right(&val);
+        assert_eq!(a.start(), 10);
+        assert_eq!(a.end(), 25);
+    }
+    
+    #[test]
+    fn test_extend_both() {
+        let mut a = Interval::new(10, 20);
+        let val = 5;
+        a.extend(&val);
+        assert_eq!(a.start(), 5);
+        assert_eq!(a.end(), 25);
     }
 }
