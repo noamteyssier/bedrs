@@ -2,7 +2,7 @@ use anyhow::{bail, Result};
 
 use crate::{
     traits::{IntervalBounds, ValueBounds},
-    Bound, Find, Merge, SetSubtract,
+    Bound, Find, Internal, Merge, SetSubtract,
 };
 
 /// The main trait representing a container of intervals.
@@ -113,6 +113,14 @@ where
     fn span(&self) -> Result<I> {
         unimplemented!("Span is not implemented generically - you will need to implement it for your custom container")
     }
+}
+
+impl<C, T, I> Internal<T, I> for C
+where
+    C: Container<T, I>,
+    I: IntervalBounds<T>,
+    T: ValueBounds,
+{
 }
 
 impl<C, T, I> Merge<T, I> for C

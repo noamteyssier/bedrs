@@ -5,7 +5,7 @@ use std::{
 
 pub mod container;
 pub mod interval;
-pub use container::{Bound, Container, Find, Merge, SetSubtract};
+pub use container::{Bound, Container, Find, Internal, Merge, SetSubtract};
 pub use interval::{Coordinates, Intersect, Overlap, Subtract};
 
 /// Generic bounds for values to be used for [Coordinates]

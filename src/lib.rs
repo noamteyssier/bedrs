@@ -230,6 +230,6 @@ pub mod traits;
 pub mod types;
 
 pub use traits::{
-    Bound, Container, Coordinates, Find, Intersect, Merge, Overlap, SetSubtract, Subtract,
+    Bound, Container, Coordinates, Find, Internal, Intersect, Merge, Overlap, SetSubtract, Subtract,
 };
 pub use types::{GenomicInterval, GenomicIntervalSet, Interval, IntervalSet};
