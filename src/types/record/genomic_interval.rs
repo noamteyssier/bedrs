@@ -81,6 +81,10 @@ mod testing {
         let b = GenomicInterval::new(1, 5, 100);
         assert_eq!(a.coord_cmp(&b), Ordering::Greater);
 
+        let a = GenomicInterval::new(1, 10, 100);
+        let b = GenomicInterval::new(1, 10, 90);
+        assert_eq!(a.coord_cmp(&b), Ordering::Greater);
+
         let a = GenomicInterval::new(2, 10, 100);
         let b = GenomicInterval::new(1, 10, 100);
         assert_eq!(a.coord_cmp(&b), Ordering::Greater);
@@ -101,10 +105,6 @@ mod testing {
     fn test_interval_ordering_eq() {
         let a = GenomicInterval::new(1, 5, 100);
         let b = GenomicInterval::new(1, 5, 100);
-        assert_eq!(a.coord_cmp(&b), Ordering::Equal);
-
-        let a = GenomicInterval::new(1, 5, 100);
-        let b = GenomicInterval::new(1, 5, 90);
         assert_eq!(a.coord_cmp(&b), Ordering::Equal);
 
         let a = GenomicInterval::new(2, 5, 100);
