@@ -11,6 +11,14 @@ pub struct GenomicIntervalSet<T> {
     records: Vec<GenomicInterval<T>>,
     is_sorted: bool,
 }
+impl<T> FromIterator<GenomicInterval<T>> for GenomicIntervalSet<T> {
+    fn from_iter<I: IntoIterator<Item = GenomicInterval<T>>>(iter: I) -> Self {
+        Self {
+            records: iter.into_iter().collect(),
+            is_sorted: false,
+        }
+    }
+}
 impl<T> Container<T, GenomicInterval<T>> for GenomicIntervalSet<T>
 where
     GenomicInterval<T>: IntervalBounds<T>,
@@ -131,6 +139,14 @@ mod testing {
         let starts = vec![10; n_intervals];
         let ends = vec![100; n_intervals + 3];
         let set = GenomicIntervalSet::from_endpoints_unchecked(&chrs, &starts, &ends);
+        assert_eq!(set.len(), n_intervals);
+    }
+
+    #[test]
+    fn test_from_iterator() {
+        let n_intervals = 10;
+        let records = vec![GenomicInterval::new(1, 10, 100); n_intervals];
+        let set = GenomicIntervalSet::from_iter(records);
         assert_eq!(set.len(), n_intervals);
     }
 }
