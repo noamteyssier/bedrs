@@ -15,6 +15,18 @@ where
     is_sorted: bool,
 }
 
+impl<T> FromIterator<Interval<T>> for IntervalSet<T>
+where
+    T: ValueBounds,
+{
+    fn from_iter<I: IntoIterator<Item = Interval<T>>>(iter: I) -> Self {
+        Self {
+            records: iter.into_iter().collect(),
+            is_sorted: false,
+        }
+    }
+}
+
 impl<T> Container<T, Interval<T>> for IntervalSet<T>
 where
     Interval<T>: IntervalBounds<T>,
@@ -111,6 +123,14 @@ mod testing {
         let starts = vec![10; n_intervals];
         let ends = vec![100; n_intervals + 3];
         let set = IntervalSet::from_endpoints_unchecked(&starts, &ends);
+        assert_eq!(set.len(), n_intervals);
+    }
+
+    #[test]
+    fn test_from_iterator() {
+        let n_intervals = 10;
+        let records = vec![Interval::new(10, 100); n_intervals];
+        let set = IntervalSet::from_iter(records);
         assert_eq!(set.len(), n_intervals);
     }
 }

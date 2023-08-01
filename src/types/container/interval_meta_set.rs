@@ -13,6 +13,19 @@ where
     is_sorted: bool,
 }
 
+impl<T, M> FromIterator<IntervalMeta<T, M>> for IntervalMetaSet<T, M>
+where
+    T: ValueBounds,
+    M: Copy,
+{
+    fn from_iter<I: IntoIterator<Item = IntervalMeta<T, M>>>(iter: I) -> Self {
+        Self {
+            records: iter.into_iter().collect(),
+            is_sorted: false,
+        }
+    }
+}
+
 impl<T, M> Container<T, IntervalMeta<T, M>> for IntervalMetaSet<T, M>
 where
     IntervalMeta<T, M>: IntervalBounds<T>,
@@ -111,6 +124,14 @@ mod testing {
         let starts = vec![10; n_intervals];
         let ends = vec![100; n_intervals + 3];
         let set = IntervalMetaSet::<usize, usize>::from_endpoints_unchecked(&starts, &ends);
+        assert_eq!(set.len(), n_intervals);
+    }
+
+    #[test]
+    fn test_from_iterator() {
+        let n_intervals = 10;
+        let records = vec![IntervalMeta::new(10, 100, None); n_intervals];
+        let set: IntervalMetaSet<usize, usize> = IntervalMetaSet::from_iter(records);
         assert_eq!(set.len(), n_intervals);
     }
 }
