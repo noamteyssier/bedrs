@@ -97,6 +97,19 @@ where
     /// Calculates the span of the container and creates a new interval
     /// representing the span. This must be implemented by the user for
     /// custom containers.
+    ///
+    /// This is not implemented generically because the span of a container
+    /// is not always well defined with container-specific contexts
+    /// (think multiple chromosomes or associated metadata to interval sets).
+    ///
+    /// However one can imagine it as the following:
+    ///
+    /// ``` text
+    /// IV1 : |-----|
+    /// IV2 :           |-----|
+    /// IV3 :                    |-----|
+    /// Span: |------------------------|
+    /// ```
     fn span(&self) -> Result<I> {
         unimplemented!("Span is not implemented generically - you will need to implement it for your custom container")
     }
