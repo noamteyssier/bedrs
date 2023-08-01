@@ -33,6 +33,18 @@ where
         MergeResults::new(cluster_intervals, cluster_ids)
     }
 
+    /// Merges overlapping intervals within a container
+    ///
+    /// ```text
+    /// (a)    i----j
+    /// (b)      k----l
+    /// (c)        m----n
+    /// (d)                  o----p
+    /// (e)                    q----r
+    /// =============================== 
+    /// (1)    i--------n
+    /// (2)                  o------r
+    /// ```
     fn merge(&self) -> Option<MergeResults<T, I>> {
         if self.is_sorted() {
             Some(self.merge_unchecked())
