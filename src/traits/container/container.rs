@@ -2,7 +2,7 @@ use anyhow::{bail, Result};
 
 use crate::{
     traits::{IntervalBounds, ValueBounds},
-    Bound, Find, Merge, SetSubtract, Internal,
+    Bound, Find, Internal, Merge, SetSubtract,
 };
 
 /// The main trait representing a container of intervals.

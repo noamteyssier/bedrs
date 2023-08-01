@@ -1,12 +1,15 @@
-use anyhow::{Result, bail};
-use crate::{Container, traits::{ValueBounds, IntervalBounds}, types::SubtractFromIter};
+use crate::{
+    traits::{IntervalBounds, ValueBounds},
+    types::SubtractFromIter,
+    Container,
+};
+use anyhow::{bail, Result};
 
 pub trait Internal<T, I>: Container<T, I>
 where
     T: ValueBounds,
     I: IntervalBounds<T>,
 {
-
     /// Returns all non-overlapping intervals of the interval
     /// set within its span
     ///
@@ -40,7 +43,7 @@ where
 #[cfg(test)]
 mod testing {
     use super::*;
-    use crate::{Interval, IntervalSet, Coordinates};
+    use crate::{Coordinates, Interval, IntervalSet};
 
     #[test]
     fn internal_unsorted() {
@@ -58,10 +61,8 @@ mod testing {
     /// ==================
     /// (i)      j-k
     fn internal_a() {
-        let set = IntervalSet::from_sorted(vec![
-            Interval::new(1, 3),
-            Interval::new(6, 10),
-        ]).unwrap();
+        let set =
+            IntervalSet::from_sorted(vec![Interval::new(1, 3), Interval::new(6, 10)]).unwrap();
         let span = set.span().unwrap();
         let sub = set.internal_unchecked(span);
         let internal_set = IntervalSet::from_iter(sub);
@@ -82,7 +83,8 @@ mod testing {
             Interval::new(1, 3),
             Interval::new(6, 10),
             Interval::new(12, 15),
-        ]).unwrap();
+        ])
+        .unwrap();
         let span = set.span().unwrap();
         let sub = set.internal_unchecked(span);
         let internal_set = IntervalSet::from_iter(sub);
@@ -92,5 +94,4 @@ mod testing {
         assert_eq!(internal_set.records()[1].start(), 10);
         assert_eq!(internal_set.records()[1].end(), 12);
     }
-
 }
