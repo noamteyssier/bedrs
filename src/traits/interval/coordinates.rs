@@ -251,7 +251,7 @@ mod testing {
         assert_eq!(a.start(), 10);
         assert_eq!(a.end(), 25);
     }
-    
+
     #[test]
     fn test_extend_both() {
         let mut a = Interval::new(10, 20);
