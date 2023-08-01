@@ -528,17 +528,17 @@ mod testing {
             Interval::new(20, 30),
             Interval::new(40, 50),
             Interval::new(60, 70),
-        ]).unwrap();
+        ])
+        .unwrap();
         let span = set.span().unwrap();
         let exp1 = Interval::new(30, 40);
         let exp2 = Interval::new(50, 60);
-        let subset = set.subtract_from(&span)
+        let subset = set
+            .subtract_from(&span)
             .unwrap()
             .collect::<IntervalSet<usize>>();
         assert_eq!(subset.len(), 2);
         assert!(subset.records()[0].eq(&exp1));
         assert!(subset.records()[1].eq(&exp2));
-        
-
     }
 }

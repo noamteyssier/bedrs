@@ -44,7 +44,7 @@ where
             Ordering::Equal => match self.start().cmp(&other.start()) {
                 Ordering::Equal => self.end().cmp(&other.end()),
                 order => order,
-            }
+            },
             order => order,
         }
     }

@@ -7,7 +7,6 @@ where
     Self: Sized,
     T: ValueBounds,
 {
-    
     /// Returns true if the two intervals are on the same chromosome.
     ///
     /// ``` text
@@ -28,7 +27,7 @@ where
     /// (Self)    |--------|
     /// (Other)     |--------|
     ///
-    /// or 
+    /// or
     ///
     /// (Self)      |--------|
     /// (Other)   |--------|
@@ -51,7 +50,6 @@ where
         self.start() < other.start() && self.end() > other.end()
     }
 
-
     /// Returns true if the current interval borders the other interval.
     ///
     /// Measured as bool OR of:
@@ -63,7 +61,7 @@ where
     /// (Other)            |--------|
     ///
     /// or
-    /// 
+    ///
     /// (Self)             |--------|
     /// (Other)   |--------|
     /// ```
@@ -88,7 +86,6 @@ where
     fn contained_by<I: Coordinates<T>>(&self, other: &I) -> bool {
         other.contains(self)
     }
-
 
     /// Returns true if the current interval borders the other -
     /// considers both the interval overlap and the chromosome.
