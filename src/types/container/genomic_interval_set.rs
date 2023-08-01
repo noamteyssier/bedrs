@@ -1,6 +1,7 @@
 use crate::{
     traits::{Container, IntervalBounds, ValueBounds},
-    types::GenomicInterval, Coordinates,
+    types::GenomicInterval,
+    Coordinates,
 };
 use anyhow::{bail, Result};
 use std::fmt::Debug;

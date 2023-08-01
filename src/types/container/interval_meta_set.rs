@@ -1,6 +1,6 @@
-use crate::Coordinates;
 use crate::traits::{Container, IntervalBounds, ValueBounds};
 use crate::types::IntervalMeta;
+use crate::Coordinates;
 use anyhow::{bail, Result};
 
 /// A collection of [IntervalMeta]
@@ -51,7 +51,7 @@ where
     fn set_sorted(&mut self) {
         self.is_sorted = true;
     }
-    
+
     /// Get the span of the interval set
     /// Does not copy the meta field of the first and last interval
     ///
@@ -65,7 +65,7 @@ where
     ///    traits::{Container, Coordinates},
     ///    types::{IntervalMeta, IntervalMetaSet},
     /// };
-    /// 
+    ///
     /// let mut ivs = IntervalMetaSet::from_iter(vec![
     ///     IntervalMeta::new(1, 10, Some(1)),
     ///     IntervalMeta::new(2, 20, Some(2)),

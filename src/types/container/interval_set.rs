@@ -1,9 +1,9 @@
 use std::fmt::Debug;
 
-use crate::Coordinates;
 use crate::traits::Container;
 use crate::traits::{IntervalBounds, ValueBounds};
 use crate::types::Interval;
+use crate::Coordinates;
 use anyhow::{bail, Result};
 
 /// A collection of [Interval]
