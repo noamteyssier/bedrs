@@ -3,7 +3,7 @@ use crate::{
     Container,
 };
 
-/// Identifies the lower bound on a [Conitainer] via a binary tree search
+/// Identifies the lower bound on a [Container] via a binary tree search
 pub trait Bound<T, I>: Container<T, I>
 where
     I: IntervalBounds<T>,
