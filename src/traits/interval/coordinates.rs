@@ -41,7 +41,10 @@ where
     }
     fn coord_cmp<I: Coordinates<T>>(&self, other: &I) -> Ordering {
         match self.chr().cmp(&other.chr()) {
-            Ordering::Equal => self.start().cmp(&other.start()),
+            Ordering::Equal => match self.start().cmp(&other.start()) {
+                Ordering::Equal => self.end().cmp(&other.end()),
+                order => order,
+            },
             order => order,
         }
     }

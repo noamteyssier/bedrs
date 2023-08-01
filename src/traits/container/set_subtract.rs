@@ -514,4 +514,31 @@ mod testing {
 
         assert!(subset.next().is_none());
     }
+
+    #[test]
+    /// (a)    x---------------y
+    /// (b)    i---j
+    /// (c)          k---l
+    /// (d)                 m--n
+    /// ==================================
+    /// (s1)       j-k
+    /// (s2)             l-m
+    fn set_subtract_from_k() {
+        let set = IntervalSet::from_sorted(vec![
+            Interval::new(20, 30),
+            Interval::new(40, 50),
+            Interval::new(60, 70),
+        ])
+        .unwrap();
+        let span = set.span().unwrap();
+        let exp1 = Interval::new(30, 40);
+        let exp2 = Interval::new(50, 60);
+        let subset = set
+            .subtract_from(&span)
+            .unwrap()
+            .collect::<IntervalSet<usize>>();
+        assert_eq!(subset.len(), 2);
+        assert!(subset.records()[0].eq(&exp1));
+        assert!(subset.records()[1].eq(&exp2));
+    }
 }

@@ -149,7 +149,7 @@ where
         if self.overlaps(other) {
             if self.eq(other) || self.contained_by(other) {
                 None
-            } else if self.contains(other) || self.contained_by(other) {
+            } else if self.contains(other) {
                 Some(self.build_contained(other))
             } else if self.gt(other) {
                 Some(self.build_gt(other))
@@ -231,7 +231,7 @@ mod testing {
     ///     x--y
     ///   i------j
     /// ==================
-    ///   i-x  y-j
+    ///   none
     fn subtraction_case_d() {
         let a = Interval::new(20, 30);
         let b = Interval::new(10, 40);
@@ -289,5 +289,33 @@ mod testing {
         assert_eq!(sub.len(), 1);
         assert_eq!(sub[0].start(), 10);
         assert_eq!(sub[0].end(), 20);
+    }
+
+    #[test]
+    ///   x--------y
+    ///   i---j
+    /// ===============
+    ///       j----y
+    fn subtraction_case_g() {
+        let a = Interval::new(10, 40);
+        let b = Interval::new(10, 20);
+        let sub = a.subtract(&b).unwrap();
+        assert_eq!(sub.len(), 1);
+        assert_eq!(sub[0].start(), 20);
+        assert_eq!(sub[0].end(), 40);
+    }
+
+    #[test]
+    ///   x--------y
+    ///        i---j
+    /// ===============
+    ///   x----i
+    fn subtraction_case_h() {
+        let a = Interval::new(10, 40);
+        let b = Interval::new(30, 40);
+        let sub = a.subtract(&b).unwrap();
+        assert_eq!(sub.len(), 1);
+        assert_eq!(sub[0].start(), 10);
+        assert_eq!(sub[0].end(), 30);
     }
 }

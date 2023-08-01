@@ -79,6 +79,10 @@ mod testing {
         let a = Interval::new(10, 100);
         let b = Interval::new(5, 100);
         assert_eq!(a.coord_cmp(&b), Ordering::Greater);
+
+        let a = Interval::new(10, 100);
+        let b = Interval::new(10, 90);
+        assert_eq!(a.coord_cmp(&b), Ordering::Greater);
     }
 
     #[test]
@@ -86,16 +90,16 @@ mod testing {
         let a = Interval::new(5, 100);
         let b = Interval::new(10, 100);
         assert_eq!(a.coord_cmp(&b), Ordering::Less);
+
+        let a = Interval::new(5, 90);
+        let b = Interval::new(5, 100);
+        assert_eq!(a.coord_cmp(&b), Ordering::Less);
     }
 
     #[test]
     fn test_interval_ordering_eq() {
         let a = Interval::new(5, 100);
         let b = Interval::new(5, 100);
-        assert_eq!(a.coord_cmp(&b), Ordering::Equal);
-
-        let a = Interval::new(5, 100);
-        let b = Interval::new(5, 90);
         assert_eq!(a.coord_cmp(&b), Ordering::Equal);
     }
 }
