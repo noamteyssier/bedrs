@@ -85,6 +85,14 @@ where
             .map(|(idx, rec)| (rec, &records[idx - 1]))
             .all(|(a, b)| a.coord_cmp(b).is_ge())
     }
+
+    /// Applies a mutable function to each interval in the container
+    fn apply_mut<F>(&mut self, f: F)
+    where
+        F: Fn(&mut I),
+    {
+        self.records_mut().iter_mut().for_each(f);
+    }
 }
 
 impl<C, T, I> Merge<T, I> for C
@@ -240,5 +248,22 @@ mod testing {
         ];
         let set = IntervalSet::from_sorted(records);
         assert!(set.is_err());
+    }
+
+    #[test]
+    fn test_container_apply_mut() {
+        let records = vec![
+            Interval::new(15, 25),
+            Interval::new(10, 20),
+            Interval::new(5, 15),
+        ];
+        let mut set = IntervalSet::from_unsorted(records);
+        set.apply_mut(|rec| rec.extend(&2));
+        assert_eq!(set.records()[0].start(), 3);
+        assert_eq!(set.records()[0].end(), 17);
+        assert_eq!(set.records()[1].start(), 8);
+        assert_eq!(set.records()[1].end(), 22);
+        assert_eq!(set.records()[2].start(), 13);
+        assert_eq!(set.records()[2].end(), 27);
     }
 }
