@@ -1,6 +1,6 @@
 use super::Container;
 use crate::{
-    traits::{IntervalBounds, ValueBounds, errors::SetError},
+    traits::{errors::SetError, IntervalBounds, ValueBounds},
     types::{FindIter, FindIterSorted},
     Bound,
 };

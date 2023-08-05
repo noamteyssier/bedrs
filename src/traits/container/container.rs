@@ -1,8 +1,8 @@
-use anyhow::Result;
 use crate::{
-    traits::{IntervalBounds, ValueBounds, errors::SetError},
+    traits::{errors::SetError, IntervalBounds, ValueBounds},
     Bound, Find, Internal, Merge, SetSubtract,
 };
+use anyhow::Result;
 
 /// The main trait representing a container of intervals.
 ///
