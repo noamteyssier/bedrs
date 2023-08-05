@@ -145,7 +145,7 @@ where
 mod testing {
     use crate::{
         traits::Container,
-        types::{Strand, StrandedGenomicInterval, StrandedGenomicIntervalSet},
+        types::{Strand, StrandedGenomicInterval, StrandedGenomicIntervalSet}, Coordinates,
     };
 
     #[test]
@@ -257,5 +257,43 @@ mod testing {
         set.records().iter().for_each(|r| {
             assert_eq!(r.strand(), Strand::Reverse);
         });
+    }
+
+    #[test]
+    fn test_span_empty() {
+        let set = StrandedGenomicIntervalSet::<u32>::new(vec![]);
+        let span = set.span();
+        assert!(span.is_err());
+    }
+
+    #[test]
+    fn test_span_unsorted() {
+        let n_intervals = 10;
+        let records = vec![StrandedGenomicInterval::new(1, 10, 100, Strand::Forward); n_intervals];
+        let set = StrandedGenomicIntervalSet::new(records);
+        let span = set.span();
+        assert!(span.is_err());
+    }
+
+    #[test]
+    fn test_span_multiple_chr() {
+        let n_intervals = 10;
+        let mut records = vec![StrandedGenomicInterval::new(1, 10, 100, Strand::Forward); n_intervals];
+        records.push(StrandedGenomicInterval::new(2, 10, 100, Strand::Forward));
+        let set = StrandedGenomicIntervalSet::new(records);
+        let span = set.span();
+        assert!(span.is_err());
+    }
+
+    #[test]
+    fn test_span() {
+        let records = vec![
+            StrandedGenomicInterval::new(1, 10, 100, Strand::Forward),
+            StrandedGenomicInterval::new(1, 1000, 2000, Strand::Forward),
+        ];
+        let set = StrandedGenomicIntervalSet::from_sorted(records).unwrap();
+        let span = set.span().unwrap();
+        assert_eq!(span.start(), 10);
+        assert_eq!(span.end(), 2000);
     }
 }
