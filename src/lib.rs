@@ -232,4 +232,6 @@ pub mod types;
 pub use traits::{
     Bound, Container, Coordinates, Find, Internal, Intersect, Merge, Overlap, SetSubtract, Subtract,
 };
-pub use types::{GenomicInterval, GenomicIntervalSet, Interval, IntervalSet};
+pub use types::{
+    GenomicInterval, GenomicIntervalSet, Interval, IntervalSet, Strand, StrandedGenomicInterval,
+};
