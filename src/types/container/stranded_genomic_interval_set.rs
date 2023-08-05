@@ -220,4 +220,42 @@ mod testing {
         let set = StrandedGenomicIntervalSet::from_iter(records);
         assert_eq!(set.len(), n_intervals);
     }
+
+    #[test]
+    fn test_new() {
+        let n_intervals = 10;
+        let records = vec![StrandedGenomicInterval::new(1, 10, 100, Strand::Reverse); n_intervals];
+        let set = StrandedGenomicIntervalSet::new(records);
+        assert_eq!(set.len(), n_intervals);
+        assert_eq!(set.is_sorted(), false);
+    }
+
+    #[test]
+    fn test_set_sorted() {
+        let n_intervals = 10;
+        let records = vec![StrandedGenomicInterval::new(1, 10, 100, Strand::Reverse); n_intervals];
+        let mut set = StrandedGenomicIntervalSet::new(records);
+        assert_eq!(set.is_sorted(), false);
+        set.set_sorted();
+        assert_eq!(set.is_sorted(), true);
+    }
+
+    #[test]
+    fn test_records_mut() {
+        let n_intervals = 10;
+        let records = vec![StrandedGenomicInterval::new(1, 10, 100, Strand::Forward); n_intervals];
+        let mut set = StrandedGenomicIntervalSet::new(records);
+
+        set.records().iter().for_each(|r| {
+            assert_eq!(r.strand(), Strand::Forward);
+        });
+
+        set.records_mut().iter_mut().for_each(|r| {
+            r.set_strand(Strand::Reverse);
+        });
+
+        set.records().iter().for_each(|r| {
+            assert_eq!(r.strand(), Strand::Reverse);
+        });
+    }
 }
