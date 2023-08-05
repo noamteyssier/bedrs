@@ -145,7 +145,8 @@ where
 mod testing {
     use crate::{
         traits::Container,
-        types::{Strand, StrandedGenomicInterval, StrandedGenomicIntervalSet}, Coordinates,
+        types::{Strand, StrandedGenomicInterval, StrandedGenomicIntervalSet},
+        Coordinates,
     };
 
     #[test]
@@ -278,7 +279,8 @@ mod testing {
     #[test]
     fn test_span_multiple_chr() {
         let n_intervals = 10;
-        let mut records = vec![StrandedGenomicInterval::new(1, 10, 100, Strand::Forward); n_intervals];
+        let mut records =
+            vec![StrandedGenomicInterval::new(1, 10, 100, Strand::Forward); n_intervals];
         records.push(StrandedGenomicInterval::new(2, 10, 100, Strand::Forward));
         let set = StrandedGenomicIntervalSet::new(records);
         let span = set.span();
