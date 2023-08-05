@@ -1,5 +1,5 @@
 use crate::{
-    traits::{IntervalBounds, ValueBounds},
+    traits::{errors::SetError, IntervalBounds, ValueBounds},
     Container,
 };
 
@@ -30,7 +30,7 @@ where
     /// let mut set = IntervalSet::new(records);
     /// set.sort();
     /// let bound = set.lower_bound(&query);
-    /// assert_eq!(bound, Some(1));
+    /// assert_eq!(bound, Ok(1));
     /// ```
     ///
     /// ## On genomic coordinates
@@ -50,13 +50,13 @@ where
     /// set.sort();
     /// let query = GenomicInterval::new(3, 10, 20);
     /// let bound = set.lower_bound(&query);
-    /// assert_eq!(bound, Some(2));
+    /// assert_eq!(bound, Ok(2));
     /// ```
-    fn lower_bound(&self, query: &I) -> Option<usize> {
+    fn lower_bound(&self, query: &I) -> Result<usize, SetError> {
         if self.is_sorted() {
-            Some(self.lower_bound_unchecked(query))
+            Ok(self.lower_bound_unchecked(query))
         } else {
-            None
+            Err(SetError::UnsortedSet)
         }
     }
 
@@ -124,7 +124,10 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::{Bound, Container, GenomicInterval, GenomicIntervalSet, Interval, IntervalSet};
+    use crate::{
+        traits::errors::SetError, Bound, Container, GenomicInterval, GenomicIntervalSet, Interval,
+        IntervalSet,
+    };
 
     #[test]
     fn bsearch_base_low() {
@@ -133,7 +136,7 @@ mod testing {
         set.sort();
         let query = Interval::new(10, 20);
         let bound = set.lower_bound(&query);
-        assert_eq!(bound, Some(10));
+        assert_eq!(bound, Ok(10));
     }
 
     #[test]
@@ -143,7 +146,7 @@ mod testing {
         set.sort();
         let query = Interval::new(300, 320);
         let bound = set.lower_bound(&query);
-        assert_eq!(bound, Some(300));
+        assert_eq!(bound, Ok(300));
     }
 
     #[test]
@@ -160,7 +163,7 @@ mod testing {
         set.sort();
         let query = GenomicInterval::new(3, 10, 20);
         let bound = set.lower_bound(&query);
-        assert_eq!(bound, Some(2));
+        assert_eq!(bound, Ok(2));
     }
 
     #[test]
@@ -177,7 +180,7 @@ mod testing {
         set.sort();
         let query = GenomicInterval::new(3, 25, 20);
         let bound = set.lower_bound(&query);
-        assert_eq!(bound, Some(4));
+        assert_eq!(bound, Ok(4));
     }
 
     #[test]
@@ -186,7 +189,7 @@ mod testing {
         let set = IntervalSet::new(records);
         let query = Interval::new(10, 20);
         let bound = set.lower_bound(&query);
-        assert!(bound.is_none());
+        assert_eq!(bound, Err(SetError::UnsortedSet));
     }
 
     #[test]

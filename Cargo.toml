@@ -13,6 +13,7 @@ keywords = ["interval", "bioinformatics", "ranges", "genomic", "bed"]
 
 [dependencies]
 anyhow = "1.0.65"
+thiserror = "1.0.44"
 
 [dev-dependencies]
 criterion = "0.4.0"
