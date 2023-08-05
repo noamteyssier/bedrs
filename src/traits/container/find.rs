@@ -1,6 +1,6 @@
 use super::Container;
 use crate::{
-    traits::{IntervalBounds, ValueBounds},
+    traits::{IntervalBounds, ValueBounds, errors::SetError},
     types::{FindIter, FindIterSorted},
     Bound,
 };
@@ -32,14 +32,14 @@ where
         FindIter::new(self.records(), query)
     }
 
-    /// Creates an Optional Iterator that finds all overlapping regions
+    /// Creates a Result Iterator that finds all overlapping regions
     ///
     /// First checks to see if container is sorted
-    fn find_iter_sorted<'a>(&'a self, query: &'a I) -> Option<FindIterSorted<'_, T, I>> {
+    fn find_iter_sorted<'a>(&'a self, query: &'a I) -> Result<FindIterSorted<'_, T, I>, SetError> {
         if self.is_sorted() {
-            Some(self.find_iter_sorted_unchecked(query))
+            Ok(self.find_iter_sorted_unchecked(query))
         } else {
-            None
+            Err(SetError::UnsortedSet)
         }
     }
 
@@ -97,6 +97,6 @@ mod testing {
         let ends = vec![45, 50, 55, 40];
         let set = IntervalSet::from_endpoints_unchecked(&starts, &ends);
         let overlaps = set.find_iter_sorted(&query);
-        assert!(overlaps.is_none());
+        assert!(overlaps.is_err());
     }
 }

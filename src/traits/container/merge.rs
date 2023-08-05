@@ -1,6 +1,6 @@
 use super::Container;
 use crate::{
-    traits::{IntervalBounds, ValueBounds},
+    traits::{IntervalBounds, ValueBounds, errors::SetError},
     types::MergeResults,
 };
 
@@ -45,11 +45,11 @@ where
     /// (1)    i--------n
     /// (2)                  o------r
     /// ```
-    fn merge(&self) -> Option<MergeResults<T, I>> {
+    fn merge(&self) -> Result<MergeResults<T, I>, SetError> {
         if self.is_sorted() {
-            Some(self.merge_unchecked())
+            Ok(self.merge_unchecked())
         } else {
-            None
+            Err(SetError::UnsortedSet)
         }
     }
 }
@@ -97,7 +97,7 @@ mod testing {
         let ends = vec![30, 20, 30];
         let set = IntervalSet::from_endpoints_unchecked(&starts, &ends);
         let merge_set = set.merge();
-        assert!(merge_set.is_none());
+        assert!(merge_set.is_err());
     }
 
     #[test]

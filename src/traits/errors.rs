@@ -8,4 +8,7 @@ pub enum SetError {
 
     #[error("The interval set is empty.")]
     EmptySet,
+
+    #[error("The provided intervals are not sorted.")]
+    UnsortedIntervals,
 }
