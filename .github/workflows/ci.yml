@@ -20,7 +20,7 @@ jobs:
       - name: Build
         run: cargo build --verbose
       - name: Test
-        run: cargo test --verbose
+        run: cargo test --verbose -F serde
 
   docs:
     name: Docs
