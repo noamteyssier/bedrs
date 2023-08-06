@@ -1,6 +1,9 @@
 use crate::traits::{Coordinates, ValueBounds};
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum Strand {
     /// The forward strand
     Forward,
@@ -32,6 +35,7 @@ pub enum Strand {
 /// assert!(a.overlaps(&b));
 /// ```
 #[derive(Debug, Clone, Copy)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct StrandedGenomicInterval<T> {
     chr: T,
     start: T,
@@ -134,6 +138,8 @@ mod testing {
         types::{Strand, StrandedGenomicInterval},
         Subtract,
     };
+    #[cfg(feature = "serde")]
+    use bincode::{deserialize, serialize};
     use std::cmp::Ordering;
 
     #[test]
@@ -220,5 +226,14 @@ mod testing {
         assert_eq!(sub[0].start(), 5);
         assert_eq!(sub[0].end(), 10);
         assert_eq!(sub[0].strand(), Strand::Reverse);
+    }
+
+    #[test]
+    #[cfg(feature = "serde")]
+    fn test_serialization() {
+        let a = StrandedGenomicInterval::new(1, 5, 100, Strand::Reverse);
+        let serialized = serialize(&a).unwrap();
+        let deserialized: StrandedGenomicInterval<u32> = deserialize(&serialized).unwrap();
+        assert!(a.eq(&deserialized));
     }
 }
