@@ -4,10 +4,13 @@ use crate::{
     Coordinates, Strand,
 };
 use anyhow::{bail, Result};
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
 
 /// A collection of [StrandedGenomicInterval]
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct StrandedGenomicIntervalSet<T> {
     records: Vec<StrandedGenomicInterval<T>>,
     is_sorted: bool,
@@ -148,6 +151,9 @@ mod testing {
         types::{Strand, StrandedGenomicInterval, StrandedGenomicIntervalSet},
         Coordinates,
     };
+
+    #[cfg(feature = "serde")]
+    use bincode::{deserialize, serialize};
 
     #[test]
     fn test_genomic_interval_set_init_from_records() {
@@ -297,5 +303,19 @@ mod testing {
         let span = set.span().unwrap();
         assert_eq!(span.start(), 10);
         assert_eq!(span.end(), 2000);
+    }
+
+    #[test]
+    #[cfg(feature = "serde")]
+    fn test_serialization() {
+        let n_intervals = 10;
+        let records = vec![StrandedGenomicInterval::new(1, 10, 100, Strand::Reverse); n_intervals];
+        let set = StrandedGenomicIntervalSet::new(records);
+        let serialized = serialize(&set).unwrap();
+        let deserialized: StrandedGenomicIntervalSet<usize> = deserialize(&serialized).unwrap();
+
+        for (iv1, iv2) in set.records().iter().zip(deserialized.records().iter()) {
+            assert!(iv1.eq(iv2));
+        }
     }
 }
