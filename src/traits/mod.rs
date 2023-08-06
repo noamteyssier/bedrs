@@ -7,6 +7,7 @@ pub mod container;
 pub mod errors;
 pub mod interval;
 pub use container::{Bound, Container, Find, Internal, Merge, SetSubtract};
+pub use errors::SetError;
 pub use interval::{Coordinates, Intersect, Overlap, Subtract};
 
 /// Generic bounds for values to be used for [Coordinates]
