@@ -5,21 +5,29 @@ env:
 jobs:
 
   ci:
-    needs: [test, docs, coverage]
+    needs: [build, test, docs, coverage]
     name: CI
     runs-on: 'ubuntu-latest'
     steps:
       - name: Done
         run: exit 0
 
-  test:
-    name: Test
+  build:
+    name: Build
     runs-on: 'ubuntu-latest'
     steps:
       - uses: actions/checkout@v3
       - name: Build
         run: cargo build --verbose
-      - name: Test
+
+  test:
+    name: Test
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: actions/checkout@v3
+      - name: Test Standard
+        run: cargo test --verbose
+      - name: Test Serde
         run: cargo test --verbose -F serde
 
   docs:
