@@ -2,9 +2,12 @@ use crate::traits::{Container, IntervalBounds, ValueBounds};
 use crate::types::IntervalMeta;
 use crate::Coordinates;
 use anyhow::{bail, Result};
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 
 /// A collection of [IntervalMeta]
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct IntervalMetaSet<T, M>
 where
     T: ValueBounds,
@@ -129,10 +132,14 @@ where
 
 #[cfg(test)]
 mod testing {
+    #[cfg(feature = "serde")]
+    use crate::traits::Coordinates;
     use crate::{
         traits::Container,
         types::{IntervalMeta, IntervalMetaSet},
     };
+    #[cfg(feature = "serde")]
+    use bincode::{deserialize, serialize};
 
     #[test]
     fn test_interval_meta_set_init_from_records() {
@@ -175,5 +182,19 @@ mod testing {
         let records = vec![IntervalMeta::new(10, 100, None); n_intervals];
         let set: IntervalMetaSet<usize, usize> = IntervalMetaSet::from_iter(records);
         assert_eq!(set.len(), n_intervals);
+    }
+
+    #[test]
+    #[cfg(feature = "serde")]
+    fn test_serialization() {
+        let n_intervals = 10;
+        let records = vec![IntervalMeta::new(10, 100, None); n_intervals];
+        let set: IntervalMetaSet<usize, usize> = IntervalMetaSet::from_iter(records);
+        let serialized = serialize(&set).unwrap();
+        let deserialized: IntervalMetaSet<usize, usize> = deserialize(&serialized).unwrap();
+
+        for (iv1, iv2) in set.records().iter().zip(deserialized.records().iter()) {
+            assert!(iv1.eq(iv2));
+        }
     }
 }

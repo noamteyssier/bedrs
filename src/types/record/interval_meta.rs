@@ -1,6 +1,9 @@
 use crate::traits::{Coordinates, ValueBounds};
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Copy)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct IntervalMeta<T, M>
 where
     T: ValueBounds,
@@ -61,6 +64,9 @@ mod testing {
     use super::IntervalMeta;
     use crate::traits::Coordinates;
 
+    #[cfg(feature = "serde")]
+    use bincode::{deserialize, serialize};
+
     #[test]
     fn test_interval_meta_init() {
         let start = 10;
@@ -96,5 +102,14 @@ mod testing {
         assert_eq!(a.start(), b.start());
         assert_eq!(a.end(), b.end());
         assert_eq!(a.chr(), b.chr());
+    }
+
+    #[test]
+    #[cfg(feature = "serde")]
+    fn test_serialization() {
+        let a = IntervalMeta::new(10, 100, Some("info"));
+        let encoding = serialize(&a).unwrap();
+        let b: IntervalMeta<usize, &str> = deserialize(&encoding).unwrap();
+        assert!(a.eq(&b));
     }
 }

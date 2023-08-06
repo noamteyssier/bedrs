@@ -1,4 +1,6 @@
 use crate::traits::{Coordinates, ValueBounds};
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 
 /// A representation of a Genomic Interval.
 ///
@@ -15,7 +17,8 @@ use crate::traits::{Coordinates, ValueBounds};
 /// let b = GenomicInterval::new(1, 20, 30);
 /// assert!(a.overlaps(&b));
 /// ```
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct GenomicInterval<T> {
     chr: T,
     start: T,
@@ -62,10 +65,24 @@ where
     }
 }
 
+// impl<T> PartialEq for GenomicInterval<T>
+// where
+//     T: ValueBounds,
+// {
+//     fn eq(&self, other: &Self) -> bool {
+//         self.chr == other.chr
+//             && self.start == other.start
+//             && self.end == other.end
+//     }
+// }
+
 #[cfg(test)]
 mod testing {
     use crate::{traits::Coordinates, types::GenomicInterval};
     use std::cmp::Ordering;
+
+    #[cfg(feature = "serde")]
+    use bincode::{deserialize, serialize};
 
     #[test]
     fn test_interval_init() {
@@ -110,5 +127,25 @@ mod testing {
         let a = GenomicInterval::new(2, 5, 100);
         let b = GenomicInterval::new(2, 5, 100);
         assert_eq!(a.coord_cmp(&b), Ordering::Equal);
+    }
+
+    #[test]
+    #[cfg(feature = "serde")]
+    fn test_serialization() {
+        let a = GenomicInterval::new(1, 5, 100);
+        let encoding = serialize(&a).unwrap();
+        let b: GenomicInterval<usize> = deserialize(&encoding).unwrap();
+        assert_eq!(a, b);
+    }
+
+    #[test]
+    #[cfg(feature = "serde")]
+    fn test_deserialization() {
+        let encoding = vec![
+            1, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0,
+        ];
+        let expected = GenomicInterval::new(1, 5, 100);
+        let interval: GenomicInterval<usize> = deserialize(&encoding).unwrap();
+        assert_eq!(interval, expected);
     }
 }
