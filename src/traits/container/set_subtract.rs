@@ -1,5 +1,5 @@
 use crate::{
-    traits::{IntervalBounds, ValueBounds},
+    traits::{errors::SetError, IntervalBounds, ValueBounds},
     types::{SubtractFromIter, SubtractIter},
     Container,
 };
@@ -41,11 +41,11 @@ where
     ///
     /// assert!(subset.next().is_none());
     /// ```
-    fn subtract<'a>(&'a self, query: &'a I) -> Option<SubtractIter<T, I>> {
+    fn subtract<'a>(&'a self, query: &'a I) -> Result<SubtractIter<T, I>, SetError> {
         if self.is_sorted() {
-            Some(self.subtract_unchecked(query))
+            Ok(self.subtract_unchecked(query))
         } else {
-            None
+            Err(SetError::UnsortedSet)
         }
     }
 
@@ -87,11 +87,11 @@ where
     ///
     /// assert!(subset.next().is_none());
     /// ```
-    fn subtract_from<'a>(&'a self, query: &'a I) -> Option<SubtractFromIter<T, I>> {
+    fn subtract_from<'a>(&'a self, query: &'a I) -> Result<SubtractFromIter<T, I>, SetError> {
         if self.is_sorted() {
-            Some(self.subtract_from_unchecked(query))
+            Ok(self.subtract_from_unchecked(query))
         } else {
-            None
+            Err(SetError::UnsortedSet)
         }
     }
 
@@ -116,7 +116,7 @@ mod testing {
         let c = Interval::new(45, 50);
         let set = IntervalSet::new(vec![a, b, c]);
         let subset = set.subtract(&q);
-        assert!(subset.is_none());
+        assert!(subset.is_err());
     }
 
     #[test]
@@ -127,7 +127,7 @@ mod testing {
         let c = Interval::new(45, 50);
         let set = IntervalSet::new(vec![a, b, c]);
         let subset = set.subtract_from(&q);
-        assert!(subset.is_none());
+        assert!(subset.is_err());
     }
 
     #[test]

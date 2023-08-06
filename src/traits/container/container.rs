@@ -1,9 +1,8 @@
-use anyhow::{bail, Result};
-
 use crate::{
-    traits::{IntervalBounds, ValueBounds},
+    traits::{errors::SetError, IntervalBounds, ValueBounds},
     Bound, Find, Internal, Merge, SetSubtract,
 };
+use anyhow::Result;
 
 /// The main trait representing a container of intervals.
 ///
@@ -53,11 +52,11 @@ where
     /// Creates a new container from presorted intervals
     ///
     /// First this validates that the intervals are truly presorted.
-    fn from_sorted(records: Vec<I>) -> anyhow::Result<Self> {
+    fn from_sorted(records: Vec<I>) -> Result<Self, SetError> {
         if Self::valid_interval_sorting(&records) {
             Ok(Self::from_sorted_unchecked(records))
         } else {
-            bail!("Intervals are unsorted!")
+            Err(SetError::UnsortedIntervals)
         }
     }
 

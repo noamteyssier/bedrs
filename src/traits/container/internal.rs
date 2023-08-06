@@ -1,5 +1,5 @@
 use crate::{
-    traits::{IntervalBounds, ValueBounds},
+    traits::{errors::SetError, IntervalBounds, ValueBounds},
     types::SubtractFromIter,
     Container,
 };
@@ -27,7 +27,7 @@ where
             let span = self.span()?;
             Ok(self.internal_unchecked(span))
         } else {
-            bail!("Interval set is not sorted")
+            bail!(SetError::UnsortedSet)
         }
     }
 
