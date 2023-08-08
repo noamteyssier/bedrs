@@ -1,6 +1,6 @@
 use crate::{
     traits::{errors::SetError, IntervalBounds, ValueBounds},
-    Bound, Find, Internal, Merge, SetSubtract,
+    Bound, Find, Internal, Merge, Sample, SetSubtract,
 };
 use anyhow::Result;
 
@@ -25,13 +25,23 @@ where
     /// Returns `true` if the internal vector is sorted
     fn is_sorted(&self) -> bool;
 
+    /// Returns a mutable reference to the internal sorted flag
+    fn sorted_mut(&mut self) -> &mut bool;
+
     /// Sets the internal state to sorted
     ///
     /// >> This would likely not be used directly by the user.
     /// >> If you are creating an interval set from presorted
     /// >> intervals use the `from_sorted()` method instead of
     /// >> the `new()` method.
-    fn set_sorted(&mut self);
+    fn set_sorted(&mut self) {
+        *self.sorted_mut() = true;
+    }
+
+    /// Sets the internal state to unsorted
+    fn set_unsorted(&mut self) {
+        *self.sorted_mut() = false;
+    }
 
     /// Returns the number of records in the container
     fn len(&self) -> usize {
@@ -147,6 +157,14 @@ where
 {
 }
 
+impl<C, T, I> Sample<T, I> for C
+where
+    C: Container<T, I>,
+    I: IntervalBounds<T>,
+    T: ValueBounds,
+{
+}
+
 impl<C, T, I> SetSubtract<T, I> for C
 where
     C: Container<T, I>,
@@ -180,8 +198,8 @@ mod testing {
         fn is_sorted(&self) -> bool {
             self.is_sorted
         }
-        fn set_sorted(&mut self) {
-            self.is_sorted = true;
+        fn sorted_mut(&mut self) -> &mut bool {
+            &mut self.is_sorted
         }
     }
 

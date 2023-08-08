@@ -36,8 +36,8 @@ where
     fn is_sorted(&self) -> bool {
         self.is_sorted
     }
-    fn set_sorted(&mut self) {
-        self.is_sorted = true;
+    fn sorted_mut(&mut self) -> &mut bool {
+        &mut self.is_sorted
     }
 }
 
