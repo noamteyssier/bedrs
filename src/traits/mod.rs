@@ -6,7 +6,7 @@ use std::{
 pub mod container;
 pub mod errors;
 pub mod interval;
-pub use container::{Bound, Container, Find, Internal, Merge, SetSubtract};
+pub use container::{Bound, Container, Find, Internal, Merge, Sample, SetSubtract};
 pub use errors::SetError;
 pub use interval::{Coordinates, Intersect, Overlap, Subtract};
 

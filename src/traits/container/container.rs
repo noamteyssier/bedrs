@@ -1,6 +1,6 @@
 use crate::{
     traits::{errors::SetError, IntervalBounds, ValueBounds},
-    Bound, Find, Internal, Merge, SetSubtract,
+    Bound, Find, Internal, Merge, Sample, SetSubtract,
 };
 use anyhow::Result;
 
@@ -150,6 +150,14 @@ where
 }
 
 impl<C, T, I> Bound<T, I> for C
+where
+    C: Container<T, I>,
+    I: IntervalBounds<T>,
+    T: ValueBounds,
+{
+}
+
+impl<C, T, I> Sample<T, I> for C
 where
     C: Container<T, I>,
     I: IntervalBounds<T>,
