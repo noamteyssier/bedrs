@@ -56,7 +56,12 @@ where
         Self::from_raw_parts(intervals, clusters, n_clusters, max_len)
     }
     #[must_use]
-    pub fn from_raw_parts(intervals: Vec<I>, clusters: Vec<usize>, n_clusters: usize, max_len: Option<T>) -> Self {
+    pub fn from_raw_parts(
+        intervals: Vec<I>,
+        clusters: Vec<usize>,
+        n_clusters: usize,
+        max_len: Option<T>,
+    ) -> Self {
         Self {
             intervals,
             clusters,

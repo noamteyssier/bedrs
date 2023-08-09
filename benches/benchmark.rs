@@ -11,7 +11,7 @@ use overlap::{overlap_base, overlap_cross, overlap_genomic, overlap_meta};
 
 mod perf;
 
-criterion_group!{
+criterion_group! {
     name = find;
     config = Criterion::default().with_profiler(perf::FlamegraphProfiler::new(100));
     targets = find_base, find_genomic, find_iter_base, find_iter_genomic, find_iter_sort_base, find_iter_sort_genomic

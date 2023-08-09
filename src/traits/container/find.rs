@@ -1,7 +1,7 @@
 use super::Container;
 use crate::{
     traits::{errors::SetError, IntervalBounds, ValueBounds},
-    types::{FindIter, FindIterSorted, iterator::QueryMethod},
+    types::{iterator::QueryMethod, FindIter, FindIterSorted},
     Bound,
 };
 
@@ -52,8 +52,7 @@ where
     /// Creates an iterator that finds all overlapping regions
     ///
     /// Does not assume a sorted Container
-    fn find_iter<'a>(&'a self, query: &'a I) -> FindIter<'_, T, I>
-    {
+    fn find_iter<'a>(&'a self, query: &'a I) -> FindIter<'_, T, I> {
         FindIter::new(self.records(), query, QueryMethod::Compare)
     }
 
@@ -61,8 +60,7 @@ where
     /// by some minimum overlap
     ///
     /// Does not assume a sorted Container
-    fn find_iter_min<'a>(&'a self, query: &'a I, minimum: T) -> FindIter<'_, T, I>
-    {
+    fn find_iter_min<'a>(&'a self, query: &'a I, minimum: T) -> FindIter<'_, T, I> {
         FindIter::new(self.records(), query, QueryMethod::CompareBy(minimum))
     }
 
@@ -70,8 +68,7 @@ where
     /// by some exact overlap
     ///
     /// Does not assume a sorted Container
-    fn find_iter_exact<'a>(&'a self, query: &'a I, exact: T) -> FindIter<'_, T, I>
-    {
+    fn find_iter_exact<'a>(&'a self, query: &'a I, exact: T) -> FindIter<'_, T, I> {
         FindIter::new(self.records(), query, QueryMethod::CompareExact(exact))
     }
 
@@ -124,9 +121,9 @@ where
     fn find_iter_sorted_unchecked<'a>(&'a self, query: &'a I) -> FindIterSorted<'_, T, I> {
         FindIterSorted::new(
             self.records(),
-            query, 
-            self.lower_bound_unchecked(query), 
-            QueryMethod::Compare
+            query,
+            self.lower_bound_unchecked(query),
+            QueryMethod::Compare,
         )
     }
 
@@ -140,10 +137,10 @@ where
         minimum: T,
     ) -> FindIterSorted<'_, T, I> {
         FindIterSorted::new(
-            self.records(), 
-            query, 
-            self.lower_bound_unchecked(query), 
-            QueryMethod::CompareBy(minimum)
+            self.records(),
+            query,
+            self.lower_bound_unchecked(query),
+            QueryMethod::CompareBy(minimum),
         )
     }
 
@@ -156,7 +153,12 @@ where
         query: &'a I,
         exact: T,
     ) -> FindIterSorted<'_, T, I> {
-        FindIterSorted::new(self.records(), query, self.lower_bound_unchecked(query), QueryMethod::CompareExact(exact))
+        FindIterSorted::new(
+            self.records(),
+            query,
+            self.lower_bound_unchecked(query),
+            QueryMethod::CompareExact(exact),
+        )
     }
 }
 

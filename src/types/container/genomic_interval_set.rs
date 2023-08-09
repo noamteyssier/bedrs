@@ -3,8 +3,8 @@ use crate::{
     types::GenomicInterval,
     Coordinates,
 };
-use num_traits::zero;
 use anyhow::{bail, Result};
+use num_traits::zero;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;

@@ -17,7 +17,7 @@ pub struct StrandedGenomicIntervalSet<T> {
     max_len: Option<T>,
     is_sorted: bool,
 }
-impl<T> FromIterator<StrandedGenomicInterval<T>> for StrandedGenomicIntervalSet<T> 
+impl<T> FromIterator<StrandedGenomicInterval<T>> for StrandedGenomicIntervalSet<T>
 where
     T: ValueBounds,
 {

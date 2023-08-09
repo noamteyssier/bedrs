@@ -63,7 +63,7 @@ where
                     Ordering::Equal => self.end().cmp(&other.end()),
                     order => order,
                 }
-            },
+            }
             order => order,
         }
     }

@@ -1,8 +1,8 @@
+use num_traits::Zero;
 use std::{
     fmt::Debug,
     ops::{Add, Div, Mul, Sub},
 };
-use num_traits::Zero;
 
 pub mod container;
 pub mod errors;

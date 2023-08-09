@@ -1,8 +1,7 @@
 use crate::traits::{IntervalBounds, ValueBounds};
 use std::marker::PhantomData;
 
-pub enum QueryMethod<T: ValueBounds> 
-{
+pub enum QueryMethod<T: ValueBounds> {
     Compare,
     CompareBy(T),
     CompareExact(T),
