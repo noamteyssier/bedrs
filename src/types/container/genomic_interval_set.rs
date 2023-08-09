@@ -237,6 +237,43 @@ mod testing {
     }
 
     #[test]
+    fn test_from_empty_iterator() {
+        let records: Vec<GenomicInterval<usize>> = vec![];
+        let set = GenomicIntervalSet::from_iter(records);
+        assert_eq!(set.len(), 0);
+        assert!(set.max_len().is_none());
+        assert!(set.span().is_err());
+    }
+
+    #[test]
+    fn test_span() {
+        let intervals = vec![
+            GenomicInterval::new(1, 10, 100),
+            GenomicInterval::new(1, 20, 200),
+        ];
+        let set = GenomicIntervalSet::from_sorted(intervals).unwrap();
+        assert_eq!(set.span().unwrap(), GenomicInterval::new(1, 10, 200));
+    }
+
+    #[test]
+    fn test_span_errors() {
+        let intervals = vec![
+            GenomicInterval::new(1, 10, 100),
+            GenomicInterval::new(2, 20, 200),
+        ];
+        let mut set = GenomicIntervalSet::from_iter(intervals);
+        match set.span() {
+            Err(e) => assert_eq!(e.to_string(), "Cannot get span of unsorted interval set"),
+            _ => panic!("Expected error"),
+        };
+        set.sort();
+        match set.span() {
+            Err(e) => assert_eq!(e.to_string(), "Cannot get span of interval set spanning multiple chromosomes"),
+            _ => panic!("Expected error"),
+        };
+    }
+
+    #[test]
     #[cfg(feature = "serde")]
     fn test_serialization() {
         let n_intervals = 10;
