@@ -69,8 +69,13 @@ where
     /// Finds all intervals that overlap a query by some fraction
     /// of **both** the query and target lengths and returns the
     /// same `Container` type with all found regions.
-    fn find_reciprocal_frac(&self, query: &I, frac: f64) -> Result<Self::ContainerType, SetError> {
-        let records = match self.find_iter_reciprocal_frac(query, frac) {
+    fn find_reciprocal_frac(
+        &self,
+        query: &I,
+        f_query: f64,
+        f_target: f64,
+    ) -> Result<Self::ContainerType, SetError> {
+        let records = match self.find_iter_reciprocal_frac(query, f_query, f_target) {
             Ok(iter) => iter.into_iter().map(|x| x.to_owned()).collect::<Vec<I>>(),
             Err(e) => return Err(e),
         };
@@ -83,9 +88,10 @@ where
     fn find_reciprocal_frac_either(
         &self,
         query: &I,
-        frac: f64,
+        f_query: f64,
+        f_target: f64,
     ) -> Result<Self::ContainerType, SetError> {
-        let records = match self.find_iter_reciprocal_frac_either(query, frac) {
+        let records = match self.find_iter_reciprocal_frac_either(query, f_query, f_target) {
             Ok(iter) => iter.into_iter().map(|x| x.to_owned()).collect::<Vec<I>>(),
             Err(e) => return Err(e),
         };
@@ -160,15 +166,18 @@ where
     fn find_iter_reciprocal_frac<'a>(
         &'a self,
         query: &'a I,
-        frac: f64,
+        f_query: f64,
+        f_target: f64,
     ) -> Result<FindIter<'_, T, I>, SetError> {
-        if frac <= 0.0 || frac > 1.0 {
-            return Err(SetError::FractionUnbounded { frac });
+        if f_query <= 0.0 || f_query > 1.0 {
+            return Err(SetError::FractionUnbounded { frac: f_query });
+        } else if f_target <= 0.0 || f_target > 1.0 {
+            return Err(SetError::FractionUnbounded { frac: f_target });
         }
         Ok(FindIter::new(
             self.records(),
             query,
-            QueryMethod::CompareReciprocalFractionAnd(frac),
+            QueryMethod::CompareReciprocalFractionAnd(f_query, f_target),
         ))
     }
 
@@ -179,15 +188,18 @@ where
     fn find_iter_reciprocal_frac_either<'a>(
         &'a self,
         query: &'a I,
-        frac: f64,
+        f_query: f64,
+        f_target: f64,
     ) -> Result<FindIter<'_, T, I>, SetError> {
-        if frac <= 0.0 || frac > 1.0 {
-            return Err(SetError::FractionUnbounded { frac });
+        if f_query <= 0.0 || f_query > 1.0 {
+            return Err(SetError::FractionUnbounded { frac: f_query });
+        } else if f_target <= 0.0 || f_target > 1.0 {
+            return Err(SetError::FractionUnbounded { frac: f_target });
         }
         Ok(FindIter::new(
             self.records(),
             query,
-            QueryMethod::CompareReciprocalFractionOr(frac),
+            QueryMethod::CompareReciprocalFractionOr(f_query, f_target),
         ))
     }
 
@@ -273,10 +285,11 @@ where
     fn find_iter_sorted_reciprocal_frac<'a>(
         &'a self,
         query: &'a I,
-        frac: f64,
+        f_query: f64,
+        f_target: f64,
     ) -> Result<FindIterSorted<'_, T, I>, SetError> {
         if self.is_sorted() {
-            Ok(self.find_iter_sorted_reciprocal_frac_unchecked(query, frac)?)
+            Ok(self.find_iter_sorted_reciprocal_frac_unchecked(query, f_query, f_target)?)
         } else {
             Err(SetError::UnsortedSet)
         }
@@ -289,10 +302,11 @@ where
     fn find_iter_sorted_reciprocal_frac_either<'a>(
         &'a self,
         query: &'a I,
-        frac: f64,
+        f_query: f64,
+        f_target: f64,
     ) -> Result<FindIterSorted<'_, T, I>, SetError> {
         if self.is_sorted() {
-            Ok(self.find_iter_sorted_reciprocal_frac_either_unchecked(query, frac)?)
+            Ok(self.find_iter_sorted_reciprocal_frac_either_unchecked(query, f_query, f_target)?)
         } else {
             Err(SetError::UnsortedSet)
         }
@@ -391,16 +405,19 @@ where
     fn find_iter_sorted_reciprocal_frac_unchecked<'a>(
         &'a self,
         query: &'a I,
-        frac: f64,
+        f_query: f64,
+        f_target: f64,
     ) -> Result<FindIterSorted<'_, T, I>, SetError> {
-        if frac <= 0.0 || frac > 1.0 {
-            return Err(SetError::FractionUnbounded { frac });
+        if f_query <= 0.0 || f_query > 1.0 {
+            return Err(SetError::FractionUnbounded { frac: f_query });
+        } else if f_target <= 0.0 || f_target > 1.0 {
+            return Err(SetError::FractionUnbounded { frac: f_target });
         }
         Ok(FindIterSorted::new(
             self.records(),
             query,
             self.lower_bound_unchecked(query),
-            QueryMethod::CompareReciprocalFractionAnd(frac),
+            QueryMethod::CompareReciprocalFractionAnd(f_query, f_target),
         ))
     }
 
@@ -411,16 +428,19 @@ where
     fn find_iter_sorted_reciprocal_frac_either_unchecked<'a>(
         &'a self,
         query: &'a I,
-        frac: f64,
+        f_query: f64,
+        f_target: f64,
     ) -> Result<FindIterSorted<'_, T, I>, SetError> {
-        if frac <= 0.0 || frac > 1.0 {
-            return Err(SetError::FractionUnbounded { frac });
+        if f_query <= 0.0 || f_query > 1.0 {
+            return Err(SetError::FractionUnbounded { frac: f_query });
+        } else if f_target <= 0.0 || f_target > 1.0 {
+            return Err(SetError::FractionUnbounded { frac: f_target });
         }
         Ok(FindIterSorted::new(
             self.records(),
             query,
             self.lower_bound_unchecked(query),
-            QueryMethod::CompareReciprocalFractionOr(frac),
+            QueryMethod::CompareReciprocalFractionOr(f_query, f_target),
         ))
     }
 }
@@ -815,7 +835,7 @@ mod testing {
         ];
         let expected = vec![Interval::new(9, 19)];
         let set = IntervalSet::from_sorted(intervals).unwrap();
-        let overlaps = set.find_reciprocal_frac(&query, frac).unwrap();
+        let overlaps = set.find_reciprocal_frac(&query, frac, frac).unwrap();
         validate_set(&overlaps, &expected)
     }
 
@@ -838,10 +858,63 @@ mod testing {
         let expected = vec![Interval::new(9, 19)];
         let set = IntervalSet::from_sorted(intervals).unwrap();
         let overlap_iter = set
-            .find_iter_sorted_reciprocal_frac(&query, frac)
+            .find_iter_sorted_reciprocal_frac(&query, frac, frac)
             .unwrap()
             .cloned();
         validate_iter(overlap_iter, &expected);
+    }
+
+    #[test]
+    fn find_reciprocal_frac_uneven() {
+        let query = Interval::new(10, 20);
+        let f_query = 0.9;
+        let f_target = 0.8;
+        let intervals = vec![
+            Interval::new(7, 17), // bounded, but missing overlap req
+            Interval::new(8, 18), // bounded, but missing overlap req on query
+            Interval::new(9, 19), // first
+            Interval::new(10, 20),
+            Interval::new(11, 21), // last
+            Interval::new(12, 22), // bounded, but missing overlap req on query
+            Interval::new(13, 23), // bounded, but missing overlap req
+        ];
+        let expected = vec![
+            Interval::new(9, 19),
+            Interval::new(10, 20),
+            Interval::new(11, 21),
+        ];
+        let set = IntervalSet::from_sorted(intervals).unwrap();
+        let overlaps = set.find_reciprocal_frac(&query, f_query, f_target).unwrap();
+        validate_set(&overlaps, &expected);
+    }
+
+    #[test]
+    fn find_reciprocal_frac_either_uneven() {
+        let query = Interval::new(10, 20);
+        let f_query = 0.9;
+        let f_target = 0.8;
+        let intervals = vec![
+            Interval::new(7, 17), // bounded, but missing overlap req
+            Interval::new(8, 18), // first
+            Interval::new(9, 19),
+            Interval::new(10, 20),
+            Interval::new(11, 21),
+            Interval::new(12, 22), // last
+            Interval::new(13, 23), // bounded, but missing overlap req
+        ];
+        let expected = vec![
+            Interval::new(8, 18),
+            Interval::new(9, 19),
+            Interval::new(10, 20),
+            Interval::new(11, 21),
+            Interval::new(12, 22),
+        ];
+        let set = IntervalSet::from_sorted(intervals).unwrap();
+        let overlaps = set
+            .find_reciprocal_frac_either(&query, f_query, f_target)
+            .unwrap();
+        println!("{:#?}", overlaps);
+        validate_set(&overlaps, &expected);
     }
 
     #[test]
@@ -866,7 +939,7 @@ mod testing {
             Interval::new(15, 18),
         ];
         let set = IntervalSet::from_sorted(intervals).unwrap();
-        let overlaps = set.find_reciprocal_frac_either(&query, frac).unwrap();
+        let overlaps = set.find_reciprocal_frac_either(&query, frac, frac).unwrap();
         validate_set(&overlaps, &expected)
     }
 
@@ -893,7 +966,7 @@ mod testing {
         ];
         let set = IntervalSet::from_sorted(intervals).unwrap();
         let overlap_iter = set
-            .find_iter_sorted_reciprocal_frac_either(&query, frac)
+            .find_iter_sorted_reciprocal_frac_either(&query, frac, frac)
             .unwrap()
             .cloned();
         validate_iter(overlap_iter, &expected);
@@ -919,7 +992,15 @@ mod testing {
     fn find_reciprocal_frac_unbounded() {
         let query = Interval::new(10, 20);
         let set = IntervalSet::from_sorted(vec![Interval::new(0, 10)]).unwrap();
-        assert!(set.find_reciprocal_frac(&query, 0.0).is_err());
-        assert!(set.find_reciprocal_frac(&query, 1.01).is_err());
+        assert!(set.find_reciprocal_frac(&query, 0.0, 0.0).is_err());
+        assert!(set.find_reciprocal_frac(&query, 1.01, 1.01).is_err());
+    }
+
+    #[test]
+    fn find_reciprocal_frac_either_unbounded() {
+        let query = Interval::new(10, 20);
+        let set = IntervalSet::from_sorted(vec![Interval::new(0, 10)]).unwrap();
+        assert!(set.find_reciprocal_frac_either(&query, 0.0, 0.0).is_err());
+        assert!(set.find_reciprocal_frac_either(&query, 1.01, 1.01).is_err());
     }
 }
