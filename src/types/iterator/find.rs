@@ -7,7 +7,8 @@ pub enum QueryMethod<T: ValueBounds> {
     CompareExact(T),
     CompareByQueryFraction(f64),
     CompareByTargetFraction(f64),
-    CompareReciprocalFraction(f64),
+    CompareReciprocalFractionAnd(f64),
+    CompareReciprocalFractionOr(f64),
 }
 
 /// Calculate the length of an interval as a fraction of its total length
@@ -38,11 +39,20 @@ where
             let min_overlap = f_len(target, *frac);
             target.overlaps_by(query, min_overlap)
         }
-        QueryMethod::CompareReciprocalFraction(frac) => {
+        QueryMethod::CompareReciprocalFractionAnd(frac) => {
             let query_min_overlap = f_len(query, *frac);
             let target_min_overlap = f_len(target, *frac);
             if let Some(ix) = target.overlap_size(query) {
                 query_min_overlap <= ix && target_min_overlap <= ix
+            } else {
+                false
+            }
+        }
+        QueryMethod::CompareReciprocalFractionOr(frac) => {
+            let query_min_overlap = f_len(query, *frac);
+            let target_min_overlap = f_len(target, *frac);
+            if let Some(ix) = target.overlap_size(query) {
+                query_min_overlap <= ix || target_min_overlap <= ix
             } else {
                 false
             }
