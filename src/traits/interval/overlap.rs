@@ -75,6 +75,76 @@ where
         self.bounded_chr(other) && self.interval_overlap(other)
     }
 
+    /// Returns true if the current interval is overlapped by the other
+    /// for the requested number of bases - considers both the interval
+    /// overlap and the chromosome.
+    ///
+    /// ```text
+    /// (Self)    |--------|
+    /// (Other)       |--------|
+    /// (n)           |----|
+    ///
+    ///
+    /// or
+    ///
+    /// (Self)        |--------|
+    /// (Other)   |--------|
+    /// (n)           |----|
+    ///
+    /// true if `n` >= `bases`
+    /// ```
+    fn overlaps_by<I: Coordinates<T>>(&self, other: &I, bases: T) -> bool {
+        self.overlap_size(other).map_or(false, |n| n >= bases)
+    }
+
+    /// Returns true if the current interval is overlapped by the other
+    /// by the exact number of bases - considers both the interval overlap
+    /// and the chromosome.
+    ///
+    /// ```text
+    /// (Self)    |--------|
+    /// (Other)       |--------|
+    /// (n)           |----|
+    ///
+    /// or
+    ///
+    /// (Self)        |--------|
+    /// (Other)   |--------|
+    /// (n)           |----|
+    ///
+    /// true if `n` == `bases`
+    /// ```
+    fn overlaps_by_exactly<I: Coordinates<T>>(&self, other: &I, bases: T) -> bool {
+        self.overlap_size(other).map_or(false, |n| n == bases)
+    }
+
+    /// Returns the number of bases overlapped by the other interval -
+    /// considers both the interval overlap and the chromosome.
+    /// Returns `None` if the intervals do not overlap.
+    ///
+    /// ```text
+    /// (Self)    |--------|
+    /// (Other)       |--------|
+    /// (n)           |----|
+    ///
+    /// or
+    ///
+    /// (Self)        |--------|
+    /// (Other)   |--------|
+    /// (n)           |----|
+    /// ```
+    fn overlap_size<I: Coordinates<T>>(&self, other: &I) -> Option<T> {
+        if self.overlaps(other) {
+            if self.start() > other.start() {
+                Some(other.end() - self.start())
+            } else {
+                Some(self.end() - other.start())
+            }
+        } else {
+            None
+        }
+    }
+
     /// Returns true if the current interval contains the other -
     /// considers both the interval overlap and the chromosome.
     fn contains<I: Coordinates<T>>(&self, other: &I) -> bool {
@@ -227,5 +297,117 @@ mod testing {
         assert!(b.borders(&a));
         assert!(!a.borders(&c));
         assert!(!c.borders(&a));
+    }
+
+    #[test]
+    fn overlap_size_lt() {
+        let a = Interval::new(10, 20);
+        let b = Interval::new(15, 25);
+        assert_eq!(a.overlap_size(&b), Some(5));
+
+        let a = Interval::new(10, 20);
+        let b = Interval::new(14, 25);
+        assert_eq!(a.overlap_size(&b), Some(6));
+
+        let a = Interval::new(10, 20);
+        let b = Interval::new(16, 25);
+        assert_eq!(a.overlap_size(&b), Some(4));
+    }
+
+    #[test]
+    fn overlap_size_gt() {
+        let a = Interval::new(15, 25);
+        let b = Interval::new(10, 20);
+        assert_eq!(a.overlap_size(&b), Some(5));
+
+        let a = Interval::new(14, 25);
+        let b = Interval::new(10, 20);
+        assert_eq!(a.overlap_size(&b), Some(6));
+
+        let a = Interval::new(16, 25);
+        let b = Interval::new(10, 20);
+        assert_eq!(a.overlap_size(&b), Some(4));
+    }
+
+    #[test]
+    fn overlap_size_none() {
+        let a = Interval::new(10, 20);
+        let b = Interval::new(21, 25);
+        assert_eq!(a.overlap_size(&b), None);
+
+        let a = Interval::new(21, 25);
+        let b = Interval::new(10, 20);
+        assert_eq!(a.overlap_size(&b), None);
+    }
+
+    #[test]
+    fn overlaps_by_lt() {
+        let a = Interval::new(10, 20);
+        let b = Interval::new(15, 25);
+        assert!(a.overlaps_by(&b, 5));
+
+        let a = Interval::new(10, 20);
+        let b = Interval::new(16, 25);
+        assert!(!a.overlaps_by(&b, 5));
+
+        let a = Interval::new(10, 20);
+        let b = Interval::new(14, 25);
+        assert!(a.overlaps_by(&b, 5));
+    }
+
+    #[test]
+    fn overlaps_by_gt() {
+        let a = Interval::new(15, 25);
+        let b = Interval::new(10, 20);
+        assert!(a.overlaps_by(&b, 5));
+
+        let a = Interval::new(16, 25);
+        let b = Interval::new(10, 20);
+        assert!(!a.overlaps_by(&b, 5));
+
+        let a = Interval::new(14, 25);
+        let b = Interval::new(10, 20);
+        assert!(a.overlaps_by(&b, 5));
+    }
+
+    #[test]
+    fn overlaps_by_none() {
+        let a = Interval::new(10, 20);
+        let b = Interval::new(21, 25);
+        assert!(!a.overlaps_by(&b, 5));
+
+        let a = Interval::new(21, 25);
+        let b = Interval::new(10, 20);
+        assert!(!a.overlaps_by(&b, 5));
+    }
+
+    #[test]
+    fn overlaps_exact_lt() {
+        let a = Interval::new(10, 20);
+        let b = Interval::new(15, 25);
+        assert!(a.overlaps_by_exactly(&b, 5));
+
+        let a = Interval::new(10, 20);
+        let b = Interval::new(16, 25);
+        assert!(!a.overlaps_by_exactly(&b, 5));
+
+        let a = Interval::new(10, 20);
+        let b = Interval::new(14, 25);
+        assert!(!a.overlaps_by_exactly(&b, 5));
+    }
+
+    #[test]
+    fn overlaps_exact_gt() {
+        let a = Interval::new(15, 25);
+        let b = Interval::new(10, 20);
+        assert!(a.overlaps_by_exactly(&b, 5));
+
+        let a = Interval::new(16, 25);
+        let b = Interval::new(10, 20);
+        assert!(!a.overlaps_by_exactly(&b, 5));
+
+        let a = Interval::new(14, 25);
+        let b = Interval::new(10, 20);
+        assert!(!a.overlaps_by_exactly(&b, 5));
     }
 }
