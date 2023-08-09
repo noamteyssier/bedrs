@@ -268,7 +268,10 @@ mod testing {
         };
         set.sort();
         match set.span() {
-            Err(e) => assert_eq!(e.to_string(), "Cannot get span of interval set spanning multiple chromosomes"),
+            Err(e) => assert_eq!(
+                e.to_string(),
+                "Cannot get span of interval set spanning multiple chromosomes"
+            ),
             _ => panic!("Expected error"),
         };
     }
