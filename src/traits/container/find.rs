@@ -243,6 +243,17 @@ mod testing {
     }
 
     #[test]
+    fn test_find_iter_exact() {
+        let query = Interval::new(17, 27);
+        let starts = vec![10, 15, 20, 25];
+        let ends = vec![40, 45, 50, 55];
+        let set = IntervalSet::from_endpoints_unchecked(&starts, &ends);
+        let overlaps = set.find_iter_exact(&query, 7);
+        let num_overlaps = overlaps.count();
+        assert_eq!(num_overlaps, 1);
+    }
+
+    #[test]
     fn test_find_iter_sorted_min() {
         let query = Interval::new(17, 27);
         let starts = vec![10, 15, 20, 25];
@@ -252,5 +263,17 @@ mod testing {
         let overlaps = set.find_iter_sorted_min(&query, 5).unwrap();
         let num_overlaps = overlaps.count();
         assert_eq!(num_overlaps, 3);
+    }
+
+    #[test]
+    fn test_find_iter_sorted_exact() {
+        let query = Interval::new(17, 27);
+        let starts = vec![10, 15, 20, 25];
+        let ends = vec![40, 45, 50, 55];
+        let mut set = IntervalSet::from_endpoints_unchecked(&starts, &ends);
+        set.sort();
+        let overlaps = set.find_iter_sorted_exact(&query, 7).unwrap();
+        let num_overlaps = overlaps.count();
+        assert_eq!(num_overlaps, 1);
     }
 }
