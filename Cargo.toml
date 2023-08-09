@@ -24,8 +24,12 @@ serde = ["dep:serde"]
 
 [dev-dependencies]
 criterion = "0.4.0"
+pprof = { version = "0.12", features = ["flamegraph", "criterion"] }
 bincode = "1.3.3" 
 
 [[bench]]
 name = "benchmark"
 harness = false
+
+[profile.bench]
+debug = true

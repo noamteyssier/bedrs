@@ -4,9 +4,12 @@ use bedrs::{
 };
 use criterion::Criterion;
 
+const N: usize = 1000;
+const SIZE: usize = 100;
+
 pub fn find_base(c: &mut Criterion) {
-    let records = (0..100)
-        .map(|x| (x, x + 50))
+    let records = (0..N)
+        .map(|x| (x, x + SIZE))
         .map(|(x, y)| Interval::new(x, y))
         .collect();
     let query = Interval::new(20, 30);
