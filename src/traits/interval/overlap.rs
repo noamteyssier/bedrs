@@ -251,6 +251,18 @@ where
     /// (Self)        |--------|
     /// (Other)   |--------|
     /// (n)           |----|
+    ///
+    /// or
+    ///
+    /// (Self)    |--------|
+    /// (Other)     |----|
+    /// (n)         |----|
+    ///
+    /// or
+    ///
+    /// (Self)      |----|
+    /// (Other)   |--------|
+    /// (n)         |----|
     /// ```
     ///
     /// # Example
@@ -269,7 +281,11 @@ where
     /// ```
     fn overlap_size<I: Coordinates<T>>(&self, other: &I) -> Option<T> {
         if self.overlaps(other) {
-            if self.start() > other.start() {
+            if self.contains(other) {
+                Some(other.len())
+            } else if other.contains(self) {
+                Some(self.len())
+            } else if self.start() > other.start() {
                 Some(other.end() - self.start())
             } else {
                 Some(self.end() - other.start())
@@ -360,7 +376,10 @@ where
 #[cfg(test)]
 mod testing {
     use super::Overlap;
-    use crate::types::{record::GenomicInterval, Interval};
+    use crate::{
+        types::{record::GenomicInterval, Interval},
+        Coordinates,
+    };
 
     #[test]
     fn test_overlap_self() {
@@ -602,5 +621,19 @@ mod testing {
         let a = Interval::new(14, 25);
         let b = Interval::new(10, 20);
         assert!(!a.overlaps_by_exactly(&b, 5));
+    }
+
+    #[test]
+    fn overlap_size_contains() {
+        let a = Interval::new(15, 25);
+        let b = Interval::new(17, 23);
+        assert_eq!(a.overlap_size(&b), Some(b.len()));
+    }
+
+    #[test]
+    fn overlap_size_contained_by() {
+        let a = Interval::new(17, 23);
+        let b = Interval::new(15, 25);
+        assert_eq!(a.overlap_size(&b), Some(a.len()));
     }
 }
