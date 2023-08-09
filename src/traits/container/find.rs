@@ -77,6 +77,21 @@ where
         Ok(Self::ContainerType::new(records))
     }
 
+    /// Finds all intervals that overlap a query by some fraction
+    /// of **either** the query and target lengths and returns the
+    /// same `Container` type with all found regions.
+    fn find_reciprocal_frac_either(
+        &self,
+        query: &I,
+        frac: f64,
+    ) -> Result<Self::ContainerType, SetError> {
+        let records = match self.find_iter_reciprocal_frac_either(query, frac) {
+            Ok(iter) => iter.into_iter().map(|x| x.to_owned()).collect::<Vec<I>>(),
+            Err(e) => return Err(e),
+        };
+        Ok(Self::ContainerType::new(records))
+    }
+
     /// Creates an iterator that finds all overlapping regions
     ///
     /// Does not assume a sorted Container
@@ -835,8 +850,8 @@ mod testing {
             Interval::new(15, 18),
         ];
         let set = IntervalSet::from_sorted(intervals).unwrap();
-        let overlaps = set.find_reciprocal_frac(&query, frac).unwrap();
-        for (i, j) in overlaps.records().iter().zip(expected.iter()) {
+        let overlaps = set.find_reciprocal_frac_either(&query, frac).unwrap();
+        for (i, j) in overlaps.records().into_iter().zip(expected.iter()) {
             assert!(i.eq(j))
         }
     }
