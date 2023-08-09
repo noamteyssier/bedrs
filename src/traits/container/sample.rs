@@ -148,6 +148,88 @@ where
         let mut rng = ChaChaRng::seed_from_u64(seed);
         self.sample_rng(n, &mut rng)
     }
+
+    /// Returns a new iterator over the elements of the container in random order using the
+    /// given random number generator.
+    ///
+    /// # Example
+    /// ```
+    /// use bedrs::{Container, Interval, IntervalSet, Sample};
+    ///
+    /// let intervals = vec![
+    ///    Interval::new(10, 100),
+    ///    Interval::new(20, 200),
+    ///    Interval::new(30, 300),
+    ///    Interval::new(40, 400),
+    /// ];
+    /// let set = IntervalSet::from_sorted(intervals).unwrap();
+    /// let mut rng = rand::thread_rng();
+    /// let shuffled_iter = set.sample_iter_rng(2, &mut rng).unwrap();
+    /// assert_eq!(shuffled_iter.count(), 2);
+    /// ```
+    fn sample_iter_rng<'a>(
+        &'a self,
+        n: usize,
+        rng: &mut impl RngCore,
+    ) -> Result<Box<dyn Iterator<Item = &I> + 'a>, SetError> {
+        if n > self.records().len() {
+            return Err(SetError::SampleSizeTooLarge);
+        }
+        let iter = self.records().choose_multiple(rng, n);
+        Ok(Box::new(iter))
+    }
+
+    /// Returns a new iterator over the elements of the container in random order
+    ///
+    /// # Example
+    /// ```
+    /// use bedrs::{Container, Interval, IntervalSet, Sample};
+    ///
+    /// let intervals = vec![
+    ///    Interval::new(10, 100),
+    ///    Interval::new(20, 200),
+    ///    Interval::new(30, 300),
+    ///    Interval::new(40, 400),
+    /// ];
+    /// let set = IntervalSet::from_sorted(intervals).unwrap();
+    /// let shuffled_iter = set.sample_iter(2).unwrap();
+    /// assert_eq!(shuffled_iter.count(), 2);
+    fn sample_iter<'a>(&'a self, n: usize) -> Result<Box<dyn Iterator<Item = &I> + 'a>, SetError> {
+        if n > self.records().len() {
+            return Err(SetError::SampleSizeTooLarge);
+        }
+        let mut rng = rand::thread_rng();
+        self.sample_iter_rng(n, &mut rng)
+    }
+
+    /// Returns a new iterator over the elements of the container in random order using the
+    /// given seed.
+    ///
+    /// # Example
+    /// ```
+    /// use bedrs::{Container, Interval, IntervalSet, Sample};
+    ///
+    /// let intervals = vec![
+    ///    Interval::new(10, 100),
+    ///    Interval::new(20, 200),
+    ///    Interval::new(30, 300),
+    ///    Interval::new(40, 400),
+    /// ];
+    /// let set = IntervalSet::from_sorted(intervals).unwrap();
+    /// let shuffled_iter = set.sample_iter_seed(2, 42).unwrap();
+    /// assert_eq!(shuffled_iter.count(), 2);
+    /// ```
+    fn sample_iter_seed<'a>(
+        &'a self,
+        n: usize,
+        seed: u64,
+    ) -> Result<Box<dyn Iterator<Item = &I> + 'a>, SetError> {
+        if n > self.records().len() {
+            return Err(SetError::SampleSizeTooLarge);
+        }
+        let mut rng = ChaChaRng::seed_from_u64(seed);
+        self.sample_iter_rng(n, &mut rng)
+    }
 }
 
 #[cfg(test)]
@@ -255,5 +337,50 @@ mod testing {
         let set = IntervalSet::from_sorted(intervals).unwrap();
         let sampled_set = set.sample(5);
         assert!(sampled_set.is_err());
+    }
+
+    #[test]
+    fn sample_iter() {
+        let intervals = vec![
+            Interval::new(10, 100),
+            Interval::new(20, 200),
+            Interval::new(30, 300),
+            Interval::new(40, 400),
+        ];
+        let set = IntervalSet::from_sorted(intervals).unwrap();
+        let sampled_iter = set.sample_iter(2).unwrap();
+        assert_eq!(sampled_iter.count(), 2);
+    }
+
+    #[test]
+    fn sample_iter_seed() {
+        let intervals = vec![
+            Interval::new(10, 100),
+            Interval::new(20, 200),
+            Interval::new(30, 300),
+            Interval::new(40, 400),
+        ];
+        let set = IntervalSet::from_sorted(intervals).unwrap();
+        let sampled_iter_a = set.sample_iter_seed(2, 0).unwrap();
+        let sampled_iter_b = set.sample_iter_seed(2, 0).unwrap();
+        for (a, b) in sampled_iter_a.zip(sampled_iter_b) {
+            assert!(a.eq(b));
+        }
+    }
+
+    #[test]
+    fn sample_iter_oversized() {
+        let intervals = vec![
+            Interval::new(10, 100),
+            Interval::new(20, 200),
+            Interval::new(30, 300),
+            Interval::new(40, 400),
+        ];
+        let set = IntervalSet::from_sorted(intervals).unwrap();
+        let sampled_iter = set.sample_iter(5);
+        assert!(sampled_iter.is_err());
+
+        let sampled_iter_seed = set.sample_iter_seed(5, 0);
+        assert!(sampled_iter_seed.is_err());
     }
 }
