@@ -2,6 +2,7 @@ use std::{
     fmt::Debug,
     ops::{Add, Div, Mul, Sub},
 };
+use num_traits::Zero;
 
 pub mod container;
 pub mod errors;
@@ -20,7 +21,8 @@ where
         + Add<Self, Output = Self>
         + Sub<Self, Output = Self>
         + Mul<Self, Output = Self>
-        + Div<Self, Output = Self>,
+        + Div<Self, Output = Self>
+        + Zero,
 {
 }
 impl<T> ValueBounds for T where
@@ -32,6 +34,7 @@ impl<T> ValueBounds for T where
         + Sub<Self, Output = Self>
         + Mul<Self, Output = Self>
         + Div<Self, Output = Self>
+        + Zero
 {
 }
 
