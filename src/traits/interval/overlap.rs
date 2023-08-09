@@ -13,11 +13,26 @@ where
     /// (Self)   chr1:  |---------|
     /// (Other)  chr2:                |---------|
     /// ```
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use bedrs::{GenomicInterval, Overlap};
+    ///
+    /// let interval1 = GenomicInterval::new(1, 100, 200);
+    /// let interval2 = GenomicInterval::new(1, 150, 250);
+    /// let interval3 = GenomicInterval::new(2, 100, 200);
+    ///
+    /// assert!(interval1.bounded_chr(&interval2));
+    /// assert!(!interval1.bounded_chr(&interval3));
+    /// ```
     fn bounded_chr<I: Coordinates<T>>(&self, other: &I) -> bool {
         other.chr() == self.chr()
     }
 
     /// Returns true if the two intervals overlap.
+    ///
+    /// Does not consider the chromosome.
     ///
     /// Measured as bool and of:
     /// * `self.start` is less than `other.end`
@@ -32,11 +47,35 @@ where
     /// (Self)      |--------|
     /// (Other)   |--------|
     /// ```
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use bedrs::{Interval, Overlap};
+    ///
+    /// // base interval
+    /// let interval1 = Interval::new(100, 200);
+    ///
+    /// // overlapping on right
+    /// let interval2 = Interval::new(150, 250);
+    ///
+    /// // overlapping on left
+    /// let interval3 = Interval::new(50, 150);
+    ///
+    /// // non-overlapping
+    /// let interval4 = Interval::new(250, 350);
+    ///
+    /// assert!(interval1.interval_overlap(&interval2));
+    /// assert!(interval1.interval_overlap(&interval3));
+    /// assert!(!interval1.interval_overlap(&interval4));
+    /// ```
     fn interval_overlap<I: Coordinates<T>>(&self, other: &I) -> bool {
         self.start() < other.end() && self.end() > other.start()
     }
 
     /// Returns true if the current interval contains the other interval.
+    ///
+    /// Does not consider the chromosome.
     ///
     /// Measured as bool and of:
     /// * `self.start` is less than `other.start`
@@ -46,11 +85,24 @@ where
     /// (Self)    |--------|
     /// (Other)     |----|
     /// ```
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use bedrs::{Interval, Overlap};
+    ///
+    /// let interval1 = Interval::new(100, 200);
+    /// let interval2 = Interval::new(150, 160);
+    ///
+    /// assert!(interval1.interval_contains(&interval2));
+    /// ```
     fn interval_contains<I: Coordinates<T>>(&self, other: &I) -> bool {
         self.start() < other.start() && self.end() > other.end()
     }
 
     /// Returns true if the current interval borders the other interval.
+    ///
+    /// Does not consider the chromosome.
     ///
     /// Measured as bool OR of:
     /// * `self.start` is equal to `other.end`
@@ -65,12 +117,49 @@ where
     /// (Self)             |--------|
     /// (Other)   |--------|
     /// ```
+    ///
+    /// # Example
+    /// ```
+    /// use bedrs::{Interval, Overlap};
+    ///
+    /// let interval1 = Interval::new(100, 200);
+    /// let interval2 = Interval::new(200, 300);
+    /// let interval3 = Interval::new(50, 100);
+    ///
+    /// assert!(interval1.interval_borders(&interval2));
+    /// assert!(interval1.interval_borders(&interval3));
+    /// ```
     fn interval_borders<I: Coordinates<T>>(&self, other: &I) -> bool {
         self.start().eq(&other.end()) || self.end().eq(&other.start())
     }
 
     /// Returns true if the current interval overlaps the other -
     /// considers both the interval overlap and the chromosome.
+    ///
+    /// ```text
+    /// (Self)    |--------|
+    /// (Other)       |--------|
+    ///
+    /// or
+    ///
+    /// (Self)        |--------|
+    /// (Other)   |--------|
+    /// ```
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use bedrs::{GenomicInterval, Overlap};
+    ///
+    /// let interval1 = GenomicInterval::new(1, 100, 200);
+    /// let interval2 = GenomicInterval::new(1, 150, 250);
+    /// let interval3 = GenomicInterval::new(1, 50, 150);
+    /// let interval4 = GenomicInterval::new(2, 150, 250);
+    ///
+    /// assert!(interval1.overlaps(&interval2));
+    /// assert!(interval1.overlaps(&interval3));
+    /// assert!(!interval1.overlaps(&interval4));
+    /// ```
     fn overlaps<I: Coordinates<T>>(&self, other: &I) -> bool {
         self.bounded_chr(other) && self.interval_overlap(other)
     }
@@ -93,6 +182,21 @@ where
     ///
     /// true if `n` >= `bases`
     /// ```
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use bedrs::{GenomicInterval, Overlap};
+    ///
+    /// let interval1 = GenomicInterval::new(1, 100, 200);
+    /// let interval2 = GenomicInterval::new(1, 150, 250);
+    /// let interval3 = GenomicInterval::new(1, 149, 250);
+    /// let interval4 = GenomicInterval::new(1, 151, 250);
+    ///
+    /// assert!(interval1.overlaps_by(&interval2, 50));
+    /// assert!(interval1.overlaps_by(&interval3, 50));
+    /// assert!(!interval1.overlaps_by(&interval4, 50));
+    /// ```
     fn overlaps_by<I: Coordinates<T>>(&self, other: &I, bases: T) -> bool {
         self.overlap_size(other).map_or(false, |n| n >= bases)
     }
@@ -114,6 +218,21 @@ where
     ///
     /// true if `n` == `bases`
     /// ```
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use bedrs::{GenomicInterval, Overlap};
+    ///
+    /// let interval1 = GenomicInterval::new(1, 100, 200);
+    /// let interval2 = GenomicInterval::new(1, 150, 250);
+    /// let interval3 = GenomicInterval::new(1, 149, 250);
+    /// let interval4 = GenomicInterval::new(1, 151, 250);
+    ///
+    /// assert!(interval1.overlaps_by_exactly(&interval2, 50));
+    /// assert!(!interval1.overlaps_by_exactly(&interval3, 50));
+    /// assert!(!interval1.overlaps_by_exactly(&interval4, 50));
+    /// ```
     fn overlaps_by_exactly<I: Coordinates<T>>(&self, other: &I, bases: T) -> bool {
         self.overlap_size(other).map_or(false, |n| n == bases)
     }
@@ -133,6 +252,21 @@ where
     /// (Other)   |--------|
     /// (n)           |----|
     /// ```
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use bedrs::{GenomicInterval, Overlap};
+    ///
+    /// let interval1 = GenomicInterval::new(1, 100, 200);
+    /// let interval2 = GenomicInterval::new(1, 150, 250);
+    /// let interval3 = GenomicInterval::new(1, 149, 250);
+    /// let interval4 = GenomicInterval::new(1, 151, 250);
+    ///
+    /// assert_eq!(interval1.overlap_size(&interval2), Some(50));
+    /// assert_eq!(interval1.overlap_size(&interval3), Some(51));
+    /// assert_eq!(interval1.overlap_size(&interval4), Some(49));
+    /// ```
     fn overlap_size<I: Coordinates<T>>(&self, other: &I) -> Option<T> {
         if self.overlaps(other) {
             if self.start() > other.start() {
@@ -147,18 +281,77 @@ where
 
     /// Returns true if the current interval contains the other -
     /// considers both the interval overlap and the chromosome.
+    ///
+    /// ```text
+    /// (Self)    |--------|
+    /// (Other)     |----|
+    /// ```
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use bedrs::{GenomicInterval, Overlap};
+    ///
+    /// let interval1 = GenomicInterval::new(1, 100, 200);
+    /// let interval2 = GenomicInterval::new(1, 150, 160);
+    /// let interval3 = GenomicInterval::new(2, 150, 160);
+    ///
+    /// assert!(interval1.contains(&interval2));
+    /// assert!(!interval1.contains(&interval3));
+    /// ```
     fn contains<I: Coordinates<T>>(&self, other: &I) -> bool {
         self.bounded_chr(other) && self.interval_contains(other)
     }
 
     /// Returns true if the current interval is contained by the other -
     /// considers both the interval overlap and the chromosome.
+    ///
+    /// ```text
+    /// (Self)      |----|
+    /// (Other)   |--------|
+    /// ```
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use bedrs::{GenomicInterval, Overlap};
+    ///
+    /// let interval1 = GenomicInterval::new(1, 150, 16);
+    /// let interval2 = GenomicInterval::new(1, 100, 200);
+    /// let interval3 = GenomicInterval::new(2, 100, 200);
+    ///
+    /// assert!(interval1.contained_by(&interval2));
+    /// assert!(!interval1.contained_by(&interval3));
+    /// ```
     fn contained_by<I: Coordinates<T>>(&self, other: &I) -> bool {
         other.contains(self)
     }
 
     /// Returns true if the current interval borders the other -
     /// considers both the interval overlap and the chromosome.
+    ///
+    /// ```text
+    /// (Self)    |--------|
+    /// (Other)            |--------|
+    ///
+    /// or
+    ///
+    /// (Self)             |--------|
+    /// (Other)   |--------|
+    /// ```
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use bedrs::{GenomicInterval, Overlap};
+    ///
+    /// let interval1 = GenomicInterval::new(1, 100, 200);
+    /// let interval2 = GenomicInterval::new(1, 200, 300);
+    /// let interval3 = GenomicInterval::new(2, 200, 300);
+    ///
+    /// assert!(interval1.borders(&interval2));
+    /// assert!(!interval1.borders(&interval3));
+    /// ```
     fn borders<I: Coordinates<T>>(&self, other: &I) -> bool {
         self.bounded_chr(other) && self.interval_borders(other)
     }
