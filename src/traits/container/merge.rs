@@ -141,4 +141,23 @@ mod testing {
         assert_eq!(merge_set.intervals()[0].start(), 10);
         assert_eq!(merge_set.intervals()[0].end(), 40);
     }
+
+    #[test]
+    fn merge_container_methods() {
+        let records = vec![
+            Interval::new(10, 20),
+            Interval::new(20, 30),
+            Interval::new(30, 40),
+        ];
+        let set = IntervalSet::from_sorted_unchecked(records);
+        let mut merge_set = set.merge_unchecked();
+        let mut_records = merge_set.records_mut();
+        assert_eq!(mut_records.len(), 1);
+        assert_eq!(mut_records[0].start(), 10);
+        assert_eq!(mut_records[0].end(), 40);
+        assert!(merge_set.is_sorted());
+        *merge_set.sorted_mut() = false;
+        assert!(!merge_set.is_sorted());
+        assert_eq!(merge_set.max_len(), Some(30));
+    }
 }
