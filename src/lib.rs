@@ -39,6 +39,40 @@
 //! 1. [Coordinates] :: which applies to individual interval records.
 //! 2. [Container] :: which applies to sets of interval records.
 //!
+//! ### Coordinates
+//!
+//! The [Coordinates] trait is the base trait for all interval types.
+//! It is the trait that defines the `<chr, start, stop>` coordinates.
+//! It is also the trait that defines the methods for interval arithmetic.
+//! This trait is generic over the type of the coordinates.
+//!
+//! You can explore the full functionality of this trait by looking at the
+//! [crate::traits::interval] module.
+//!
+//! Some examples of the functionality are:
+//! - [Intersect](crate::traits::interval::Intersect)
+//! - [Overlap](crate::traits::interval::Overlap)
+//! - [Subtract](crate::traits::interval::Subtract)
+//!
+//! ### Container
+//!
+//! The [Container] trait is the base trait for all interval containers.
+//! It is the trait that defines the methods for set operations.
+//! This trait is generic over the type of the coordinates.
+//! It is also generic over the type of the interval.
+//! This means that you can have a container of any interval type.
+//!
+//! You can explore the full functionality of this trait by looking at the
+//! [crate::traits::container] module.
+//!
+//! Some examples of the functionality are:
+//! - [Merge](crate::traits::container::Merge)
+//! - [SetSubtract](crate::traits::container::SetSubtract)
+//! - [Internal](crate::traits::container::Internal)
+//! - [Sample](crate::traits::container::Sample)
+//! - [Find](crate::traits::container::Find)
+//! - [Bound](crate::traits::container::Bound)
+//!
 //! ## Types
 //!
 //! This library has batteries included and has a few types you can use immediately or

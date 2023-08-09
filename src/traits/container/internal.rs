@@ -5,6 +5,7 @@ use crate::{
 };
 use anyhow::{bail, Result};
 
+/// Identifies al non-overlapping intervals within the span of the interval set
 pub trait Internal<T, I>: Container<T, I>
 where
     T: ValueBounds,

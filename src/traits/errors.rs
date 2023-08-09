@@ -14,4 +14,7 @@ pub enum SetError {
 
     #[error("Sample size is larger than the number of intervals.")]
     SampleSizeTooLarge,
+
+    #[error("Provided fraction {frac} is oversized. Must be (0, 1]")]
+    FractionUnbounded { frac: f64 },
 }
