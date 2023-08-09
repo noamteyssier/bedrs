@@ -171,7 +171,7 @@ mod testing {
     };
 
     #[test]
-    fn test_find() {
+    fn find() {
         let query = Interval::new(17, 27);
         let starts = vec![10, 15, 20, 25];
         let ends = vec![40, 45, 50, 55];
@@ -181,7 +181,7 @@ mod testing {
     }
 
     #[test]
-    fn test_find_minimum() {
+    fn find_minimum() {
         let query = Interval::new(17, 27);
         let starts = vec![10, 15, 20, 25];
         let ends = vec![40, 45, 50, 55];
@@ -191,7 +191,7 @@ mod testing {
     }
 
     #[test]
-    fn test_find_exact() {
+    fn find_exact() {
         let query = Interval::new(17, 27);
         let starts = vec![10, 15, 20, 25];
         let ends = vec![40, 45, 50, 55];
@@ -201,7 +201,7 @@ mod testing {
     }
 
     #[test]
-    fn test_find_iter() {
+    fn find_iter() {
         let query = Interval::new(5, 12);
         let starts = vec![10, 15, 20, 25];
         let ends = vec![40, 45, 50, 55];
@@ -211,7 +211,7 @@ mod testing {
     }
 
     #[test]
-    fn test_find_iter_sorted() {
+    fn find_iter_sorted() {
         let query = Interval::new(5, 12);
         let starts = vec![10, 15, 20, 25];
         let ends = vec![40, 45, 50, 55];
@@ -222,7 +222,7 @@ mod testing {
     }
 
     #[test]
-    fn test_find_iter_sorted_wrong_order() {
+    fn find_iter_sorted_wrong_order() {
         let query = Interval::new(5, 12);
         let starts = vec![15, 20, 25, 10];
         let ends = vec![45, 50, 55, 40];
@@ -232,7 +232,7 @@ mod testing {
     }
 
     #[test]
-    fn test_find_iter_min() {
+    fn find_iter_min() {
         let query = Interval::new(17, 27);
         let starts = vec![10, 15, 20, 25];
         let ends = vec![40, 45, 50, 55];
@@ -243,7 +243,7 @@ mod testing {
     }
 
     #[test]
-    fn test_find_iter_exact() {
+    fn find_iter_exact() {
         let query = Interval::new(17, 27);
         let starts = vec![10, 15, 20, 25];
         let ends = vec![40, 45, 50, 55];
@@ -254,7 +254,7 @@ mod testing {
     }
 
     #[test]
-    fn test_find_iter_sorted_min() {
+    fn find_iter_sorted_min() {
         let query = Interval::new(17, 27);
         let starts = vec![10, 15, 20, 25];
         let ends = vec![40, 45, 50, 55];
@@ -266,7 +266,7 @@ mod testing {
     }
 
     #[test]
-    fn test_find_iter_sorted_exact() {
+    fn find_iter_sorted_exact() {
         let query = Interval::new(17, 27);
         let starts = vec![10, 15, 20, 25];
         let ends = vec![40, 45, 50, 55];
