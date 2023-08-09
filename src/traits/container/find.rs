@@ -165,10 +165,7 @@ where
 #[cfg(test)]
 mod testing {
     use super::Find;
-    use crate::{
-        traits::Container,
-        types::{Interval, IntervalSet},
-    };
+    use crate::{traits::Container, GenomicInterval, GenomicIntervalSet, Interval, IntervalSet};
 
     #[test]
     fn find() {
@@ -275,5 +272,55 @@ mod testing {
         let overlaps = set.find_iter_sorted_exact(&query, 7).unwrap();
         let num_overlaps = overlaps.count();
         assert_eq!(num_overlaps, 1);
+    }
+
+    #[test]
+    fn find_iter_sorted_min_genomic() {
+        let query = GenomicInterval::new(3, 17, 27);
+        let intervals = vec![
+            GenomicInterval::new(1, 10, 20),
+            GenomicInterval::new(2, 15, 25),
+            GenomicInterval::new(3, 10, 20), // bounded, but missing overlap req
+            GenomicInterval::new(3, 15, 25), // first
+            GenomicInterval::new(3, 20, 30), // last
+            GenomicInterval::new(3, 40, 50), // unbounded
+            GenomicInterval::new(4, 10, 20),
+            GenomicInterval::new(4, 25, 35),
+        ];
+        let set = GenomicIntervalSet::from_sorted(intervals).unwrap();
+        let mut overlaps = set
+            .find_iter_sorted_min(&query, 5)
+            .unwrap()
+            .into_iter()
+            .cloned();
+        let first = overlaps.next().unwrap();
+        let last = overlaps.last().unwrap();
+        assert_eq!(first, GenomicInterval::new(3, 15, 25));
+        assert_eq!(last, GenomicInterval::new(3, 20, 30));
+    }
+
+    #[test]
+    fn find_iter_sorted_exact_genomic() {
+        let query = GenomicInterval::new(3, 17, 27);
+        let intervals = vec![
+            GenomicInterval::new(1, 10, 20),
+            GenomicInterval::new(2, 15, 25),
+            GenomicInterval::new(3, 10, 20), // bounded, but missing overlap req
+            GenomicInterval::new(3, 15, 25), // bounded, but missing overlap req
+            GenomicInterval::new(3, 20, 30), // first and last
+            GenomicInterval::new(3, 40, 50), // unbounded
+            GenomicInterval::new(4, 10, 20),
+            GenomicInterval::new(4, 25, 35),
+        ];
+        let set = GenomicIntervalSet::from_sorted(intervals).unwrap();
+        let mut overlaps = set
+            .find_iter_sorted_exact(&query, 7)
+            .unwrap()
+            .into_iter()
+            .cloned();
+        let first = overlaps.next().unwrap();
+        let last = overlaps.last();
+        assert_eq!(first, GenomicInterval::new(3, 20, 30));
+        assert!(last.is_none());
     }
 }
