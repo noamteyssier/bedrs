@@ -12,10 +12,10 @@ use overlap::{overlap_base, overlap_cross, overlap_genomic, overlap_meta};
 criterion_group!(
     find,
     find_base,
-    find_iter_base,
-    find_iter_sort_base,
     find_genomic,
+    find_iter_base,
     find_iter_genomic,
+    find_iter_sort_base,
     find_iter_sort_genomic
 );
 criterion_group!(

@@ -4,6 +4,7 @@ use crate::{
     Coordinates, Strand,
 };
 use anyhow::{bail, Result};
+use num_traits::zero;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
@@ -13,12 +14,30 @@ use std::fmt::Debug;
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct StrandedGenomicIntervalSet<T> {
     records: Vec<StrandedGenomicInterval<T>>,
+    max_len: Option<T>,
     is_sorted: bool,
 }
-impl<T> FromIterator<StrandedGenomicInterval<T>> for StrandedGenomicIntervalSet<T> {
+impl<T> FromIterator<StrandedGenomicInterval<T>> for StrandedGenomicIntervalSet<T>
+where
+    T: ValueBounds,
+{
     fn from_iter<I: IntoIterator<Item = StrandedGenomicInterval<T>>>(iter: I) -> Self {
+        let mut max_len = zero::<T>();
+        let records = iter
+            .into_iter()
+            .map(|interval| {
+                max_len = max_len.max(interval.len());
+                interval
+            })
+            .collect();
+        let max_len = if max_len == zero::<T>() {
+            None
+        } else {
+            Some(max_len)
+        };
         Self {
-            records: iter.into_iter().collect(),
+            records,
+            max_len,
             is_sorted: false,
         }
     }
@@ -29,8 +48,10 @@ where
     T: ValueBounds,
 {
     fn new(records: Vec<StrandedGenomicInterval<T>>) -> Self {
+        let max_len = records.iter().map(|iv| iv.len()).max();
         Self {
             records,
+            max_len,
             is_sorted: false,
         }
     }
@@ -45,6 +66,9 @@ where
     }
     fn sorted_mut(&mut self) -> &mut bool {
         &mut self.is_sorted
+    }
+    fn max_len(&self) -> Option<T> {
+        self.max_len
     }
 
     /// Get the span of the interval set
@@ -102,8 +126,10 @@ where
 {
     #[must_use]
     pub fn new(records: Vec<StrandedGenomicInterval<T>>) -> Self {
+        let max_len = records.iter().map(|iv| iv.len()).max();
         Self {
             records,
+            max_len,
             is_sorted: false,
         }
     }
@@ -130,15 +156,26 @@ where
         ends: &[T],
         strands: &[Strand],
     ) -> Self {
+        let mut max_len = zero::<T>();
         let records = chrs
             .iter()
             .zip(starts.iter())
             .zip(ends.iter())
             .zip(strands.iter())
             .map(|(((c, x), y), s)| StrandedGenomicInterval::new(*c, *x, *y, *s))
+            .map(|interval| {
+                max_len = max_len.max(interval.len());
+                interval
+            })
             .collect();
+        let max_len = if max_len == zero::<T>() {
+            None
+        } else {
+            Some(max_len)
+        };
         Self {
             records,
+            max_len,
             is_sorted: false,
         }
     }

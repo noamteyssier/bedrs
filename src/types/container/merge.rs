@@ -1,5 +1,4 @@
 use crate::traits::{Container, IntervalBounds, ValueBounds};
-use std::marker::PhantomData;
 
 pub struct MergeResults<T, I>
 where
@@ -9,7 +8,7 @@ where
     intervals: Vec<I>,
     clusters: Vec<usize>,
     n_clusters: usize,
-    phantom: PhantomData<T>,
+    max_len: Option<T>,
     is_sorted: bool,
 }
 
@@ -19,11 +18,12 @@ where
     T: ValueBounds,
 {
     fn new(records: Vec<I>) -> Self {
+        let max_len = records.iter().map(|iv| iv.len()).max();
         Self {
             intervals: records,
             clusters: Vec::new(),
             n_clusters: 0,
-            phantom: PhantomData,
+            max_len,
             is_sorted: true,
         }
     }
@@ -39,6 +39,9 @@ where
     fn sorted_mut(&mut self) -> &mut bool {
         &mut self.is_sorted
     }
+    fn max_len(&self) -> Option<T> {
+        self.max_len
+    }
 }
 
 impl<T, I> MergeResults<T, I>
@@ -48,16 +51,22 @@ where
 {
     #[must_use]
     pub fn new(intervals: Vec<I>, clusters: Vec<usize>) -> Self {
+        let max_len = intervals.iter().map(|iv| iv.len()).max();
         let n_clusters = clusters.iter().max().unwrap_or(&0) + 1;
-        Self::from_raw_parts(intervals, clusters, n_clusters)
+        Self::from_raw_parts(intervals, clusters, n_clusters, max_len)
     }
     #[must_use]
-    pub fn from_raw_parts(intervals: Vec<I>, clusters: Vec<usize>, n_clusters: usize) -> Self {
+    pub fn from_raw_parts(
+        intervals: Vec<I>,
+        clusters: Vec<usize>,
+        n_clusters: usize,
+        max_len: Option<T>,
+    ) -> Self {
         Self {
             intervals,
             clusters,
             n_clusters,
-            phantom: PhantomData,
+            max_len,
             is_sorted: true,
         }
     }

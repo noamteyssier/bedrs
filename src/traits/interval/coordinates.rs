@@ -13,6 +13,9 @@ where
     fn update_end(&mut self, val: &T);
     fn update_chr(&mut self, val: &T);
     fn from(other: &Self) -> Self;
+    fn len(&self) -> T {
+        self.end().sub(self.start())
+    }
     fn update_all(&mut self, chr: &T, start: &T, end: &T) {
         self.update_chr(chr);
         self.update_endpoints(start, end);
@@ -47,6 +50,25 @@ where
             },
             order => order,
         }
+    }
+    fn biased_coord_cmp<I: Coordinates<T>>(&self, other: &I, bias: T) -> Ordering {
+        match self.chr().cmp(&other.chr()) {
+            Ordering::Equal => {
+                let comp = if other.start() < bias {
+                    self.start().cmp(&T::zero())
+                } else {
+                    self.start().cmp(&other.start().sub(bias))
+                };
+                match comp {
+                    Ordering::Equal => self.end().cmp(&other.end()),
+                    order => order,
+                }
+            }
+            order => order,
+        }
+    }
+    fn biased_lt<I: Coordinates<T>>(&self, other: &I, bias: T) -> bool {
+        self.biased_coord_cmp(other, bias) == Ordering::Less
     }
     fn lt<I: Coordinates<T>>(&self, other: &I) -> bool {
         self.coord_cmp(other) == Ordering::Less

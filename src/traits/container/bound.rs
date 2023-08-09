@@ -14,14 +14,19 @@ where
     ///
     /// This first checks if the [Container] is sorted
     ///
+    /// Then, it performs a binary tree search for the lower bound
+    /// but performs a biased comparison to search for the lower bound
+    /// subtracting the largest possible interval size.
+    ///
     /// ## On base coordinates
     ///
     /// ```
     /// use bedrs::{Bound, Container, Interval, IntervalSet};
     ///
     /// let records = vec![
-    ///     Interval::new(10, 20),
-    ///     Interval::new(20, 30), // <- min
+    ///     Interval::new(0, 10),
+    ///     Interval::new(10, 20), // <- min
+    ///     Interval::new(20, 30),
     ///     Interval::new(30, 40),
     ///     Interval::new(40, 50),
     ///     Interval::new(50, 60),
@@ -54,6 +59,9 @@ where
     /// ```
     fn lower_bound(&self, query: &I) -> Result<usize, SetError> {
         if self.is_sorted() {
+            if self.records().is_empty() {
+                return Err(SetError::EmptySet);
+            }
             Ok(self.lower_bound_unchecked(query))
         } else {
             Err(SetError::UnsortedSet)
@@ -72,8 +80,9 @@ where
     /// use bedrs::{Bound, Interval, IntervalSet};
     ///
     /// let records = vec![
-    ///     Interval::new(10, 20),
-    ///     Interval::new(20, 30), // <- min
+    ///     Interval::new(0, 10),
+    ///     Interval::new(10, 20), // <- min
+    ///     Interval::new(20, 30),
     ///     Interval::new(30, 40),
     ///     Interval::new(40, 50),
     ///     Interval::new(50, 60),
@@ -105,6 +114,7 @@ where
     fn lower_bound_unchecked(&self, query: &I) -> usize {
         let mut high = self.len();
         let mut low = 0;
+        let max_len = self.max_len().unwrap();
         while high > 0 {
             let mid = high / 2;
             let top_half = high - mid;
@@ -112,7 +122,7 @@ where
             let top_index = low + top_half;
             let test_interval = &self.records()[low_index];
             high = mid;
-            low = if test_interval.lt(query) {
+            low = if test_interval.biased_lt(query, max_len) {
                 top_index
             } else {
                 low
@@ -136,7 +146,7 @@ mod testing {
         set.sort();
         let query = Interval::new(10, 20);
         let bound = set.lower_bound(&query);
-        assert_eq!(bound, Ok(10));
+        assert_eq!(bound, Ok(0));
     }
 
     #[test]
@@ -146,7 +156,7 @@ mod testing {
         set.sort();
         let query = Interval::new(300, 320);
         let bound = set.lower_bound(&query);
-        assert_eq!(bound, Ok(300));
+        assert_eq!(bound, Ok(251));
     }
 
     #[test]
@@ -172,15 +182,15 @@ mod testing {
             GenomicInterval::new(1, 10, 20),
             GenomicInterval::new(2, 10, 20),
             GenomicInterval::new(3, 10, 20),
-            GenomicInterval::new(3, 20, 20),
-            GenomicInterval::new(3, 30, 20), // <- min
+            GenomicInterval::new(3, 20, 20), // <- min
+            GenomicInterval::new(3, 30, 40),
             GenomicInterval::new(4, 10, 20),
         ];
         let mut set = GenomicIntervalSet::new(records);
         set.sort();
         let query = GenomicInterval::new(3, 25, 20);
         let bound = set.lower_bound(&query);
-        assert_eq!(bound, Ok(4));
+        assert_eq!(bound, Ok(3));
     }
 
     #[test]
