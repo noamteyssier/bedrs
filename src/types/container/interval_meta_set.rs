@@ -2,6 +2,7 @@ use crate::traits::{Container, IntervalBounds, ValueBounds};
 use crate::types::IntervalMeta;
 use crate::Coordinates;
 use anyhow::{bail, Result};
+use num_traits::zero;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -14,6 +15,7 @@ where
     M: Copy,
 {
     records: Vec<IntervalMeta<T, M>>,
+    max_len: Option<T>,
     is_sorted: bool,
 }
 
@@ -23,8 +25,22 @@ where
     M: Copy,
 {
     fn from_iter<I: IntoIterator<Item = IntervalMeta<T, M>>>(iter: I) -> Self {
+        let mut max_len = zero::<T>();
+        let records = iter
+            .into_iter()
+            .map(|interval| {
+                max_len = max_len.max(interval.len());
+                interval
+            })
+            .collect();
+        let max_len = if max_len == zero::<T>() {
+            None
+        } else {
+            Some(max_len)
+        };
         Self {
-            records: iter.into_iter().collect(),
+            records,
+            max_len,
             is_sorted: false,
         }
     }
@@ -37,8 +53,10 @@ where
     M: Copy,
 {
     fn new(records: Vec<IntervalMeta<T, M>>) -> Self {
+        let max_len = records.iter().map(|iv| iv.len()).max();
         Self {
             records,
+            max_len,
             is_sorted: false,
         }
     }
@@ -53,6 +71,9 @@ where
     }
     fn sorted_mut(&mut self) -> &mut bool {
         &mut self.is_sorted
+    }
+    fn max_len(&self) -> Option<T> {
+        self.max_len
     }
 
     /// Get the span of the interval set
@@ -104,8 +125,10 @@ where
 {
     #[must_use]
     pub fn new(records: Vec<IntervalMeta<T, M>>) -> Self {
+        let max_len = records.iter().map(|iv| iv.len()).max();
         Self {
             records,
+            max_len,
             is_sorted: false,
         }
     }
@@ -118,13 +141,24 @@ where
     }
 
     pub fn from_endpoints_unchecked(starts: &[T], ends: &[T]) -> Self {
+        let mut max_len = zero::<T>();
         let records = starts
             .iter()
             .zip(ends.iter())
             .map(|(x, y)| IntervalMeta::new(*x, *y, None))
+            .map(|interval| {
+                max_len = max_len.max(interval.len());
+                interval
+            })
             .collect();
+        let max_len = if max_len == zero::<T>() {
+            None
+        } else {
+            Some(max_len)
+        };
         Self {
             records,
+            max_len,
             is_sorted: false,
         }
     }

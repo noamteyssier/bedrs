@@ -28,6 +28,9 @@ where
     /// Returns a mutable reference to the internal sorted flag
     fn sorted_mut(&mut self) -> &mut bool;
 
+    /// Returns the maximum length of the intervals in the container
+    fn max_len(&self) -> Option<T>;
+
     /// Sets the internal state to sorted
     ///
     /// >> This would likely not be used directly by the user.
@@ -180,12 +183,15 @@ mod testing {
 
     struct CustomContainer {
         records: Vec<Interval<usize>>,
+        max_len: Option<usize>,
         is_sorted: bool,
     }
     impl Container<usize, Interval<usize>> for CustomContainer {
         fn new(records: Vec<Interval<usize>>) -> Self {
+            let max_len = records.iter().map(|iv| iv.len()).max();
             Self {
                 records,
+                max_len,
                 is_sorted: false,
             }
         }
@@ -201,6 +207,9 @@ mod testing {
         fn sorted_mut(&mut self) -> &mut bool {
             &mut self.is_sorted
         }
+        fn max_len(&self) -> Option<usize> {
+            self.max_len
+        }
     }
 
     #[test]
@@ -208,6 +217,7 @@ mod testing {
         let records = vec![Interval::new(10, 100); 4];
         let container = CustomContainer {
             records,
+            max_len: Some(90),
             is_sorted: false,
         };
         assert_eq!(container.len(), 4);
@@ -224,6 +234,7 @@ mod testing {
         ];
         let mut container = CustomContainer {
             records,
+            max_len: Some(10),
             is_sorted: false,
         };
         container.sort();
@@ -237,6 +248,7 @@ mod testing {
         let records = Vec::new();
         let container = CustomContainer {
             records,
+            max_len: None,
             is_sorted: false,
         };
         assert!(container.is_empty());
