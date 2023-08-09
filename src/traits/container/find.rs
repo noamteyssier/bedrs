@@ -429,8 +429,35 @@ where
 mod testing {
     use super::Find;
     use crate::{
-        traits::Container, Coordinates, GenomicInterval, GenomicIntervalSet, Interval, IntervalSet,
+        traits::{Container, IntervalBounds, ValueBounds},
+        GenomicInterval, GenomicIntervalSet, Interval, IntervalSet,
     };
+
+    fn validate_set<C, I, T>(set: &C, expected: &[I])
+    where
+        C: Container<T, I>,
+        I: IntervalBounds<T>,
+        T: ValueBounds,
+    {
+        for idx in 0..expected.len() {
+            let c1 = &set.records()[idx];
+            let c2 = &expected[idx];
+            assert!(c1.eq(c2))
+        }
+    }
+
+    fn validate_iter<I, T>(iter: impl Iterator<Item = I>, expected: &[I])
+    where
+        I: IntervalBounds<T>,
+        T: ValueBounds,
+    {
+        let observed = iter.collect::<Vec<I>>();
+        for idx in 0..expected.len() {
+            let c1 = &observed[idx];
+            let c2 = &expected[idx];
+            assert!(c1.eq(c2))
+        }
+    }
 
     #[test]
     fn find() {
@@ -610,9 +637,7 @@ mod testing {
         ];
         let set = IntervalSet::from_sorted(intervals).unwrap();
         let overlaps = set.find_query_frac(&query, frac).unwrap();
-        for (i, j) in overlaps.records().iter().zip(expected.iter()) {
-            assert!(i.eq(j))
-        }
+        validate_set(&overlaps, &expected);
     }
 
     #[test]
@@ -637,9 +662,7 @@ mod testing {
         ];
         let set = IntervalSet::from_sorted(intervals).unwrap();
         let overlaps = set.find_query_frac(&query, frac).unwrap();
-        for (i, j) in overlaps.records().iter().zip(expected.iter()) {
-            assert!(i.eq(j))
-        }
+        validate_set(&overlaps, &expected);
     }
 
     #[test]
@@ -658,9 +681,7 @@ mod testing {
         let expected = vec![Interval::new(10, 20)];
         let set = IntervalSet::from_sorted(intervals).unwrap();
         let overlaps = set.find_query_frac(&query, frac).unwrap();
-        for (i, j) in overlaps.records().iter().zip(expected.iter()) {
-            assert!(i.eq(j))
-        }
+        validate_set(&overlaps, &expected);
     }
 
     #[test]
@@ -683,10 +704,11 @@ mod testing {
             Interval::new(15, 25),
         ];
         let set = IntervalSet::from_sorted(intervals).unwrap();
-        let overlaps = set.find_iter_sorted_query_frac(&query, frac).unwrap();
-        for (i, j) in overlaps.into_iter().zip(expected.iter()) {
-            assert!(i.eq(j))
-        }
+        let overlap_iter = set
+            .find_iter_sorted_query_frac(&query, frac)
+            .unwrap()
+            .cloned();
+        validate_iter(overlap_iter, &expected);
     }
 
     #[test]
@@ -708,9 +730,7 @@ mod testing {
         ];
         let set = IntervalSet::from_sorted(intervals).unwrap();
         let overlaps = set.find_target_frac(&query, frac).unwrap();
-        for (i, j) in overlaps.records().iter().zip(expected.iter()) {
-            assert!(i.eq(j))
-        }
+        validate_set(&overlaps, &expected)
     }
 
     #[test]
@@ -728,9 +748,7 @@ mod testing {
         let expected = vec![Interval::new(10, 20)];
         let set = IntervalSet::from_sorted(intervals).unwrap();
         let overlaps = set.find_target_frac(&query, frac).unwrap();
-        for (i, j) in overlaps.records().iter().zip(expected.iter()) {
-            assert!(i.eq(j))
-        }
+        validate_set(&overlaps, &expected)
     }
 
     #[test]
@@ -751,9 +769,7 @@ mod testing {
         ];
         let set = IntervalSet::from_sorted(intervals).unwrap();
         let overlaps = set.find_target_frac(&query, frac).unwrap();
-        for (i, j) in overlaps.records().iter().zip(expected.iter()) {
-            assert!(i.eq(j))
-        }
+        validate_set(&overlaps, &expected)
     }
 
     #[test]
@@ -774,10 +790,11 @@ mod testing {
             Interval::new(10, 20),
         ];
         let set = IntervalSet::from_sorted(intervals).unwrap();
-        let overlaps = set.find_iter_sorted_target_frac(&query, frac).unwrap();
-        for (i, j) in overlaps.into_iter().zip(expected.iter()) {
-            assert!(i.eq(j))
-        }
+        let overlap_iter = set
+            .find_iter_sorted_target_frac(&query, frac)
+            .unwrap()
+            .cloned();
+        validate_iter(overlap_iter, &expected);
     }
 
     #[test]
@@ -799,9 +816,7 @@ mod testing {
         let expected = vec![Interval::new(9, 19)];
         let set = IntervalSet::from_sorted(intervals).unwrap();
         let overlaps = set.find_reciprocal_frac(&query, frac).unwrap();
-        for (i, j) in overlaps.records().iter().zip(expected.iter()) {
-            assert!(i.eq(j))
-        }
+        validate_set(&overlaps, &expected)
     }
 
     #[test]
@@ -822,10 +837,11 @@ mod testing {
         ];
         let expected = vec![Interval::new(9, 19)];
         let set = IntervalSet::from_sorted(intervals).unwrap();
-        let overlaps = set.find_iter_sorted_reciprocal_frac(&query, frac).unwrap();
-        for (i, j) in overlaps.into_iter().zip(expected.iter()) {
-            assert!(i.eq(j))
-        }
+        let overlap_iter = set
+            .find_iter_sorted_reciprocal_frac(&query, frac)
+            .unwrap()
+            .cloned();
+        validate_iter(overlap_iter, &expected);
     }
 
     #[test]
@@ -851,9 +867,7 @@ mod testing {
         ];
         let set = IntervalSet::from_sorted(intervals).unwrap();
         let overlaps = set.find_reciprocal_frac_either(&query, frac).unwrap();
-        for (i, j) in overlaps.records().into_iter().zip(expected.iter()) {
-            assert!(i.eq(j))
-        }
+        validate_set(&overlaps, &expected)
     }
 
     #[test]
@@ -878,10 +892,11 @@ mod testing {
             Interval::new(15, 18),
         ];
         let set = IntervalSet::from_sorted(intervals).unwrap();
-        let overlaps = set.find_iter_sorted_reciprocal_frac(&query, frac).unwrap();
-        for (i, j) in overlaps.into_iter().zip(expected.iter()) {
-            assert!(i.eq(j))
-        }
+        let overlap_iter = set
+            .find_iter_sorted_reciprocal_frac_either(&query, frac)
+            .unwrap()
+            .cloned();
+        validate_iter(overlap_iter, &expected);
     }
 
     #[test]
