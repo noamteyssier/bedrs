@@ -61,6 +61,8 @@ where
         if self.is_sorted() {
             if self.records().is_empty() {
                 return Err(SetError::EmptySet);
+            } else if self.max_len().is_none() {
+                return Err(SetError::MissingMaxLen);
             }
             Ok(self.lower_bound_unchecked(query))
         } else {
@@ -114,7 +116,9 @@ where
     fn lower_bound_unchecked(&self, query: &I) -> usize {
         let mut high = self.len();
         let mut low = 0;
-        let max_len = self.max_len().unwrap();
+        let max_len = self
+            .max_len()
+            .expect("max_len is None - is this an empty set?");
         while high > 0 {
             let mid = high / 2;
             let top_half = high - mid;
