@@ -220,4 +220,24 @@ mod testing {
         let bound = set.lower_bound_unchecked(&query);
         assert_eq!(bound, 1);
     }
+
+    #[test]
+    fn bsearch_no_max_len() {
+        let records = (0..500).map(|x| Interval::new(x, x + 50)).collect();
+        let mut set = IntervalSet::from_sorted(records).unwrap();
+        let query = Interval::new(10, 20);
+        set.max_len_mut().take();
+        let bound = set.lower_bound(&query);
+        assert_eq!(bound, Err(SetError::MissingMaxLen));
+    }
+
+    #[test]
+    #[should_panic]
+    fn bsearch_no_max_len_unchecked_panic() {
+        let records = (0..500).map(|x| Interval::new(x, x + 50)).collect();
+        let mut set = IntervalSet::from_sorted(records).unwrap();
+        let query = Interval::new(10, 20);
+        set.max_len_mut().take();
+        set.lower_bound_unchecked(&query);
+    }
 }
