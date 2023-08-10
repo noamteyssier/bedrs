@@ -36,6 +36,10 @@ where
     /// Returns the maximum length of the intervals in the container
     fn max_len(&self) -> Option<T>;
 
+    /// Returns a mutable reference to the maximum length of the intervals
+    /// in the container
+    fn max_len_mut(&mut self) -> &mut Option<T>;
+
     /// Sets the internal state to sorted
     ///
     /// >> This would likely not be used directly by the user.
@@ -67,6 +71,18 @@ where
         self.set_sorted();
     }
 
+    /// Updates the maximum length of the intervals in the container
+    /// if the new interval is longer than the current maximum length.
+    fn update_max_len(&mut self, interval: &I) {
+        if let Some(max_len) = self.max_len() {
+            if interval.len() > max_len {
+                *self.max_len_mut() = Some(interval.len());
+            }
+        } else {
+            *self.max_len_mut() = Some(interval.len());
+        }
+    }
+
     /// Inserts a new interval into the container
     ///
     /// This will not sort the container after insertion.
@@ -76,6 +92,7 @@ where
     /// This is more efficient if you are inserting many
     /// intervals at once.
     fn insert(&mut self, interval: I) {
+        self.update_max_len(&interval);
         self.records_mut().push(interval);
         self.set_unsorted();
     }
@@ -237,6 +254,9 @@ mod testing {
         }
         fn max_len(&self) -> Option<usize> {
             self.max_len
+        }
+        fn max_len_mut(&mut self) -> &mut Option<usize> {
+            &mut self.max_len
         }
     }
 

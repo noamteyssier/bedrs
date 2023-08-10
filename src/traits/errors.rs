@@ -12,6 +12,9 @@ pub enum SetError {
     #[error("The provided intervals are not sorted.")]
     UnsortedIntervals,
 
+    #[error("The maximum interval length is unknown")]
+    MissingMaxLen,
+
     #[error("Sample size is larger than the number of intervals.")]
     SampleSizeTooLarge,
 

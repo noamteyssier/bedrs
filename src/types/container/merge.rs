@@ -42,6 +42,9 @@ where
     fn max_len(&self) -> Option<T> {
         self.max_len
     }
+    fn max_len_mut(&mut self) -> &mut Option<T> {
+        &mut self.max_len
+    }
 }
 
 impl<T, I> MergeResults<T, I>

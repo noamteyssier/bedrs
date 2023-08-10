@@ -61,6 +61,8 @@ where
         if self.is_sorted() {
             if self.records().is_empty() {
                 return Err(SetError::EmptySet);
+            } else if self.max_len().is_none() {
+                return Err(SetError::MissingMaxLen);
             }
             Ok(self.lower_bound_unchecked(query))
         } else {
@@ -114,7 +116,9 @@ where
     fn lower_bound_unchecked(&self, query: &I) -> usize {
         let mut high = self.len();
         let mut low = 0;
-        let max_len = self.max_len().unwrap();
+        let max_len = self
+            .max_len()
+            .expect("max_len is None - is this an empty set?");
         while high > 0 {
             let mid = high / 2;
             let top_half = high - mid;
@@ -215,5 +219,25 @@ mod testing {
         let set = IntervalSet::new(records);
         let bound = set.lower_bound_unchecked(&query);
         assert_eq!(bound, 1);
+    }
+
+    #[test]
+    fn bsearch_no_max_len() {
+        let records = (0..500).map(|x| Interval::new(x, x + 50)).collect();
+        let mut set = IntervalSet::from_sorted(records).unwrap();
+        let query = Interval::new(10, 20);
+        set.max_len_mut().take();
+        let bound = set.lower_bound(&query);
+        assert_eq!(bound, Err(SetError::MissingMaxLen));
+    }
+
+    #[test]
+    #[should_panic]
+    fn bsearch_no_max_len_unchecked_panic() {
+        let records = (0..500).map(|x| Interval::new(x, x + 50)).collect();
+        let mut set = IntervalSet::from_sorted(records).unwrap();
+        let query = Interval::new(10, 20);
+        set.max_len_mut().take();
+        set.lower_bound_unchecked(&query);
     }
 }
