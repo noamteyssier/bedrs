@@ -164,6 +164,16 @@ mod testing {
     }
 
     #[test]
+    fn bsearch_base_mid() {
+        let records = (0..500).map(|x| Interval::new(x, x + 50)).collect();
+        let mut set = IntervalSet::new(records);
+        set.sort();
+        let query = Interval::new(200, 220);
+        let bound = set.lower_bound(&query);
+        assert_eq!(bound, Ok(151));
+    }
+
+    #[test]
     fn bsearch_genomic_low() {
         let records = vec![
             GenomicInterval::new(1, 10, 20),
@@ -217,6 +227,54 @@ mod testing {
         ];
         let query = Interval::new(20, 25);
         let set = IntervalSet::new(records);
+        let bound = set.lower_bound_unchecked(&query);
+        assert_eq!(bound, 1);
+    }
+
+    #[test]
+    fn bsearch_zero() {
+        let records = vec![
+            Interval::new(0, 10), // <- min
+            Interval::new(10, 20),
+            Interval::new(20, 30),
+            Interval::new(30, 40),
+            Interval::new(40, 50),
+            Interval::new(50, 60),
+        ];
+        let query = Interval::new(5, 20);
+        let set = IntervalSet::new(records);
+        let bound = set.lower_bound_unchecked(&query);
+        assert_eq!(bound, 0);
+    }
+
+    #[test]
+    fn bsearch_multizero() {
+        let records = vec![
+            Interval::new(0, 10), // <- min
+            Interval::new(0, 10),
+            Interval::new(10, 20),
+            Interval::new(20, 30),
+            Interval::new(30, 40),
+            Interval::new(40, 50),
+            Interval::new(50, 60),
+        ];
+        let query = Interval::new(5, 20);
+        let set = IntervalSet::new(records);
+        let bound = set.lower_bound_unchecked(&query);
+        assert_eq!(bound, 0);
+    }
+
+    #[test]
+    fn bsearch_zero_example() {
+        let query = GenomicInterval::new(2, 226, 376);
+        let intervals = vec![
+            GenomicInterval::new(1, 0, 300),
+            GenomicInterval::new(2, 0, 300), // <- min
+            GenomicInterval::new(2, 16, 316),
+            GenomicInterval::new(2, 53, 353),
+            GenomicInterval::new(2, 204, 504),
+        ];
+        let set = GenomicIntervalSet::new(intervals);
         let bound = set.lower_bound_unchecked(&query);
         assert_eq!(bound, 1);
     }
