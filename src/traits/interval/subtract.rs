@@ -1,4 +1,7 @@
-use crate::{traits::ValueBounds, Coordinates, Overlap};
+use crate::{
+    traits::{IntervalBounds, ValueBounds},
+    Coordinates, Overlap,
+};
 
 /// Trait for performing subtraction with coordinates
 pub trait Subtract<T>: Coordinates<T> + Overlap<T>
@@ -19,26 +22,28 @@ where
         right_sub.update_all(&other.chr(), &right_start, &right_end);
         right_sub
     }
-    fn build_contained<I: Coordinates<T>>(&self, other: &I) -> Vec<I> {
-        vec![
-            self.build_left_contained(other),
-            self.build_right_contained(other),
-        ]
+    fn build_contained_iter<I: Coordinates<T> + 'static>(
+        &self,
+        other: &I,
+    ) -> Box<dyn Iterator<Item = I>> {
+        let iter = std::iter::once(self.build_left_contained(other))
+            .chain(std::iter::once(self.build_right_contained(other)));
+        Box::new(iter)
     }
-    fn build_gt<I: Coordinates<T>>(&self, other: &I) -> Vec<I> {
+    fn build_gt<I: Coordinates<T>>(&self, other: &I) -> I {
         let mut sub = I::from(other);
         sub.update_all(&other.chr(), &other.end(), &self.end());
-        vec![sub]
+        sub
     }
-    fn build_lt<I: Coordinates<T>>(&self, other: &I) -> Vec<I> {
+    fn build_lt<I: Coordinates<T>>(&self, other: &I) -> I {
         let mut sub = I::from(other);
         sub.update_all(&other.chr(), &self.start(), &other.start());
-        vec![sub]
+        sub
     }
-    fn build_self<I: Coordinates<T>>(&self, other: &I) -> Vec<I> {
+    fn build_self<I: Coordinates<T>>(&self, other: &I) -> I {
         let mut sub = I::from(&other);
         sub.update_all(&other.chr(), &self.start(), &self.end());
-        vec![sub]
+        sub
     }
     /// Perform subtraction between two coordinates.
     ///
@@ -150,16 +155,42 @@ where
             if self.eq(other) || self.contained_by(other) {
                 None
             } else if self.contains(other) {
-                Some(self.build_contained(other))
+                let left = self.build_left_contained(other);
+                let right = self.build_right_contained(other);
+                Some(vec![left, right])
             } else if self.gt(other) {
-                Some(self.build_gt(other))
+                Some(vec![self.build_gt(other)])
             } else if self.lt(other) {
-                Some(self.build_lt(other))
+                Some(vec![self.build_lt(other)])
             } else {
                 todo!()
             }
         } else {
-            Some(self.build_self(other))
+            Some(vec![self.build_self(other)])
+        }
+    }
+
+    fn subtract_iter<I: IntervalBounds<T> + 'static>(
+        &self,
+        other: &I,
+    ) -> Box<dyn Iterator<Item = I>> {
+        if self.overlaps(other) {
+            if self.eq(other) || self.contained_by(other) {
+                Box::new(std::iter::empty())
+            } else if self.contains(other) {
+                self.build_contained_iter(other)
+            } else if self.gt(other) {
+                let iv = self.build_gt(other);
+                Box::new(std::iter::once(iv))
+            } else if self.lt(other) {
+                let iv = self.build_lt(other);
+                Box::new(std::iter::once(iv))
+            } else {
+                todo!()
+            }
+        } else {
+            let iv = self.build_self(other);
+            Box::new(std::iter::once(iv))
         }
     }
 }
@@ -198,6 +229,15 @@ mod testing {
     }
 
     #[test]
+    fn subtraction_case_a_iter() {
+        let a = Interval::new(20, 30);
+        let b = Interval::new(15, 25);
+        let mut sub = a.subtract_iter(&b);
+        assert_eq!(sub.next().unwrap().start(), 25);
+        assert!(sub.next().is_none());
+    }
+
+    #[test]
     ///   x-----y
     ///      i-------j
     /// ==================
@@ -209,6 +249,15 @@ mod testing {
         assert_eq!(sub.len(), 1);
         assert_eq!(sub[0].start(), 15);
         assert_eq!(sub[0].end(), 20);
+    }
+
+    #[test]
+    fn subtraction_case_b_iter() {
+        let a = Interval::new(15, 25);
+        let b = Interval::new(20, 30);
+        let mut sub = a.subtract_iter(&b);
+        assert_eq!(sub.next().unwrap().start(), 15);
+        assert!(sub.next().is_none());
     }
 
     #[test]
@@ -228,6 +277,16 @@ mod testing {
     }
 
     #[test]
+    fn subtraction_case_c_iter() {
+        let a = Interval::new(10, 40);
+        let b = Interval::new(20, 30);
+        let mut sub = a.subtract_iter(&b);
+        assert_eq!(sub.next().unwrap().start(), 10);
+        assert_eq!(sub.next().unwrap().start(), 30);
+        assert!(sub.next().is_none());
+    }
+
+    #[test]
     ///     x--y
     ///   i------j
     /// ==================
@@ -237,6 +296,14 @@ mod testing {
         let b = Interval::new(10, 40);
         let sub = a.subtract(&b);
         assert!(sub.is_none());
+    }
+
+    #[test]
+    fn subtraction_case_d_iter() {
+        let a = Interval::new(20, 30);
+        let b = Interval::new(10, 40);
+        let mut sub = a.subtract_iter(&b);
+        assert!(sub.next().is_none());
     }
 
     #[test]
@@ -252,6 +319,14 @@ mod testing {
     }
 
     #[test]
+    fn subtraction_case_e_iter() {
+        let a = Interval::new(10, 30);
+        let b = Interval::new(10, 30);
+        let mut sub = a.subtract_iter(&b);
+        assert!(sub.next().is_none());
+    }
+
+    #[test]
     ///     x--y
     ///     i--j
     /// ==================
@@ -261,6 +336,14 @@ mod testing {
         let b = GenomicInterval::new(1, 10, 30);
         let sub = a.subtract(&b);
         assert!(sub.is_none());
+    }
+
+    #[test]
+    fn subtraction_genomic_e_iter() {
+        let a = GenomicInterval::new(1, 10, 30);
+        let b = GenomicInterval::new(1, 10, 30);
+        let mut sub = a.subtract_iter(&b);
+        assert!(sub.next().is_none());
     }
 
     #[test]
@@ -278,6 +361,17 @@ mod testing {
     }
 
     #[test]
+    fn subtraction_genomic_e_wrong_chr_iter() {
+        let a = GenomicInterval::new(1, 10, 30);
+        let b = GenomicInterval::new(2, 10, 30);
+        let mut sub = a.subtract_iter(&b);
+        let first = sub.next().unwrap();
+        assert_eq!(first.start(), 10);
+        assert_eq!(first.end(), 30);
+        assert!(sub.next().is_none());
+    }
+
+    #[test]
     ///   x--y
     ///        i--j
     /// ==================
@@ -289,6 +383,17 @@ mod testing {
         assert_eq!(sub.len(), 1);
         assert_eq!(sub[0].start(), 10);
         assert_eq!(sub[0].end(), 20);
+    }
+
+    #[test]
+    fn subtraction_case_f_iter() {
+        let a = Interval::new(10, 20);
+        let b = Interval::new(30, 40);
+        let mut sub = a.subtract_iter(&b);
+        let first = sub.next().unwrap();
+        assert_eq!(first.start(), 10);
+        assert_eq!(first.end(), 20);
+        assert!(sub.next().is_none());
     }
 
     #[test]
@@ -306,6 +411,17 @@ mod testing {
     }
 
     #[test]
+    fn subtraction_case_g_iter() {
+        let a = Interval::new(10, 40);
+        let b = Interval::new(10, 20);
+        let mut sub = a.subtract_iter(&b);
+        let first = sub.next().unwrap();
+        assert_eq!(first.start(), 20);
+        assert_eq!(first.end(), 40);
+        assert!(sub.next().is_none());
+    }
+
+    #[test]
     ///   x--------y
     ///        i---j
     /// ===============
@@ -317,5 +433,16 @@ mod testing {
         assert_eq!(sub.len(), 1);
         assert_eq!(sub[0].start(), 10);
         assert_eq!(sub[0].end(), 30);
+    }
+
+    #[test]
+    fn subtraction_case_h_iter() {
+        let a = Interval::new(10, 40);
+        let b = Interval::new(30, 40);
+        let mut sub = a.subtract_iter(&b);
+        let first = sub.next().unwrap();
+        assert_eq!(first.start(), 10);
+        assert_eq!(first.end(), 30);
+        assert!(sub.next().is_none());
     }
 }
