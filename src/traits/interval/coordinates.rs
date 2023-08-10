@@ -51,11 +51,16 @@ where
             order => order,
         }
     }
+    /// Compare two intervals, but bias the `other` interval to extend
+    /// further to the left by `bias` units.
+    ///
+    /// Used to find the lower bound of an interval in a sorted container
+    /// where the maximum range of the intervals is known a priori.
     fn biased_coord_cmp<I: Coordinates<T>>(&self, other: &I, bias: T) -> Ordering {
         match self.chr().cmp(&other.chr()) {
             Ordering::Equal => {
                 let comp = if other.start() < bias {
-                    self.start().cmp(&T::zero())
+                    other.start().cmp(&T::zero())
                 } else {
                     self.start().cmp(&other.start().sub(bias))
                 };
