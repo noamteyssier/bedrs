@@ -16,6 +16,11 @@ where
     /// Creates a new container from intervals (assumed unsorted)
     fn new(records: Vec<I>) -> Self;
 
+    /// Creates a new empty container
+    fn empty() -> Self {
+        Self::new(Vec::new())
+    }
+
     /// Returns a reference to the internal interval vector
     fn records(&self) -> &Vec<I>;
 
@@ -60,6 +65,29 @@ where
     fn sort(&mut self) {
         self.records_mut().sort_unstable_by(|a, b| a.coord_cmp(b));
         self.set_sorted();
+    }
+
+    /// Inserts a new interval into the container
+    ///
+    /// This will not sort the container after insertion.
+    /// If you need to sort the container after insertion
+    /// use the `insert_sorted()` method instead.
+    ///
+    /// This is more efficient if you are inserting many
+    /// intervals at once.
+    fn insert(&mut self, interval: I) {
+        self.records_mut().push(interval);
+        self.set_unsorted();
+    }
+
+    /// Inserts a new interval into the container and sorts the container
+    /// after insertion.
+    ///
+    /// This is less efficient than the `insert()` method if you are
+    /// inserting many intervals at once.
+    fn insert_sorted(&mut self, interval: I) {
+        self.insert(interval);
+        self.sort();
     }
 
     /// Creates a new container from presorted intervals
@@ -322,5 +350,23 @@ mod testing {
         assert_eq!(set.records()[1].end(), 22);
         assert_eq!(set.records()[2].start(), 13);
         assert_eq!(set.records()[2].end(), 27);
+    }
+
+    #[test]
+    fn test_container_insert() {
+        let mut set = IntervalSet::empty();
+        set.insert(Interval::new(15, 25));
+        set.insert(Interval::new(10, 20));
+        assert_eq!(set.len(), 2);
+    }
+
+    #[test]
+    fn test_container_insert_sorted() {
+        let mut set = IntervalSet::empty();
+        set.insert_sorted(Interval::new(15, 25));
+        set.insert_sorted(Interval::new(10, 20));
+        assert_eq!(set.len(), 2);
+        assert_eq!(set.records()[0].start(), 10);
+        assert!(set.is_sorted());
     }
 }
