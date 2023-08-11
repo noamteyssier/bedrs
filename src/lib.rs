@@ -268,5 +268,6 @@ pub use traits::{
     Subtract,
 };
 pub use types::{
-    GenomicInterval, GenomicIntervalSet, Interval, IntervalSet, Strand, StrandedGenomicInterval,
+    GenomicInterval, GenomicIntervalSet, Interval, IntervalSet, MergeIter, Strand,
+    StrandedGenomicInterval,
 };
