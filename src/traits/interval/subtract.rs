@@ -26,9 +26,17 @@ where
         &self,
         other: &I,
     ) -> Box<dyn Iterator<Item = I>> {
-        let iter = std::iter::once(self.build_left_contained(other))
-            .chain(std::iter::once(self.build_right_contained(other)));
-        Box::new(iter)
+        if self.start() == other.start() {
+            let iter = std::iter::once(self.build_right_contained(other));
+            return Box::new(iter);
+        } else if self.end() == other.end() {
+            let iter = std::iter::once(self.build_left_contained(other));
+            return Box::new(iter);
+        } else {
+            let iter = std::iter::once(self.build_left_contained(other))
+                .chain(std::iter::once(self.build_right_contained(other)));
+            return Box::new(iter);
+        }
     }
     fn build_gt<I: Coordinates<T>>(&self, other: &I) -> I {
         let mut sub = I::from(other);
@@ -155,9 +163,15 @@ where
             if self.eq(other) || self.contained_by(other) {
                 None
             } else if self.contains(other) {
-                let left = self.build_left_contained(other);
-                let right = self.build_right_contained(other);
-                Some(vec![left, right])
+                if self.start() == other.start() {
+                    Some(vec![self.build_gt(other)])
+                } else if self.end() == other.end() {
+                    Some(vec![self.build_lt(other)])
+                } else {
+                    let left = self.build_lt(other);
+                    let right = self.build_gt(other);
+                    Some(vec![left, right])
+                }
             } else if self.gt(other) {
                 Some(vec![self.build_gt(other)])
             } else if self.lt(other) {
