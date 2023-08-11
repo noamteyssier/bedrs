@@ -490,6 +490,25 @@ mod testing {
     }
 
     #[test]
+    fn find_containing() {
+        let query = Interval::new(0, 100);
+        let intervals = vec![Interval::new(10, 20)];
+        let set = IntervalSet::from_sorted(intervals).unwrap();
+        let overlaps = set.find(&query);
+        assert_eq!(overlaps.len(), 1);
+    }
+
+    #[test]
+    fn find_containing_iter_sorted() {
+        let query = Interval::new(0, 100);
+        let intervals = vec![Interval::new(10, 20)];
+        let set = IntervalSet::from_sorted(intervals).unwrap();
+        let overlaps = set.find_iter_sorted(&query).unwrap();
+        let counts = overlaps.count();
+        assert_eq!(counts, 1);
+    }
+
+    #[test]
     fn find_minimum() {
         let query = Interval::new(17, 27);
         let starts = vec![10, 15, 20, 25];
