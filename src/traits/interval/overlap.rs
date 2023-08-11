@@ -97,7 +97,7 @@ where
     /// assert!(interval1.interval_contains(&interval2));
     /// ```
     fn interval_contains<I: Coordinates<T>>(&self, other: &I) -> bool {
-        self.start() < other.start() && self.end() > other.end()
+        self.start() <= other.start() && self.end() >= other.end()
     }
 
     /// Returns true if the current interval borders the other interval.
