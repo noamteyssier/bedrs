@@ -459,4 +459,44 @@ mod testing {
         assert_eq!(first.end(), 30);
         assert!(sub.next().is_none());
     }
+
+    #[test]
+    ///     x-----y
+    ///  i--------j   
+    /// ===============
+    /// none
+    fn subtraction_case_i() {
+        let a = Interval::new(20, 30);
+        let b = Interval::new(10, 30);
+        let sub = a.subtract(&b);
+        assert!(sub.is_none());
+    }
+
+    #[test]
+    fn subtraction_case_i_iter() {
+        let a = Interval::new(20, 30);
+        let b = Interval::new(10, 30);
+        let mut sub = a.subtract_iter(&b);
+        assert!(sub.next().is_none());
+    }
+
+    #[test]
+    ///  x-----y
+    ///  i--------j   
+    /// ===============
+    /// none
+    fn subtraction_case_j() {
+        let a = Interval::new(10, 30);
+        let b = Interval::new(10, 40);
+        let sub = a.subtract(&b);
+        assert!(sub.is_none());
+    }
+
+    #[test]
+    fn subtraction_case_j_iter() {
+        let a = Interval::new(10, 30);
+        let b = Interval::new(10, 40);
+        let mut sub = a.subtract_iter(&b);
+        assert!(sub.next().is_none());
+    }
 }

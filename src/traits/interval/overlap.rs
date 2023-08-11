@@ -97,7 +97,7 @@ where
     /// assert!(interval1.interval_contains(&interval2));
     /// ```
     fn interval_contains<I: Coordinates<T>>(&self, other: &I) -> bool {
-        self.start() < other.start() && self.end() > other.end()
+        self.start() <= other.start() && self.end() >= other.end()
     }
 
     /// Returns true if the current interval borders the other interval.
@@ -462,8 +462,8 @@ mod testing {
         let d = Interval::new(9, 31);
         assert!(a.contains(&b));
         assert!(b.contained_by(&a));
-        assert!(!a.contains(&c));
-        assert!(!a.contained_by(&c));
+        assert!(a.contains(&c));
+        assert!(a.contained_by(&c));
         assert!(!a.contains(&d));
         assert!(a.contained_by(&d));
     }
@@ -485,8 +485,8 @@ mod testing {
         let e = GenomicInterval::new(2, 15, 25);
         assert!(a.contains(&b));
         assert!(b.contained_by(&a));
-        assert!(!a.contains(&c));
-        assert!(!a.contained_by(&c));
+        assert!(a.contains(&c));
+        assert!(a.contained_by(&c));
         assert!(!a.contains(&d));
         assert!(a.contained_by(&d));
         assert!(!a.contains(&e));
