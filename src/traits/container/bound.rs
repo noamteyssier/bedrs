@@ -174,6 +174,16 @@ mod testing {
     }
 
     #[test]
+    fn bsearch_base_containing() {
+        let records = (0..500).map(|x| Interval::new(x, x + 50)).collect();
+        let mut set = IntervalSet::new(records);
+        set.sort();
+        let query = Interval::new(0, 500);
+        let bound = set.lower_bound(&query);
+        assert_eq!(bound, Ok(0));
+    }
+
+    #[test]
     fn bsearch_genomic_low() {
         let records = vec![
             GenomicInterval::new(1, 10, 20),

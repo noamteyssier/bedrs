@@ -60,13 +60,17 @@ where
         match self.chr().cmp(&other.chr()) {
             Ordering::Equal => {
                 let comp = if other.start() < bias {
-                    other.start().cmp(&T::zero())
+                    None // can't compare the intervals since they both bias below zero
                 } else {
-                    self.start().cmp(&other.start().sub(bias))
+                    Some(self.start().cmp(&other.start().sub(bias)))
                 };
-                match comp {
-                    Ordering::Equal => self.end().cmp(&other.end()),
-                    order => order,
+                if let Some(comp) = comp {
+                    match comp {
+                        Ordering::Equal => self.end().cmp(&other.end()),
+                        order => order,
+                    }
+                } else {
+                    Ordering::Equal
                 }
             }
             order => order,

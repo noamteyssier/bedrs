@@ -469,6 +469,14 @@ mod testing {
     }
 
     #[test]
+    fn test_overlapping_contains() {
+        let a = Interval::new(10, 30);
+        let b = Interval::new(15, 25);
+        assert!(a.overlaps(&b));
+        assert!(b.overlaps(&a));
+    }
+
+    #[test]
     fn test_genomic_contained() {
         let a = GenomicInterval::new(1, 10, 30);
         let b = GenomicInterval::new(1, 15, 25);
