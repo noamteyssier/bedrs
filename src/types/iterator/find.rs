@@ -35,9 +35,10 @@ pub enum QueryMethod<T: ValueBounds> {
 }
 
 /// Calculate the length of an interval as a fraction of its total length
-pub fn f_len<I, T>(interval: &I, frac: f64) -> T
+pub fn f_len<I, C, T>(interval: &I, frac: f64) -> T
 where
-    I: IntervalBounds<T>,
+    I: IntervalBounds<C, T>,
+    C: ValueBounds,
     T: ValueBounds,
 {
     let len_f: f64 = interval.len().to_f64().unwrap();
@@ -47,9 +48,10 @@ where
 
 /// Determine whether a query interval overlaps a target interval
 /// using a specific overlap method
-pub fn predicate<I, T>(target: &I, query: &I, method: &QueryMethod<T>) -> bool
+pub fn predicate<I, C, T>(target: &I, query: &I, method: &QueryMethod<T>) -> bool
 where
-    I: IntervalBounds<T>,
+    I: IntervalBounds<C, T>,
+    C: ValueBounds,
     T: ValueBounds,
 {
     match method {
@@ -85,20 +87,23 @@ where
     }
 }
 
-pub struct FindIter<'a, T, I>
+pub struct FindIter<'a, C, T, I>
 where
-    I: IntervalBounds<T> + 'a,
+    I: IntervalBounds<C, T> + 'a,
+    C: ValueBounds + 'a,
     T: ValueBounds + 'a,
 {
     inner: &'a Vec<I>,
     query: &'a I,
     offset: usize,
     phantom_t: PhantomData<T>,
+    phantom_c: PhantomData<C>,
     method: QueryMethod<T>,
 }
-impl<'a, T, I> FindIter<'a, T, I>
+impl<'a, C, T, I> FindIter<'a, C, T, I>
 where
-    I: IntervalBounds<T>,
+    I: IntervalBounds<C, T>,
+    C: ValueBounds,
     T: ValueBounds,
 {
     pub fn new(inner: &'a Vec<I>, query: &'a I, method: QueryMethod<T>) -> Self {
@@ -107,13 +112,15 @@ where
             query,
             offset: 0,
             phantom_t: PhantomData,
+            phantom_c: PhantomData,
             method,
         }
     }
 }
-impl<'a, T, I> Iterator for FindIter<'a, T, I>
+impl<'a, C, T, I> Iterator for FindIter<'a, C, T, I>
 where
-    I: IntervalBounds<T>,
+    I: IntervalBounds<C, T>,
+    C: ValueBounds,
     T: ValueBounds,
 {
     type Item = &'a I;
@@ -129,20 +136,23 @@ where
     }
 }
 
-pub struct FindIterSorted<'a, T, I>
+pub struct FindIterSorted<'a, C, T, I>
 where
-    I: IntervalBounds<T> + 'a,
+    I: IntervalBounds<C, T> + 'a,
+    C: ValueBounds + 'a,
     T: ValueBounds + 'a,
 {
     inner: &'a Vec<I>,
     query: &'a I,
     offset: usize,
     phantom_t: PhantomData<T>,
+    phantom_c: PhantomData<C>,
     method: QueryMethod<T>,
 }
-impl<'a, T, I> FindIterSorted<'a, T, I>
+impl<'a, C, T, I> FindIterSorted<'a, C, T, I>
 where
-    I: IntervalBounds<T>,
+    I: IntervalBounds<C, T>,
+    C: ValueBounds,
     T: ValueBounds,
 {
     pub fn new(inner: &'a Vec<I>, query: &'a I, offset: usize, method: QueryMethod<T>) -> Self {
@@ -151,13 +161,15 @@ where
             query,
             offset,
             phantom_t: PhantomData,
+            phantom_c: PhantomData,
             method,
         }
     }
 }
-impl<'a, T, I> Iterator for FindIterSorted<'a, T, I>
+impl<'a, C, T, I> Iterator for FindIterSorted<'a, C, T, I>
 where
-    I: IntervalBounds<T>,
+    I: IntervalBounds<C, T>,
+    C: ValueBounds,
     T: ValueBounds,
 {
     type Item = &'a I;

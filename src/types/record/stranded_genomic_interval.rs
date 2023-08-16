@@ -43,7 +43,7 @@ pub struct StrandedGenomicInterval<T> {
     strand: Strand,
 }
 
-impl<T> Coordinates<T> for StrandedGenomicInterval<T>
+impl<T> Coordinates<T, T> for StrandedGenomicInterval<T>
 where
     T: ValueBounds,
 {

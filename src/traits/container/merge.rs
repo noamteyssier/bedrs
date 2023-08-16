@@ -5,12 +5,13 @@ use crate::{
 };
 
 /// A trait to merge overlapping interval regions within a container
-pub trait Merge<T, I>: Container<T, I>
+pub trait Merge<C, T, I>: Container<C, T, I>
 where
+    C: ValueBounds,
     T: ValueBounds,
-    I: IntervalBounds<T>,
+    I: IntervalBounds<C, T>,
 {
-    fn merge_unchecked(&self) -> MergeResults<T, I> {
+    fn merge_unchecked(&self) -> MergeResults<C, T, I> {
         let mut base_interval = I::from(&self.records()[0]);
 
         let mut cluster_intervals = Vec::with_capacity(self.len());
@@ -45,7 +46,7 @@ where
     /// (1)    i--------n
     /// (2)                  o------r
     /// ```
-    fn merge(&self) -> Result<MergeResults<T, I>, SetError> {
+    fn merge(&self) -> Result<MergeResults<C, T, I>, SetError> {
         if self.is_sorted() {
             Ok(self.merge_unchecked())
         } else {

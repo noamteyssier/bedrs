@@ -2,7 +2,7 @@ use crate::{
     traits::{IntervalBounds, ValueBounds},
     Intersect,
 };
-use std::{collections::VecDeque, fmt::Debug};
+use std::{collections::VecDeque, fmt::Debug, marker::PhantomData};
 
 use super::{find::predicate, QueryMethod};
 
@@ -19,10 +19,11 @@ use super::{find::predicate, QueryMethod};
 /// Works by keeping two queues of intervals, one for each iterator. The
 /// intervals are popped from the queue and compared. This will consume
 /// all target intervals that precede or overlap the query interval.
-pub struct IntersectIter<It, I, T>
+pub struct IntersectIter<It, I, C, T>
 where
     It: Iterator<Item = I>,
-    I: IntervalBounds<T>,
+    I: IntervalBounds<C, T>,
+    C: ValueBounds,
     T: ValueBounds,
 {
     iter_left: It,
@@ -30,11 +31,13 @@ where
     queue_left: VecDeque<I>,
     queue_right: VecDeque<I>,
     method: QueryMethod<T>,
+    phantom_c: PhantomData<C>,
 }
-impl<It, I, T> IntersectIter<It, I, T>
+impl<It, I, C, T> IntersectIter<It, I, C, T>
 where
     It: Iterator<Item = I>,
-    I: IntervalBounds<T>,
+    I: IntervalBounds<C, T>,
+    C: ValueBounds,
     T: ValueBounds,
 {
     pub fn new(iter_left: It, iter_right: It) -> Self {
@@ -44,6 +47,7 @@ where
             queue_left: VecDeque::new(),
             queue_right: VecDeque::new(),
             method: QueryMethod::default(),
+            phantom_c: PhantomData,
         }
     }
 
@@ -54,6 +58,7 @@ where
             queue_left: VecDeque::new(),
             queue_right: VecDeque::new(),
             method,
+            phantom_c: PhantomData,
         }
     }
 
@@ -80,10 +85,11 @@ where
     }
 }
 
-impl<It, I, T> Iterator for IntersectIter<It, I, T>
+impl<It, I, C, T> Iterator for IntersectIter<It, I, C, T>
 where
     It: Iterator<Item = I>,
-    I: IntervalBounds<T> + Debug,
+    I: IntervalBounds<C, T> + Debug,
+    C: ValueBounds,
     T: ValueBounds,
 {
     type Item = I;
@@ -132,9 +138,10 @@ mod testing {
         GenomicInterval, Interval,
     };
 
-    fn validate_records<I, T>(obs: &[I], exp: &[I])
+    fn validate_records<I, C, T>(obs: &[I], exp: &[I])
     where
-        I: IntervalBounds<T>,
+        I: IntervalBounds<C, T>,
+        C: ValueBounds,
         T: ValueBounds,
     {
         assert_eq!(obs.len(), exp.len());

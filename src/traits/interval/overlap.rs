@@ -2,9 +2,10 @@ use super::Coordinates;
 use crate::traits::ValueBounds;
 
 /// A trait to measure overlaps between intervals implementing `Coordinates`
-pub trait Overlap<T>: Coordinates<T>
+pub trait Overlap<C, T>: Coordinates<C, T>
 where
     Self: Sized,
+    C: ValueBounds,
     T: ValueBounds,
 {
     /// Returns true if the two intervals are on the same chromosome.
@@ -26,7 +27,7 @@ where
     /// assert!(interval1.bounded_chr(&interval2));
     /// assert!(!interval1.bounded_chr(&interval3));
     /// ```
-    fn bounded_chr<I: Coordinates<T>>(&self, other: &I) -> bool {
+    fn bounded_chr<I: Coordinates<C, T>>(&self, other: &I) -> bool {
         other.chr() == self.chr()
     }
 
@@ -69,7 +70,7 @@ where
     /// assert!(interval1.interval_overlap(&interval3));
     /// assert!(!interval1.interval_overlap(&interval4));
     /// ```
-    fn interval_overlap<I: Coordinates<T>>(&self, other: &I) -> bool {
+    fn interval_overlap<I: Coordinates<C, T>>(&self, other: &I) -> bool {
         self.start() < other.end() && self.end() > other.start()
     }
 
@@ -96,7 +97,7 @@ where
     ///
     /// assert!(interval1.interval_contains(&interval2));
     /// ```
-    fn interval_contains<I: Coordinates<T>>(&self, other: &I) -> bool {
+    fn interval_contains<I: Coordinates<C, T>>(&self, other: &I) -> bool {
         self.start() <= other.start() && self.end() >= other.end()
     }
 
@@ -129,7 +130,7 @@ where
     /// assert!(interval1.interval_borders(&interval2));
     /// assert!(interval1.interval_borders(&interval3));
     /// ```
-    fn interval_borders<I: Coordinates<T>>(&self, other: &I) -> bool {
+    fn interval_borders<I: Coordinates<C, T>>(&self, other: &I) -> bool {
         self.start().eq(&other.end()) || self.end().eq(&other.start())
     }
 
@@ -160,7 +161,7 @@ where
     /// assert!(interval1.overlaps(&interval3));
     /// assert!(!interval1.overlaps(&interval4));
     /// ```
-    fn overlaps<I: Coordinates<T>>(&self, other: &I) -> bool {
+    fn overlaps<I: Coordinates<C, T>>(&self, other: &I) -> bool {
         self.bounded_chr(other) && self.interval_overlap(other)
     }
 
@@ -197,7 +198,7 @@ where
     /// assert!(interval1.overlaps_by(&interval3, 50));
     /// assert!(!interval1.overlaps_by(&interval4, 50));
     /// ```
-    fn overlaps_by<I: Coordinates<T>>(&self, other: &I, bases: T) -> bool {
+    fn overlaps_by<I: Coordinates<C, T>>(&self, other: &I, bases: T) -> bool {
         self.overlap_size(other).map_or(false, |n| n >= bases)
     }
 
@@ -233,7 +234,7 @@ where
     /// assert!(!interval1.overlaps_by_exactly(&interval3, 50));
     /// assert!(!interval1.overlaps_by_exactly(&interval4, 50));
     /// ```
-    fn overlaps_by_exactly<I: Coordinates<T>>(&self, other: &I, bases: T) -> bool {
+    fn overlaps_by_exactly<I: Coordinates<C, T>>(&self, other: &I, bases: T) -> bool {
         self.overlap_size(other).map_or(false, |n| n == bases)
     }
 
@@ -279,7 +280,7 @@ where
     /// assert_eq!(interval1.overlap_size(&interval3), Some(51));
     /// assert_eq!(interval1.overlap_size(&interval4), Some(49));
     /// ```
-    fn overlap_size<I: Coordinates<T>>(&self, other: &I) -> Option<T> {
+    fn overlap_size<I: Coordinates<C, T>>(&self, other: &I) -> Option<T> {
         if self.overlaps(other) {
             if self.contains(other) {
                 Some(other.len())
@@ -315,7 +316,7 @@ where
     /// assert!(interval1.contains(&interval2));
     /// assert!(!interval1.contains(&interval3));
     /// ```
-    fn contains<I: Coordinates<T>>(&self, other: &I) -> bool {
+    fn contains<I: Coordinates<C, T>>(&self, other: &I) -> bool {
         self.bounded_chr(other) && self.interval_contains(other)
     }
 
@@ -339,7 +340,7 @@ where
     /// assert!(interval1.contained_by(&interval2));
     /// assert!(!interval1.contained_by(&interval3));
     /// ```
-    fn contained_by<I: Coordinates<T>>(&self, other: &I) -> bool {
+    fn contained_by<I: Coordinates<C, T>>(&self, other: &I) -> bool {
         other.contains(self)
     }
 
@@ -368,7 +369,7 @@ where
     /// assert!(interval1.borders(&interval2));
     /// assert!(!interval1.borders(&interval3));
     /// ```
-    fn borders<I: Coordinates<T>>(&self, other: &I) -> bool {
+    fn borders<I: Coordinates<C, T>>(&self, other: &I) -> bool {
         self.bounded_chr(other) && self.interval_borders(other)
     }
 }

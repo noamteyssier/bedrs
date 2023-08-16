@@ -5,10 +5,11 @@ use crate::{
 };
 
 /// Performs interval subtraction at the set level.
-pub trait SetSubtract<T, I>: Container<T, I>
+pub trait SetSubtract<C, T, I>: Container<C, T, I>
 where
+    C: ValueBounds,
     T: ValueBounds,
-    I: IntervalBounds<T>,
+    I: IntervalBounds<C, T>,
 {
     /// Subtract a query interval from the set.
     ///
@@ -41,7 +42,7 @@ where
     ///
     /// assert!(subset.next().is_none());
     /// ```
-    fn subtract<'a>(&'a self, query: &'a I) -> Result<SubtractIter<T, I>, SetError> {
+    fn subtract<'a>(&'a self, query: &'a I) -> Result<SubtractIter<C, T, I>, SetError> {
         if self.is_sorted() {
             Ok(self.subtract_unchecked(query))
         } else {
@@ -52,7 +53,7 @@ where
     /// Unchecked version of [subtract](Self::subtract).
     ///
     /// Does not check if the container is sorted
-    fn subtract_unchecked<'a>(&'a self, query: &'a I) -> SubtractIter<T, I> {
+    fn subtract_unchecked<'a>(&'a self, query: &'a I) -> SubtractIter<C, T, I> {
         SubtractIter::new(self.records(), query)
     }
 
@@ -87,7 +88,7 @@ where
     ///
     /// assert!(subset.next().is_none());
     /// ```
-    fn subtract_from<'a>(&'a self, query: &'a I) -> Result<SubtractFromIter<T, I>, SetError> {
+    fn subtract_from<'a>(&'a self, query: &'a I) -> Result<SubtractFromIter<C, T, I>, SetError> {
         if self.is_sorted() {
             Ok(self.subtract_from_unchecked(query))
         } else {
@@ -98,7 +99,7 @@ where
     /// Unchecked version of [subtract_from](Self::subtract_from).
     ///
     /// Does not check if the container is sorted
-    fn subtract_from_unchecked<'a>(&'a self, query: &'a I) -> SubtractFromIter<T, I> {
+    fn subtract_from_unchecked<'a>(&'a self, query: &'a I) -> SubtractFromIter<C, T, I> {
         SubtractFromIter::new(self, query)
     }
 }

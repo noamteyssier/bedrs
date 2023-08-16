@@ -6,9 +6,10 @@ use rand::{seq::SliceRandom, RngCore, SeedableRng};
 use rand_chacha::ChaChaRng;
 
 /// Utility functions for random sampling within a container.
-pub trait Sample<T, I>: Container<T, I>
+pub trait Sample<C, T, I>: Container<C, T, I>
 where
-    I: IntervalBounds<T>,
+    I: IntervalBounds<C, T>,
+    C: ValueBounds,
     T: ValueBounds,
 {
     /// Shuffles the elements of the container in place using the given random number generator.

@@ -25,7 +25,7 @@ pub struct GenomicInterval<T> {
     end: T,
 }
 
-impl<T> Coordinates<T> for GenomicInterval<T>
+impl<T> Coordinates<T, T> for GenomicInterval<T>
 where
     T: ValueBounds,
 {

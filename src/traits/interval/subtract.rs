@@ -4,25 +4,26 @@ use crate::{
 };
 
 /// Trait for performing subtraction with coordinates
-pub trait Subtract<T>: Coordinates<T> + Overlap<T>
+pub trait Subtract<C, T>: Coordinates<C, T> + Overlap<C, T>
 where
+    C: ValueBounds,
     T: ValueBounds,
 {
-    fn build_left_contained<I: Coordinates<T>>(&self, other: &I) -> I {
+    fn build_left_contained<I: Coordinates<C, T>>(&self, other: &I) -> I {
         let left_start = self.start().min(other.start());
         let left_end = self.start().max(other.start());
         let mut left_sub = I::from(other);
         left_sub.update_all(&other.chr(), &left_start, &left_end);
         left_sub
     }
-    fn build_right_contained<I: Coordinates<T>>(&self, other: &I) -> I {
+    fn build_right_contained<I: Coordinates<C, T>>(&self, other: &I) -> I {
         let right_start = self.end().min(other.end());
         let right_end = self.end().max(other.end());
         let mut right_sub = I::from(other);
         right_sub.update_all(&other.chr(), &right_start, &right_end);
         right_sub
     }
-    fn build_contained_iter<I: Coordinates<T> + 'static>(
+    fn build_contained_iter<I: Coordinates<C, T> + 'static>(
         &self,
         other: &I,
     ) -> Box<dyn Iterator<Item = I>> {
@@ -38,17 +39,17 @@ where
             return Box::new(iter);
         }
     }
-    fn build_gt<I: Coordinates<T>>(&self, other: &I) -> I {
+    fn build_gt<I: Coordinates<C, T>>(&self, other: &I) -> I {
         let mut sub = I::from(other);
         sub.update_all(&other.chr(), &other.end(), &self.end());
         sub
     }
-    fn build_lt<I: Coordinates<T>>(&self, other: &I) -> I {
+    fn build_lt<I: Coordinates<C, T>>(&self, other: &I) -> I {
         let mut sub = I::from(other);
         sub.update_all(&other.chr(), &self.start(), &other.start());
         sub
     }
-    fn build_self<I: Coordinates<T>>(&self, other: &I) -> I {
+    fn build_self<I: Coordinates<C, T>>(&self, other: &I) -> I {
         let mut sub = I::from(&other);
         sub.update_all(&other.chr(), &self.start(), &self.end());
         sub
@@ -158,7 +159,7 @@ where
     /// assert_eq!(s[0].start(), 10);
     /// assert_eq!(s[0].end(), 20);
     /// ```
-    fn subtract<I: Coordinates<T>>(&self, other: &I) -> Option<Vec<I>> {
+    fn subtract<I: Coordinates<C, T>>(&self, other: &I) -> Option<Vec<I>> {
         if self.overlaps(other) {
             if self.eq(other) || self.contained_by(other) {
                 None
@@ -184,7 +185,7 @@ where
         }
     }
 
-    fn subtract_iter<I: IntervalBounds<T> + 'static>(
+    fn subtract_iter<I: IntervalBounds<C, T> + 'static>(
         &self,
         other: &I,
     ) -> Box<dyn Iterator<Item = I>> {

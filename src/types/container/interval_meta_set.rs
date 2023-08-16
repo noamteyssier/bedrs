@@ -46,9 +46,9 @@ where
     }
 }
 
-impl<T, M> Container<T, IntervalMeta<T, M>> for IntervalMetaSet<T, M>
+impl<T, M> Container<T, T, IntervalMeta<T, M>> for IntervalMetaSet<T, M>
 where
-    IntervalMeta<T, M>: IntervalBounds<T>,
+    IntervalMeta<T, M>: IntervalBounds<T, T>,
     T: ValueBounds,
     M: Copy,
 {

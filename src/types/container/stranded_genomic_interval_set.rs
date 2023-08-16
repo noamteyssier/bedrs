@@ -42,9 +42,9 @@ where
         }
     }
 }
-impl<T> Container<T, StrandedGenomicInterval<T>> for StrandedGenomicIntervalSet<T>
+impl<T> Container<T, T, StrandedGenomicInterval<T>> for StrandedGenomicIntervalSet<T>
 where
-    StrandedGenomicInterval<T>: IntervalBounds<T>,
+    StrandedGenomicInterval<T>: IntervalBounds<T, T>,
     T: ValueBounds,
 {
     fn new(records: Vec<StrandedGenomicInterval<T>>) -> Self {

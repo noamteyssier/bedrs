@@ -20,15 +20,17 @@ impl<T> ValueBounds for T where
 }
 
 /// Generic bounds for coordinates to be used within [Container]s
-pub trait IntervalBounds<T>
+pub trait IntervalBounds<C, T>
 where
-    Self: Coordinates<T> + Clone + Overlap<T>,
+    Self: Coordinates<C, T> + Clone + Overlap<C, T>,
+    C: ValueBounds,
     T: ValueBounds,
 {
 }
-impl<I, T> IntervalBounds<T> for I
+impl<I, C, T> IntervalBounds<C, T> for I
 where
-    I: Coordinates<T> + Clone + Overlap<T>,
+    I: Coordinates<C, T> + Clone + Overlap<C, T>,
+    C: ValueBounds,
     T: ValueBounds,
 {
 }

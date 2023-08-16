@@ -6,12 +6,13 @@ use crate::{
 };
 
 /// A trait to query set overlaps through a container
-pub trait Find<T, I>: Container<T, I>
+pub trait Find<C, T, I>: Container<C, T, I>
 where
+    C: ValueBounds,
     T: ValueBounds,
-    I: IntervalBounds<T>,
+    I: IntervalBounds<C, T>,
 {
-    type ContainerType: Container<T, I>;
+    type ContainerType: Container<C, T, I>;
 
     /// Finds all intervals that overlap a query and returns
     /// the same `Container` type with all found regions.
@@ -101,7 +102,7 @@ where
     /// Creates an iterator that finds all overlapping regions
     ///
     /// Does not assume a sorted Container
-    fn find_iter<'a>(&'a self, query: &'a I) -> FindIter<'_, T, I> {
+    fn find_iter<'a>(&'a self, query: &'a I) -> FindIter<'_, C, T, I> {
         FindIter::new(self.records(), query, QueryMethod::Compare)
     }
 
@@ -109,7 +110,7 @@ where
     /// by some minimum overlap
     ///
     /// Does not assume a sorted Container
-    fn find_iter_min<'a>(&'a self, query: &'a I, minimum: T) -> FindIter<'_, T, I> {
+    fn find_iter_min<'a>(&'a self, query: &'a I, minimum: T) -> FindIter<'_, C, T, I> {
         FindIter::new(self.records(), query, QueryMethod::CompareBy(minimum))
     }
 
@@ -117,7 +118,7 @@ where
     /// by some exact overlap
     ///
     /// Does not assume a sorted Container
-    fn find_iter_exact<'a>(&'a self, query: &'a I, exact: T) -> FindIter<'_, T, I> {
+    fn find_iter_exact<'a>(&'a self, query: &'a I, exact: T) -> FindIter<'_, C, T, I> {
         FindIter::new(self.records(), query, QueryMethod::CompareExact(exact))
     }
 
@@ -129,7 +130,7 @@ where
         &'a self,
         query: &'a I,
         frac: f64,
-    ) -> Result<FindIter<'_, T, I>, SetError> {
+    ) -> Result<FindIter<'_, C, T, I>, SetError> {
         if frac <= 0.0 || frac > 1.0 {
             return Err(SetError::FractionUnbounded { frac });
         }
@@ -148,7 +149,7 @@ where
         &'a self,
         query: &'a I,
         frac: f64,
-    ) -> Result<FindIter<'_, T, I>, SetError> {
+    ) -> Result<FindIter<'_, C, T, I>, SetError> {
         if frac <= 0.0 || frac > 1.0 {
             return Err(SetError::FractionUnbounded { frac });
         }
@@ -168,7 +169,7 @@ where
         query: &'a I,
         f_query: f64,
         f_target: f64,
-    ) -> Result<FindIter<'_, T, I>, SetError> {
+    ) -> Result<FindIter<'_, C, T, I>, SetError> {
         if f_query <= 0.0 || f_query > 1.0 {
             return Err(SetError::FractionUnbounded { frac: f_query });
         } else if f_target <= 0.0 || f_target > 1.0 {
@@ -190,7 +191,7 @@ where
         query: &'a I,
         f_query: f64,
         f_target: f64,
-    ) -> Result<FindIter<'_, T, I>, SetError> {
+    ) -> Result<FindIter<'_, C, T, I>, SetError> {
         if f_query <= 0.0 || f_query > 1.0 {
             return Err(SetError::FractionUnbounded { frac: f_query });
         } else if f_target <= 0.0 || f_target > 1.0 {
@@ -206,7 +207,10 @@ where
     /// Creates a Result Iterator that finds all overlapping regions
     ///
     /// First checks to see if container is sorted
-    fn find_iter_sorted<'a>(&'a self, query: &'a I) -> Result<FindIterSorted<'_, T, I>, SetError> {
+    fn find_iter_sorted<'a>(
+        &'a self,
+        query: &'a I,
+    ) -> Result<FindIterSorted<'_, C, T, I>, SetError> {
         if self.is_sorted() {
             Ok(self.find_iter_sorted_unchecked(query))
         } else {
@@ -222,7 +226,7 @@ where
         &'a self,
         query: &'a I,
         minimum: T,
-    ) -> Result<FindIterSorted<'_, T, I>, SetError> {
+    ) -> Result<FindIterSorted<'_, C, T, I>, SetError> {
         if self.is_sorted() {
             Ok(self.find_iter_sorted_min_unchecked(query, minimum))
         } else {
@@ -238,7 +242,7 @@ where
         &'a self,
         query: &'a I,
         exact: T,
-    ) -> Result<FindIterSorted<'_, T, I>, SetError> {
+    ) -> Result<FindIterSorted<'_, C, T, I>, SetError> {
         if self.is_sorted() {
             Ok(self.find_iter_sorted_exact_unchecked(query, exact))
         } else {
@@ -254,7 +258,7 @@ where
         &'a self,
         query: &'a I,
         frac: f64,
-    ) -> Result<FindIterSorted<'_, T, I>, SetError> {
+    ) -> Result<FindIterSorted<'_, C, T, I>, SetError> {
         if self.is_sorted() {
             Ok(self.find_iter_sorted_query_frac_unchecked(query, frac)?)
         } else {
@@ -270,7 +274,7 @@ where
         &'a self,
         query: &'a I,
         frac: f64,
-    ) -> Result<FindIterSorted<'_, T, I>, SetError> {
+    ) -> Result<FindIterSorted<'_, C, T, I>, SetError> {
         if self.is_sorted() {
             Ok(self.find_iter_sorted_target_frac_unchecked(query, frac)?)
         } else {
@@ -287,7 +291,7 @@ where
         query: &'a I,
         f_query: f64,
         f_target: f64,
-    ) -> Result<FindIterSorted<'_, T, I>, SetError> {
+    ) -> Result<FindIterSorted<'_, C, T, I>, SetError> {
         if self.is_sorted() {
             Ok(self.find_iter_sorted_reciprocal_frac_unchecked(query, f_query, f_target)?)
         } else {
@@ -304,7 +308,7 @@ where
         query: &'a I,
         f_query: f64,
         f_target: f64,
-    ) -> Result<FindIterSorted<'_, T, I>, SetError> {
+    ) -> Result<FindIterSorted<'_, C, T, I>, SetError> {
         if self.is_sorted() {
             Ok(self.find_iter_sorted_reciprocal_frac_either_unchecked(query, f_query, f_target)?)
         } else {
@@ -315,7 +319,7 @@ where
     /// Creates an Iterator that finds all overlapping regions
     ///
     /// Assumes a sorted Container.
-    fn find_iter_sorted_unchecked<'a>(&'a self, query: &'a I) -> FindIterSorted<'_, T, I> {
+    fn find_iter_sorted_unchecked<'a>(&'a self, query: &'a I) -> FindIterSorted<'_, C, T, I> {
         FindIterSorted::new(
             self.records(),
             query,
@@ -332,7 +336,7 @@ where
         &'a self,
         query: &'a I,
         minimum: T,
-    ) -> FindIterSorted<'_, T, I> {
+    ) -> FindIterSorted<'_, C, T, I> {
         FindIterSorted::new(
             self.records(),
             query,
@@ -349,7 +353,7 @@ where
         &'a self,
         query: &'a I,
         exact: T,
-    ) -> FindIterSorted<'_, T, I> {
+    ) -> FindIterSorted<'_, C, T, I> {
         FindIterSorted::new(
             self.records(),
             query,
@@ -366,7 +370,7 @@ where
         &'a self,
         query: &'a I,
         frac: f64,
-    ) -> Result<FindIterSorted<'_, T, I>, SetError> {
+    ) -> Result<FindIterSorted<'_, C, T, I>, SetError> {
         if frac <= 0.0 || frac > 1.0 {
             return Err(SetError::FractionUnbounded { frac });
         }
@@ -386,7 +390,7 @@ where
         &'a self,
         query: &'a I,
         frac: f64,
-    ) -> Result<FindIterSorted<'_, T, I>, SetError> {
+    ) -> Result<FindIterSorted<'_, C, T, I>, SetError> {
         if frac <= 0.0 || frac > 1.0 {
             return Err(SetError::FractionUnbounded { frac });
         }
@@ -407,7 +411,7 @@ where
         query: &'a I,
         f_query: f64,
         f_target: f64,
-    ) -> Result<FindIterSorted<'_, T, I>, SetError> {
+    ) -> Result<FindIterSorted<'_, C, T, I>, SetError> {
         if f_query <= 0.0 || f_query > 1.0 {
             return Err(SetError::FractionUnbounded { frac: f_query });
         } else if f_target <= 0.0 || f_target > 1.0 {
@@ -430,7 +434,7 @@ where
         query: &'a I,
         f_query: f64,
         f_target: f64,
-    ) -> Result<FindIterSorted<'_, T, I>, SetError> {
+    ) -> Result<FindIterSorted<'_, C, T, I>, SetError> {
         if f_query <= 0.0 || f_query > 1.0 {
             return Err(SetError::FractionUnbounded { frac: f_query });
         } else if f_target <= 0.0 || f_target > 1.0 {
@@ -453,10 +457,11 @@ mod testing {
         GenomicInterval, GenomicIntervalSet, Interval, IntervalSet,
     };
 
-    fn validate_set<C, I, T>(set: &C, expected: &[I])
+    fn validate_set<Co, C, I, T>(set: &Co, expected: &[I])
     where
-        C: Container<T, I>,
-        I: IntervalBounds<T>,
+        Co: Container<C, T, I>,
+        I: IntervalBounds<C, T>,
+        C: ValueBounds,
         T: ValueBounds,
     {
         for idx in 0..expected.len() {
@@ -466,9 +471,10 @@ mod testing {
         }
     }
 
-    fn validate_iter<I, T>(iter: impl Iterator<Item = I>, expected: &[I])
+    fn validate_iter<I, C, T>(iter: impl Iterator<Item = I>, expected: &[I])
     where
-        I: IntervalBounds<T>,
+        I: IntervalBounds<C, T>,
+        C: ValueBounds,
         T: ValueBounds,
     {
         let observed = iter.collect::<Vec<I>>();

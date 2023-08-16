@@ -28,7 +28,7 @@ where
         &self.metadata
     }
 }
-impl<T, M> Coordinates<T> for IntervalMeta<T, M>
+impl<T, M> Coordinates<T, T> for IntervalMeta<T, M>
 where
     T: ValueBounds,
     M: Copy,

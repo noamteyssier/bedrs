@@ -1,8 +1,11 @@
+use std::marker::PhantomData;
+
 use crate::traits::{Container, IntervalBounds, ValueBounds};
 
-pub struct MergeResults<T, I>
+pub struct MergeResults<C, T, I>
 where
-    I: IntervalBounds<T>,
+    I: IntervalBounds<C, T>,
+    C: ValueBounds,
     T: ValueBounds,
 {
     intervals: Vec<I>,
@@ -10,11 +13,13 @@ where
     n_clusters: usize,
     max_len: Option<T>,
     is_sorted: bool,
+    phantom_c: PhantomData<C>,
 }
 
-impl<T, I> Container<T, I> for MergeResults<T, I>
+impl<C, T, I> Container<C, T, I> for MergeResults<C, T, I>
 where
-    I: IntervalBounds<T>,
+    I: IntervalBounds<C, T>,
+    C: ValueBounds,
     T: ValueBounds,
 {
     fn new(records: Vec<I>) -> Self {
@@ -25,6 +30,7 @@ where
             n_clusters: 0,
             max_len,
             is_sorted: true,
+            phantom_c: PhantomData,
         }
     }
     fn records(&self) -> &Vec<I> {
@@ -47,9 +53,10 @@ where
     }
 }
 
-impl<T, I> MergeResults<T, I>
+impl<C, T, I> MergeResults<C, T, I>
 where
-    I: IntervalBounds<T>,
+    I: IntervalBounds<C, T>,
+    C: ValueBounds,
     T: ValueBounds,
 {
     #[must_use]
@@ -71,6 +78,7 @@ where
             n_clusters,
             max_len,
             is_sorted: true,
+            phantom_c: PhantomData,
         }
     }
     #[must_use]

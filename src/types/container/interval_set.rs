@@ -46,9 +46,9 @@ where
     }
 }
 
-impl<T> Container<T, Interval<T>> for IntervalSet<T>
+impl<T> Container<T, T, Interval<T>> for IntervalSet<T>
 where
-    Interval<T>: IntervalBounds<T>,
+    Interval<T>: IntervalBounds<T, T>,
     T: ValueBounds,
 {
     fn new(records: Vec<Interval<T>>) -> Self {

@@ -6,10 +6,11 @@ use crate::{
 use anyhow::{bail, Result};
 
 /// Identifies al non-overlapping intervals within the span of the interval set
-pub trait Internal<T, I>: Container<T, I>
+pub trait Internal<C, T, I>: Container<C, T, I>
 where
+    C: ValueBounds,
     T: ValueBounds,
-    I: IntervalBounds<T>,
+    I: IntervalBounds<C, T>,
 {
     /// Returns all non-overlapping intervals of the interval
     /// set within its span
@@ -23,7 +24,7 @@ where
     /// (i)          j---k
     /// (ii)                  l--m
     /// ```
-    fn internal<'a>(&'a self) -> Result<SubtractFromIter<T, I>> {
+    fn internal<'a>(&'a self) -> Result<SubtractFromIter<C, T, I>> {
         if self.is_sorted() {
             let span = self.span()?;
             Ok(self.internal_unchecked(span))
@@ -36,7 +37,7 @@ where
     //
     // Does not check if the interval set is sorted.
     // Span must still be valid.
-    fn internal_unchecked<'a>(&'a self, span: I) -> SubtractFromIter<T, I> {
+    fn internal_unchecked<'a>(&'a self, span: I) -> SubtractFromIter<C, T, I> {
         SubtractFromIter::new(self, &span)
     }
 }

@@ -33,7 +33,7 @@ where
         Self { start, end }
     }
 }
-impl<T> Coordinates<T> for Interval<T>
+impl<T> Coordinates<T, T> for Interval<T>
 where
     T: ValueBounds,
 {
