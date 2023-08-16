@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 /// use bedrs::{Coordinates, GenomicInterval, Overlap};
 ///
 /// let a = GenomicInterval::new(1, 20, 30);
-/// assert_eq!(a.chr(), 1);
+/// assert_eq!(*a.chr(), 1);
 /// assert_eq!(a.start(), 20);
 /// assert_eq!(a.end(), 30);
 ///
@@ -35,8 +35,8 @@ where
     fn end(&self) -> T {
         self.end
     }
-    fn chr(&self) -> T {
-        self.chr
+    fn chr(&self) -> &T {
+        &self.chr
     }
     fn update_start(&mut self, val: &T) {
         self.start = *val;
@@ -49,7 +49,7 @@ where
     }
     fn from(other: &Self) -> Self {
         Self {
-            chr: other.chr(),
+            chr: *other.chr(),
             start: other.start(),
             end: other.end(),
         }
@@ -76,7 +76,7 @@ mod testing {
     #[test]
     fn test_interval_init() {
         let interval = GenomicInterval::new(1, 10, 100);
-        assert_eq!(interval.chr(), 1);
+        assert_eq!(*interval.chr(), 1);
         assert_eq!(interval.start(), 10);
         assert_eq!(interval.end(), 100);
     }

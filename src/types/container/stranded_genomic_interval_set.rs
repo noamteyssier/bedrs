@@ -96,7 +96,7 @@ where
     /// ivs.set_sorted();
     ///
     /// let span = ivs.span().unwrap();
-    /// assert_eq!(span.chr(), 1);
+    /// assert_eq!(*span.chr(), 1);
     /// assert_eq!(span.start(), 10);
     /// assert_eq!(span.end(), 500);
     /// assert_eq!(span.strand(), Strand::Unknown); // Strand is arbitrary in span
@@ -113,7 +113,7 @@ where
                 bail!("Cannot get span of interval set spanning multiple chromosomes")
             } else {
                 let iv = StrandedGenomicInterval::new(
-                    first.chr(),
+                    *first.chr(),
                     first.start(),
                     last.end(),
                     Strand::Unknown,

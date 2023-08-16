@@ -96,7 +96,7 @@ where
     /// ivs.set_sorted();
     ///
     /// let span = ivs.span().unwrap();
-    /// assert_eq!(span.chr(), 1);
+    /// assert_eq!(*span.chr(), 1);
     /// assert_eq!(span.start(), 10);
     /// assert_eq!(span.end(), 500);
     /// ```
@@ -111,7 +111,7 @@ where
             if first.chr() != last.chr() {
                 bail!("Cannot get span of interval set spanning multiple chromosomes")
             } else {
-                let iv = GenomicInterval::new(first.chr(), first.start(), last.end());
+                let iv = GenomicInterval::new(*first.chr(), first.start(), last.end());
                 Ok(iv)
             }
         }

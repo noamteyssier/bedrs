@@ -11,6 +11,7 @@ where
     start: T,
     end: T,
     metadata: Option<M>,
+    chr: T,
 }
 impl<T, M> IntervalMeta<T, M>
 where
@@ -22,6 +23,7 @@ where
             start,
             end,
             metadata,
+            chr: T::default(),
         }
     }
     pub fn metadata(&self) -> &Option<M> {
@@ -39,8 +41,8 @@ where
     fn end(&self) -> T {
         self.end
     }
-    fn chr(&self) -> T {
-        T::default()
+    fn chr(&self) -> &T {
+        &self.chr
     }
     fn update_start(&mut self, val: &T) {
         self.start = *val;
@@ -55,6 +57,7 @@ where
             start: other.start(),
             end: other.end(),
             metadata: *other.metadata(),
+            chr: T::default(),
         }
     }
 }
@@ -77,7 +80,7 @@ mod testing {
         assert_eq!(interval.start(), start);
         assert_eq!(interval.end(), end);
         assert_eq!(interval.metadata(), &metadata);
-        assert_eq!(interval.chr(), 0);
+        assert_eq!(*interval.chr(), 0);
     }
 
     #[test]

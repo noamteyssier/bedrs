@@ -22,6 +22,7 @@ pub struct Interval<T>
 where
     T: ValueBounds,
 {
+    chr: T,
     start: T,
     end: T,
 }
@@ -30,7 +31,7 @@ where
     T: ValueBounds,
 {
     pub fn new(start: T, end: T) -> Self {
-        Self { start, end }
+        Self { start, end, chr: T::default() }
     }
 }
 impl<T> Coordinates<T, T> for Interval<T>
@@ -43,8 +44,8 @@ where
     fn end(&self) -> T {
         self.end
     }
-    fn chr(&self) -> T {
-        T::default()
+    fn chr(&self) -> &T {
+        &self.chr
     }
     fn update_start(&mut self, val: &T) {
         self.start = *val;
@@ -58,6 +59,7 @@ where
         Self {
             start: other.start(),
             end: other.end(),
+            chr: T::default(),
         }
     }
 }
