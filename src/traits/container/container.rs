@@ -1,5 +1,5 @@
 use crate::{
-    traits::{errors::SetError, IntervalBounds, ValueBounds},
+    traits::{errors::SetError, ChromBounds, IntervalBounds, ValueBounds},
     Bound, Find, Internal, Merge, Sample, SetSubtract,
 };
 use anyhow::Result;
@@ -11,7 +11,7 @@ pub trait Container<C, T, I>
 where
     Self: Sized,
     I: IntervalBounds<C, T>,
-    C: ValueBounds,
+    C: ChromBounds,
     T: ValueBounds,
 {
     /// Creates a new container from intervals (assumed unsorted)
@@ -177,7 +177,7 @@ impl<Co, C, T, I> Internal<C, T, I> for Co
 where
     Co: Container<C, T, I>,
     I: IntervalBounds<C, T>,
-    C: ValueBounds,
+    C: ChromBounds,
     T: ValueBounds,
 {
 }
@@ -186,7 +186,7 @@ impl<Co, C, T, I> Merge<C, T, I> for Co
 where
     Co: Container<C, T, I>,
     I: IntervalBounds<C, T>,
-    C: ValueBounds,
+    C: ChromBounds,
     T: ValueBounds,
 {
 }
@@ -195,7 +195,7 @@ impl<Co, C, T, I> Find<C, T, I> for Co
 where
     Co: Container<C, T, I>,
     I: IntervalBounds<C, T>,
-    C: ValueBounds,
+    C: ChromBounds,
     T: ValueBounds,
 {
     type ContainerType = Co;
@@ -205,7 +205,7 @@ impl<Co, C, T, I> Bound<C, T, I> for Co
 where
     Co: Container<C, T, I>,
     I: IntervalBounds<C, T>,
-    C: ValueBounds,
+    C: ChromBounds,
     T: ValueBounds,
 {
 }
@@ -214,7 +214,7 @@ impl<Co, C, T, I> Sample<C, T, I> for Co
 where
     Co: Container<C, T, I>,
     I: IntervalBounds<C, T>,
-    C: ValueBounds,
+    C: ChromBounds,
     T: ValueBounds,
 {
 }
@@ -223,7 +223,7 @@ impl<Co, C, T, I> SetSubtract<C, T, I> for Co
 where
     Co: Container<C, T, I>,
     I: IntervalBounds<C, T>,
-    C: ValueBounds,
+    C: ChromBounds,
     T: ValueBounds,
 {
 }

@@ -1,10 +1,13 @@
-use crate::{traits::ValueBounds, Intersect, Overlap, Subtract};
+use crate::{
+    traits::{ChromBounds, ValueBounds},
+    Intersect, Overlap, Subtract,
+};
 use std::cmp::Ordering;
 
 /// The main trait representing an interval.
 pub trait Coordinates<C, T>
 where
-    C: ValueBounds,
+    C: ChromBounds,
     T: ValueBounds,
 {
     fn start(&self) -> T;
@@ -94,7 +97,7 @@ where
 impl<I, C, T> Overlap<C, T> for I
 where
     I: Coordinates<C, T>,
-    C: ValueBounds,
+    C: ChromBounds,
     T: ValueBounds,
 {
 }
@@ -102,7 +105,7 @@ where
 impl<I, C, T> Intersect<C, T> for I
 where
     I: Coordinates<C, T>,
-    C: ValueBounds,
+    C: ChromBounds,
     T: ValueBounds,
 {
 }
@@ -110,7 +113,7 @@ where
 impl<I, C, T> Subtract<C, T> for I
 where
     I: Coordinates<C, T>,
-    C: ValueBounds,
+    C: ChromBounds,
     T: ValueBounds,
 {
 }

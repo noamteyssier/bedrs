@@ -1,11 +1,11 @@
 use std::marker::PhantomData;
 
-use crate::traits::{Container, IntervalBounds, ValueBounds};
+use crate::traits::{ChromBounds, Container, IntervalBounds, ValueBounds};
 
 pub struct MergeResults<C, T, I>
 where
     I: IntervalBounds<C, T>,
-    C: ValueBounds,
+    C: ChromBounds,
     T: ValueBounds,
 {
     intervals: Vec<I>,
@@ -19,7 +19,7 @@ where
 impl<C, T, I> Container<C, T, I> for MergeResults<C, T, I>
 where
     I: IntervalBounds<C, T>,
-    C: ValueBounds,
+    C: ChromBounds,
     T: ValueBounds,
 {
     fn new(records: Vec<I>) -> Self {
@@ -56,7 +56,7 @@ where
 impl<C, T, I> MergeResults<C, T, I>
 where
     I: IntervalBounds<C, T>,
-    C: ValueBounds,
+    C: ChromBounds,
     T: ValueBounds,
 {
     #[must_use]

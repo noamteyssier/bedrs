@@ -1,11 +1,11 @@
 use super::Coordinates;
-use crate::traits::ValueBounds;
+use crate::traits::{ChromBounds, ValueBounds};
 
 /// A trait to measure overlaps between intervals implementing `Coordinates`
 pub trait Overlap<C, T>: Coordinates<C, T>
 where
     Self: Sized,
-    C: ValueBounds,
+    C: ChromBounds,
     T: ValueBounds,
 {
     /// Returns true if the two intervals are on the same chromosome.

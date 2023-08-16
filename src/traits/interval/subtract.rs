@@ -1,12 +1,12 @@
 use crate::{
-    traits::{IntervalBounds, ValueBounds},
+    traits::{ChromBounds, IntervalBounds, ValueBounds},
     Coordinates, Overlap,
 };
 
 /// Trait for performing subtraction with coordinates
 pub trait Subtract<C, T>: Coordinates<C, T> + Overlap<C, T>
 where
-    C: ValueBounds,
+    C: ChromBounds,
     T: ValueBounds,
 {
     fn build_left_contained<I: Coordinates<C, T>>(&self, other: &I) -> I {

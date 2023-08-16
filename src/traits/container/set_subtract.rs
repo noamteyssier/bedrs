@@ -1,5 +1,5 @@
 use crate::{
-    traits::{errors::SetError, IntervalBounds, ValueBounds},
+    traits::{errors::SetError, ChromBounds, IntervalBounds, ValueBounds},
     types::{SubtractFromIter, SubtractIter},
     Container,
 };
@@ -7,7 +7,7 @@ use crate::{
 /// Performs interval subtraction at the set level.
 pub trait SetSubtract<C, T, I>: Container<C, T, I>
 where
-    C: ValueBounds,
+    C: ChromBounds,
     T: ValueBounds,
     I: IntervalBounds<C, T>,
 {

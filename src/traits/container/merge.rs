@@ -1,13 +1,13 @@
 use super::Container;
 use crate::{
-    traits::{errors::SetError, IntervalBounds, ValueBounds},
+    traits::{errors::SetError, ChromBounds, IntervalBounds, ValueBounds},
     types::MergeResults,
 };
 
 /// A trait to merge overlapping interval regions within a container
 pub trait Merge<C, T, I>: Container<C, T, I>
 where
-    C: ValueBounds,
+    C: ChromBounds,
     T: ValueBounds,
     I: IntervalBounds<C, T>,
 {

@@ -1,5 +1,5 @@
 use crate::{
-    traits::{IntervalBounds, ValueBounds},
+    traits::{ChromBounds, IntervalBounds, ValueBounds},
     types::MergeResults,
     Container, Merge, Subtract,
 };
@@ -8,7 +8,7 @@ use std::marker::PhantomData;
 pub struct SubtractIter<'a, C, T, I>
 where
     I: IntervalBounds<C, T> + 'a,
-    C: ValueBounds + 'a,
+    C: ChromBounds + 'a,
     T: ValueBounds + 'a,
 {
     inner: &'a Vec<I>,
@@ -21,7 +21,7 @@ where
 impl<'a, C, T, I> SubtractIter<'a, C, T, I>
 where
     I: IntervalBounds<C, T>,
-    C: ValueBounds,
+    C: ChromBounds,
     T: ValueBounds,
 {
     pub fn new(inner: &'a Vec<I>, query: &'a I) -> Self {
@@ -38,7 +38,7 @@ where
 impl<'a, C, T, I> Iterator for SubtractIter<'a, C, T, I>
 where
     I: IntervalBounds<C, T>,
-    C: ValueBounds,
+    C: ChromBounds,
     T: ValueBounds,
 {
     type Item = I;
@@ -80,7 +80,7 @@ where
 pub struct SubtractFromIter<C, T, I>
 where
     I: IntervalBounds<C, T>,
-    C: ValueBounds,
+    C: ChromBounds,
     T: ValueBounds,
 {
     inner: MergeResults<C, T, I>,
@@ -93,7 +93,7 @@ where
 impl<C, T, I> SubtractFromIter<C, T, I>
 where
     I: IntervalBounds<C, T>,
-    C: ValueBounds,
+    C: ChromBounds,
     T: ValueBounds,
 {
     pub fn new<Co: Container<C, T, I>>(container: &Co, query: &I) -> Self {
@@ -111,7 +111,7 @@ where
 impl<C, T, I> Iterator for SubtractFromIter<C, T, I>
 where
     I: IntervalBounds<C, T>,
-    C: ValueBounds,
+    C: ChromBounds,
     T: ValueBounds,
 {
     type Item = I;

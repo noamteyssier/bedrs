@@ -1,6 +1,6 @@
 use super::Container;
 use crate::{
-    traits::{errors::SetError, IntervalBounds, ValueBounds},
+    traits::{errors::SetError, ChromBounds, IntervalBounds, ValueBounds},
     types::{iterator::QueryMethod, FindIter, FindIterSorted},
     Bound,
 };
@@ -8,7 +8,7 @@ use crate::{
 /// A trait to query set overlaps through a container
 pub trait Find<C, T, I>: Container<C, T, I>
 where
-    C: ValueBounds,
+    C: ChromBounds,
     T: ValueBounds,
     I: IntervalBounds<C, T>,
 {
@@ -453,7 +453,7 @@ where
 mod testing {
     use super::Find;
     use crate::{
-        traits::{Container, IntervalBounds, ValueBounds},
+        traits::{ChromBounds, Container, IntervalBounds, ValueBounds},
         GenomicInterval, GenomicIntervalSet, Interval, IntervalSet,
     };
 
@@ -461,7 +461,7 @@ mod testing {
     where
         Co: Container<C, T, I>,
         I: IntervalBounds<C, T>,
-        C: ValueBounds,
+        C: ChromBounds,
         T: ValueBounds,
     {
         for idx in 0..expected.len() {
@@ -474,7 +474,7 @@ mod testing {
     fn validate_iter<I, C, T>(iter: impl Iterator<Item = I>, expected: &[I])
     where
         I: IntervalBounds<C, T>,
-        C: ValueBounds,
+        C: ChromBounds,
         T: ValueBounds,
     {
         let observed = iter.collect::<Vec<I>>();

@@ -1,9 +1,12 @@
-use crate::{traits::ValueBounds, Coordinates, Overlap};
+use crate::{
+    traits::{ChromBounds, ValueBounds},
+    Coordinates, Overlap,
+};
 
 /// Calculates the intersection between two coordinates.
 pub trait Intersect<C, T>: Coordinates<C, T> + Overlap<C, T>
 where
-    C: ValueBounds,
+    C: ChromBounds,
     T: ValueBounds,
 {
     fn build_intersection_interval<I: Coordinates<C, T>>(&self, other: &I) -> I {

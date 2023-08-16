@@ -65,17 +65,6 @@ where
     }
 }
 
-// impl<T> PartialEq for GenomicInterval<T>
-// where
-//     T: ValueBounds,
-// {
-//     fn eq(&self, other: &Self) -> bool {
-//         self.chr == other.chr
-//             && self.start == other.start
-//             && self.end == other.end
-//     }
-// }
-
 #[cfg(test)]
 mod testing {
     use crate::{traits::Coordinates, types::GenomicInterval};

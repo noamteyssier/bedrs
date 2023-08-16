@@ -1,5 +1,5 @@
 use crate::{
-    traits::{Container, IntervalBounds, ValueBounds},
+    traits::{ChromBounds, Container, IntervalBounds, ValueBounds},
     types::StrandedGenomicInterval,
     Coordinates, Strand,
 };
@@ -45,7 +45,7 @@ where
 impl<T> Container<T, T, StrandedGenomicInterval<T>> for StrandedGenomicIntervalSet<T>
 where
     StrandedGenomicInterval<T>: IntervalBounds<T, T>,
-    T: ValueBounds,
+    T: ValueBounds + ChromBounds,
 {
     fn new(records: Vec<StrandedGenomicInterval<T>>) -> Self {
         let max_len = records.iter().map(|iv| iv.len()).max();

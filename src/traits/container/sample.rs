@@ -1,5 +1,5 @@
 use crate::{
-    traits::{IntervalBounds, SetError, ValueBounds},
+    traits::{ChromBounds, IntervalBounds, SetError, ValueBounds},
     Container,
 };
 use rand::{seq::SliceRandom, RngCore, SeedableRng};
@@ -9,7 +9,7 @@ use rand_chacha::ChaChaRng;
 pub trait Sample<C, T, I>: Container<C, T, I>
 where
     I: IntervalBounds<C, T>,
-    C: ValueBounds,
+    C: ChromBounds,
     T: ValueBounds,
 {
     /// Shuffles the elements of the container in place using the given random number generator.

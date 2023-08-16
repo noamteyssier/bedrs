@@ -1,5 +1,5 @@
 use crate::{
-    traits::{IntervalBounds, ValueBounds},
+    traits::{ChromBounds, IntervalBounds, ValueBounds},
     Intersect,
 };
 use std::{collections::VecDeque, fmt::Debug, marker::PhantomData};
@@ -23,7 +23,7 @@ pub struct IntersectIter<It, I, C, T>
 where
     It: Iterator<Item = I>,
     I: IntervalBounds<C, T>,
-    C: ValueBounds,
+    C: ChromBounds,
     T: ValueBounds,
 {
     iter_left: It,
@@ -37,7 +37,7 @@ impl<It, I, C, T> IntersectIter<It, I, C, T>
 where
     It: Iterator<Item = I>,
     I: IntervalBounds<C, T>,
-    C: ValueBounds,
+    C: ChromBounds,
     T: ValueBounds,
 {
     pub fn new(iter_left: It, iter_right: It) -> Self {
@@ -89,7 +89,7 @@ impl<It, I, C, T> Iterator for IntersectIter<It, I, C, T>
 where
     It: Iterator<Item = I>,
     I: IntervalBounds<C, T> + Debug,
-    C: ValueBounds,
+    C: ChromBounds,
     T: ValueBounds,
 {
     type Item = I;
@@ -133,7 +133,7 @@ where
 mod testing {
     use super::IntersectIter;
     use crate::{
-        traits::{IntervalBounds, ValueBounds},
+        traits::{ChromBounds, IntervalBounds, ValueBounds},
         types::iterator::QueryMethod,
         GenomicInterval, Interval,
     };
@@ -141,7 +141,7 @@ mod testing {
     fn validate_records<I, C, T>(obs: &[I], exp: &[I])
     where
         I: IntervalBounds<C, T>,
-        C: ValueBounds,
+        C: ChromBounds,
         T: ValueBounds,
     {
         assert_eq!(obs.len(), exp.len());

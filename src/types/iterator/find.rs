@@ -1,4 +1,4 @@
-use crate::traits::{IntervalBounds, ValueBounds};
+use crate::traits::{ChromBounds, IntervalBounds, ValueBounds};
 use std::marker::PhantomData;
 
 /// An enumeration of the different methods of querying a query
@@ -38,7 +38,7 @@ pub enum QueryMethod<T: ValueBounds> {
 pub fn f_len<I, C, T>(interval: &I, frac: f64) -> T
 where
     I: IntervalBounds<C, T>,
-    C: ValueBounds,
+    C: ChromBounds,
     T: ValueBounds,
 {
     let len_f: f64 = interval.len().to_f64().unwrap();
@@ -51,7 +51,7 @@ where
 pub fn predicate<I, C, T>(target: &I, query: &I, method: &QueryMethod<T>) -> bool
 where
     I: IntervalBounds<C, T>,
-    C: ValueBounds,
+    C: ChromBounds,
     T: ValueBounds,
 {
     match method {
@@ -90,7 +90,7 @@ where
 pub struct FindIter<'a, C, T, I>
 where
     I: IntervalBounds<C, T> + 'a,
-    C: ValueBounds + 'a,
+    C: ChromBounds + 'a,
     T: ValueBounds + 'a,
 {
     inner: &'a Vec<I>,
@@ -103,7 +103,7 @@ where
 impl<'a, C, T, I> FindIter<'a, C, T, I>
 where
     I: IntervalBounds<C, T>,
-    C: ValueBounds,
+    C: ChromBounds,
     T: ValueBounds,
 {
     pub fn new(inner: &'a Vec<I>, query: &'a I, method: QueryMethod<T>) -> Self {
@@ -120,7 +120,7 @@ where
 impl<'a, C, T, I> Iterator for FindIter<'a, C, T, I>
 where
     I: IntervalBounds<C, T>,
-    C: ValueBounds,
+    C: ChromBounds,
     T: ValueBounds,
 {
     type Item = &'a I;
@@ -139,7 +139,7 @@ where
 pub struct FindIterSorted<'a, C, T, I>
 where
     I: IntervalBounds<C, T> + 'a,
-    C: ValueBounds + 'a,
+    C: ChromBounds + 'a,
     T: ValueBounds + 'a,
 {
     inner: &'a Vec<I>,
@@ -152,7 +152,7 @@ where
 impl<'a, C, T, I> FindIterSorted<'a, C, T, I>
 where
     I: IntervalBounds<C, T>,
-    C: ValueBounds,
+    C: ChromBounds,
     T: ValueBounds,
 {
     pub fn new(inner: &'a Vec<I>, query: &'a I, offset: usize, method: QueryMethod<T>) -> Self {
@@ -169,7 +169,7 @@ where
 impl<'a, C, T, I> Iterator for FindIterSorted<'a, C, T, I>
 where
     I: IntervalBounds<C, T>,
-    C: ValueBounds,
+    C: ChromBounds,
     T: ValueBounds,
 {
     type Item = &'a I;

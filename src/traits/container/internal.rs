@@ -1,5 +1,5 @@
 use crate::{
-    traits::{errors::SetError, IntervalBounds, ValueBounds},
+    traits::{errors::SetError, ChromBounds, IntervalBounds, ValueBounds},
     types::SubtractFromIter,
     Container,
 };
@@ -8,7 +8,7 @@ use anyhow::{bail, Result};
 /// Identifies al non-overlapping intervals within the span of the interval set
 pub trait Internal<C, T, I>: Container<C, T, I>
 where
-    C: ValueBounds,
+    C: ChromBounds,
     T: ValueBounds,
     I: IntervalBounds<C, T>,
 {
