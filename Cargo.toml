@@ -1,6 +1,6 @@
 [package]
 name = "bedrs"
-version = "0.0.46"
+version = "0.1.1"
 edition = "2021"
 license = "MIT"
 description = "Genomic interval library in rust"
@@ -25,6 +25,7 @@ serde = ["dep:serde"]
 [dev-dependencies]
 criterion = "0.4.0"
 bincode = "1.3.3" 
+tinystr = "0.7.1"
 
 [[bench]]
 name = "benchmark"
