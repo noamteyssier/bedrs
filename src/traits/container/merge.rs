@@ -1,16 +1,17 @@
 use super::Container;
 use crate::{
-    traits::{errors::SetError, IntervalBounds, ValueBounds},
+    traits::{errors::SetError, ChromBounds, IntervalBounds, ValueBounds},
     types::MergeResults,
 };
 
 /// A trait to merge overlapping interval regions within a container
-pub trait Merge<T, I>: Container<T, I>
+pub trait Merge<C, T, I>: Container<C, T, I>
 where
+    C: ChromBounds,
     T: ValueBounds,
-    I: IntervalBounds<T>,
+    I: IntervalBounds<C, T>,
 {
-    fn merge_unchecked(&self) -> MergeResults<T, I> {
+    fn merge_unchecked(&self) -> MergeResults<C, T, I> {
         let mut base_interval = I::from(&self.records()[0]);
 
         let mut cluster_intervals = Vec::with_capacity(self.len());
@@ -45,7 +46,7 @@ where
     /// (1)    i--------n
     /// (2)                  o------r
     /// ```
-    fn merge(&self) -> Result<MergeResults<T, I>, SetError> {
+    fn merge(&self) -> Result<MergeResults<C, T, I>, SetError> {
         if self.is_sorted() {
             Ok(self.merge_unchecked())
         } else {
@@ -59,7 +60,7 @@ mod testing {
     use super::Merge;
     use crate::{
         traits::{Container, Coordinates},
-        types::{GenomicIntervalSet, IntervalSet},
+        types::{GenomicIntervalSet, IntervalSet, MergeResults},
         Interval,
     };
 
@@ -159,5 +160,17 @@ mod testing {
         *merge_set.sorted_mut() = false;
         assert!(!merge_set.is_sorted());
         assert_eq!(merge_set.max_len(), Some(30));
+        assert_eq!(merge_set.max_len_mut().unwrap(), 30);
+    }
+
+    #[test]
+    #[should_panic]
+    fn merge_container_new() {
+        let records = vec![
+            Interval::new(10, 20),
+            Interval::new(20, 30),
+            Interval::new(30, 40),
+        ];
+        let _merge_set: MergeResults<usize, usize, Interval<usize>> = Container::new(records);
     }
 }

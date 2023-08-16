@@ -8,27 +8,36 @@ pub use container::{Bound, Container, Find, Internal, Merge, Sample, SetSubtract
 pub use errors::SetError;
 pub use interval::{Coordinates, Intersect, Overlap, Subtract};
 
-/// Generic bounds for values to be used for [Coordinates]
+/// Generic bounds for types to be used for [Coordinates] in the context
+/// of Chromosome coordinates
+pub trait ChromBounds
+where
+    Self: Clone + Default + Ord + Debug,
+{
+}
+impl<T> ChromBounds for T where T: Clone + Default + Ord + Debug {}
+
+/// Generic bounds for values to be used for [Coordinates] in the context
+/// of numeric values
 pub trait ValueBounds
 where
-    Self: Copy + Default + Ord + Debug + NumOps + ToPrimitive + FromPrimitive + Zero,
+    Self: Copy + ChromBounds + NumOps + ToPrimitive + FromPrimitive + Zero,
 {
 }
-impl<T> ValueBounds for T where
-    T: Copy + Default + Ord + Debug + NumOps + ToPrimitive + FromPrimitive + Zero
-{
-}
+impl<T> ValueBounds for T where T: Copy + ChromBounds + NumOps + ToPrimitive + FromPrimitive + Zero {}
 
 /// Generic bounds for coordinates to be used within [Container]s
-pub trait IntervalBounds<T>
+pub trait IntervalBounds<C, T>
 where
-    Self: Coordinates<T> + Clone + Overlap<T>,
+    Self: Coordinates<C, T> + Clone + Overlap<C, T>,
+    C: ChromBounds,
     T: ValueBounds,
 {
 }
-impl<I, T> IntervalBounds<T> for I
+impl<I, C, T> IntervalBounds<C, T> for I
 where
-    I: Coordinates<T> + Clone + Overlap<T>,
+    I: Coordinates<C, T> + Clone + Overlap<C, T>,
+    C: ChromBounds,
     T: ValueBounds,
 {
 }

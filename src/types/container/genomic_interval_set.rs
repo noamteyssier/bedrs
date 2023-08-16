@@ -1,5 +1,5 @@
 use crate::{
-    traits::{Container, IntervalBounds, ValueBounds},
+    traits::{ChromBounds, Container, IntervalBounds, ValueBounds},
     types::GenomicInterval,
     Coordinates,
 };
@@ -42,10 +42,10 @@ where
         }
     }
 }
-impl<T> Container<T, GenomicInterval<T>> for GenomicIntervalSet<T>
+impl<T> Container<T, T, GenomicInterval<T>> for GenomicIntervalSet<T>
 where
-    GenomicInterval<T>: IntervalBounds<T>,
-    T: ValueBounds,
+    GenomicInterval<T>: IntervalBounds<T, T>,
+    T: ValueBounds + ChromBounds,
 {
     fn new(records: Vec<GenomicInterval<T>>) -> Self {
         let max_len = records.iter().map(|iv| iv.len()).max();
@@ -96,7 +96,7 @@ where
     /// ivs.set_sorted();
     ///
     /// let span = ivs.span().unwrap();
-    /// assert_eq!(span.chr(), 1);
+    /// assert_eq!(*span.chr(), 1);
     /// assert_eq!(span.start(), 10);
     /// assert_eq!(span.end(), 500);
     /// ```
@@ -111,7 +111,7 @@ where
             if first.chr() != last.chr() {
                 bail!("Cannot get span of interval set spanning multiple chromosomes")
             } else {
-                let iv = GenomicInterval::new(first.chr(), first.start(), last.end());
+                let iv = GenomicInterval::new(*first.chr(), first.start(), last.end());
                 Ok(iv)
             }
         }

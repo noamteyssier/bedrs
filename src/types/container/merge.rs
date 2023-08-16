@@ -1,8 +1,11 @@
-use crate::traits::{Container, IntervalBounds, ValueBounds};
+use std::marker::PhantomData;
 
-pub struct MergeResults<T, I>
+use crate::traits::{ChromBounds, Container, IntervalBounds, ValueBounds};
+
+pub struct MergeResults<C, T, I>
 where
-    I: IntervalBounds<T>,
+    I: IntervalBounds<C, T>,
+    C: ChromBounds,
     T: ValueBounds,
 {
     intervals: Vec<I>,
@@ -10,22 +13,17 @@ where
     n_clusters: usize,
     max_len: Option<T>,
     is_sorted: bool,
+    phantom_c: PhantomData<C>,
 }
 
-impl<T, I> Container<T, I> for MergeResults<T, I>
+impl<C, T, I> Container<C, T, I> for MergeResults<C, T, I>
 where
-    I: IntervalBounds<T>,
+    I: IntervalBounds<C, T>,
+    C: ChromBounds,
     T: ValueBounds,
 {
-    fn new(records: Vec<I>) -> Self {
-        let max_len = records.iter().map(|iv| iv.len()).max();
-        Self {
-            intervals: records,
-            clusters: Vec::new(),
-            n_clusters: 0,
-            max_len,
-            is_sorted: true,
-        }
+    fn new(_records: Vec<I>) -> Self {
+        unimplemented!("MergeResults overwrites the new() method")
     }
     fn records(&self) -> &Vec<I> {
         &self.intervals
@@ -47,9 +45,10 @@ where
     }
 }
 
-impl<T, I> MergeResults<T, I>
+impl<C, T, I> MergeResults<C, T, I>
 where
-    I: IntervalBounds<T>,
+    I: IntervalBounds<C, T>,
+    C: ChromBounds,
     T: ValueBounds,
 {
     #[must_use]
@@ -71,6 +70,7 @@ where
             n_clusters,
             max_len,
             is_sorted: true,
+            phantom_c: PhantomData,
         }
     }
     #[must_use]

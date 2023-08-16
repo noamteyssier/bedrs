@@ -1,4 +1,4 @@
-use crate::traits::{IntervalBounds, ValueBounds};
+use crate::traits::{ChromBounds, IntervalBounds, ValueBounds};
 use std::{collections::VecDeque, marker::PhantomData};
 
 /// An iterator that merges overlapping intervals
@@ -26,27 +26,31 @@ use std::{collections::VecDeque, marker::PhantomData};
 /// let merged: Vec<_> = iter.collect();
 /// assert_eq!(merged.len(), 3);
 /// ```
-pub struct MergeIter<It, I, T>
+pub struct MergeIter<It, I, C, T>
 where
     It: Iterator<Item = I>,
-    I: IntervalBounds<T>,
+    I: IntervalBounds<C, T>,
+    C: ChromBounds,
     T: ValueBounds,
 {
     iter: It,
     queue: VecDeque<I>,
-    phantom: PhantomData<T>,
+    phantom_t: PhantomData<T>,
+    phantom_c: PhantomData<C>,
 }
-impl<It, I, T> MergeIter<It, I, T>
+impl<It, I, C, T> MergeIter<It, I, C, T>
 where
     It: Iterator<Item = I>,
-    I: IntervalBounds<T>,
+    I: IntervalBounds<C, T>,
+    C: ChromBounds,
     T: ValueBounds,
 {
     pub fn new(iter: It) -> Self {
         Self {
             iter,
             queue: VecDeque::new(),
-            phantom: PhantomData,
+            phantom_t: PhantomData,
+            phantom_c: PhantomData,
         }
     }
     fn next_interval(&mut self) -> Option<I> {
@@ -60,10 +64,11 @@ where
         }
     }
 }
-impl<It, I, T> Iterator for MergeIter<It, I, T>
+impl<It, I, C, T> Iterator for MergeIter<It, I, C, T>
 where
     It: Iterator<Item = I>,
-    I: IntervalBounds<T>,
+    I: IntervalBounds<C, T>,
+    C: ChromBounds,
     T: ValueBounds,
 {
     type Item = I;

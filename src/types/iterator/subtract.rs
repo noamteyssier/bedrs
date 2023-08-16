@@ -1,13 +1,14 @@
 use crate::{
-    traits::{IntervalBounds, ValueBounds},
+    traits::{ChromBounds, IntervalBounds, ValueBounds},
     types::MergeResults,
     Container, Merge, Subtract,
 };
 use std::marker::PhantomData;
 
-pub struct SubtractIter<'a, T, I>
+pub struct SubtractIter<'a, C, T, I>
 where
-    I: IntervalBounds<T> + 'a,
+    I: IntervalBounds<C, T> + 'a,
+    C: ChromBounds + 'a,
     T: ValueBounds + 'a,
 {
     inner: &'a Vec<I>,
@@ -15,10 +16,12 @@ where
     remainder: Option<I>,
     offset: usize,
     phantom_t: PhantomData<T>,
+    phantom_c: PhantomData<C>,
 }
-impl<'a, T, I> SubtractIter<'a, T, I>
+impl<'a, C, T, I> SubtractIter<'a, C, T, I>
 where
-    I: IntervalBounds<T>,
+    I: IntervalBounds<C, T>,
+    C: ChromBounds,
     T: ValueBounds,
 {
     pub fn new(inner: &'a Vec<I>, query: &'a I) -> Self {
@@ -28,12 +31,14 @@ where
             remainder: None,
             offset: 0,
             phantom_t: PhantomData,
+            phantom_c: PhantomData,
         }
     }
 }
-impl<'a, T, I> Iterator for SubtractIter<'a, T, I>
+impl<'a, C, T, I> Iterator for SubtractIter<'a, C, T, I>
 where
-    I: IntervalBounds<T>,
+    I: IntervalBounds<C, T>,
+    C: ChromBounds,
     T: ValueBounds,
 {
     type Item = I;
@@ -72,23 +77,26 @@ where
     }
 }
 
-pub struct SubtractFromIter<T, I>
+pub struct SubtractFromIter<C, T, I>
 where
-    I: IntervalBounds<T>,
+    I: IntervalBounds<C, T>,
+    C: ChromBounds,
     T: ValueBounds,
 {
-    inner: MergeResults<T, I>,
+    inner: MergeResults<C, T, I>,
     remainder: I,
     send_remainder: bool,
     offset: usize,
     phantom_t: PhantomData<T>,
+    phantom_c: PhantomData<C>,
 }
-impl<T, I> SubtractFromIter<T, I>
+impl<C, T, I> SubtractFromIter<C, T, I>
 where
-    I: IntervalBounds<T>,
+    I: IntervalBounds<C, T>,
+    C: ChromBounds,
     T: ValueBounds,
 {
-    pub fn new<C: Container<T, I>>(container: &C, query: &I) -> Self {
+    pub fn new<Co: Container<C, T, I>>(container: &Co, query: &I) -> Self {
         let merged_container = container.merge_unchecked();
         Self {
             inner: merged_container,
@@ -96,12 +104,14 @@ where
             offset: 0,
             send_remainder: true,
             phantom_t: PhantomData,
+            phantom_c: PhantomData,
         }
     }
 }
-impl<T, I> Iterator for SubtractFromIter<T, I>
+impl<C, T, I> Iterator for SubtractFromIter<C, T, I>
 where
-    I: IntervalBounds<T>,
+    I: IntervalBounds<C, T>,
+    C: ChromBounds,
     T: ValueBounds,
 {
     type Item = I;

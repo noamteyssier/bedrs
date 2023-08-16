@@ -7,7 +7,10 @@ use find::{
     find_iter_sort_genomic,
 };
 use merge::{merge_base, merge_genomic, merge_unchecked_base, merge_unchecked_genomic};
-use overlap::{overlap_base, overlap_cross, overlap_genomic, overlap_meta};
+use overlap::{
+    overlap_base, overlap_cross, overlap_genomic, overlap_meta, overlap_named,
+    overlap_named_tinystr,
+};
 
 criterion_group!(
     find,
@@ -30,6 +33,8 @@ criterion_group!(
     overlap_base,
     overlap_meta,
     overlap_cross,
-    overlap_genomic
+    overlap_genomic,
+    overlap_named,
+    overlap_named_tinystr,
 );
 criterion_main!(find, merge, overlap);

@@ -1,5 +1,5 @@
 use crate::traits::Container;
-use crate::traits::{IntervalBounds, ValueBounds};
+use crate::traits::{ChromBounds, IntervalBounds, ValueBounds};
 use crate::types::Interval;
 use crate::Coordinates;
 use anyhow::{bail, Result};
@@ -46,10 +46,10 @@ where
     }
 }
 
-impl<T> Container<T, Interval<T>> for IntervalSet<T>
+impl<T> Container<T, T, Interval<T>> for IntervalSet<T>
 where
-    Interval<T>: IntervalBounds<T>,
-    T: ValueBounds,
+    Interval<T>: IntervalBounds<T, T>,
+    T: ValueBounds + ChromBounds,
 {
     fn new(records: Vec<Interval<T>>) -> Self {
         let max_len = records.iter().map(|iv| iv.len()).max();

@@ -1,22 +1,26 @@
-use crate::{traits::ValueBounds, Intersect, Overlap, Subtract};
+use crate::{
+    traits::{ChromBounds, ValueBounds},
+    Intersect, Overlap, Subtract,
+};
 use std::cmp::Ordering;
 
 /// The main trait representing an interval.
-pub trait Coordinates<T>
+pub trait Coordinates<C, T>
 where
+    C: ChromBounds,
     T: ValueBounds,
 {
     fn start(&self) -> T;
     fn end(&self) -> T;
-    fn chr(&self) -> T;
+    fn chr(&self) -> &C;
     fn update_start(&mut self, val: &T);
     fn update_end(&mut self, val: &T);
-    fn update_chr(&mut self, val: &T);
+    fn update_chr(&mut self, val: &C);
     fn from(other: &Self) -> Self;
     fn len(&self) -> T {
         self.end().sub(self.start())
     }
-    fn update_all(&mut self, chr: &T, start: &T, end: &T) {
+    fn update_all(&mut self, chr: &C, start: &T, end: &T) {
         self.update_chr(chr);
         self.update_endpoints(start, end);
     }
@@ -24,11 +28,11 @@ where
         self.update_start(start);
         self.update_end(end);
     }
-    fn update_all_from<I: Coordinates<T>>(&mut self, other: &I) {
+    fn update_all_from<I: Coordinates<C, T>>(&mut self, other: &I) {
         self.update_chr(&other.chr());
         self.update_endpoints(&other.start(), &other.end());
     }
-    fn update_endpoints_from<I: Coordinates<T>>(&mut self, other: &I) {
+    fn update_endpoints_from<I: Coordinates<C, T>>(&mut self, other: &I) {
         self.update_start(&other.start());
         self.update_end(&other.end());
     }
@@ -42,7 +46,7 @@ where
         self.extend_left(val);
         self.extend_right(val);
     }
-    fn coord_cmp<I: Coordinates<T>>(&self, other: &I) -> Ordering {
+    fn coord_cmp<I: Coordinates<C, T>>(&self, other: &I) -> Ordering {
         match self.chr().cmp(&other.chr()) {
             Ordering::Equal => match self.start().cmp(&other.start()) {
                 Ordering::Equal => self.end().cmp(&other.end()),
@@ -56,7 +60,7 @@ where
     ///
     /// Used to find the lower bound of an interval in a sorted container
     /// where the maximum range of the intervals is known a priori.
-    fn biased_coord_cmp<I: Coordinates<T>>(&self, other: &I, bias: T) -> Ordering {
+    fn biased_coord_cmp<I: Coordinates<C, T>>(&self, other: &I, bias: T) -> Ordering {
         match self.chr().cmp(&other.chr()) {
             Ordering::Equal => {
                 let comp = if other.start() < bias {
@@ -76,37 +80,40 @@ where
             order => order,
         }
     }
-    fn biased_lt<I: Coordinates<T>>(&self, other: &I, bias: T) -> bool {
+    fn biased_lt<I: Coordinates<C, T>>(&self, other: &I, bias: T) -> bool {
         self.biased_coord_cmp(other, bias) == Ordering::Less
     }
-    fn lt<I: Coordinates<T>>(&self, other: &I) -> bool {
+    fn lt<I: Coordinates<C, T>>(&self, other: &I) -> bool {
         self.coord_cmp(other) == Ordering::Less
     }
-    fn gt<I: Coordinates<T>>(&self, other: &I) -> bool {
+    fn gt<I: Coordinates<C, T>>(&self, other: &I) -> bool {
         self.coord_cmp(other) == Ordering::Greater
     }
-    fn eq<I: Coordinates<T>>(&self, other: &I) -> bool {
+    fn eq<I: Coordinates<C, T>>(&self, other: &I) -> bool {
         self.coord_cmp(other) == Ordering::Equal
     }
 }
 
-impl<I, T> Overlap<T> for I
+impl<I, C, T> Overlap<C, T> for I
 where
-    I: Coordinates<T>,
+    I: Coordinates<C, T>,
+    C: ChromBounds,
     T: ValueBounds,
 {
 }
 
-impl<I, T> Intersect<T> for I
+impl<I, C, T> Intersect<C, T> for I
 where
-    I: Coordinates<T>,
+    I: Coordinates<C, T>,
+    C: ChromBounds,
     T: ValueBounds,
 {
 }
 
-impl<I, T> Subtract<T> for I
+impl<I, C, T> Subtract<C, T> for I
 where
-    I: Coordinates<T>,
+    I: Coordinates<C, T>,
+    C: ChromBounds,
     T: ValueBounds,
 {
 }
@@ -120,15 +127,15 @@ mod testing {
         left: usize,
         right: usize,
     }
-    impl Coordinates<usize> for CustomInterval {
+    impl Coordinates<usize, usize> for CustomInterval {
         fn start(&self) -> usize {
             self.left
         }
         fn end(&self) -> usize {
             self.right
         }
-        fn chr(&self) -> usize {
-            0
+        fn chr(&self) -> &usize {
+            &0
         }
         fn update_start(&mut self, val: &usize) {
             self.left = *val;
@@ -157,15 +164,15 @@ mod testing {
             &self.meta
         }
     }
-    impl Coordinates<usize> for CustomIntervalMeta {
+    impl Coordinates<usize, usize> for CustomIntervalMeta {
         fn start(&self) -> usize {
             self.left
         }
         fn end(&self) -> usize {
             self.right
         }
-        fn chr(&self) -> usize {
-            0
+        fn chr(&self) -> &usize {
+            &0
         }
         fn update_start(&mut self, val: &usize) {
             self.left = *val;
@@ -191,7 +198,7 @@ mod testing {
         let a = CustomInterval { left, right };
         assert_eq!(a.start(), 10);
         assert_eq!(a.end(), 100);
-        assert_eq!(a.chr(), 0);
+        assert_eq!(*a.chr(), 0);
     }
 
     #[test]
@@ -227,7 +234,7 @@ mod testing {
         let a = CustomIntervalMeta { left, right, meta };
         assert_eq!(a.start(), 10);
         assert_eq!(a.end(), 100);
-        assert_eq!(a.chr(), 0);
+        assert_eq!(*a.chr(), 0);
     }
 
     #[test]

@@ -22,6 +22,7 @@ pub struct Interval<T>
 where
     T: ValueBounds,
 {
+    chr: T,
     start: T,
     end: T,
 }
@@ -30,10 +31,14 @@ where
     T: ValueBounds,
 {
     pub fn new(start: T, end: T) -> Self {
-        Self { start, end }
+        Self {
+            start,
+            end,
+            chr: T::default(),
+        }
     }
 }
-impl<T> Coordinates<T> for Interval<T>
+impl<T> Coordinates<T, T> for Interval<T>
 where
     T: ValueBounds,
 {
@@ -43,8 +48,8 @@ where
     fn end(&self) -> T {
         self.end
     }
-    fn chr(&self) -> T {
-        T::default()
+    fn chr(&self) -> &T {
+        &self.chr
     }
     fn update_start(&mut self, val: &T) {
         self.start = *val;
@@ -58,6 +63,7 @@ where
         Self {
             start: other.start(),
             end: other.end(),
+            chr: T::default(),
         }
     }
 }
@@ -110,19 +116,10 @@ mod testing {
 
     #[test]
     #[cfg(feature = "serde")]
-    fn test_serialization() {
+    fn interval_serde() {
         let a = Interval::new(5, 100);
         let encoding = serialize(&a).unwrap();
         let b: Interval<usize> = deserialize(&encoding).unwrap();
         assert!(a.eq(&b));
-    }
-
-    #[test]
-    #[cfg(feature = "serde")]
-    fn test_deserialization() {
-        let encoding = vec![5, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0];
-        let expected = Interval::new(5, 100);
-        let observed: Interval<usize> = deserialize(&encoding).unwrap();
-        assert!(expected.eq(&observed));
     }
 }

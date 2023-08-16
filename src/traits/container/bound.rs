@@ -1,12 +1,13 @@
 use crate::{
-    traits::{errors::SetError, IntervalBounds, ValueBounds},
+    traits::{errors::SetError, ChromBounds, IntervalBounds, ValueBounds},
     Container,
 };
 
 /// Identifies the lower bound on a [Container] via a binary tree search
-pub trait Bound<T, I>: Container<T, I>
+pub trait Bound<C, T, I>: Container<C, T, I>
 where
-    I: IntervalBounds<T>,
+    I: IntervalBounds<C, T>,
+    C: ChromBounds,
     T: ValueBounds,
 {
     /// Identifies the lower bound on the [Container] via a binary tree search

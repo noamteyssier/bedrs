@@ -1,5 +1,5 @@
 use crate::{
-    traits::{errors::SetError, IntervalBounds, ValueBounds},
+    traits::{errors::SetError, ChromBounds, IntervalBounds, ValueBounds},
     Bound, Find, Internal, Merge, Sample, SetSubtract,
 };
 use anyhow::Result;
@@ -7,10 +7,11 @@ use anyhow::Result;
 /// The main trait representing a container of intervals.
 ///
 /// Each of the intervals: `I` must impl the `Coordinates` trait.
-pub trait Container<T, I>
+pub trait Container<C, T, I>
 where
     Self: Sized,
-    I: IntervalBounds<T>,
+    I: IntervalBounds<C, T>,
+    C: ChromBounds,
     T: ValueBounds,
 {
     /// Creates a new container from intervals (assumed unsorted)
@@ -172,51 +173,57 @@ where
     }
 }
 
-impl<C, T, I> Internal<T, I> for C
+impl<Co, C, T, I> Internal<C, T, I> for Co
 where
-    C: Container<T, I>,
-    I: IntervalBounds<T>,
+    Co: Container<C, T, I>,
+    I: IntervalBounds<C, T>,
+    C: ChromBounds,
     T: ValueBounds,
 {
 }
 
-impl<C, T, I> Merge<T, I> for C
+impl<Co, C, T, I> Merge<C, T, I> for Co
 where
-    C: Container<T, I>,
-    I: IntervalBounds<T>,
+    Co: Container<C, T, I>,
+    I: IntervalBounds<C, T>,
+    C: ChromBounds,
     T: ValueBounds,
 {
 }
 
-impl<C, T, I> Find<T, I> for C
+impl<Co, C, T, I> Find<C, T, I> for Co
 where
-    C: Container<T, I>,
-    I: IntervalBounds<T>,
+    Co: Container<C, T, I>,
+    I: IntervalBounds<C, T>,
+    C: ChromBounds,
     T: ValueBounds,
 {
-    type ContainerType = C;
+    type ContainerType = Co;
 }
 
-impl<C, T, I> Bound<T, I> for C
+impl<Co, C, T, I> Bound<C, T, I> for Co
 where
-    C: Container<T, I>,
-    I: IntervalBounds<T>,
-    T: ValueBounds,
-{
-}
-
-impl<C, T, I> Sample<T, I> for C
-where
-    C: Container<T, I>,
-    I: IntervalBounds<T>,
+    Co: Container<C, T, I>,
+    I: IntervalBounds<C, T>,
+    C: ChromBounds,
     T: ValueBounds,
 {
 }
 
-impl<C, T, I> SetSubtract<T, I> for C
+impl<Co, C, T, I> Sample<C, T, I> for Co
 where
-    C: Container<T, I>,
-    I: IntervalBounds<T>,
+    Co: Container<C, T, I>,
+    I: IntervalBounds<C, T>,
+    C: ChromBounds,
+    T: ValueBounds,
+{
+}
+
+impl<Co, C, T, I> SetSubtract<C, T, I> for Co
+where
+    Co: Container<C, T, I>,
+    I: IntervalBounds<C, T>,
+    C: ChromBounds,
     T: ValueBounds,
 {
 }
@@ -231,7 +238,7 @@ mod testing {
         max_len: Option<usize>,
         is_sorted: bool,
     }
-    impl Container<usize, Interval<usize>> for CustomContainer {
+    impl Container<usize, usize, Interval<usize>> for CustomContainer {
         fn new(records: Vec<Interval<usize>>) -> Self {
             let max_len = records.iter().map(|iv| iv.len()).max();
             Self {

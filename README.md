@@ -39,16 +39,21 @@ library.
 
 The library centers around the `Coordinates` trait.
 
+The `ChromBounds` and `ValueBounds` are the minimal trait requirements
+for all the types that can be used as the chromosome and interval values.
+
 ```rust
-pub trait Coordinates<T>
+pub trait Coordinates<C, T>
 where
-    T: Copy + Default,
+    C: ChromBounds,
+    T: ValueBounds,
 {
     fn start(&self) -> T;
     fn end(&self) -> T;
-    fn chr(&self) -> T;
+    fn chr(&self) -> &C;
     fn update_start(&mut self, val: &T);
     fn update_end(&mut self, val: &T);
+    fn update_chr(&mut self, val: &C);
     fn from(other: &Self) -> Self;
 }
 ```
@@ -70,8 +75,8 @@ impl Coordinates<usize> for CustomInterval {
     fn end(&self) -> usize {
         self.right
     }
-    fn chr(&self) -> usize {
-        0
+    fn chr(&self) -> &usize {
+        &0
     }
     fn update_start(&mut self, val: &usize) {
         self.left = *val;
