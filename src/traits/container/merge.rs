@@ -60,7 +60,7 @@ mod testing {
     use super::Merge;
     use crate::{
         traits::{Container, Coordinates},
-        types::{GenomicIntervalSet, IntervalSet},
+        types::{GenomicIntervalSet, IntervalSet, MergeResults},
         Interval,
     };
 
@@ -160,5 +160,17 @@ mod testing {
         *merge_set.sorted_mut() = false;
         assert!(!merge_set.is_sorted());
         assert_eq!(merge_set.max_len(), Some(30));
+        assert_eq!(merge_set.max_len_mut().unwrap(), 30);
+    }
+
+    #[test]
+    #[should_panic]
+    fn merge_container_new() {
+        let records = vec![
+            Interval::new(10, 20),
+            Interval::new(20, 30),
+            Interval::new(30, 40),
+        ];
+        let _merge_set: MergeResults<usize, usize, Interval<usize>> = Container::new(records);
     }
 }
