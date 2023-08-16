@@ -30,8 +30,10 @@ where
     iter_right: It,
     queue_left: VecDeque<I>,
     queue_right: VecDeque<I>,
+    queue_right_matched: VecDeque<I>,
     method: QueryMethod<T>,
     phantom_c: PhantomData<C>,
+    is_new: bool,
 }
 impl<It, I, C, T> IntersectIter<It, I, C, T>
 where
@@ -46,8 +48,10 @@ where
             iter_right,
             queue_left: VecDeque::new(),
             queue_right: VecDeque::new(),
+            queue_right_matched: VecDeque::new(),
             method: QueryMethod::default(),
             phantom_c: PhantomData,
+            is_new: true,
         }
     }
 
@@ -57,15 +61,19 @@ where
             iter_right,
             queue_left: VecDeque::new(),
             queue_right: VecDeque::new(),
+            queue_right_matched: VecDeque::new(),
             method,
             phantom_c: PhantomData,
+            is_new: true,
         }
     }
 
     fn next_interval_left(&mut self) -> Option<I> {
         if let Some(next) = self.queue_left.pop_front() {
+            self.is_new = false;
             Some(next)
         } else {
+            self.is_new = true;
             self.iter_left.next().map(|interval| {
                 self.queue_left.push_back(interval);
                 self.queue_left.pop_front().unwrap()
@@ -83,6 +91,22 @@ where
             })
         }
     }
+
+    fn next_matched_interval(&mut self) -> Option<I> {
+        self.queue_right_matched.pop_front()
+    }
+
+    fn next_target(&mut self) -> Option<I> {
+        if self.is_new {
+            if let Some(next) = self.next_matched_interval() {
+                Some(next)
+            } else {
+                self.next_interval_right()
+            }
+        } else {
+            self.next_interval_right()
+        }
+    }
 }
 
 impl<It, I, C, T> Iterator for IntersectIter<It, I, C, T>
@@ -95,7 +119,17 @@ where
     type Item = I;
     fn next(&mut self) -> Option<Self::Item> {
         let query = self.next_interval_left()?;
-        let mut target = self.next_interval_right()?;
+        let mut target = if let Some(t) = self.next_target() {
+            t
+        } else {
+            // if there are no more targets and we have a new query we're done
+            if self.is_new {
+                return None;
+            // otherwise we advance the query and try again
+            } else {
+                return self.next();
+            }
+        };
 
         loop {
             if predicate(&target, &query, &self.method) {
@@ -104,6 +138,9 @@ where
 
                 // push the query back onto the queue
                 self.queue_left.push_front(query);
+
+                // push the matched target onto the queue
+                self.queue_right_matched.push_front(target);
 
                 // return the intersection
                 return ix;
@@ -116,7 +153,7 @@ where
                 // keep popping from the right until we find an interval
                 // that overlaps, is greater than the query, or we run out
                 } else {
-                    target = self.next_interval_right()?;
+                    target = self.next_target()?;
                     continue;
                 }
             }
@@ -184,6 +221,112 @@ mod testing {
         let intervals_a = vec![Interval::new(100, 300), Interval::new(400, 475)];
         let intervals_b = vec![Interval::new(80, 120), Interval::new(460, 480)];
         let expected = vec![Interval::new(100, 120), Interval::new(460, 475)];
+        let iter_a = intervals_a.into_iter();
+        let iter_b = intervals_b.into_iter();
+        let ix_iter = IntersectIter::new(iter_a, iter_b);
+        let intersections: Vec<_> = ix_iter.collect();
+        validate_records(&intersections, &expected);
+    }
+
+    #[test]
+    ///  x---------y   x------------y
+    ///        i------------j
+    /// ===============================
+    ///        i---y   x----j
+    fn intersections_c() {
+        let intervals_a = vec![Interval::new(10, 30), Interval::new(40, 60)];
+        let intervals_b = vec![Interval::new(20, 50)];
+        let expected = vec![Interval::new(20, 30), Interval::new(40, 50)];
+        let iter_a = intervals_a.into_iter();
+        let iter_b = intervals_b.into_iter();
+        let ix_iter = IntersectIter::new(iter_a, iter_b);
+        let intersections: Vec<_> = ix_iter.collect();
+        validate_records(&intersections, &expected);
+    }
+
+    #[test]
+    ///        i------------j
+    ///  x---------y   x------------y
+    /// ===============================
+    ///        i---y   x----j
+    fn intersections_d() {
+        let intervals_a = vec![Interval::new(20, 50)];
+        let intervals_b = vec![Interval::new(10, 30), Interval::new(40, 60)];
+        let expected = vec![Interval::new(20, 30), Interval::new(40, 50)];
+        let iter_a = intervals_a.into_iter();
+        let iter_b = intervals_b.into_iter();
+        let ix_iter = IntersectIter::new(iter_a, iter_b);
+        let intersections: Vec<_> = ix_iter.collect();
+        validate_records(&intersections, &expected);
+    }
+
+    #[test]
+    ///  x---------y   x-------------y   x----------y
+    ///        i------------j    i------------j
+    /// ==============================================
+    ///        i---y   x----j    i---y   x-----j
+    fn intersections_e() {
+        let intervals_a = vec![
+            Interval::new(10, 30),
+            Interval::new(40, 60),
+            Interval::new(70, 90),
+        ];
+        let intervals_b = vec![Interval::new(20, 50), Interval::new(50, 80)];
+        let expected = vec![
+            Interval::new(20, 30),
+            Interval::new(40, 50),
+            Interval::new(50, 60),
+            Interval::new(70, 80),
+        ];
+        let iter_a = intervals_a.into_iter();
+        let iter_b = intervals_b.into_iter();
+        let ix_iter = IntersectIter::new(iter_a, iter_b);
+        let intersections: Vec<_> = ix_iter.collect();
+        validate_records(&intersections, &expected);
+    }
+
+    #[test]
+    ///        i------------j    i------------j
+    ///  x---------y   x-------------y   x----------y
+    /// ==============================================
+    ///        i---y   x----j    i---y   x-----j
+    fn intersections_f() {
+        let intervals_a = vec![Interval::new(20, 50), Interval::new(50, 80)];
+        let intervals_b = vec![
+            Interval::new(10, 30),
+            Interval::new(40, 60),
+            Interval::new(70, 90),
+        ];
+        let expected = vec![
+            Interval::new(20, 30),
+            Interval::new(40, 50),
+            Interval::new(50, 60),
+            Interval::new(70, 80),
+        ];
+        let iter_a = intervals_a.into_iter();
+        let iter_b = intervals_b.into_iter();
+        let ix_iter = IntersectIter::new(iter_a, iter_b);
+        let intersections: Vec<_> = ix_iter.collect();
+        validate_records(&intersections, &expected);
+    }
+
+    #[test]
+    ///  x---------y   x-------------y   x----------y
+    ///        i------------j               i----j
+    /// ==============================================
+    ///        i---y   x----j               i----j
+    fn intersections_g() {
+        let intervals_a = vec![
+            Interval::new(10, 30),
+            Interval::new(40, 60),
+            Interval::new(70, 90),
+        ];
+        let intervals_b = vec![Interval::new(20, 50), Interval::new(75, 85)];
+        let expected = vec![
+            Interval::new(20, 30),
+            Interval::new(40, 50),
+            Interval::new(75, 85),
+        ];
         let iter_a = intervals_a.into_iter();
         let iter_b = intervals_b.into_iter();
         let ix_iter = IntersectIter::new(iter_a, iter_b);
