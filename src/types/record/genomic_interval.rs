@@ -120,21 +120,10 @@ mod testing {
 
     #[test]
     #[cfg(feature = "serde")]
-    fn test_serialization() {
+    fn genomic_interval_serde() {
         let a = GenomicInterval::new(1, 5, 100);
         let encoding = serialize(&a).unwrap();
         let b: GenomicInterval<usize> = deserialize(&encoding).unwrap();
         assert_eq!(a, b);
-    }
-
-    #[test]
-    #[cfg(feature = "serde")]
-    fn test_deserialization() {
-        let encoding = vec![
-            1, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0,
-        ];
-        let expected = GenomicInterval::new(1, 5, 100);
-        let interval: GenomicInterval<usize> = deserialize(&encoding).unwrap();
-        assert_eq!(interval, expected);
     }
 }

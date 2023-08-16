@@ -230,7 +230,7 @@ mod testing {
 
     #[test]
     #[cfg(feature = "serde")]
-    fn test_serialization() {
+    fn stranded_genomic_interval_serde() {
         let a = StrandedGenomicInterval::new(1, 5, 100, Strand::Reverse);
         let serialized = serialize(&a).unwrap();
         let deserialized: StrandedGenomicInterval<u32> = deserialize(&serialized).unwrap();

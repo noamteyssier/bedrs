@@ -109,7 +109,7 @@ mod testing {
 
     #[test]
     #[cfg(feature = "serde")]
-    fn test_serialization() {
+    fn interval_meta_serde() {
         let a = IntervalMeta::new(10, 100, Some("info"));
         let encoding = serialize(&a).unwrap();
         let b: IntervalMeta<usize, &str> = deserialize(&encoding).unwrap();

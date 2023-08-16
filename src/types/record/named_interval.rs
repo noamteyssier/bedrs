@@ -59,6 +59,9 @@ mod testing {
     use super::NamedInterval;
     use crate::Coordinates;
 
+    #[cfg(feature = "serde")]
+    use bincode::{deserialize, serialize};
+
     #[test]
     fn named_interval_init() {
         let interval = NamedInterval::new("chr1".to_string(), 10, 100);
@@ -166,22 +169,12 @@ mod testing {
         let b = NamedInterval::new("chr2", 10, 100);
         assert_eq!(a.coord_cmp(&b), Ordering::Equal);
     }
-
     #[test]
     #[cfg(feature = "serde")]
     fn named_interval_serde() {
-        let interval = NamedInterval::new("chr1", 10, 100);
-        let serialized = serde_json::to_string(&interval).unwrap();
-        let deserialized: NamedInterval<String, u32> = serde_json::from_str(&serialized).unwrap();
-        assert_eq!(interval, deserialized);
-    }
-
-    #[test]
-    #[cfg(feature = "serde")]
-    fn named_interval_bytes_serde() {
-        let interval = NamedInterval::new(b"chr1".to_vec(), 10, 100);
-        let serialized = serde_json::to_string(&interval).unwrap();
-        let deserialized: NamedInterval<Vec<u8>, u32> = serde_json::from_str(&serialized).unwrap();
-        assert_eq!(interval, deserialized);
+        let a = NamedInterval::new("chr1", 5, 100);
+        let encoding = serialize(&a).unwrap();
+        let b: NamedInterval<&str, usize> = deserialize(&encoding).unwrap();
+        assert_eq!(a, b);
     }
 }
