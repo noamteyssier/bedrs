@@ -1,4 +1,4 @@
-use crate::traits::{Coordinates, ValueBounds, ChromBounds};
+use crate::traits::{ChromBounds, Coordinates, ValueBounds};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -56,8 +56,8 @@ where
 mod testing {
     use std::cmp::Ordering;
 
-    use crate::Coordinates;
     use super::NamedInterval;
+    use crate::Coordinates;
 
     #[test]
     fn named_interval_init() {

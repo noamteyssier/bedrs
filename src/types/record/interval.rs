@@ -31,7 +31,11 @@ where
     T: ValueBounds,
 {
     pub fn new(start: T, end: T) -> Self {
-        Self { start, end, chr: T::default() }
+        Self {
+            start,
+            end,
+            chr: T::default(),
+        }
     }
 }
 impl<T> Coordinates<T, T> for Interval<T>
