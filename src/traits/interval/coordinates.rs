@@ -12,15 +12,15 @@ where
 {
     fn start(&self) -> T;
     fn end(&self) -> T;
-    fn chr(&self) -> T;
+    fn chr(&self) -> &C;
     fn update_start(&mut self, val: &T);
     fn update_end(&mut self, val: &T);
-    fn update_chr(&mut self, val: &T);
+    fn update_chr(&mut self, val: &C);
     fn from(other: &Self) -> Self;
     fn len(&self) -> T {
         self.end().sub(self.start())
     }
-    fn update_all(&mut self, chr: &T, start: &T, end: &T) {
+    fn update_all(&mut self, chr: &C, start: &T, end: &T) {
         self.update_chr(chr);
         self.update_endpoints(start, end);
     }
@@ -134,8 +134,8 @@ mod testing {
         fn end(&self) -> usize {
             self.right
         }
-        fn chr(&self) -> usize {
-            0
+        fn chr(&self) -> &usize {
+            &0
         }
         fn update_start(&mut self, val: &usize) {
             self.left = *val;
@@ -171,8 +171,8 @@ mod testing {
         fn end(&self) -> usize {
             self.right
         }
-        fn chr(&self) -> usize {
-            0
+        fn chr(&self) -> &usize {
+            &0
         }
         fn update_start(&mut self, val: &usize) {
             self.left = *val;
@@ -198,7 +198,7 @@ mod testing {
         let a = CustomInterval { left, right };
         assert_eq!(a.start(), 10);
         assert_eq!(a.end(), 100);
-        assert_eq!(a.chr(), 0);
+        assert_eq!(*a.chr(), 0);
     }
 
     #[test]
@@ -234,7 +234,7 @@ mod testing {
         let a = CustomIntervalMeta { left, right, meta };
         assert_eq!(a.start(), 10);
         assert_eq!(a.end(), 100);
-        assert_eq!(a.chr(), 0);
+        assert_eq!(*a.chr(), 0);
     }
 
     #[test]

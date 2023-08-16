@@ -12,10 +12,10 @@ pub use interval::{Coordinates, Intersect, Overlap, Subtract};
 /// of Chromosome coordinates
 pub trait ChromBounds
 where
-    Self: Default + Ord + Debug,
+    Self: Clone + Default + Ord + Debug,
 {
 }
-impl<T> ChromBounds for T where T: Default + Ord + Debug {}
+impl<T> ChromBounds for T where T: Clone + Default + Ord + Debug {}
 
 /// Generic bounds for values to be used for [Coordinates] in the context
 /// of numeric values
