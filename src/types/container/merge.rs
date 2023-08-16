@@ -22,16 +22,8 @@ where
     C: ChromBounds,
     T: ValueBounds,
 {
-    fn new(records: Vec<I>) -> Self {
-        let max_len = records.iter().map(|iv| iv.len()).max();
-        Self {
-            intervals: records,
-            clusters: Vec::new(),
-            n_clusters: 0,
-            max_len,
-            is_sorted: true,
-            phantom_c: PhantomData,
-        }
+    fn new(_records: Vec<I>) -> Self {
+        unimplemented!("MergeResults overwrites the new() method")
     }
     fn records(&self) -> &Vec<I> {
         &self.intervals
