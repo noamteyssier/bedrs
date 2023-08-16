@@ -7,4 +7,6 @@ pub use container::{
 pub use iterator::{
     FindIter, FindIterSorted, IntersectIter, MergeIter, SubtractFromIter, SubtractIter,
 };
-pub use record::{GenomicInterval, Interval, IntervalMeta, Strand, StrandedGenomicInterval};
+pub use record::{
+    GenomicInterval, Interval, IntervalMeta, NamedInterval, Strand, StrandedGenomicInterval,
+};
