@@ -1,6 +1,10 @@
 use crate::traits::{ChromBounds, IntervalBounds, ValueBounds};
 use std::{fmt::Debug, marker::PhantomData};
 
+/// An iterator over the complement of a set of interval records.
+///
+/// This iterator expects the input to be sorted and pre-merged and will
+/// panic if this is not the case.
 pub struct ComplementIter<It, I, C, T>
 where
     It: Iterator<Item = I>,
