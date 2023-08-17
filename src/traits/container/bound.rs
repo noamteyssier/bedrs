@@ -135,6 +135,65 @@ where
         }
         low
     }
+
+    /// Finds the earliest record in the [Container] that shares a chromosome
+    /// with the query. Can result in an error if the [Container] is not sorted.
+    fn chr_bound(&self, query: &I) -> Result<Option<usize>, SetError> {
+        if self.is_sorted() {
+            if self.records().is_empty() {
+                return Err(SetError::EmptySet);
+            }
+            Ok(self.chr_bound_unchecked(query))
+        } else {
+            Err(SetError::UnsortedSet)
+        }
+    }
+
+    /// Finds the earliest record in the [Container] that shares a chromosome
+    /// with the query. Does not perform a check if it is sorted beforehand.
+    /// Use at your own risk.
+    fn chr_bound_unchecked(&self, query: &I) -> Option<usize> {
+        let mut high = self.len();
+        let mut low = 0;
+        while high > 0 {
+            let mid = high / 2;
+            let top_half = high - mid;
+            let low_index = low + mid;
+            let top_index = low + top_half;
+            let test_interval = &self.records()[low_index];
+            high = mid;
+            low = if test_interval.chr() < query.chr() {
+                top_index
+            } else {
+                low
+            };
+        }
+
+        // If the low index is the length of the set, then the query is
+        // greater than all records in the set.
+        if low == self.len() {
+            None
+
+        // If the low index is 0, then the query is potentially less than
+        // all records in the set.
+        } else if low == 0 {
+            // If the first record in the set has the same chromosome as the
+            // query, then return 0.
+            if self.records()[0].chr() == query.chr() {
+                Some(0)
+
+            // Otherwise, the query is less than all records in the set.
+            } else {
+                None
+            }
+        }
+        // If the low index is not 0 or the length of the set, then the query
+        // shares a chromosome with at least one record in the set.
+        // Returns the earliest index of a record with the same chromosome
+        else {
+            Some(low)
+        }
+    }
 }
 
 #[cfg(test)]
@@ -308,5 +367,77 @@ mod testing {
         let query = Interval::new(10, 20);
         set.max_len_mut().take();
         set.lower_bound_unchecked(&query);
+    }
+
+    #[test]
+    fn bsearch_chr_a() {
+        let intervals = vec![
+            GenomicInterval::new(1, 0, 300),
+            GenomicInterval::new(2, 0, 300), // <- min
+            GenomicInterval::new(2, 16, 316),
+            GenomicInterval::new(3, 53, 353),
+        ];
+        let query = GenomicInterval::new(2, 100, 300);
+        let set = GenomicIntervalSet::from_unsorted(intervals);
+        let bound = set.chr_bound(&query).unwrap();
+        assert_eq!(bound, Some(1));
+    }
+
+    #[test]
+    fn bsearch_chr_b() {
+        let intervals = vec![
+            GenomicInterval::new(1, 0, 300), // <- min
+            GenomicInterval::new(2, 0, 300),
+            GenomicInterval::new(3, 16, 316),
+            GenomicInterval::new(4, 53, 353),
+        ];
+        let query = GenomicInterval::new(1, 100, 300);
+        let set = GenomicIntervalSet::from_unsorted(intervals);
+        let bound = set.chr_bound(&query).unwrap();
+        assert_eq!(bound, Some(0));
+    }
+
+    #[test]
+    fn bsearch_chr_c() {
+        let intervals = vec![
+            GenomicInterval::new(1, 0, 300),
+            GenomicInterval::new(2, 0, 300),
+            GenomicInterval::new(2, 16, 316),
+            GenomicInterval::new(3, 53, 353), // <- min
+        ];
+        let query = GenomicInterval::new(3, 100, 300);
+        let set = GenomicIntervalSet::from_unsorted(intervals);
+        let bound = set.chr_bound(&query).unwrap();
+        assert_eq!(bound, Some(3));
+    }
+
+    #[test]
+    fn bsearch_chr_d() {
+        // no minimum in this set
+        let intervals = vec![
+            GenomicInterval::new(1, 0, 300),
+            GenomicInterval::new(2, 0, 300),
+            GenomicInterval::new(2, 16, 316),
+            GenomicInterval::new(3, 53, 353),
+        ];
+        let query = GenomicInterval::new(4, 100, 300);
+        let set = GenomicIntervalSet::from_unsorted(intervals);
+        let bound = set.chr_bound(&query).unwrap();
+        assert_eq!(bound, None);
+    }
+
+    #[test]
+    fn bsearch_chr_e() {
+        // no minimum in this set
+        let intervals = vec![
+            GenomicInterval::new(2, 0, 300),
+            GenomicInterval::new(3, 0, 300),
+            GenomicInterval::new(4, 16, 316),
+            GenomicInterval::new(5, 53, 353),
+        ];
+        let query = GenomicInterval::new(1, 100, 300);
+        let set = GenomicIntervalSet::from_unsorted(intervals);
+        let bound = set.chr_bound(&query).unwrap();
+        assert_eq!(bound, None);
     }
 }
