@@ -50,6 +50,7 @@
 //! [crate::traits::interval] module.
 //!
 //! Some examples of the functionality are:
+//! - [Distance](crate::traits::interval::Distance)
 //! - [Intersect](crate::traits::interval::Intersect)
 //! - [Overlap](crate::traits::interval::Overlap)
 //! - [Subtract](crate::traits::interval::Subtract)
@@ -66,13 +67,14 @@
 //! [crate::traits::container] module.
 //!
 //! Some examples of the functionality are:
-//! - [Merge](crate::traits::container::Merge)
-//! - [SetSubtract](crate::traits::container::SetSubtract)
-//! - [Internal](crate::traits::container::Internal)
-//! - [Sample](crate::traits::container::Sample)
-//! - [Find](crate::traits::container::Find)
 //! - [Bound](crate::traits::container::Bound)
+//! - [Closest](crate::traits::container::Closest)
 //! - [Complement](crate::traits::container::Complement)
+//! - [Internal](crate::traits::container::Internal)
+//! - [Find](crate::traits::container::Find)
+//! - [Merge](crate::traits::container::Merge)
+//! - [Sample](crate::traits::container::Sample)
+//! - [SetSubtract](crate::traits::container::SetSubtract)
 //!
 //! ## Types
 //!
@@ -265,8 +267,8 @@ pub mod traits;
 pub mod types;
 
 pub use traits::{
-    Bound, Complement, Container, Coordinates, Find, Internal, Intersect, Merge, Overlap, Sample,
-    SetSubtract, Subtract,
+    Bound, Closest, Complement, Container, Coordinates, Distance, Find, Internal, Intersect, Merge,
+    Overlap, Sample, SetSubtract, Subtract,
 };
 pub use types::{
     GenomicInterval, GenomicIntervalSet, IntersectIter, Interval, IntervalIterOwned,

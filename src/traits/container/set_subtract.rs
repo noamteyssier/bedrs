@@ -279,11 +279,9 @@ mod testing {
         let mut subset = set.subtract_from(&q).unwrap();
 
         let iv = subset.next().unwrap();
-        println!("{:?}", iv);
         assert!(iv.eq(&Interval::new(20, 25)));
 
         let iv = subset.next().unwrap();
-        println!("{:?}", iv);
         assert!(iv.eq(&Interval::new(35, 40)));
 
         assert!(subset.next().is_none());
@@ -306,7 +304,6 @@ mod testing {
         let mut subset = set.subtract_from(&q).unwrap();
 
         let iv = subset.next().unwrap();
-        println!("{:?}", iv);
         assert!(iv.eq(&Interval::new(35, 40)));
 
         assert!(subset.next().is_none());
@@ -346,15 +343,12 @@ mod testing {
 
         let mut subset = set.subtract_from(&q).unwrap();
         let iv = subset.next().unwrap();
-        // println!("{:?}", iv);
         assert!(iv.eq(&Interval::new(20, 25)));
 
         let iv = subset.next().unwrap();
-        // println!("{:?}", iv);
         assert!(iv.eq(&Interval::new(27, 32)));
 
         let iv = subset.next().unwrap();
-        // println!("{:?}", iv);
         assert!(iv.eq(&Interval::new(35, 40)));
 
         assert!(subset.next().is_none());
@@ -411,15 +405,12 @@ mod testing {
 
         let mut subset = set.subtract_from(&a).unwrap();
         let iv = subset.next().unwrap();
-        // println!("{:?}", iv);
         assert!(iv.eq(&Interval::new(10, 20)));
 
         let iv = subset.next().unwrap();
-        // println!("{:?}", iv);
         assert!(iv.eq(&Interval::new(30, 40)));
 
         let iv = subset.next().unwrap();
-        // println!("{:?}", iv);
         assert!(iv.eq(&Interval::new(50, 60)));
 
         assert!(subset.next().is_none());

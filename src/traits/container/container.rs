@@ -5,7 +5,7 @@ use crate::{
 };
 use anyhow::Result;
 
-use super::Complement;
+use super::{closest::Closest, Complement};
 
 /// The main trait representing a container of intervals.
 ///
@@ -243,6 +243,15 @@ where
 }
 
 impl<Co, C, T, I> Complement<C, T, I> for Co
+where
+    Co: Container<C, T, I>,
+    I: IntervalBounds<C, T>,
+    C: ChromBounds,
+    T: ValueBounds,
+{
+}
+
+impl<Co, C, T, I> Closest<C, T, I> for Co
 where
     Co: Container<C, T, I>,
     I: IntervalBounds<C, T>,

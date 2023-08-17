@@ -938,7 +938,6 @@ mod testing {
         let overlaps = set
             .find_reciprocal_frac_either(&query, f_query, f_target)
             .unwrap();
-        println!("{:#?}", overlaps);
         validate_set(&overlaps, &expected);
     }
 
