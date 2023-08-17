@@ -242,12 +242,14 @@ where
             let top_index = low + top_half;
             let test_interval = &self.records()[low_index];
             high = mid;
-            low = if test_interval.chr() < query.chr() {
-                top_index
-            } else if test_interval.chr() == query.chr() && test_interval.lt(query) {
-                low
+            low = if test_interval.lt(query) {
+                if test_interval.chr() == query.chr() {
+                    low
+                } else {
+                    top_index
+                }
             } else {
-                top_index
+                low
             };
         }
 
@@ -268,6 +270,11 @@ where
             } else {
                 None
             }
+
+        // If the resulting record is greater than the query, then the query
+        // is less than all records in the set that match its chromosome.
+        } else if self.records()[low].gt(query) {
+            None
         }
         // If the low index is not 0 or the length of the set, then the query
         // shares a chromosome with at least one record in the set.
@@ -707,6 +714,19 @@ mod testing {
         let set = GenomicIntervalSet::from_unsorted(intervals);
         let bound = set.chr_bound_upstream(&query).unwrap();
         assert_eq!(bound, None);
+    }
+
+    #[test]
+    fn bsearch_chr_upstream_g() {
+        let intervals = vec![
+            GenomicInterval::new(1, 10, 20), // <- min
+            GenomicInterval::new(1, 30, 40),
+            GenomicInterval::new(1, 50, 60),
+        ];
+        let query = GenomicInterval::new(1, 22, 32);
+        let set = GenomicIntervalSet::from_unsorted(intervals);
+        let bound = set.chr_bound_upstream(&query).unwrap();
+        assert_eq!(bound, Some(0));
     }
 
     #[test]
