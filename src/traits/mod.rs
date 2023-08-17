@@ -1,4 +1,4 @@
-use num_traits::{FromPrimitive, NumOps, ToPrimitive, Zero};
+use num_traits::{Bounded, FromPrimitive, NumOps, ToPrimitive, Zero};
 use std::fmt::Debug;
 
 pub mod container;
@@ -23,10 +23,13 @@ impl<T> ChromBounds for T where T: Clone + Default + Ord + Debug {}
 /// of numeric values
 pub trait ValueBounds
 where
-    Self: Copy + ChromBounds + NumOps + ToPrimitive + FromPrimitive + Zero,
+    Self: Copy + ChromBounds + NumOps + ToPrimitive + FromPrimitive + Zero + Bounded,
 {
 }
-impl<T> ValueBounds for T where T: Copy + ChromBounds + NumOps + ToPrimitive + FromPrimitive + Zero {}
+impl<T> ValueBounds for T where
+    T: Copy + ChromBounds + NumOps + ToPrimitive + FromPrimitive + Zero + Bounded
+{
+}
 
 /// Generic bounds for coordinates to be used within [Container]s
 pub trait IntervalBounds<C, T>
