@@ -31,6 +31,9 @@ where
     fn records_mut(&mut self) -> &mut Vec<I> {
         &mut self.intervals
     }
+    fn records_owned(self) -> Vec<I> {
+        self.intervals
+    }
     fn is_sorted(&self) -> bool {
         self.is_sorted
     }

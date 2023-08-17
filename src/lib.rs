@@ -72,6 +72,7 @@
 //! - [Sample](crate::traits::container::Sample)
 //! - [Find](crate::traits::container::Find)
 //! - [Bound](crate::traits::container::Bound)
+//! - [Complement](crate::traits::container::Complement)
 //!
 //! ## Types
 //!
@@ -264,10 +265,10 @@ pub mod traits;
 pub mod types;
 
 pub use traits::{
-    Bound, Container, Coordinates, Find, Internal, Intersect, Merge, Overlap, Sample, SetSubtract,
-    Subtract,
+    Bound, Complement, Container, Coordinates, Find, Internal, Intersect, Merge, Overlap, Sample,
+    SetSubtract, Subtract,
 };
 pub use types::{
-    GenomicInterval, GenomicIntervalSet, IntersectIter, Interval, IntervalSet, MergeIter,
-    NamedInterval, Strand, StrandedGenomicInterval,
+    GenomicInterval, GenomicIntervalSet, IntersectIter, Interval, IntervalIterOwned,
+    IntervalIterRef, IntervalSet, MergeIter, NamedInterval, Strand, StrandedGenomicInterval,
 };
