@@ -1,4 +1,5 @@
 mod bound;
+mod complement;
 mod container;
 mod find;
 mod internal;
@@ -6,6 +7,7 @@ mod merge;
 mod sample;
 mod set_subtract;
 pub use bound::Bound;
+pub use complement::Complement;
 pub use container::Container;
 pub use find::Find;
 pub use internal::Internal;
