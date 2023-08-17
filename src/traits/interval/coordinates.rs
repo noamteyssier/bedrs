@@ -4,6 +4,8 @@ use crate::{
 };
 use std::cmp::Ordering;
 
+use super::Distance;
+
 /// The main trait representing an interval.
 pub trait Coordinates<C, T>
 where
@@ -94,7 +96,7 @@ where
     }
 }
 
-impl<I, C, T> Overlap<C, T> for I
+impl<I, C, T> Distance<C, T> for I
 where
     I: Coordinates<C, T>,
     C: ChromBounds,
@@ -103,6 +105,14 @@ where
 }
 
 impl<I, C, T> Intersect<C, T> for I
+where
+    I: Coordinates<C, T>,
+    C: ChromBounds,
+    T: ValueBounds,
+{
+}
+
+impl<I, C, T> Overlap<C, T> for I
 where
     I: Coordinates<C, T>,
     C: ChromBounds,
