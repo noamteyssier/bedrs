@@ -4,6 +4,66 @@ use crate::{
 };
 
 /// Calculates the distance between two coordinates.
+///
+/// Only works for coordinates that are on the same chromosome 
+/// as there is no notion of chromosomal distance.
+///
+/// # Example
+///
+/// ## Unsigned distance
+///
+/// This distance metric is unsigned and will always return a positive value.
+/// It is symmetric between the two coordinates.
+///
+/// ```
+/// use bedrs::*;
+///
+/// let a = Interval::new(10, 20);
+/// let b = Interval::new(30, 40);
+/// assert_eq!(a.distance(&b), Some(10));
+/// assert_eq!(b.distance(&a), Some(10));
+/// ```
+///
+/// ## Signed distance
+///
+/// This distance metric is signed and will return a positive or negative value.
+/// It is not symmetric between the two coordinates.
+///
+/// A positive value indicates that the first coordinate is upstream of the second.
+/// A negative value indicates that the first coordinate is downstream of the second.
+///
+/// ```
+/// use bedrs::*;
+///
+/// let a = Interval::new(10, 20);
+/// let b = Interval::new(30, 40);
+/// assert_eq!(a.directed_distance(&b), Some(10));
+/// assert_eq!(b.directed_distance(&a), Some(-10));
+/// ```
+///
+/// ## No distance
+///
+/// If the two coordinates overlap or border each other, the distance is zero.
+/// If the two coordinates are on different chromosomes, the distance is undefined.
+///
+/// ```
+/// use bedrs::*;
+///
+/// // Bordering Intervals
+/// let a = Interval::new(10, 20);
+/// let b = Interval::new(20, 30);
+/// assert_eq!(a.distance(&b), Some(0));
+///
+/// // Overlapping Intervals
+/// let a = Interval::new(10, 20);
+/// let b = Interval::new(18, 30);
+/// assert_eq!(a.distance(&b), Some(0));
+///
+/// // Different Chromosomes
+/// let a = GenomicInterval::new(1, 10, 20);
+/// let b = GenomicInterval::new(2, 10, 20);
+/// assert_eq!(a.distance(&b), None);
+/// ```
 pub trait Distance<C, T>: Coordinates<C, T> + Overlap<C, T>
 where
     C: ChromBounds,
