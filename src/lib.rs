@@ -72,6 +72,7 @@
 //! - [Sample](crate::traits::container::Sample)
 //! - [Find](crate::traits::container::Find)
 //! - [Bound](crate::traits::container::Bound)
+//! - [Complement](crate::traits::container::Complement)
 //!
 //! ## Types
 //!
