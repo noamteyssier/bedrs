@@ -263,7 +263,7 @@ where
         } else if low == 0 {
             // If the first record in the set has the same chromosome as the
             // query, then return 0.
-            if self.records()[0].chr() == query.chr() {
+            if self.records()[0].chr() == query.chr() && self.records()[0].lt(query) {
                 Some(0)
 
             // Otherwise, the query is less than all records in the set.
@@ -727,6 +727,20 @@ mod testing {
         let set = GenomicIntervalSet::from_unsorted(intervals);
         let bound = set.chr_bound_upstream(&query).unwrap();
         assert_eq!(bound, Some(0));
+    }
+
+    #[test]
+    fn bsearch_chr_upstream_h() {
+        let intervals = vec![
+            // no min
+            GenomicInterval::new(1, 10, 20),
+            GenomicInterval::new(1, 30, 40),
+            GenomicInterval::new(1, 50, 60),
+        ];
+        let query = GenomicInterval::new(1, 8, 32);
+        let set = GenomicIntervalSet::from_unsorted(intervals);
+        let bound = set.chr_bound_upstream(&query).unwrap();
+        assert_eq!(bound, None);
     }
 
     #[test]

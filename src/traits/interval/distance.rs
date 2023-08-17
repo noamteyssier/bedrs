@@ -5,7 +5,7 @@ use crate::{
 
 /// Calculates the distance between two coordinates.
 ///
-/// Only works for coordinates that are on the same chromosome 
+/// Only works for coordinates that are on the same chromosome
 /// as there is no notion of chromosomal distance.
 ///
 /// # Example
