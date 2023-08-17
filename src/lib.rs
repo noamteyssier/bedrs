@@ -50,6 +50,7 @@
 //! [crate::traits::interval] module.
 //!
 //! Some examples of the functionality are:
+//! - [Distance](crate::traits::interval::Distance)
 //! - [Intersect](crate::traits::interval::Intersect)
 //! - [Overlap](crate::traits::interval::Overlap)
 //! - [Subtract](crate::traits::interval::Subtract)
