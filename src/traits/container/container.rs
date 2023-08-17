@@ -1,8 +1,11 @@
 use crate::{
     traits::{errors::SetError, ChromBounds, IntervalBounds, ValueBounds},
+    types::{IntervalIterOwned, IntervalIterRef},
     Bound, Find, Internal, Merge, Sample, SetSubtract,
 };
 use anyhow::Result;
+
+use super::Complement;
 
 /// The main trait representing a container of intervals.
 ///
@@ -27,6 +30,9 @@ where
 
     /// Returns a mutable reference to the internal interval vector
     fn records_mut(&mut self) -> &mut Vec<I>;
+
+    /// Returns the internal records as a vector
+    fn records_owned(self) -> Vec<I>;
 
     /// Returns `true` if the internal vector is sorted
     fn is_sorted(&self) -> bool;
@@ -171,6 +177,14 @@ where
     fn span(&self) -> Result<I> {
         unimplemented!("Span is not implemented generically - you will need to implement it for your custom container")
     }
+
+    fn iter(&self) -> IntervalIterRef<I, C, T> {
+        IntervalIterRef::new(&self.records())
+    }
+
+    fn into_iter(self) -> IntervalIterOwned<I, C, T> {
+        IntervalIterOwned::new(self.records_owned())
+    }
 }
 
 impl<Co, C, T, I> Internal<C, T, I> for Co
@@ -228,6 +242,15 @@ where
 {
 }
 
+impl<Co, C, T, I> Complement<C, T, I> for Co
+where
+    Co: Container<C, T, I>,
+    I: IntervalBounds<C, T>,
+    C: ChromBounds,
+    T: ValueBounds,
+{
+}
+
 #[cfg(test)]
 mod testing {
     use super::Container;
@@ -252,6 +275,9 @@ mod testing {
         }
         fn records_mut(&mut self) -> &mut Vec<Interval<usize>> {
             &mut self.records
+        }
+        fn records_owned(self) -> Vec<Interval<usize>> {
+            self.records
         }
         fn is_sorted(&self) -> bool {
             self.is_sorted
@@ -395,5 +421,19 @@ mod testing {
         assert_eq!(set.len(), 2);
         assert_eq!(set.records()[0].start(), 10);
         assert!(set.is_sorted());
+    }
+
+    #[test]
+    fn container_iter() {
+        let records = vec![
+            Interval::new(15, 25),
+            Interval::new(10, 20),
+            Interval::new(5, 15),
+        ];
+        let set = IntervalSet::from_unsorted(records);
+        let mut iter = set.iter();
+        assert_eq!(iter.next().unwrap().start(), 5);
+        assert_eq!(iter.next().unwrap().start(), 10);
+        assert_eq!(iter.next().unwrap().start(), 15);
     }
 }

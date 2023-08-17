@@ -61,6 +61,9 @@ where
     fn records_mut(&mut self) -> &mut Vec<StrandedGenomicInterval<T>> {
         &mut self.records
     }
+    fn records_owned(self) -> Vec<StrandedGenomicInterval<T>> {
+        self.records
+    }
     fn is_sorted(&self) -> bool {
         self.is_sorted
     }
