@@ -297,12 +297,14 @@ where
             let top_index = low + top_half;
             let test_interval = &self.records()[low_index];
             high = mid;
-            low = if test_interval.chr() < query.chr() {
+            low = if test_interval.lt(query) {
                 top_index
-            } else if test_interval.chr() == query.chr() && test_interval.gt(query) {
-                low
             } else {
-                top_index
+                if test_interval.start() == query.start() {
+                    low_index
+                } else {
+                    low
+                }
             };
         }
 
@@ -797,5 +799,30 @@ mod testing {
         let set = GenomicIntervalSet::from_unsorted(intervals);
         let bound = set.chr_bound_downstream(&query).unwrap();
         assert_eq!(bound, None);
+    }
+
+    #[test]
+    fn bsearch_chr_downstream_f() {
+        let intervals = vec![
+            GenomicInterval::new(1, 70, 220), // <- min
+            GenomicInterval::new(1, 142, 292),
+            GenomicInterval::new(1, 154, 304),
+        ];
+        let query = GenomicInterval::new(1, 21, 71);
+        let set = GenomicIntervalSet::from_unsorted(intervals);
+        let bound = set.chr_bound_downstream(&query).unwrap();
+        assert_eq!(bound, Some(0));
+    }
+
+    #[test]
+    fn bsearch_chr_downstream_range_a() {
+        let chrs = (0..100).map(|x| x % 3).collect::<Vec<_>>();
+        let starts = (0..100).step_by(1).collect::<Vec<_>>();
+        let ends = (10..110).step_by(1).collect::<Vec<_>>();
+        let mut set = GenomicIntervalSet::from_endpoints(&chrs, &starts, &ends).unwrap();
+        set.sort();
+        let query = GenomicInterval::new(0, 12, 15);
+        let bound = set.chr_bound_downstream(&query).unwrap().unwrap();
+        assert_eq!(bound, 4);
     }
 }

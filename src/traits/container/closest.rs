@@ -128,7 +128,9 @@ where
 #[cfg(test)]
 mod testing {
     use super::Closest;
-    use crate::{Container, GenomicInterval, GenomicIntervalSet};
+    use crate::{
+        Container, Coordinates, GenomicInterval, GenomicIntervalSet, Interval, IntervalSet,
+    };
 
     #[test]
     fn closest_unsorted() {
@@ -356,5 +358,53 @@ mod testing {
         let set = GenomicIntervalSet::from_unsorted(intervals);
         let closest = set.closest_downstream(&query).unwrap().unwrap();
         assert_eq!(closest, &GenomicInterval::new(2, 50, 60));
+    }
+
+    #[test]
+    fn closest_downstream_d() {
+        let intervals = vec![
+            GenomicInterval::new(1, 70, 220), // <- min
+            GenomicInterval::new(1, 142, 292),
+            GenomicInterval::new(1, 154, 304),
+        ];
+        let query = GenomicInterval::new(1, 21, 71);
+        let set = GenomicIntervalSet::from_unsorted(intervals);
+        let closest = set.closest_downstream(&query).unwrap().unwrap();
+        assert_eq!(closest, &GenomicInterval::new(1, 70, 220));
+    }
+
+    #[test]
+    fn closest_downstream_range_a() {
+        let starts = (0..100).step_by(1).collect::<Vec<_>>();
+        let ends = (10..110).step_by(1).collect::<Vec<_>>();
+        let mut intervals = IntervalSet::from_endpoints(&starts, &ends).unwrap();
+        intervals.sort();
+        let query = Interval::new(12, 15);
+        let closest = intervals.closest_downstream(&query).unwrap().unwrap();
+        assert!(closest.eq(&Interval::new(12, 22)));
+    }
+
+    #[test]
+    fn closest_downstream_range_b() {
+        let chrs = (0..100).map(|x| x % 3).collect::<Vec<_>>();
+        let starts = (0..100).step_by(1).collect::<Vec<_>>();
+        let ends = (10..110).step_by(1).collect::<Vec<_>>();
+        let mut intervals = GenomicIntervalSet::from_endpoints(&chrs, &starts, &ends).unwrap();
+        intervals.sort();
+        let query = GenomicInterval::new(1, 12, 15);
+        let closest = intervals.closest_downstream(&query).unwrap().unwrap();
+        assert_eq!(closest, &GenomicInterval::new(1, 13, 23));
+    }
+
+    #[test]
+    fn closest_downstream_range_c() {
+        let chrs = (0..100).map(|x| x % 3).collect::<Vec<_>>();
+        let starts = (0..100).step_by(1).collect::<Vec<_>>();
+        let ends = (10..110).step_by(1).collect::<Vec<_>>();
+        let mut intervals = GenomicIntervalSet::from_endpoints(&chrs, &starts, &ends).unwrap();
+        intervals.sort();
+        let query = GenomicInterval::new(0, 12, 15);
+        let closest = intervals.closest_downstream(&query).unwrap().unwrap();
+        assert_eq!(closest, &GenomicInterval::new(0, 12, 22));
     }
 }
