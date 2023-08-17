@@ -265,8 +265,8 @@ pub mod traits;
 pub mod types;
 
 pub use traits::{
-    Bound, Complement, Container, Coordinates, Find, Internal, Intersect, Merge, Overlap, Sample,
-    SetSubtract, Subtract,
+    Bound, Closest, Complement, Container, Coordinates, Distance, Find, Internal, Intersect, Merge,
+    Overlap, Sample, SetSubtract, Subtract,
 };
 pub use types::{
     GenomicInterval, GenomicIntervalSet, IntersectIter, Interval, IntervalIterOwned,

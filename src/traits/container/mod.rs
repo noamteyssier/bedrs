@@ -1,4 +1,5 @@
 mod bound;
+mod closest;
 mod complement;
 mod container;
 mod find;
@@ -7,6 +8,7 @@ mod merge;
 mod sample;
 mod set_subtract;
 pub use bound::Bound;
+pub use closest::Closest;
 pub use complement::Complement;
 pub use container::Container;
 pub use find::Find;
