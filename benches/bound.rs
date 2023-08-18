@@ -1,0 +1,17 @@
+use bedrs::{Bound, Interval, IntervalSet};
+use criterion::Criterion;
+
+const N: usize = 10000;
+const SIZE: usize = 100;
+
+pub fn lower_bound(c: &mut Criterion) {
+    let records = (0..N)
+        .map(|x| (x, x + SIZE))
+        .map(|(x, y)| Interval::new(x, y))
+        .collect();
+    let query = Interval::new(20, 30);
+    let set = IntervalSet::new(records);
+    c.bench_function("bound_original", |bench| {
+        bench.iter(|| set.lower_bound_unchecked(&query))
+    });
+}
