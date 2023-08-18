@@ -2,7 +2,7 @@ mod bound;
 mod find;
 mod merge;
 mod overlap;
-use bound::lower_bound;
+use bound::{chr_bound_downstream, chr_bound_upstream, lower_bound};
 use criterion::{criterion_group, criterion_main};
 use find::{
     find_base, find_genomic, find_iter_base, find_iter_genomic, find_iter_sort_base,
@@ -11,7 +11,7 @@ use find::{
 use merge::{merge_base, merge_genomic, merge_unchecked_base, merge_unchecked_genomic};
 use overlap::{overlap_base, overlap_genomic, overlap_named};
 
-criterion_group!(bound, lower_bound);
+criterion_group!(bound, lower_bound, chr_bound_upstream, chr_bound_downstream,);
 
 criterion_group!(
     find,
