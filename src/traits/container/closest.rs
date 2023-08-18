@@ -44,28 +44,28 @@ where
     }
 
     fn closest_unchecked(&self, query: &I) -> Option<&I> {
-        if let Some(bound) = self.chr_bound_unchecked(query) {
-            let mut current_dist = T::max_value();
-            let mut current_lowest = bound;
-            let mut position = bound;
-            loop {
-                if position == self.len() {
-                    break;
-                }
-                let test_iv = &self.records()[position];
-                let distance = query.distance(test_iv)?;
-                if distance < current_dist {
-                    current_dist = distance;
-                    current_lowest = position;
-                } else if distance > current_dist || distance == current_dist {
-                    break;
-                }
-                position += 1;
+        let bound = match self.chr_bound_upstream_unchecked(query) {
+            Some(bound) => bound,
+            None => self.chr_bound_downstream_unchecked(query)?,
+        };
+        let mut current_dist = T::max_value();
+        let mut current_lowest = bound;
+        let mut position = bound;
+        loop {
+            if position == self.len() {
+                break;
             }
-            Some(&self.records()[current_lowest])
-        } else {
-            None
+            let test_iv = &self.records()[position];
+            let distance = query.distance(test_iv)?;
+            if distance < current_dist {
+                current_dist = distance;
+                current_lowest = position;
+            } else if distance > current_dist || distance == current_dist {
+                break;
+            }
+            position += 1;
         }
+        Some(&self.records()[current_lowest])
     }
 
     fn closest_upstream_unchecked(&self, query: &I) -> Option<&I> {

@@ -1,3 +1,5 @@
+use std::cmp::Ordering;
+
 use crate::{
     traits::{errors::SetError, ChromBounds, IntervalBounds, ValueBounds},
     Container,
@@ -115,25 +117,18 @@ where
     /// assert_eq!(bound, 2);
     /// ```
     fn lower_bound_unchecked(&self, query: &I) -> usize {
-        let mut high = self.len();
-        let mut low = 0;
         let max_len = self
             .max_len()
             .expect("max_len is None - is this an empty set?");
-        while high > 0 {
-            let mid = high / 2;
-            let top_half = high - mid;
-            let low_index = low + mid;
-            let top_index = low + top_half;
-            let test_interval = &self.records()[low_index];
-            high = mid;
-            low = if test_interval.biased_lt(query, max_len) {
-                top_index
-            } else {
-                low
-            };
-        }
-        low
+        self.records()
+            .binary_search_by(|iv| {
+                if iv.biased_lt(query, max_len) {
+                    Ordering::Less
+                } else {
+                    Ordering::Greater
+                }
+            })
+            .unwrap_or_else(|x| x)
     }
 
     /// Finds the earliest record in the [Container] that shares a chromosome
@@ -149,7 +144,7 @@ where
         }
     }
 
-    /// Finds the earliest record in the [Container] that shares a chromosome
+    /// Finds the latest record in the [Container] that shares a chromosome
     /// with the query and is upstream. Can result in an error if the [Container]
     /// is not sorted.
     ///
@@ -187,100 +182,75 @@ where
     /// with the query. Does not perform a check if it is sorted beforehand.
     /// Use at your own risk.
     fn chr_bound_unchecked(&self, query: &I) -> Option<usize> {
-        let mut high = self.len();
-        let mut low = 0;
-        while high > 0 {
-            let mid = high / 2;
-            let top_half = high - mid;
-            let low_index = low + mid;
-            let top_index = low + top_half;
-            let test_interval = &self.records()[low_index];
-            high = mid;
-            low = if test_interval.chr() < query.chr() {
-                top_index
-            } else {
-                low
-            };
-        }
+        // Find the partition point for the chromosome
+        let bound = self.records().partition_point(|iv| iv.chr() < query.chr());
 
-        // If the low index is the length of the set, then the query is
-        // greater than all records in the set.
-        if low == self.len() {
-            None
-
-        // If the low index is 0, then the query is potentially less than
-        // all records in the set.
-        } else if low == 0 {
-            // If the first record in the set has the same chromosome as the
-            // query, then return 0.
+        // if the partition point is 0, then the first record is the
+        // earliest record that shares a chromosome with the query or
+        // there are no records that share a chromosome with the query.
+        if bound == 0 {
             if self.records()[0].chr() == query.chr() {
                 Some(0)
-
-            // Otherwise, the query is less than all records in the set.
             } else {
                 None
             }
-        }
-        // If the low index is not 0 or the length of the set, then the query
-        // shares a chromosome with at least one record in the set.
-        // Returns the earliest index of a record with the same chromosome
-        else {
-            Some(low)
+
+        // if the partition point is the length of the records, then
+        // the query is potentially greater than all records in the set.
+        // If the last record shares a chromosome with the query, then
+        // it is the earliest record that shares a chromosome with the
+        // query.
+        } else if bound == self.len() {
+            if self.records()[bound - 1].chr() == query.chr() {
+                Some(bound - 1)
+            } else {
+                None
+            }
+        } else {
+            Some(bound)
         }
     }
 
-    /// Finds the earliest record in the [Container] that shares a chromosome
+    /// Finds the latest record in the [Container] that shares a chromosome
     /// and is upstream of the query. Does not perform a check if it is
     /// sorted beforehand. Use at your own risk.
     fn chr_bound_upstream_unchecked(&self, query: &I) -> Option<usize> {
-        let mut high = self.len();
-        let mut low = 0;
-        while high > 0 {
-            let mid = high / 2;
-            let top_half = high - mid;
-            let low_index = low + mid;
-            let top_index = low + top_half;
-            let test_interval = &self.records()[low_index];
-            high = mid;
-            low = if test_interval.lt(query) {
-                if test_interval.chr() == query.chr() {
-                    low
-                } else {
-                    top_index
-                }
-            } else {
-                low
-            };
-        }
-
-        // If the low index is the length of the set, then the query is
-        // greater than all records in the set.
-        if low == self.len() {
-            None
+        // partition point returns the first index in the slice for which
+        // the predicate fails (i.e. the index of the first record that is
+        // greater than the query).
+        let low = self.records().partition_point(|iv| iv.lt(query));
 
         // If the low index is 0, then the query is potentially less than
         // all records in the set.
-        } else if low == 0 {
+        if low == 0 {
+            let target = &self.records()[0];
+
             // If the first record in the set has the same chromosome as the
-            // query, then return 0.
-            if self.records()[0].chr() == query.chr() && self.records()[0].lt(query) {
+            // query and the start of the record is less than or equal to the
+            // start of the query, then return 0.
+            if target.chr() == query.chr() && target.start() <= query.start() {
                 Some(0)
 
-            // Otherwise, the query is less than all records in the set.
+            // Otherwise, the query is less than all records in the set
             } else {
                 None
             }
+        } else {
+            // otherwise the low index is the index of the first record that
+            // is greater than the query. We subtract 1 to get the index of
+            // the last record that is less than the query.
+            let idx = low - 1;
 
-        // If the resulting record is greater than the query, then the query
-        // is less than all records in the set that match its chromosome.
-        } else if self.records()[low].gt(query) {
-            None
-        }
-        // If the low index is not 0 or the length of the set, then the query
-        // shares a chromosome with at least one record in the set.
-        // Returns the earliest index of a record with the same chromosome
-        else {
-            Some(low)
+            // If the record at the index has the same chromosome as the
+            // query, then return the index.
+            if self.records()[idx].chr() == query.chr() {
+                Some(idx)
+
+            // Otherwise, the query is less than all records in the set
+            // that share a chromosome.
+            } else {
+                None
+            }
         }
     }
 
@@ -288,25 +258,10 @@ where
     /// and is downstream of the query. Does not perform a check if it is
     /// sorted beforehand. Use at your own risk.
     fn chr_bound_downstream_unchecked(&self, query: &I) -> Option<usize> {
-        let mut high = self.len();
-        let mut low = 0;
-        while high > 0 {
-            let mid = high / 2;
-            let top_half = high - mid;
-            let low_index = low + mid;
-            let top_index = low + top_half;
-            let test_interval = &self.records()[low_index];
-            high = mid;
-            low = if test_interval.lt(query) {
-                top_index
-            } else {
-                if test_interval.start() == query.start() {
-                    low_index
-                } else {
-                    low
-                }
-            };
-        }
+        // partition point returns the first index in the slice for which
+        // the predicate fails (i.e. the index of the first record that is
+        // greater than the query).
+        let low = self.records().partition_point(|iv| iv.lt(query));
 
         // If the low index is the length of the set, then the query is
         // greater than all records in the set.
@@ -638,28 +593,28 @@ mod testing {
     fn bsearch_chr_upstream_a() {
         let intervals = vec![
             GenomicInterval::new(1, 0, 300),
-            GenomicInterval::new(2, 0, 300), // <- min
-            GenomicInterval::new(2, 16, 316),
+            GenomicInterval::new(2, 0, 300),
+            GenomicInterval::new(2, 16, 316), // <- closest
             GenomicInterval::new(3, 53, 353),
         ];
         let query = GenomicInterval::new(2, 100, 300);
         let set = GenomicIntervalSet::from_unsorted(intervals);
         let bound = set.chr_bound_upstream(&query).unwrap();
-        assert_eq!(bound, Some(1));
+        assert_eq!(bound, Some(2));
     }
 
     #[test]
     fn bsearch_chr_upstream_b() {
         let intervals = vec![
             GenomicInterval::new(1, 0, 300),
-            GenomicInterval::new(2, 0, 300), // <- min
-            GenomicInterval::new(2, 16, 316),
+            GenomicInterval::new(2, 0, 300),
+            GenomicInterval::new(2, 16, 316), // <- closest
             GenomicInterval::new(3, 53, 353),
         ];
         let query = GenomicInterval::new(2, 18, 300);
         let set = GenomicIntervalSet::from_unsorted(intervals);
         let bound = set.chr_bound_upstream(&query).unwrap();
-        assert_eq!(bound, Some(1));
+        assert_eq!(bound, Some(2));
     }
 
     #[test]
@@ -667,13 +622,13 @@ mod testing {
         let intervals = vec![
             GenomicInterval::new(1, 0, 300),
             GenomicInterval::new(2, 0, 300),
-            GenomicInterval::new(2, 16, 316),
-            GenomicInterval::new(3, 53, 353), // <- min
+            GenomicInterval::new(2, 16, 316), // <- closest
+            GenomicInterval::new(3, 53, 353),
         ];
         let query = GenomicInterval::new(2, 53, 300);
         let set = GenomicIntervalSet::from_unsorted(intervals);
         let bound = set.chr_bound_upstream(&query).unwrap();
-        assert_eq!(bound, Some(1));
+        assert_eq!(bound, Some(2));
     }
 
     #[test]
