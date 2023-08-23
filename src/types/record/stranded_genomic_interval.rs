@@ -1,20 +1,23 @@
-use crate::traits::{Coordinates, ValueBounds};
+use crate::{
+    traits::{Coordinates, ValueBounds},
+    Strand,
+};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub enum Strand {
-    /// The forward strand
-    Forward,
+// #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+// #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+// pub enum Strand {
+//     /// The forward strand
+//     Forward,
 
-    /// The reverse strand
-    Reverse,
+//     /// The reverse strand
+//     Reverse,
 
-    /// Unknown strand
-    #[default]
-    Unknown,
-}
+//     /// Unknown strand
+//     #[default]
+//     Unknown,
+// }
 
 /// A representation of a Genomic Interval.
 ///

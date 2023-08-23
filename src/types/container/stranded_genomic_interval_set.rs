@@ -119,7 +119,7 @@ where
                     *first.chr(),
                     first.start(),
                     last.end(),
-                    Strand::Unknown,
+                    Strand::default(),
                 );
                 Ok(iv)
             }
