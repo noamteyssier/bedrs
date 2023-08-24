@@ -102,7 +102,7 @@ where
     /// assert_eq!(*span.chr(), 1);
     /// assert_eq!(span.start(), 10);
     /// assert_eq!(span.end(), 500);
-    /// assert_eq!(span.strand(), Strand::Unknown); // Strand is arbitrary in span
+    /// assert_eq!(span.strand().unwrap(), Strand::Unknown); // Strand is arbitrary in span
     /// ```
     fn span(&self) -> Result<StrandedGenomicInterval<T>> {
         if self.is_empty() {
@@ -297,7 +297,7 @@ mod testing {
         let mut set = StrandedGenomicIntervalSet::new(records);
 
         set.records().iter().for_each(|r| {
-            assert_eq!(r.strand(), Strand::Forward);
+            assert_eq!(r.strand().unwrap(), Strand::Forward);
         });
 
         set.records_mut().iter_mut().for_each(|r| {
@@ -305,7 +305,7 @@ mod testing {
         });
 
         set.records().iter().for_each(|r| {
-            assert_eq!(r.strand(), Strand::Reverse);
+            assert_eq!(r.strand().unwrap(), Strand::Reverse);
         });
     }
 
