@@ -60,7 +60,10 @@ where
     fn coord_cmp<I: Coordinates<C, T>>(&self, other: &I) -> Ordering {
         match self.chr().cmp(&other.chr()) {
             Ordering::Equal => match self.start().cmp(&other.start()) {
-                Ordering::Equal => self.end().cmp(&other.end()),
+                Ordering::Equal => match self.end().cmp(&other.end()) {
+                    Ordering::Equal => self.strand().cmp(&other.strand()),
+                    order => order,
+                },
                 order => order,
             },
             order => order,
@@ -81,7 +84,10 @@ where
                 };
                 if let Some(comp) = comp {
                     match comp {
-                        Ordering::Equal => self.end().cmp(&other.end()),
+                        Ordering::Equal => match self.end().cmp(&other.end()) {
+                            Ordering::Equal => self.strand().cmp(&other.strand()),
+                            order => order,
+                        },
                         order => order,
                     }
                 } else {
