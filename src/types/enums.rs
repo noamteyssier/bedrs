@@ -1,6 +1,7 @@
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 use std::{
+    cmp::Ordering,
     fmt::{Display, Formatter},
     str::FromStr,
 };
@@ -156,6 +157,32 @@ impl Display for Strand {
         }
     }
 }
+impl Ord for Strand {
+    /// Sort order for Strand
+    ///
+    /// - Forward < Reverse < Unknown
+    fn cmp(&self, other: &Self) -> Ordering {
+        match (self, other) {
+            (Strand::Forward, Strand::Forward) => Ordering::Equal,
+            (Strand::Forward, Strand::Reverse) => Ordering::Less,
+            (Strand::Forward, Strand::Unknown) => Ordering::Less,
+            (Strand::Reverse, Strand::Forward) => Ordering::Greater,
+            (Strand::Reverse, Strand::Reverse) => Ordering::Equal,
+            (Strand::Reverse, Strand::Unknown) => Ordering::Less,
+            (Strand::Unknown, Strand::Forward) => Ordering::Greater,
+            (Strand::Unknown, Strand::Reverse) => Ordering::Greater,
+            (Strand::Unknown, Strand::Unknown) => Ordering::Equal,
+        }
+    }
+}
+impl PartialOrd for Strand {
+    /// Sort order for Strand
+    ///
+    /// - Forward < Reverse < Unknown
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
 
 #[cfg(test)]
 mod testing {
@@ -244,5 +271,20 @@ mod testing {
         let strand = Strand::Forward;
         let strand_copy = strand;
         assert_eq!(strand, strand_copy);
+    }
+
+    #[test]
+    fn test_strand_ordering() {
+        assert!(Strand::Forward < Strand::Reverse);
+        assert!(Strand::Forward < Strand::Unknown);
+        assert!(Strand::Forward == Strand::Forward);
+
+        assert!(Strand::Reverse > Strand::Forward);
+        assert!(Strand::Reverse < Strand::Unknown);
+        assert!(Strand::Reverse == Strand::Reverse);
+
+        assert!(Strand::Unknown > Strand::Forward);
+        assert!(Strand::Unknown > Strand::Reverse);
+        assert!(Strand::Unknown == Strand::Unknown);
     }
 }

@@ -349,6 +349,69 @@ mod testing {
     }
 
     #[test]
+    fn test_sort() {
+        let records = vec![
+            StrandedGenomicInterval::new(1, 1000, 2000, Strand::Reverse),
+            StrandedGenomicInterval::new(1, 1000, 2000, Strand::Forward),
+            StrandedGenomicInterval::new(1, 1000, 2000, Strand::Unknown),
+            StrandedGenomicInterval::new(1, 10, 100, Strand::Reverse),
+            StrandedGenomicInterval::new(1, 10, 100, Strand::Forward),
+            StrandedGenomicInterval::new(1, 10, 100, Strand::Unknown),
+            StrandedGenomicInterval::new(2, 1000, 2000, Strand::Reverse),
+            StrandedGenomicInterval::new(2, 1000, 2000, Strand::Forward),
+            StrandedGenomicInterval::new(2, 1000, 2000, Strand::Unknown),
+            StrandedGenomicInterval::new(2, 10, 100, Strand::Reverse),
+            StrandedGenomicInterval::new(2, 10, 100, Strand::Forward),
+            StrandedGenomicInterval::new(2, 10, 100, Strand::Unknown),
+        ];
+        let set = StrandedGenomicIntervalSet::from_unsorted(records);
+        assert!(set.is_sorted());
+        let vec = set.records();
+        assert!(vec[0].eq(&StrandedGenomicInterval::new(1, 10, 100, Strand::Forward)));
+        assert!(vec[1].eq(&StrandedGenomicInterval::new(1, 10, 100, Strand::Reverse)));
+        assert!(vec[2].eq(&StrandedGenomicInterval::new(1, 10, 100, Strand::Unknown)));
+        assert!(vec[3].eq(&StrandedGenomicInterval::new(
+            1,
+            1000,
+            2000,
+            Strand::Forward
+        )));
+        assert!(vec[4].eq(&StrandedGenomicInterval::new(
+            1,
+            1000,
+            2000,
+            Strand::Reverse
+        )));
+        assert!(vec[5].eq(&StrandedGenomicInterval::new(
+            1,
+            1000,
+            2000,
+            Strand::Unknown
+        )));
+        assert!(vec[6].eq(&StrandedGenomicInterval::new(2, 10, 100, Strand::Forward)));
+        assert!(vec[7].eq(&StrandedGenomicInterval::new(2, 10, 100, Strand::Reverse)));
+        assert!(vec[8].eq(&StrandedGenomicInterval::new(2, 10, 100, Strand::Unknown)));
+        assert!(vec[9].eq(&StrandedGenomicInterval::new(
+            2,
+            1000,
+            2000,
+            Strand::Forward
+        )));
+        assert!(vec[10].eq(&StrandedGenomicInterval::new(
+            2,
+            1000,
+            2000,
+            Strand::Reverse
+        )));
+        assert!(vec[11].eq(&StrandedGenomicInterval::new(
+            2,
+            1000,
+            2000,
+            Strand::Unknown
+        )));
+    }
+
+    #[test]
     #[cfg(feature = "serde")]
     fn test_serialization() {
         let n_intervals = 10;
