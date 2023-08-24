@@ -1,6 +1,6 @@
 use crate::{
     traits::{ChromBounds, ValueBounds},
-    Intersect, Overlap, Subtract,
+    Intersect, Overlap, Strand, Subtract,
 };
 use std::cmp::Ordering;
 
@@ -15,6 +15,15 @@ where
     fn start(&self) -> T;
     fn end(&self) -> T;
     fn chr(&self) -> &C;
+
+    /// Return the strand of the interval, if it has one.
+    ///
+    /// This is a default implementation that returns `None` for
+    /// intervals that do not have a strand.
+    fn strand(&self) -> Option<Strand> {
+        None
+    }
+
     fn update_start(&mut self, val: &T);
     fn update_end(&mut self, val: &T);
     fn update_chr(&mut self, val: &C);
