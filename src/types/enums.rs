@@ -1,3 +1,4 @@
+use rand::{prelude::Distribution, distributions::Standard};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 use std::{
@@ -9,10 +10,22 @@ use std::{
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum Strand {
+    #[cfg_attr(feature = "serde", serde(rename = "+"))]
     Forward,
+    #[cfg_attr(feature = "serde", serde(rename = "-"))]
     Reverse,
+    #[cfg_attr(feature = "serde", serde(rename = "."))]
     #[default]
     Unknown,
+}
+impl Distribution<Strand> for Standard {
+    fn sample<R: rand::Rng + ?Sized>(&self, rng: &mut R) -> Strand {
+        match rng.gen_range(0..2) {
+            0 => Strand::Forward,
+            1 => Strand::Reverse,
+            _ => Strand::Unknown, // this should never happen
+        }
+    }
 }
 impl FromStr for Strand {
     type Err = &'static str;
@@ -286,5 +299,13 @@ mod testing {
         assert!(Strand::Unknown > Strand::Forward);
         assert!(Strand::Unknown > Strand::Reverse);
         assert!(Strand::Unknown == Strand::Unknown);
+    }
+
+    #[test]
+    fn test_random_draws() {
+        for _ in 0..100 {
+            let strand: Strand = rand::random();
+            assert!(strand == Strand::Forward || strand == Strand::Reverse);
+        }
     }
 }
