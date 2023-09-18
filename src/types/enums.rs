@@ -1,4 +1,4 @@
-use rand::{prelude::Distribution, distributions::Standard};
+use rand::{distributions::Standard, prelude::Distribution};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 use std::{
