@@ -159,3 +159,7 @@ which are listed below:
 - [rampart](https://crates.io/crates/rampart)
 - [rust_lapper](https://crates.io/crates/rust-lapper)
 - [COITrees](https://crates.io/crates/coitrees)
+
+It also was motivated by the following interval toolkits in C++ and C respectively:
+- [bedtools](https://github.com/arq5x/bedtools2)
+- [bedops](https://github.com/bedops/bedops)
