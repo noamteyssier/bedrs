@@ -18,14 +18,48 @@ where
     T: ValueBounds,
 {
     /// Creates a new container from intervals (assumed unsorted)
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bedrs::{GenomicInterval, GenomicIntervalSet, Container};
+    ///
+    /// let ivs = vec![
+    ///     GenomicInterval::new(1, 1, 10),
+    ///     GenomicInterval::new(1, 20, 30),
+    ///     GenomicInterval::new(1, 40, 50),
+    /// ];
+    /// let set = GenomicIntervalSet::new(ivs);
+    /// assert_eq!(set.len(), 3);
+    /// ```
     fn new(records: Vec<I>) -> Self;
 
     /// Creates a new empty container
+    ///
+    /// # Examples
+    /// use bedrs::{GenomicInterval, GenomicIntervalSet, Container};
+    ///
+    /// let set = GenomicIntervalSet::<u32, GenomicInterval<u32>>::empty();
+    /// assert_eq!(set.len(), 0);
+    /// ```
     fn empty() -> Self {
         Self::new(Vec::new())
     }
 
     /// Returns a reference to the internal interval vector
+    ///
+    /// # Examples
+    /// ```
+    /// use bedrs::{GenomicInterval, GenomicIntervalSet, Container};
+    ///
+    /// let ivs = vec![
+    ///     GenomicInterval::new(1, 1, 10),
+    ///     GenomicInterval::new(1, 20, 30),
+    ///     GenomicInterval::new(1, 40, 50),
+    /// ];
+    /// let set = GenomicIntervalSet::new(ivs);
+    /// assert_eq!(set.records().len(), 3);
+    /// ```
     fn records(&self) -> &Vec<I>;
 
     /// Returns a mutable reference to the internal interval vector

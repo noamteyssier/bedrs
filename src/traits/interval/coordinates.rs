@@ -12,51 +12,284 @@ where
     C: ChromBounds,
     T: ValueBounds,
 {
+    /// Returns the start coordinate of the interval.
+    ///
+    /// # Examples
+    /// ```
+    /// use bedrs::{Coordinates, GenomicInterval};
+    ///
+    /// let iv = GenomicInterval::new(1, 10, 20);
+    /// assert_eq!(iv.start(), 10);
+    /// ```
     fn start(&self) -> T;
+
+    /// Returns the end coordinate of the interval.
+    ///
+    /// # Examples
+    /// ```
+    /// use bedrs::{Coordinates, GenomicInterval};
+    ///
+    /// let iv = GenomicInterval::new(1, 10, 20);
+    /// assert_eq!(iv.end(), 20);
+    /// ```
     fn end(&self) -> T;
+
+    /// Returns a reference to the chromosome of the interval.
+    ///
+    /// *Note*: A reference is returned in the case that the chromosome
+    /// is a large type, such as a `String` or `Vec<u8>`.
+    ///
+    /// # Examples
+    /// ```
+    /// use bedrs::{Coordinates, GenomicInterval};
+    ///
+    /// let iv = GenomicInterval::new(1, 10, 20);
+    /// assert_eq!(iv.chr(), &1);
+    /// ```
     fn chr(&self) -> &C;
 
     /// Return the strand of the interval, if it has one.
     ///
     /// This is a default implementation that returns `None` for
     /// intervals that do not have a strand.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bedrs::{Coordinates, GenomicInterval, Strand, StrandedGenomicInterval};
+    ///
+    /// let iv = GenomicInterval::new(1, 10, 20);
+    /// assert_eq!(iv.strand(), None);
+    ///
+    /// let siv = StrandedGenomicInterval::new(1, 10, 20, Strand::Forward);
+    /// assert_eq!(siv.strand(), Some(Strand::Forward));
+    /// ```
     fn strand(&self) -> Option<Strand> {
         None
     }
 
+    /// Update the start coordinate of the interval.
+    ///
+    ///     
+    /// # Examples
+    ///
+    /// ```
+    /// use bedrs::{Coordinates, GenomicInterval};
+    ///
+    /// let mut iv = GenomicInterval::new(1, 10, 20);
+    /// assert_eq!(iv.start(), 10);
+    ///
+    /// iv.update_start(&5);
+    /// assert_eq!(iv.start(), 5);
+    /// ```
     fn update_start(&mut self, val: &T);
+
+    /// Update the end coordinate of the interval.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bedrs::{Coordinates, GenomicInterval};
+    ///
+    /// let mut iv = GenomicInterval::new(1, 10, 20);
+    /// assert_eq!(iv.end(), 20);
+    ///
+    /// iv.update_end(&30);
+    /// assert_eq!(iv.end(), 30);
+    /// ```
     fn update_end(&mut self, val: &T);
+
+    /// Update the chromosome of the interval.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bedrs::{Coordinates, GenomicInterval};
+    ///
+    /// let mut iv = GenomicInterval::new(1, 10, 20);
+    /// assert_eq!(iv.chr(), &1);
+    ///
+    /// iv.update_chr(&2);
+    /// assert_eq!(iv.chr(), &2);
+    /// ```
     fn update_chr(&mut self, val: &C);
+
+    /// Create a new interval with the same coordinates as the current one.
+    ///
+    /// *Note*: This is less verbose when working with generic types.
+    /// In most cases it can be better to use the `copy` or `clone` methods.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bedrs::{Coordinates, GenomicInterval};
+    ///
+    /// let iv = GenomicInterval::new(1, 10, 20);
+    /// let new_iv = <GenomicInterval<usize> as Coordinates<usize, usize>>::from(&iv);
+    ///
+    /// assert_eq!(iv, new_iv);
+    /// ```
     fn from(other: &Self) -> Self;
+
+    /// Calculates the length of the interval across its start and end coordinates.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bedrs::{Coordinates, GenomicInterval};
+    ///
+    /// let iv = GenomicInterval::new(1, 10, 20);
+    /// assert_eq!(iv.len(), 10);
+    /// ```
     fn len(&self) -> T {
         self.end().sub(self.start())
     }
+
+    /// Update all attributes of the interval.
+    ///
+    /// # Examples
+    /// ```
+    /// use bedrs::{Coordinates, GenomicInterval};
+    ///
+    /// let mut iv = GenomicInterval::new(1, 10, 20);
+    /// assert_eq!(iv, GenomicInterval::new(1, 10, 20));
+    ///
+    /// iv.update_all(&2, &5, &10);
+    /// assert_eq!(iv, GenomicInterval::new(2, 5, 10));
+    /// ```
     fn update_all(&mut self, chr: &C, start: &T, end: &T) {
         self.update_chr(chr);
         self.update_endpoints(start, end);
     }
+
+    /// Update the endpoints of the interval.
+    ///
+    /// # Examples
+    /// ```
+    /// use bedrs::{Coordinates, GenomicInterval};
+    ///
+    /// let mut iv = GenomicInterval::new(1, 10, 20);
+    /// assert_eq!(iv, GenomicInterval::new(1, 10, 20));
+    ///
+    /// iv.update_endpoints(&5, &10);
+    /// assert_eq!(iv, GenomicInterval::new(1, 5, 10));
+    /// ```
     fn update_endpoints(&mut self, start: &T, end: &T) {
         self.update_start(start);
         self.update_end(end);
     }
+
+    /// Update all the attributes of the interval from another interval.
+    ///
+    /// # Examples
+    /// ```
+    /// use bedrs::{Coordinates, GenomicInterval};
+    ///
+    /// let mut iv = GenomicInterval::new(1, 10, 20);
+    /// assert_eq!(iv, GenomicInterval::new(1, 10, 20));
+    ///
+    /// iv.update_all_from(&GenomicInterval::new(2, 5, 10));
+    /// assert_eq!(iv, GenomicInterval::new(2, 5, 10));
+    /// ```
     fn update_all_from<I: Coordinates<C, T>>(&mut self, other: &I) {
         self.update_chr(&other.chr());
         self.update_endpoints(&other.start(), &other.end());
     }
+
+    /// Update only the endpoints of the interval from another interval.
+    ///
+    /// # Examples
+    /// ```
+    /// use bedrs::{Coordinates, GenomicInterval};
+    ///
+    /// let mut iv = GenomicInterval::new(1, 10, 20);
+    /// assert_eq!(iv, GenomicInterval::new(1, 10, 20));
+    ///
+    /// iv.update_endpoints_from(&GenomicInterval::new(2, 5, 10));
+    /// assert_eq!(iv, GenomicInterval::new(1, 5, 10));
+    /// ```
     fn update_endpoints_from<I: Coordinates<C, T>>(&mut self, other: &I) {
         self.update_start(&other.start());
         self.update_end(&other.end());
     }
+
+    /// Extend the interval to the left by a value.
+    /// This is equivalent to subtracting the value from the start coordinate.
+    ///
+    /// # Examples
+    /// ```
+    /// use bedrs::{Coordinates, GenomicInterval};
+    ///
+    /// let mut iv = GenomicInterval::new(1, 10, 20);
+    /// assert_eq!(iv, GenomicInterval::new(1, 10, 20));
+    ///
+    /// iv.extend_left(&5);
+    /// assert_eq!(iv, GenomicInterval::new(1, 5, 20));
+    /// ```
     fn extend_left(&mut self, val: &T) {
         self.update_start(&self.start().sub(*val));
     }
+
+    /// Extend the interval to the right by a value.
+    /// This is equivalent to adding the value to the end coordinate.
+    ///
+    /// # Examples
+    /// ```
+    /// use bedrs::{Coordinates, GenomicInterval};
+    ///
+    /// let mut iv = GenomicInterval::new(1, 10, 20);
+    /// assert_eq!(iv, GenomicInterval::new(1, 10, 20));
+    ///
+    /// iv.extend_right(&5);
+    /// assert_eq!(iv, GenomicInterval::new(1, 10, 25));
+    /// ```
     fn extend_right(&mut self, val: &T) {
         self.update_end(&self.end().add(*val));
     }
+
+    /// Extend the interval to the left and right by a value.
+    /// This is equivalent to subtracting the value from the start coordinate
+    /// and adding the value to the end coordinate.
+    ///
+    /// # Examples
+    /// ```
+    /// use bedrs::{Coordinates, GenomicInterval};
+    ///
+    /// let mut iv = GenomicInterval::new(1, 10, 20);
+    /// assert_eq!(iv, GenomicInterval::new(1, 10, 20));
+    ///
+    /// iv.extend(&5);
+    /// assert_eq!(iv, GenomicInterval::new(1, 5, 25));
+    /// ```
     fn extend(&mut self, val: &T) {
         self.extend_left(val);
         self.extend_right(val);
     }
+
+    /// Compare two intervals by their genomic coordinates.
+    ///
+    /// # Examples
+    /// ```
+    /// use bedrs::{Coordinates, GenomicInterval};
+    ///
+    /// let a = GenomicInterval::new(1, 10, 20);
+    /// let b = GenomicInterval::new(1, 10, 20);
+    /// let c = GenomicInterval::new(1, 20, 30);
+    /// let d = GenomicInterval::new(2, 10, 20);
+    /// let e = GenomicInterval::new(1, 5, 10);
+    ///
+    /// // a == b
+    /// assert_eq!(a.coord_cmp(&b), std::cmp::Ordering::Equal);
+    ///
+    /// // a < c
+    /// assert_eq!(a.coord_cmp(&c), std::cmp::Ordering::Less);
+    ///
+    /// // a < d
+    /// assert_eq!(a.coord_cmp(&d), std::cmp::Ordering::Less);
+    ///
+    /// // a > e
+    /// assert_eq!(a.coord_cmp(&e), std::cmp::Ordering::Greater);
+    /// ```
     fn coord_cmp<I: Coordinates<C, T>>(&self, other: &I) -> Ordering {
         match self.chr().cmp(&other.chr()) {
             Ordering::Equal => match self.start().cmp(&other.start()) {
