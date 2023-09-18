@@ -6,27 +6,23 @@
 [![Crates.io](https://img.shields.io/crates/v/bedrs)](https://crates.io/crates/bedrs)
 [![docs.rs](https://img.shields.io/docsrs/bedrs/latest)](https://docs.rs/bedrs/latest/bedrs/)
 
-bedtools-like functionality for interval sets in rust
+`bedtools`-like functionality for interval sets in rust
 
 ## Summary
 
-I wanted some bedtools-like functionality in rust and I made this tool to both
-learn how to implement genomic arithmetic as well as get more comfortable with
-generics and traits in rust.
+This is an interval library written in rust that takes advantage of the trait
+system, generics, and monomorphization.
 
-This library will eventually be focused towards genome-specific arithmetic
-and focuses around a base `Coordinates` trait which includes functions to
-retrieve `<chr, start, stop>`.
+It focuses around two main traits: `Coordinates` and `Container` which when
+implemented on an arbitrary type allow for a wide range of genomic interval
+arithmetic.
 
-This is a work in progress and is subject to heavy changes.
+Interval arithmetic can be thought of as set theoretic operations (like intersection,
+union, difference, complement, etc.) on intervals with associated chromosomes, strands,
+and other genomic markers.
 
-If you want a more robust interval library I recommend the following:
-
-- [rust_lapper](https://crates.io/crates/rust-lapper)
-- [COITrees](https://crates.io/crates/coitrees)
-- [rampart](https://crates.io/crates/rampart)
-
-This library is heavily inspired from those above.
+This library facilitates the development of these types of operations on arbitrary types
+and lets the user tailor their structures to minimize overhead.
 
 ## Usage
 
@@ -34,6 +30,8 @@ The main benefit of this library is that it is trait-based.
 So you can define your own types - but if they implement the
 `Coordinates` trait they can use the other functions within the
 library.
+
+For detailed usage and examples please review the [documentation](https://docs.rs/bedrs/latest/bedrs/).
 
 ### `Coordinates` Trait
 
@@ -130,3 +128,34 @@ let a = GenomicInterval::new(1, 10, 20);
 let b = GenomicInterval::new(2, 15, 25);
 assert!(!a.overlaps(&b));
 ```
+
+#### Stranded Genomic Interval
+
+This is another version of the genomic interval which includes strand information.
+It is a 4-attribute struct of `[chr, start, stop, strand]`
+
+```rust
+use bedrs::{Overlap, Strand, StrandedGenomicInterval};
+
+// Initializing three intervals on the same Chr with strands
+let a = StrandedGenomicInterval::new(1, 10, 20, Strand::Forward);
+let b = StrandedGenomicInterval::new(1, 15, 25, Strand::Forward);
+let c = StrandedGenomicInterval::new(1, 15, 25, Strand::Reverse);
+
+// All intervals overlap
+assert!(a.overlaps(&b));
+assert!(a.overlaps(&c));
+
+// Only `a` and `b` overlap on the same strand
+assert!(a.stranded_overlaps(&b));
+assert!(!a.stranded_overlaps(&b));
+```
+
+## Other Work
+
+This library is heavily inspired by other interval libraries in rust
+which are listed below:
+
+- [rampart](https://crates.io/crates/rampart)
+- [rust_lapper](https://crates.io/crates/rust-lapper)
+- [COITrees](https://crates.io/crates/coitrees)
