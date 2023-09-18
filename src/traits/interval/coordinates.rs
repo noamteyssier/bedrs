@@ -1,6 +1,6 @@
 use crate::{
     traits::{ChromBounds, ValueBounds},
-    Intersect, Overlap, Subtract,
+    Intersect, Overlap, Strand, Subtract,
 };
 use std::cmp::Ordering;
 
@@ -15,6 +15,15 @@ where
     fn start(&self) -> T;
     fn end(&self) -> T;
     fn chr(&self) -> &C;
+
+    /// Return the strand of the interval, if it has one.
+    ///
+    /// This is a default implementation that returns `None` for
+    /// intervals that do not have a strand.
+    fn strand(&self) -> Option<Strand> {
+        None
+    }
+
     fn update_start(&mut self, val: &T);
     fn update_end(&mut self, val: &T);
     fn update_chr(&mut self, val: &C);
@@ -51,7 +60,10 @@ where
     fn coord_cmp<I: Coordinates<C, T>>(&self, other: &I) -> Ordering {
         match self.chr().cmp(&other.chr()) {
             Ordering::Equal => match self.start().cmp(&other.start()) {
-                Ordering::Equal => self.end().cmp(&other.end()),
+                Ordering::Equal => match self.end().cmp(&other.end()) {
+                    Ordering::Equal => self.strand().cmp(&other.strand()),
+                    order => order,
+                },
                 order => order,
             },
             order => order,
@@ -72,7 +84,10 @@ where
                 };
                 if let Some(comp) = comp {
                     match comp {
-                        Ordering::Equal => self.end().cmp(&other.end()),
+                        Ordering::Equal => match self.end().cmp(&other.end()) {
+                            Ordering::Equal => self.strand().cmp(&other.strand()),
+                            order => order,
+                        },
                         order => order,
                     }
                 } else {

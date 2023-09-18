@@ -102,7 +102,7 @@ where
     /// assert_eq!(*span.chr(), 1);
     /// assert_eq!(span.start(), 10);
     /// assert_eq!(span.end(), 500);
-    /// assert_eq!(span.strand(), Strand::Unknown); // Strand is arbitrary in span
+    /// assert_eq!(span.strand().unwrap(), Strand::Unknown); // Strand is arbitrary in span
     /// ```
     fn span(&self) -> Result<StrandedGenomicInterval<T>> {
         if self.is_empty() {
@@ -119,7 +119,7 @@ where
                     *first.chr(),
                     first.start(),
                     last.end(),
-                    Strand::Unknown,
+                    Strand::default(),
                 );
                 Ok(iv)
             }
@@ -297,7 +297,7 @@ mod testing {
         let mut set = StrandedGenomicIntervalSet::new(records);
 
         set.records().iter().for_each(|r| {
-            assert_eq!(r.strand(), Strand::Forward);
+            assert_eq!(r.strand().unwrap(), Strand::Forward);
         });
 
         set.records_mut().iter_mut().for_each(|r| {
@@ -305,7 +305,7 @@ mod testing {
         });
 
         set.records().iter().for_each(|r| {
-            assert_eq!(r.strand(), Strand::Reverse);
+            assert_eq!(r.strand().unwrap(), Strand::Reverse);
         });
     }
 
@@ -346,6 +346,69 @@ mod testing {
         let span = set.span().unwrap();
         assert_eq!(span.start(), 10);
         assert_eq!(span.end(), 2000);
+    }
+
+    #[test]
+    fn test_sort() {
+        let records = vec![
+            StrandedGenomicInterval::new(1, 1000, 2000, Strand::Reverse),
+            StrandedGenomicInterval::new(1, 1000, 2000, Strand::Forward),
+            StrandedGenomicInterval::new(1, 1000, 2000, Strand::Unknown),
+            StrandedGenomicInterval::new(1, 10, 100, Strand::Reverse),
+            StrandedGenomicInterval::new(1, 10, 100, Strand::Forward),
+            StrandedGenomicInterval::new(1, 10, 100, Strand::Unknown),
+            StrandedGenomicInterval::new(2, 1000, 2000, Strand::Reverse),
+            StrandedGenomicInterval::new(2, 1000, 2000, Strand::Forward),
+            StrandedGenomicInterval::new(2, 1000, 2000, Strand::Unknown),
+            StrandedGenomicInterval::new(2, 10, 100, Strand::Reverse),
+            StrandedGenomicInterval::new(2, 10, 100, Strand::Forward),
+            StrandedGenomicInterval::new(2, 10, 100, Strand::Unknown),
+        ];
+        let set = StrandedGenomicIntervalSet::from_unsorted(records);
+        assert!(set.is_sorted());
+        let vec = set.records();
+        assert!(vec[0].eq(&StrandedGenomicInterval::new(1, 10, 100, Strand::Forward)));
+        assert!(vec[1].eq(&StrandedGenomicInterval::new(1, 10, 100, Strand::Reverse)));
+        assert!(vec[2].eq(&StrandedGenomicInterval::new(1, 10, 100, Strand::Unknown)));
+        assert!(vec[3].eq(&StrandedGenomicInterval::new(
+            1,
+            1000,
+            2000,
+            Strand::Forward
+        )));
+        assert!(vec[4].eq(&StrandedGenomicInterval::new(
+            1,
+            1000,
+            2000,
+            Strand::Reverse
+        )));
+        assert!(vec[5].eq(&StrandedGenomicInterval::new(
+            1,
+            1000,
+            2000,
+            Strand::Unknown
+        )));
+        assert!(vec[6].eq(&StrandedGenomicInterval::new(2, 10, 100, Strand::Forward)));
+        assert!(vec[7].eq(&StrandedGenomicInterval::new(2, 10, 100, Strand::Reverse)));
+        assert!(vec[8].eq(&StrandedGenomicInterval::new(2, 10, 100, Strand::Unknown)));
+        assert!(vec[9].eq(&StrandedGenomicInterval::new(
+            2,
+            1000,
+            2000,
+            Strand::Forward
+        )));
+        assert!(vec[10].eq(&StrandedGenomicInterval::new(
+            2,
+            1000,
+            2000,
+            Strand::Reverse
+        )));
+        assert!(vec[11].eq(&StrandedGenomicInterval::new(
+            2,
+            1000,
+            2000,
+            Strand::Unknown
+        )));
     }
 
     #[test]

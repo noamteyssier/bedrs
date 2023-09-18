@@ -1,20 +1,9 @@
-use crate::traits::{Coordinates, ValueBounds};
+use crate::{
+    traits::{Coordinates, ValueBounds},
+    Strand,
+};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub enum Strand {
-    /// The forward strand
-    Forward,
-
-    /// The reverse strand
-    Reverse,
-
-    /// Unknown strand
-    #[default]
-    Unknown,
-}
 
 /// A representation of a Genomic Interval.
 ///
@@ -29,10 +18,11 @@ pub enum Strand {
 /// assert_eq!(*a.chr(), 1);
 /// assert_eq!(a.start(), 20);
 /// assert_eq!(a.end(), 30);
-/// assert_eq!(a.strand(), Strand::Forward);
+/// assert_eq!(a.strand(), Some(Strand::Forward));
 ///
 /// let b = StrandedGenomicInterval::new(1, 20, 30, Strand::Reverse);
 /// assert!(a.overlaps(&b));
+/// assert!(!a.stranded_overlaps(&b));
 /// ```
 #[derive(Debug, Clone, Copy)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -56,6 +46,9 @@ where
     fn chr(&self) -> &T {
         &self.chr
     }
+    fn strand(&self) -> Option<Strand> {
+        Some(self.strand)
+    }
     fn update_start(&mut self, val: &T) {
         self.start = *val;
     }
@@ -70,7 +63,7 @@ where
             chr: *other.chr(),
             start: other.start(),
             end: other.end(),
-            strand: other.strand(),
+            strand: other.strand().unwrap_or_default(),
         }
     }
 }
@@ -89,7 +82,7 @@ where
     /// assert_eq!(*a.chr(), 1);
     /// assert_eq!(a.start(), 20);
     /// assert_eq!(a.end(), 30);
-    /// assert_eq!(a.strand(), Strand::Forward);
+    /// assert_eq!(a.strand(), Some(Strand::Forward));
     /// ```
     pub fn new(chr: T, start: T, end: T, strand: Strand) -> Self {
         Self {
@@ -100,21 +93,7 @@ where
         }
     }
 
-    /// Get the strand of the interval
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use bedrs::{Coordinates, StrandedGenomicInterval, Strand};
-    ///
-    /// let a = StrandedGenomicInterval::new(1, 20, 30, Strand::Forward);
-    /// assert_eq!(a.strand(), Strand::Forward);
-    /// ```
-    pub fn strand(&self) -> Strand {
-        self.strand
-    }
-
-    /// Set the strand of the interval
+    /// Overwrite the strand of the interval.
     ///
     /// # Examples
     ///
@@ -122,9 +101,9 @@ where
     /// use bedrs::{Coordinates, StrandedGenomicInterval, Strand};
     ///
     /// let mut a = StrandedGenomicInterval::new(1, 20, 30, Strand::Forward);
-    /// assert_eq!(a.strand(), Strand::Forward);
+    /// assert_eq!(a.strand(), Some(Strand::Forward));
     /// a.set_strand(Strand::Reverse);
-    /// assert_eq!(a.strand(), Strand::Reverse);
+    /// assert_eq!(a.strand(), Some(Strand::Reverse));
     /// ```
     pub fn set_strand(&mut self, strand: Strand) {
         self.strand = strand;
@@ -190,9 +169,9 @@ mod testing {
     #[test]
     fn test_set_strand() {
         let mut a = StrandedGenomicInterval::new(1, 5, 100, Strand::Forward);
-        assert_eq!(a.strand(), Strand::Forward);
+        assert_eq!(a.strand(), Some(Strand::Forward));
         a.set_strand(Strand::Reverse);
-        assert_eq!(a.strand(), Strand::Reverse);
+        assert_eq!(a.strand(), Some(Strand::Reverse));
     }
 
     #[test]
@@ -203,7 +182,7 @@ mod testing {
         assert_eq!(sub.len(), 1);
         assert_eq!(sub[0].start(), 5);
         assert_eq!(sub[0].end(), 10);
-        assert_eq!(sub[0].strand(), Strand::Forward);
+        assert_eq!(sub[0].strand().unwrap(), Strand::Forward);
     }
 
     #[test]
@@ -214,7 +193,7 @@ mod testing {
         assert_eq!(sub.len(), 1);
         assert_eq!(sub[0].start(), 5);
         assert_eq!(sub[0].end(), 10);
-        assert_eq!(sub[0].strand(), Strand::Forward);
+        assert_eq!(sub[0].strand().unwrap(), Strand::Forward);
     }
 
     #[test]
@@ -225,7 +204,14 @@ mod testing {
         assert_eq!(sub.len(), 1);
         assert_eq!(sub[0].start(), 5);
         assert_eq!(sub[0].end(), 10);
-        assert_eq!(sub[0].strand(), Strand::Reverse);
+        assert_eq!(sub[0].strand().unwrap(), Strand::Reverse);
+    }
+
+    #[test]
+    fn test_from() {
+        let a = StrandedGenomicInterval::new(1, 5, 100, Strand::Reverse);
+        let b: StrandedGenomicInterval<usize> = Coordinates::from(&a);
+        assert!(a.eq(&b));
     }
 
     #[test]
