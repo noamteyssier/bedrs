@@ -148,7 +148,7 @@ assert!(a.overlaps(&c));
 
 // Only `a` and `b` overlap on the same strand
 assert!(a.stranded_overlaps(&b));
-assert!(!a.stranded_overlaps(&b));
+assert!(!a.stranded_overlaps(&c));
 ```
 
 ## Other Work
