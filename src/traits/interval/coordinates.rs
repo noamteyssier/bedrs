@@ -13,18 +13,57 @@ where
     T: ValueBounds,
 {
     /// Returns the start coordinate of the interval.
+    ///
+    /// # Examples
+    /// ```
+    /// use bedrs::{Coordinates, GenomicInterval};
+    ///
+    /// let iv = GenomicInterval::new(1, 10, 20);
+    /// assert_eq!(iv.start(), 10);
+    /// ```
     fn start(&self) -> T;
 
     /// Returns the end coordinate of the interval.
+    ///
+    /// # Examples
+    /// ```
+    /// use bedrs::{Coordinates, GenomicInterval};
+    ///
+    /// let iv = GenomicInterval::new(1, 10, 20);
+    /// assert_eq!(iv.end(), 20);
+    /// ```
     fn end(&self) -> T;
 
-    /// Returns the chromosome of the interval.
+    /// Returns a reference to the chromosome of the interval.
+    ///
+    /// *Note*: A reference is returned in the case that the chromosome
+    /// is a large type, such as a `String` or `Vec<u8>`.
+    ///
+    /// # Examples
+    /// ```
+    /// use bedrs::{Coordinates, GenomicInterval};
+    ///
+    /// let iv = GenomicInterval::new(1, 10, 20);
+    /// assert_eq!(iv.chr(), &1);
+    /// ```
     fn chr(&self) -> &C;
 
     /// Return the strand of the interval, if it has one.
     ///
     /// This is a default implementation that returns `None` for
     /// intervals that do not have a strand.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bedrs::{Coordinates, GenomicInterval, Strand, StrandedGenomicInterval};
+    ///
+    /// let iv = GenomicInterval::new(1, 10, 20);
+    /// assert_eq!(iv.strand(), None);
+    ///
+    /// let siv = StrandedGenomicInterval::new(1, 10, 20, Strand::Forward);
+    /// assert_eq!(siv.strand(), Some(Strand::Forward));
+    /// ```
     fn strand(&self) -> Option<Strand> {
         None
     }
