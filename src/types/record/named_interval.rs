@@ -41,6 +41,65 @@ where
         }
     }
 }
+impl<'a, N, T> Coordinates<N, T> for &'a NamedInterval<N, T>
+where
+    N: ChromBounds,
+    T: ValueBounds,
+{
+    fn start(&self) -> T {
+        self.start
+    }
+    fn end(&self) -> T {
+        self.end
+    }
+    fn chr(&self) -> &N {
+        &self.chr
+    }
+    #[allow(unused)]
+    fn update_start(&mut self, val: &T) {
+        unreachable!("Cannot update an immutable reference")
+    }
+    #[allow(unused)]
+    fn update_end(&mut self, val: &T) {
+        unreachable!("Cannot update an immutable reference")
+    }
+    #[allow(unused)]
+    fn update_chr(&mut self, val: &N) {
+        unreachable!("Cannot update an immutable reference")
+    }
+    #[allow(unused)]
+    fn from(other: &Self) -> Self {
+        unimplemented!("Cannot create a new reference from a reference")
+    }
+}
+impl<'a, N, T> Coordinates<N, T> for &'a mut NamedInterval<N, T>
+where
+    N: ChromBounds,
+    T: ValueBounds,
+{
+    fn start(&self) -> T {
+        self.start
+    }
+    fn end(&self) -> T {
+        self.end
+    }
+    fn chr(&self) -> &N {
+        &self.chr
+    }
+    fn update_start(&mut self, val: &T) {
+        self.start = *val;
+    }
+    fn update_end(&mut self, val: &T) {
+        self.end = *val;
+    }
+    fn update_chr(&mut self, val: &N) {
+        self.chr = val.clone();
+    }
+    #[allow(unused)]
+    fn from(other: &Self) -> Self {
+        unimplemented!("Cannot create a new reference from a reference")
+    }
+}
 
 impl<N, T> NamedInterval<N, T>
 where
@@ -176,5 +235,20 @@ mod testing {
         let encoding = serialize(&a).unwrap();
         let b: NamedInterval<&str, usize> = deserialize(&encoding).unwrap();
         assert_eq!(a, b);
+    }
+
+    fn function_generic_reference<'a, C: Coordinates<&'a str, usize>>(iv: C) {
+        assert_eq!(*iv.chr(), "chr1");
+        assert_eq!(iv.start(), 10);
+        assert_eq!(iv.end(), 100);
+        assert!(iv.strand().is_none());
+    }
+
+    #[test]
+    fn test_generic_reference() {
+        let mut iv = NamedInterval::new("chr1", 10, 100);
+        function_generic_reference(&iv);
+        function_generic_reference(&mut iv);
+        function_generic_reference(iv);
     }
 }
