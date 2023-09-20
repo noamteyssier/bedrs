@@ -69,11 +69,17 @@ where
         &self.chr
     }
     #[allow(unused)]
-    fn update_start(&mut self, val: &T) {}
+    fn update_start(&mut self, val: &T) {
+        unreachable!("Cannot update an immutable reference")
+    }
     #[allow(unused)]
-    fn update_end(&mut self, val: &T) {}
+    fn update_end(&mut self, val: &T) {
+        unreachable!("Cannot update an immutable reference")
+    }
     #[allow(unused)]
-    fn update_chr(&mut self, val: &T) {}
+    fn update_chr(&mut self, val: &T) {
+        unreachable!("Cannot update an immutable reference")
+    }
     #[allow(unused)]
     fn from(other: &Self) -> Self {
         unimplemented!("Cannot create a new reference from a reference")
@@ -182,6 +188,7 @@ mod testing {
         assert_eq!(*iv.chr(), 1);
         assert_eq!(iv.start(), 10);
         assert_eq!(iv.end(), 100);
+        assert!(iv.strand().is_none());
     }
 
     #[test]
