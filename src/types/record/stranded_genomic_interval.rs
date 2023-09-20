@@ -68,6 +68,65 @@ where
     }
 }
 
+impl<'a, T> Coordinates<T, T> for &'a StrandedGenomicInterval<T>
+where
+    T: ValueBounds,
+{
+    fn start(&self) -> T {
+        self.start
+    }
+    fn end(&self) -> T {
+        self.end
+    }
+    fn chr(&self) -> &T {
+        &self.chr
+    }
+    fn strand(&self) -> Option<Strand> {
+        Some(self.strand)
+    }
+    #[allow(unused)]
+    fn update_start(&mut self, val: &T) {}
+    #[allow(unused)]
+    fn update_end(&mut self, val: &T) {}
+    #[allow(unused)]
+    fn update_chr(&mut self, val: &T) {}
+    #[allow(unused)]
+    fn from(other: &Self) -> Self {
+        unimplemented!("Cannot create a new reference from a reference")
+    }
+}
+
+impl<'a, T> Coordinates<T, T> for &'a mut StrandedGenomicInterval<T>
+where
+    T: ValueBounds,
+{
+    fn start(&self) -> T {
+        self.start
+    }
+    fn end(&self) -> T {
+        self.end
+    }
+    fn chr(&self) -> &T {
+        &self.chr
+    }
+    fn strand(&self) -> Option<Strand> {
+        Some(self.strand)
+    }
+    fn update_start(&mut self, val: &T) {
+        self.start = *val;
+    }
+    fn update_end(&mut self, val: &T) {
+        self.end = *val;
+    }
+    fn update_chr(&mut self, val: &T) {
+        self.chr = *val;
+    }
+    #[allow(unused)]
+    fn from(other: &Self) -> Self {
+        unimplemented!("Cannot create a new reference from a reference")
+    }
+}
+
 impl<T> StrandedGenomicInterval<T>
 where
     T: ValueBounds,
@@ -221,5 +280,19 @@ mod testing {
         let serialized = serialize(&a).unwrap();
         let deserialized: StrandedGenomicInterval<u32> = deserialize(&serialized).unwrap();
         assert!(a.eq(&deserialized));
+    }
+
+    fn function_generic_reference<C: Coordinates<usize, usize>>(iv: C) {
+        assert_eq!(*iv.chr(), 1);
+        assert_eq!(iv.start(), 10);
+        assert_eq!(iv.end(), 100);
+    }
+
+    #[test]
+    fn test_generic_reference() {
+        let mut iv = StrandedGenomicInterval::new(1, 10, 100, Strand::Forward);
+        function_generic_reference(&iv);
+        function_generic_reference(&mut iv);
+        function_generic_reference(iv);
     }
 }

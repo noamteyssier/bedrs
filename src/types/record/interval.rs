@@ -67,6 +67,56 @@ where
         }
     }
 }
+impl<'a, T> Coordinates<T, T> for &'a Interval<T>
+where
+    T: ValueBounds,
+{
+    fn start(&self) -> T {
+        self.start
+    }
+    fn end(&self) -> T {
+        self.end
+    }
+    fn chr(&self) -> &T {
+        &self.chr
+    }
+    #[allow(unused)]
+    fn update_start(&mut self, val: &T) {}
+    #[allow(unused)]
+    fn update_end(&mut self, val: &T) {}
+    #[allow(unused)]
+    fn update_chr(&mut self, val: &T) {}
+    #[allow(unused)]
+    fn from(other: &Self) -> Self {
+        unimplemented!("Cannot create a new reference from a reference")
+    }
+}
+impl<'a, T> Coordinates<T, T> for &'a mut Interval<T>
+where
+    T: ValueBounds,
+{
+    fn start(&self) -> T {
+        self.start
+    }
+    fn end(&self) -> T {
+        self.end
+    }
+    fn chr(&self) -> &T {
+        &self.chr
+    }
+    fn update_start(&mut self, val: &T) {
+        self.start = *val;
+    }
+    fn update_end(&mut self, val: &T) {
+        self.end = *val;
+    }
+    #[allow(unused)]
+    fn update_chr(&mut self, val: &T) {}
+    #[allow(unused)]
+    fn from(other: &Self) -> Self {
+        unimplemented!("Cannot create a new reference from a mutable reference")
+    }
+}
 
 #[cfg(test)]
 mod testing {
@@ -121,5 +171,19 @@ mod testing {
         let encoding = serialize(&a).unwrap();
         let b: Interval<usize> = deserialize(&encoding).unwrap();
         assert!(a.eq(&b));
+    }
+
+    fn function_generic_reference<C: Coordinates<usize, usize>>(iv: C) {
+        assert_eq!(*iv.chr(), 0);
+        assert_eq!(iv.start(), 10);
+        assert_eq!(iv.end(), 100);
+    }
+
+    #[test]
+    fn test_generic_reference() {
+        let mut iv = Interval::new(10, 100);
+        function_generic_reference(&iv);
+        function_generic_reference(&mut iv);
+        function_generic_reference(iv);
     }
 }
