@@ -1,3 +1,4 @@
+use super::{closest::Closest, Complement};
 use crate::{
     traits::{errors::SetError, ChromBounds, IntervalBounds, ValueBounds},
     types::{IntervalIterOwned, IntervalIterRef},
@@ -5,7 +6,8 @@ use crate::{
 };
 use anyhow::Result;
 
-use super::{closest::Closest, Complement};
+#[cfg(feature = "rayon")]
+use rayon::prelude::*;
 
 /// The main trait representing a container of intervals.
 ///
@@ -109,6 +111,15 @@ where
     /// Sorts the internal interval vector on the chromosome and start position of the intervals.
     fn sort(&mut self) {
         self.records_mut().sort_unstable_by(|a, b| a.coord_cmp(b));
+        self.set_sorted();
+    }
+
+    /// Sorts the internal interval vector on the chromosome and start position of the intervals.
+    /// but parallelizes the sorting.
+    #[cfg(feature = "rayon")]
+    fn par_sort(&mut self) {
+        self.records_mut()
+            .par_sort_unstable_by(|a, b| a.coord_cmp(b));
         self.set_sorted();
     }
 
@@ -362,6 +373,25 @@ mod testing {
             is_sorted: false,
         };
         container.sort();
+        assert_eq!(container.records()[0].start(), 10);
+        assert_eq!(container.records()[1].start(), 15);
+        assert_eq!(container.records()[2].start(), 20);
+    }
+
+    #[test]
+    #[cfg(feature = "rayon")]
+    fn test_custom_container_par_sort() {
+        let records = vec![
+            Interval::new(20, 30), // 3
+            Interval::new(10, 20), // 1
+            Interval::new(15, 25), // 2
+        ];
+        let mut container = CustomContainer {
+            records,
+            max_len: Some(10),
+            is_sorted: false,
+        };
+        container.par_sort();
         assert_eq!(container.records()[0].start(), 10);
         assert_eq!(container.records()[1].start(), 15);
         assert_eq!(container.records()[2].start(), 20);
