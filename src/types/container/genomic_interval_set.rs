@@ -295,4 +295,14 @@ mod testing {
             assert!(iv1.eq(&iv2));
         }
     }
+
+    #[test]
+    #[cfg(feature = "rayon")]
+    fn test_par_sort() {
+        let n_intervals = 10;
+        let records = vec![GenomicInterval::new(1, 10, 100); n_intervals];
+        let mut set = GenomicIntervalSet::new(records.clone());
+        set.par_sort();
+        assert_eq!(set.records(), &records);
+    }
 }

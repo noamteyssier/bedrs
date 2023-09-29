@@ -231,4 +231,14 @@ mod testing {
             assert!(iv1.eq(iv2));
         }
     }
+
+    #[test]
+    #[cfg(feature = "rayon")]
+    fn test_par_sort() {
+        let n_intervals = 10;
+        let records = vec![Interval::new(10, 100); n_intervals];
+        let mut set = IntervalSet::new(records);
+        set.par_sort();
+        assert!(set.is_sorted());
+    }
 }
