@@ -1,6 +1,6 @@
 [package]
 name = "bedrs"
-version = "0.1.10"
+version = "0.1.11"
 edition = "2021"
 license = "MIT"
 description = "Genomic interval library in rust"
@@ -16,11 +16,13 @@ anyhow = "1.0.65"
 num-traits = "0.2.16"
 rand = "0.8.5"
 rand_chacha = "0.3.1"
+rayon = { version = "1.8.0", optional = true }
 serde = { version = "1.0.181", features = ["derive"], optional = true }
 thiserror = "1.0.44"
 
 [features]
 serde = ["dep:serde"]
+rayon = ["dep:rayon"]
 
 [dev-dependencies]
 criterion = "0.4.0"

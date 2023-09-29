@@ -424,4 +424,14 @@ mod testing {
             assert!(iv1.eq(iv2));
         }
     }
+
+    #[test]
+    #[cfg(feature = "rayon")]
+    fn test_par_sort() {
+        let n_intervals = 10;
+        let records = vec![StrandedGenomicInterval::new(1, 10, 100, Strand::Reverse); n_intervals];
+        let mut set = StrandedGenomicIntervalSet::new(records);
+        set.par_sort();
+        assert!(set.is_sorted());
+    }
 }

@@ -29,6 +29,8 @@ jobs:
         run: cargo test --verbose
       - name: Test Serde
         run: cargo test --verbose -F serde
+      - name: Test Rayon
+        run: cargo test --verbose -F rayon
 
   docs:
     name: Docs
