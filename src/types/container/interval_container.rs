@@ -1,6 +1,6 @@
 use crate::{
-    traits::{ChromBounds, IntervalBounds, SetError, ValueBounds},
-    IntervalIterOwned, IntervalIterRef,
+    traits::{ChromBounds, IntervalBounds, ValueBounds},
+    Container,
 };
 use anyhow::{bail, Result};
 use num_traits::zero;
@@ -45,7 +45,7 @@ where
         }
     }
 }
-impl<I, C, T> IntervalContainer<I, C, T>
+impl<I, C, T> Container<C, T, I> for IntervalContainer<I, C, T>
 where
     I: IntervalBounds<C, T>,
     C: ChromBounds,
@@ -63,46 +63,7 @@ where
     fn empty() -> Self {
         Self::new(Vec::new())
     }
-    fn set_sorted(&mut self) {
-        *self.sorted_mut() = true;
-    }
-    fn set_unsorted(&mut self) {
-        *self.sorted_mut() = false;
-    }
-    fn len(&self) -> usize {
-        self.records.len()
-    }
-    fn is_empty(&self) -> bool {
-        self.records.is_empty()
-    }
-    fn sort(&mut self) {
-        self.records_mut().sort_unstable_by(|a, b| a.coord_cmp(b));
-        self.set_sorted();
-    }
-    fn update_max_len<Iv, Co, To>(&mut self, interval: &Iv)
-    where
-        Iv: IntervalBounds<Co, To>,
-        Co: ChromBounds,
-        To: ValueBounds + Into<T>,
-    {
-        if let Some(max_len) = self.max_len() {
-            if interval.len().into() > max_len {
-                *self.max_len_mut() = Some(interval.len().into());
-            }
-        } else {
-            *self.max_len_mut() = Some(interval.len().into());
-        }
-    }
-    fn insert(&mut self, interval: I) {
-        self.update_max_len(&interval);
-        self.records_mut().push(interval);
-        self.set_unsorted();
-    }
-    fn insert_sorted(&mut self, interval: I) {
-        self.insert(interval);
-        self.sort();
-    }
-    fn records(&self) -> &[I] {
+    fn records(&self) -> &Vec<I> {
         &self.records
     }
     fn records_mut(&mut self) -> &mut Vec<I> {
@@ -111,11 +72,11 @@ where
     fn records_owned(self) -> Vec<I> {
         self.records
     }
-    fn sorted_mut(&mut self) -> &mut bool {
-        &mut self.is_sorted
-    }
     fn is_sorted(&self) -> bool {
         self.is_sorted
+    }
+    fn sorted_mut(&mut self) -> &mut bool {
+        &mut self.is_sorted
     }
     fn max_len(&self) -> Option<T> {
         self.max_len
@@ -141,57 +102,6 @@ where
                 Ok(iv)
             }
         }
-    }
-    /// Creates a new container from presorted intervals
-    ///
-    /// First this validates that the intervals are truly presorted.
-    fn from_sorted(records: Vec<I>) -> Result<Self, SetError> {
-        if Self::valid_interval_sorting(&records) {
-            Ok(Self::from_sorted_unchecked(records))
-        } else {
-            Err(SetError::UnsortedIntervals)
-        }
-    }
-
-    /// Creates a new container from presorted intervals without
-    /// validating if the intervals are truly presorted.
-    fn from_sorted_unchecked(records: Vec<I>) -> Self {
-        let mut set = Self::new(records);
-        set.set_sorted();
-        set
-    }
-
-    /// Creates a new *sorted* container from unsorted intervals
-    fn from_unsorted(records: Vec<I>) -> Self {
-        let mut set = Self::new(records);
-        set.sort();
-        set
-    }
-
-    /// Validates that a set of intervals are sorted
-    fn valid_interval_sorting(records: &Vec<I>) -> bool {
-        records
-            .iter()
-            .enumerate()
-            .skip(1)
-            .map(|(idx, rec)| (rec, &records[idx - 1]))
-            .all(|(a, b)| a.coord_cmp(b).is_ge())
-    }
-
-    /// Applies a mutable function to each interval in the container
-    fn apply_mut<F>(&mut self, f: F)
-    where
-        F: Fn(&mut I),
-    {
-        self.records_mut().iter_mut().for_each(f);
-    }
-
-    fn iter(&self) -> IntervalIterRef<I, C, T> {
-        IntervalIterRef::new(&self.records())
-    }
-
-    fn into_iter(self) -> IntervalIterOwned<I, C, T> {
-        IntervalIterOwned::new(self.records_owned())
     }
 }
 
