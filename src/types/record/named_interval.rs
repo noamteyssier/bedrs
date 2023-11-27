@@ -1,4 +1,5 @@
 use crate::traits::{ChromBounds, Coordinates, ValueBounds};
+use num_traits::zero;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -15,6 +16,13 @@ where
     N: ChromBounds,
     T: ValueBounds,
 {
+    fn empty() -> Self {
+        Self {
+            chr: N::default(),
+            start: zero::<T>(),
+            end: zero::<T>(),
+        }
+    }
     fn start(&self) -> T {
         self.start
     }
@@ -46,6 +54,9 @@ where
     N: ChromBounds,
     T: ValueBounds,
 {
+    fn empty() -> Self {
+        unreachable!("Cannot create an immutable reference to an empty interval")
+    }
     fn start(&self) -> T {
         self.start
     }
@@ -77,6 +88,9 @@ where
     N: ChromBounds,
     T: ValueBounds,
 {
+    fn empty() -> Self {
+        unreachable!("Cannot create an immutable reference to an empty interval")
+    }
     fn start(&self) -> T {
         self.start
     }

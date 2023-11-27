@@ -1,4 +1,5 @@
 use crate::traits::{Coordinates, ValueBounds};
+use num_traits::zero;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -42,6 +43,13 @@ impl<T> Coordinates<T, T> for Interval<T>
 where
     T: ValueBounds,
 {
+    fn empty() -> Self {
+        Self {
+            chr: zero::<T>(),
+            start: zero::<T>(),
+            end: zero::<T>(),
+        }
+    }
     fn start(&self) -> T {
         self.start
     }
@@ -71,6 +79,9 @@ impl<'a, T> Coordinates<T, T> for &'a Interval<T>
 where
     T: ValueBounds,
 {
+    fn empty() -> Self {
+        unreachable!("Cannot create an immutable reference to an empty interval")
+    }
     fn start(&self) -> T {
         self.start
     }
@@ -101,6 +112,9 @@ impl<'a, T> Coordinates<T, T> for &'a mut Interval<T>
 where
     T: ValueBounds,
 {
+    fn empty() -> Self {
+        unreachable!("Cannot create an immutable reference to an empty interval")
+    }
     fn start(&self) -> T {
         self.start
     }

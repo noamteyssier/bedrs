@@ -131,6 +131,9 @@ where
     /// ```
     fn from(other: &Self) -> Self;
 
+    /// Creates an empty interval.
+    fn empty() -> Self;
+
     /// Calculates the length of the interval across its start and end coordinates.
     ///
     /// # Examples
@@ -386,6 +389,9 @@ mod testing {
         right: usize,
     }
     impl Coordinates<usize, usize> for CustomInterval {
+        fn empty() -> Self {
+            Self { left: 0, right: 0 }
+        }
         fn start(&self) -> usize {
             self.left
         }
@@ -423,6 +429,13 @@ mod testing {
         }
     }
     impl Coordinates<usize, usize> for CustomIntervalMeta {
+        fn empty() -> Self {
+            Self {
+                left: 0,
+                right: 0,
+                meta: String::new(),
+            }
+        }
         fn start(&self) -> usize {
             self.left
         }

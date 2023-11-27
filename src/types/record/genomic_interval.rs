@@ -1,4 +1,5 @@
 use crate::traits::{Coordinates, ValueBounds};
+use num_traits::zero;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -29,6 +30,13 @@ impl<T> Coordinates<T, T> for GenomicInterval<T>
 where
     T: ValueBounds,
 {
+    fn empty() -> Self {
+        Self {
+            chr: zero::<T>(),
+            start: zero::<T>(),
+            end: zero::<T>(),
+        }
+    }
     fn start(&self) -> T {
         self.start
     }
@@ -59,6 +67,9 @@ impl<'a, T> Coordinates<T, T> for &'a GenomicInterval<T>
 where
     T: ValueBounds,
 {
+    fn empty() -> Self {
+        unreachable!("Cannot create an immutable empty reference")
+    }
     fn start(&self) -> T {
         self.start
     }
@@ -89,6 +100,9 @@ impl<'a, T> Coordinates<T, T> for &'a mut GenomicInterval<T>
 where
     T: ValueBounds,
 {
+    fn empty() -> Self {
+        unreachable!("Cannot create an immutable empty reference")
+    }
     fn start(&self) -> T {
         self.start
     }

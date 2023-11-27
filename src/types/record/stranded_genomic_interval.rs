@@ -2,6 +2,7 @@ use crate::{
     traits::{Coordinates, ValueBounds},
     Strand,
 };
+use num_traits::zero;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -37,6 +38,14 @@ impl<T> Coordinates<T, T> for StrandedGenomicInterval<T>
 where
     T: ValueBounds,
 {
+    fn empty() -> Self {
+        Self {
+            chr: zero::<T>(),
+            start: zero::<T>(),
+            end: zero::<T>(),
+            strand: Strand::Forward,
+        }
+    }
     fn start(&self) -> T {
         self.start
     }
@@ -72,6 +81,9 @@ impl<'a, T> Coordinates<T, T> for &'a StrandedGenomicInterval<T>
 where
     T: ValueBounds,
 {
+    fn empty() -> Self {
+        unreachable!("Cannot create an empty reference")
+    }
     fn start(&self) -> T {
         self.start
     }
@@ -106,6 +118,9 @@ impl<'a, T> Coordinates<T, T> for &'a mut StrandedGenomicInterval<T>
 where
     T: ValueBounds,
 {
+    fn empty() -> Self {
+        unreachable!("Cannot create an empty reference")
+    }
     fn start(&self) -> T {
         self.start
     }
