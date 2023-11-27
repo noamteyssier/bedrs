@@ -125,13 +125,18 @@ where
 
     /// Updates the maximum length of the intervals in the container
     /// if the new interval is longer than the current maximum length.
-    fn update_max_len(&mut self, interval: &I) {
+    fn update_max_len<Iv, Co, To>(&mut self, interval: &Iv)
+    where
+        Iv: IntervalBounds<Co, To>,
+        Co: ChromBounds,
+        To: ValueBounds + Into<T>,
+    {
         if let Some(max_len) = self.max_len() {
-            if interval.len() > max_len {
-                *self.max_len_mut() = Some(interval.len());
+            if interval.len().into() > max_len {
+                *self.max_len_mut() = Some(interval.len().into());
             }
         } else {
-            *self.max_len_mut() = Some(interval.len());
+            *self.max_len_mut() = Some(interval.len().into());
         }
     }
 
