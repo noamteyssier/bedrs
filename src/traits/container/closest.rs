@@ -10,7 +10,10 @@ where
     T: ValueBounds,
     I: IntervalBounds<C, T>,
 {
-    fn closest(&self, query: &I) -> Result<Option<&I>, SetError> {
+    fn closest<Iv>(&self, query: &Iv) -> Result<Option<&I>, SetError>
+    where
+        Iv: IntervalBounds<C, T>,
+    {
         if self.is_sorted() {
             if self.records().is_empty() {
                 return Err(SetError::EmptySet);
@@ -21,7 +24,10 @@ where
         }
     }
 
-    fn closest_upstream(&self, query: &I) -> Result<Option<&I>, SetError> {
+    fn closest_upstream<Iv>(&self, query: &Iv) -> Result<Option<&I>, SetError>
+    where
+        Iv: IntervalBounds<C, T>,
+    {
         if self.is_sorted() {
             if self.records().is_empty() {
                 return Err(SetError::EmptySet);
@@ -32,7 +38,10 @@ where
         }
     }
 
-    fn closest_downstream(&self, query: &I) -> Result<Option<&I>, SetError> {
+    fn closest_downstream<Iv>(&self, query: &Iv) -> Result<Option<&I>, SetError>
+    where
+        Iv: IntervalBounds<C, T>,
+    {
         if self.is_sorted() {
             if self.records().is_empty() {
                 return Err(SetError::EmptySet);
@@ -43,7 +52,10 @@ where
         }
     }
 
-    fn closest_unchecked(&self, query: &I) -> Option<&I> {
+    fn closest_unchecked<Iv>(&self, query: &Iv) -> Option<&I>
+    where
+        Iv: IntervalBounds<C, T>,
+    {
         let bound = match self.chr_bound_upstream_unchecked(query) {
             Some(bound) => bound,
             None => self.chr_bound_downstream_unchecked(query)?,
@@ -68,7 +80,10 @@ where
         Some(&self.records()[current_lowest])
     }
 
-    fn closest_upstream_unchecked(&self, query: &I) -> Option<&I> {
+    fn closest_upstream_unchecked<Iv>(&self, query: &Iv) -> Option<&I>
+    where
+        Iv: IntervalBounds<C, T>,
+    {
         if let Some(bound) = self.chr_bound_upstream_unchecked(query) {
             let mut current_dist = T::max_value();
             let mut current_lowest = bound;
@@ -96,7 +111,10 @@ where
         }
     }
 
-    fn closest_downstream_unchecked(&self, query: &I) -> Option<&I> {
+    fn closest_downstream_unchecked<Iv>(&self, query: &Iv) -> Option<&I>
+    where
+        Iv: IntervalBounds<C, T>,
+    {
         if let Some(bound) = self.chr_bound_downstream_unchecked(query) {
             let mut current_dist = T::max_value();
             let mut current_lowest = bound;
@@ -146,7 +164,7 @@ mod testing {
 
     #[test]
     fn closest_empty() {
-        let intervals = vec![];
+        let intervals: Vec<GenomicInterval<_>> = vec![];
         let query = GenomicInterval::new(1, 22, 23);
         let set = IntervalContainer::from_unsorted(intervals);
         assert!(set.closest(&query).is_err());
