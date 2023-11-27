@@ -12,7 +12,6 @@ where
     fn build_left_contained<I: Coordinates<C, T>>(&self, other: &I) -> Self {
         let left_start = self.start().min(other.start());
         let left_end = self.start().max(other.start());
-        // let mut left_sub = I::from(other);
         let mut left_sub = Self::from(other);
         left_sub.update_all(&other.chr(), &left_start, &left_end);
         left_sub
@@ -20,7 +19,6 @@ where
     fn build_right_contained<I: Coordinates<C, T>>(&self, other: &I) -> Self {
         let right_start = self.end().min(other.end());
         let right_end = self.end().max(other.end());
-        // let mut right_sub = I::from(other);
         let mut right_sub = Self::from(other);
         right_sub.update_all(&other.chr(), &right_start, &right_end);
         right_sub
