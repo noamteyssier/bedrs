@@ -60,7 +60,10 @@ where
     /// let bound = set.lower_bound(&query);
     /// assert_eq!(bound, Ok(2));
     /// ```
-    fn lower_bound(&self, query: &I) -> Result<usize, SetError> {
+    fn lower_bound<Iv>(&self, query: &Iv) -> Result<usize, SetError>
+    where
+        Iv: IntervalBounds<C, T>,
+    {
         if self.is_sorted() {
             if self.records().is_empty() {
                 return Err(SetError::EmptySet);
@@ -116,7 +119,10 @@ where
     /// let bound = set.lower_bound_unchecked(&query);
     /// assert_eq!(bound, 2);
     /// ```
-    fn lower_bound_unchecked(&self, query: &I) -> usize {
+    fn lower_bound_unchecked<Iv>(&self, query: &Iv) -> usize
+    where
+        Iv: IntervalBounds<C, T>,
+    {
         let max_len = self
             .max_len()
             .expect("max_len is None - is this an empty set?");
@@ -133,7 +139,10 @@ where
 
     /// Finds the earliest record in the [Container] that shares a chromosome
     /// with the query. Can result in an error if the [Container] is not sorted.
-    fn chr_bound(&self, query: &I) -> Result<Option<usize>, SetError> {
+    fn chr_bound<Iv>(&self, query: &Iv) -> Result<Option<usize>, SetError>
+    where
+        Iv: IntervalBounds<C, T>,
+    {
         if self.is_sorted() {
             if self.records().is_empty() {
                 return Err(SetError::EmptySet);
@@ -150,7 +159,10 @@ where
     ///
     /// Will return `None` if no record shares a chromosome with the query and is
     /// upstream.
-    fn chr_bound_upstream(&self, query: &I) -> Result<Option<usize>, SetError> {
+    fn chr_bound_upstream<Iv>(&self, query: &Iv) -> Result<Option<usize>, SetError>
+    where
+        Iv: IntervalBounds<C, T>,
+    {
         if self.is_sorted() {
             if self.records().is_empty() {
                 return Err(SetError::EmptySet);
@@ -167,7 +179,10 @@ where
     ///
     /// Will return `None` if no record shares a chromosome and a strand with
     /// the query and is upstream.
-    fn stranded_upstream_bound(&self, query: &I) -> Result<Option<usize>, SetError> {
+    fn stranded_upstream_bound<Iv>(&self, query: &Iv) -> Result<Option<usize>, SetError>
+    where
+        Iv: IntervalBounds<C, T>,
+    {
         if self.is_sorted() {
             if self.records().is_empty() {
                 return Err(SetError::EmptySet);
@@ -184,7 +199,10 @@ where
     ///
     /// Will return `None` if no record shares a chromosome with the query and is
     /// downstream.
-    fn chr_bound_downstream(&self, query: &I) -> Result<Option<usize>, SetError> {
+    fn chr_bound_downstream<Iv>(&self, query: &Iv) -> Result<Option<usize>, SetError>
+    where
+        Iv: IntervalBounds<C, T>,
+    {
         if self.is_sorted() {
             if self.records().is_empty() {
                 return Err(SetError::EmptySet);
@@ -201,7 +219,10 @@ where
     ///
     /// Will return `None` if no record shares a chromosome and a strand with
     /// the query and is downstream.
-    fn stranded_downstream_bound(&self, query: &I) -> Result<Option<usize>, SetError> {
+    fn stranded_downstream_bound<Iv>(&self, query: &Iv) -> Result<Option<usize>, SetError>
+    where
+        Iv: IntervalBounds<C, T>,
+    {
         if self.is_sorted() {
             if self.records().is_empty() {
                 return Err(SetError::EmptySet);
@@ -215,7 +236,10 @@ where
     /// Finds the earliest record in the [Container] that shares a chromosome
     /// with the query. Does not perform a check if it is sorted beforehand.
     /// Use at your own risk.
-    fn chr_bound_unchecked(&self, query: &I) -> Option<usize> {
+    fn chr_bound_unchecked<Iv>(&self, query: &Iv) -> Option<usize>
+    where
+        Iv: IntervalBounds<C, T>,
+    {
         // Find the partition point for the chromosome
         let bound = self.records().partition_point(|iv| iv.chr() < query.chr());
 
@@ -248,7 +272,10 @@ where
     /// Finds the latest record in the [Container] that shares a chromosome
     /// and is upstream of the query. Does not perform a check if it is
     /// sorted beforehand. Use at your own risk.
-    fn chr_bound_upstream_unchecked(&self, query: &I) -> Option<usize> {
+    fn chr_bound_upstream_unchecked<Iv>(&self, query: &Iv) -> Option<usize>
+    where
+        Iv: IntervalBounds<C, T>,
+    {
         // partition point returns the first index in the slice for which
         // the predicate fails (i.e. the index of the first record that is
         // greater than the query).
@@ -288,7 +315,10 @@ where
         }
     }
 
-    fn stranded_upstream_bound_unchecked(&self, query: &I) -> Option<usize> {
+    fn stranded_upstream_bound_unchecked<Iv>(&self, query: &Iv) -> Option<usize>
+    where
+        Iv: IntervalBounds<C, T>,
+    {
         // partition point returns the first index in the slice for which
         // the predicate fails (i.e. the index of the first record that is
         // greater than the query).
@@ -336,7 +366,10 @@ where
     /// Finds the earliest record in the [Container] that shares a chromosome
     /// and is downstream of the query. Does not perform a check if it is
     /// sorted beforehand. Use at your own risk.
-    fn chr_bound_downstream_unchecked(&self, query: &I) -> Option<usize> {
+    fn chr_bound_downstream_unchecked<Iv>(&self, query: &Iv) -> Option<usize>
+    where
+        Iv: IntervalBounds<C, T>,
+    {
         // partition point returns the first index in the slice for which
         // the predicate fails (i.e. the index of the first record that is
         // greater than the query).
@@ -371,7 +404,10 @@ where
     /// Finds the earliest record in the [Container] that shares a chromosome
     /// and is downstream of the query and shares a strand. Does not perform a check if it is
     /// sorted beforehand. Use at your own risk.
-    fn stranded_downstream_bound_unchecked(&self, query: &I) -> Option<usize> {
+    fn stranded_downstream_bound_unchecked<Iv>(&self, query: &Iv) -> Option<usize>
+    where
+        Iv: IntervalBounds<C, T>,
+    {
         // partition point returns the first index in the slice for which
         // the predicate fails (i.e. the index of the first record that is
         // greater than the query).
@@ -478,7 +514,7 @@ mod testing {
 
     #[test]
     fn bsearch_empty_chr() {
-        let records = Vec::new();
+        let records: Vec<Interval<_>> = Vec::new();
         let set = IntervalContainer::new(records);
         let query = Interval::new(10, 20);
         let bound = set.lower_bound(&query);
@@ -487,7 +523,7 @@ mod testing {
 
     #[test]
     fn bsearch_empty_chr_upstream() {
-        let records = Vec::new();
+        let records: Vec<Interval<_>> = Vec::new();
         let set = IntervalContainer::new(records);
         let query = Interval::new(10, 20);
         let bound = set.chr_bound_upstream(&query);
@@ -496,7 +532,7 @@ mod testing {
 
     #[test]
     fn bsearch_empty_chr_downstream() {
-        let records = Vec::new();
+        let records: Vec<Interval<_>> = Vec::new();
         let set = IntervalContainer::new(records);
         let query = Interval::new(10, 20);
         let bound = set.chr_bound_downstream(&query);
@@ -505,7 +541,7 @@ mod testing {
 
     #[test]
     fn bsearch_empty_chr_stranded_upstream() {
-        let records = Vec::new();
+        let records: Vec<Interval<_>> = Vec::new();
         let set = IntervalContainer::new(records);
         let query = StrandedGenomicInterval::new(1, 10, 20, Strand::Forward);
         let bound = set.stranded_upstream_bound(&query);
@@ -514,7 +550,7 @@ mod testing {
 
     #[test]
     fn bsearch_empty_chr_stranded_downstream() {
-        let records = Vec::new();
+        let records: Vec<Interval<_>> = Vec::new();
         let set = IntervalContainer::new(records);
         let query = StrandedGenomicInterval::new(1, 10, 20, Strand::Forward);
         let bound = set.stranded_downstream_bound(&query);
