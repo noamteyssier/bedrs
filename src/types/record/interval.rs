@@ -67,7 +67,7 @@ where
     }
     #[allow(unused)]
     fn update_chr(&mut self, val: &T) {}
-    fn from(other: &Self) -> Self {
+    fn from<Iv: Coordinates<T, T>>(other: &Iv) -> Self {
         Self {
             start: other.start(),
             end: other.end(),
@@ -104,7 +104,7 @@ where
         unreachable!("Cannot update an immutable reference")
     }
     #[allow(unused)]
-    fn from(other: &Self) -> Self {
+    fn from<Iv>(other: &Iv) -> Self {
         unimplemented!("Cannot create a new reference from a reference")
     }
 }
@@ -133,7 +133,7 @@ where
     #[allow(unused)]
     fn update_chr(&mut self, val: &T) {}
     #[allow(unused)]
-    fn from(other: &Self) -> Self {
+    fn from<Iv>(other: &Iv) -> Self {
         unimplemented!("Cannot create a new reference from a mutable reference")
     }
 }

@@ -5,26 +5,28 @@ use crate::{
 };
 use std::marker::PhantomData;
 
-pub struct SubtractIter<'a, C, T, I>
+pub struct SubtractIter<'a, C, T, I, Iv>
 where
     I: IntervalBounds<C, T> + 'a,
+    Iv: IntervalBounds<C, T> + 'a,
     C: ChromBounds + 'a,
     T: ValueBounds + 'a,
 {
     inner: &'a Vec<I>,
-    query: &'a I,
+    query: &'a Iv,
     remainder: Option<I>,
     offset: usize,
     phantom_t: PhantomData<T>,
     phantom_c: PhantomData<C>,
 }
-impl<'a, C, T, I> SubtractIter<'a, C, T, I>
+impl<'a, C, T, I, Iv> SubtractIter<'a, C, T, I, Iv>
 where
     I: IntervalBounds<C, T>,
+    Iv: IntervalBounds<C, T>,
     C: ChromBounds,
     T: ValueBounds,
 {
-    pub fn new(inner: &'a Vec<I>, query: &'a I) -> Self {
+    pub fn new(inner: &'a Vec<I>, query: &'a Iv) -> Self {
         Self {
             inner,
             query,
@@ -35,9 +37,10 @@ where
         }
     }
 }
-impl<'a, C, T, I> Iterator for SubtractIter<'a, C, T, I>
+impl<'a, C, T, I, Iv> Iterator for SubtractIter<'a, C, T, I, Iv>
 where
     I: IntervalBounds<C, T>,
+    Iv: IntervalBounds<C, T>,
     C: ChromBounds,
     T: ValueBounds,
 {
@@ -77,26 +80,28 @@ where
     }
 }
 
-pub struct SubtractFromIter<C, T, I>
+pub struct SubtractFromIter<C, T, I, Iv>
 where
     I: IntervalBounds<C, T>,
+    Iv: IntervalBounds<C, T>,
     C: ChromBounds,
     T: ValueBounds,
 {
     inner: MergeResults<C, T, I>,
-    remainder: I,
+    remainder: Iv,
     send_remainder: bool,
     offset: usize,
     phantom_t: PhantomData<T>,
     phantom_c: PhantomData<C>,
 }
-impl<C, T, I> SubtractFromIter<C, T, I>
+impl<C, T, I, Iv> SubtractFromIter<C, T, I, Iv>
 where
     I: IntervalBounds<C, T>,
+    Iv: IntervalBounds<C, T>,
     C: ChromBounds,
     T: ValueBounds,
 {
-    pub fn new<Co: Container<C, T, I>>(container: &Co, query: &I) -> Self {
+    pub fn new<Co: Container<C, T, I>>(container: &Co, query: &Iv) -> Self {
         let merged_container = container.merge_unchecked();
         Self {
             inner: merged_container,
@@ -108,9 +113,10 @@ where
         }
     }
 }
-impl<C, T, I> Iterator for SubtractFromIter<C, T, I>
+impl<C, T, I, Iv> Iterator for SubtractFromIter<C, T, I, Iv>
 where
     I: IntervalBounds<C, T>,
+    Iv: IntervalBounds<C, T>,
     C: ChromBounds,
     T: ValueBounds,
 {
@@ -139,6 +145,7 @@ where
                 if iv.gt(&self.remainder) {
                     if self.send_remainder {
                         let some_iv = self.remainder.to_owned();
+                        let some_iv = I::from(&some_iv);
                         self.send_remainder = false;
                         // self.remainder = iv.to_owned();
                         return Some(some_iv);
@@ -172,13 +179,15 @@ where
                 }
             };
 
+            let return_iv = return_iv.map(|iv| I::from(&iv));
             return return_iv;
         }
 
         // sends any remaining remainder
         if self.send_remainder {
             self.send_remainder = false;
-            Some(self.remainder.to_owned())
+            Some(I::from(&self.remainder))
+            // Some(self.remainder.to_owned())
         } else {
             None
         }

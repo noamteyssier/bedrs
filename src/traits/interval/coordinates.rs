@@ -129,7 +129,7 @@ where
     ///
     /// assert!(iv.eq(&new_iv));
     /// ```
-    fn from(other: &Self) -> Self;
+    fn from<Iv: Coordinates<C, T>>(other: &Iv) -> Self;
 
     /// Creates an empty interval.
     fn empty() -> Self;
@@ -409,7 +409,7 @@ mod testing {
         }
         #[allow(unused)]
         fn update_chr(&mut self, val: &usize) {}
-        fn from(other: &Self) -> Self {
+        fn from<Iv: Coordinates<usize, usize>>(other: &Iv) -> Self {
             Self {
                 left: other.start(),
                 right: other.end(),
@@ -422,11 +422,6 @@ mod testing {
         left: usize,
         right: usize,
         meta: String,
-    }
-    impl CustomIntervalMeta {
-        pub fn meta(&self) -> &str {
-            &self.meta
-        }
     }
     impl Coordinates<usize, usize> for CustomIntervalMeta {
         fn empty() -> Self {
@@ -453,11 +448,11 @@ mod testing {
         }
         #[allow(unused)]
         fn update_chr(&mut self, val: &usize) {}
-        fn from(other: &Self) -> Self {
+        fn from<Iv: Coordinates<usize, usize>>(other: &Iv) -> Self {
             Self {
                 left: other.start(),
                 right: other.end(),
-                meta: other.meta().to_string(),
+                meta: String::new(),
             }
         }
     }
@@ -492,7 +487,7 @@ mod testing {
             left: 10,
             right: 100,
         };
-        let b = Coordinates::from(&a);
+        let b: CustomInterval = Coordinates::from(&a);
         assert_eq!(a.start(), b.start());
         assert_eq!(a.end(), b.end());
         assert_eq!(a.chr(), b.chr());
@@ -530,10 +525,11 @@ mod testing {
             right: 100,
             meta: String::from("hello"),
         };
-        let b = Coordinates::from(&a);
+        let b: CustomIntervalMeta = Coordinates::from(&a);
         assert_eq!(a.start(), b.start());
         assert_eq!(a.end(), b.end());
         assert_eq!(a.chr(), b.chr());
+        assert_ne!(a.meta, b.meta);
     }
 
     #[test]
