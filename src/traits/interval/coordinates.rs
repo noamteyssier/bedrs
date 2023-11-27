@@ -127,9 +127,12 @@ where
     /// let iv = GenomicInterval::new(1, 10, 20);
     /// let new_iv = <GenomicInterval<usize> as Coordinates<usize, usize>>::from(&iv);
     ///
-    /// assert_eq!(iv, new_iv);
+    /// assert!(iv.eq(&new_iv));
     /// ```
-    fn from(other: &Self) -> Self;
+    fn from<Iv: Coordinates<C, T>>(other: &Iv) -> Self;
+
+    /// Creates an empty interval.
+    fn empty() -> Self;
 
     /// Calculates the length of the interval across its start and end coordinates.
     ///
@@ -152,10 +155,10 @@ where
     /// use bedrs::{Coordinates, GenomicInterval};
     ///
     /// let mut iv = GenomicInterval::new(1, 10, 20);
-    /// assert_eq!(iv, GenomicInterval::new(1, 10, 20));
+    /// assert!(iv.eq(&GenomicInterval::new(1, 10, 20)));
     ///
     /// iv.update_all(&2, &5, &10);
-    /// assert_eq!(iv, GenomicInterval::new(2, 5, 10));
+    /// assert!(iv.eq(&GenomicInterval::new(2, 5, 10)));
     /// ```
     fn update_all(&mut self, chr: &C, start: &T, end: &T) {
         self.update_chr(chr);
@@ -169,10 +172,10 @@ where
     /// use bedrs::{Coordinates, GenomicInterval};
     ///
     /// let mut iv = GenomicInterval::new(1, 10, 20);
-    /// assert_eq!(iv, GenomicInterval::new(1, 10, 20));
+    /// assert!(iv.eq(&GenomicInterval::new(1, 10, 20)));
     ///
     /// iv.update_endpoints(&5, &10);
-    /// assert_eq!(iv, GenomicInterval::new(1, 5, 10));
+    /// assert!(iv.eq(&GenomicInterval::new(1, 5, 10)));
     /// ```
     fn update_endpoints(&mut self, start: &T, end: &T) {
         self.update_start(start);
@@ -186,10 +189,10 @@ where
     /// use bedrs::{Coordinates, GenomicInterval};
     ///
     /// let mut iv = GenomicInterval::new(1, 10, 20);
-    /// assert_eq!(iv, GenomicInterval::new(1, 10, 20));
+    /// assert!(iv.eq(&GenomicInterval::new(1, 10, 20)));
     ///
     /// iv.update_all_from(&GenomicInterval::new(2, 5, 10));
-    /// assert_eq!(iv, GenomicInterval::new(2, 5, 10));
+    /// assert!(iv.eq(&GenomicInterval::new(2, 5, 10)));
     /// ```
     fn update_all_from<I: Coordinates<C, T>>(&mut self, other: &I) {
         self.update_chr(&other.chr());
@@ -203,10 +206,10 @@ where
     /// use bedrs::{Coordinates, GenomicInterval};
     ///
     /// let mut iv = GenomicInterval::new(1, 10, 20);
-    /// assert_eq!(iv, GenomicInterval::new(1, 10, 20));
+    /// assert!(iv.eq(&GenomicInterval::new(1, 10, 20)));
     ///
     /// iv.update_endpoints_from(&GenomicInterval::new(2, 5, 10));
-    /// assert_eq!(iv, GenomicInterval::new(1, 5, 10));
+    /// assert!(iv.eq(&GenomicInterval::new(1, 5, 10)));
     /// ```
     fn update_endpoints_from<I: Coordinates<C, T>>(&mut self, other: &I) {
         self.update_start(&other.start());
@@ -221,10 +224,10 @@ where
     /// use bedrs::{Coordinates, GenomicInterval};
     ///
     /// let mut iv = GenomicInterval::new(1, 10, 20);
-    /// assert_eq!(iv, GenomicInterval::new(1, 10, 20));
+    /// assert!(iv.eq(&GenomicInterval::new(1, 10, 20)));
     ///
     /// iv.extend_left(&5);
-    /// assert_eq!(iv, GenomicInterval::new(1, 5, 20));
+    /// assert!(iv.eq(&GenomicInterval::new(1, 5, 20)));
     /// ```
     fn extend_left(&mut self, val: &T) {
         self.update_start(&self.start().sub(*val));
@@ -238,10 +241,10 @@ where
     /// use bedrs::{Coordinates, GenomicInterval};
     ///
     /// let mut iv = GenomicInterval::new(1, 10, 20);
-    /// assert_eq!(iv, GenomicInterval::new(1, 10, 20));
+    /// assert!(iv.eq(&GenomicInterval::new(1, 10, 20)));
     ///
     /// iv.extend_right(&5);
-    /// assert_eq!(iv, GenomicInterval::new(1, 10, 25));
+    /// assert!(iv.eq(&GenomicInterval::new(1, 10, 25)));
     /// ```
     fn extend_right(&mut self, val: &T) {
         self.update_end(&self.end().add(*val));
@@ -256,10 +259,10 @@ where
     /// use bedrs::{Coordinates, GenomicInterval};
     ///
     /// let mut iv = GenomicInterval::new(1, 10, 20);
-    /// assert_eq!(iv, GenomicInterval::new(1, 10, 20));
+    /// assert!(iv.eq(&GenomicInterval::new(1, 10, 20)));
     ///
     /// iv.extend(&5);
-    /// assert_eq!(iv, GenomicInterval::new(1, 5, 25));
+    /// assert!(iv.eq(&GenomicInterval::new(1, 5, 25)));
     /// ```
     fn extend(&mut self, val: &T) {
         self.extend_left(val);
@@ -386,6 +389,9 @@ mod testing {
         right: usize,
     }
     impl Coordinates<usize, usize> for CustomInterval {
+        fn empty() -> Self {
+            Self { left: 0, right: 0 }
+        }
         fn start(&self) -> usize {
             self.left
         }
@@ -403,7 +409,7 @@ mod testing {
         }
         #[allow(unused)]
         fn update_chr(&mut self, val: &usize) {}
-        fn from(other: &Self) -> Self {
+        fn from<Iv: Coordinates<usize, usize>>(other: &Iv) -> Self {
             Self {
                 left: other.start(),
                 right: other.end(),
@@ -417,12 +423,14 @@ mod testing {
         right: usize,
         meta: String,
     }
-    impl CustomIntervalMeta {
-        pub fn meta(&self) -> &str {
-            &self.meta
-        }
-    }
     impl Coordinates<usize, usize> for CustomIntervalMeta {
+        fn empty() -> Self {
+            Self {
+                left: 0,
+                right: 0,
+                meta: String::new(),
+            }
+        }
         fn start(&self) -> usize {
             self.left
         }
@@ -440,11 +448,11 @@ mod testing {
         }
         #[allow(unused)]
         fn update_chr(&mut self, val: &usize) {}
-        fn from(other: &Self) -> Self {
+        fn from<Iv: Coordinates<usize, usize>>(other: &Iv) -> Self {
             Self {
                 left: other.start(),
                 right: other.end(),
-                meta: other.meta().to_string(),
+                meta: String::new(),
             }
         }
     }
@@ -479,7 +487,7 @@ mod testing {
             left: 10,
             right: 100,
         };
-        let b = Coordinates::from(&a);
+        let b: CustomInterval = Coordinates::from(&a);
         assert_eq!(a.start(), b.start());
         assert_eq!(a.end(), b.end());
         assert_eq!(a.chr(), b.chr());
@@ -517,10 +525,11 @@ mod testing {
             right: 100,
             meta: String::from("hello"),
         };
-        let b = Coordinates::from(&a);
+        let b: CustomIntervalMeta = Coordinates::from(&a);
         assert_eq!(a.start(), b.start());
         assert_eq!(a.end(), b.end());
         assert_eq!(a.chr(), b.chr());
+        assert_ne!(a.meta, b.meta);
     }
 
     #[test]

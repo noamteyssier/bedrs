@@ -42,7 +42,7 @@ use std::{collections::VecDeque, marker::PhantomData};
 /// ];
 ///
 /// // build a container of interval records
-/// let set = IntervalSet::from_iter(intervals);
+/// let set = IntervalContainer::from_iter(intervals);
 ///
 /// // iterate on the container
 /// for interval in set.into_iter() {
@@ -129,7 +129,7 @@ where
 /// ];
 ///
 /// // build a container of interval records
-/// let set = IntervalSet::from_iter(intervals);
+/// let set = IntervalContainer::from_iter(intervals);
 ///
 /// // iterate on the container
 /// for interval in set.iter() {
@@ -185,7 +185,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::{Container, Coordinates, Interval, IntervalSet};
+    use crate::{Container, Coordinates, Interval, IntervalContainer};
 
     #[test]
     fn iterator_owned() {
@@ -194,7 +194,7 @@ mod testing {
             Interval::new(2, 20),
             Interval::new(3, 30),
         ];
-        let set = IntervalSet::from_iter(intervals);
+        let set = IntervalContainer::from_iter(intervals);
         let mut iter = set.into_iter();
         assert_eq!(iter.next().unwrap().start(), 1);
         assert_eq!(iter.next().unwrap().start(), 2);
@@ -209,7 +209,7 @@ mod testing {
             Interval::new(2, 20),
             Interval::new(3, 30),
         ];
-        let set = IntervalSet::from_iter(intervals);
+        let set = IntervalContainer::from_iter(intervals);
         let mut iter = set.iter();
         assert_eq!(iter.next().unwrap().start(), 1);
         assert_eq!(iter.next().unwrap().start(), 2);

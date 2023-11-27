@@ -1,4 +1,5 @@
 use crate::traits::{ChromBounds, Coordinates, ValueBounds};
+use num_traits::zero;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -15,6 +16,13 @@ where
     N: ChromBounds,
     T: ValueBounds,
 {
+    fn empty() -> Self {
+        Self {
+            chr: N::default(),
+            start: zero::<T>(),
+            end: zero::<T>(),
+        }
+    }
     fn start(&self) -> T {
         self.start
     }
@@ -33,7 +41,7 @@ where
     fn update_chr(&mut self, val: &N) {
         self.chr = val.clone();
     }
-    fn from(other: &Self) -> Self {
+    fn from<Iv: Coordinates<N, T>>(other: &Iv) -> Self {
         Self {
             chr: other.chr().clone(),
             start: other.start(),
@@ -46,6 +54,9 @@ where
     N: ChromBounds,
     T: ValueBounds,
 {
+    fn empty() -> Self {
+        unreachable!("Cannot create an immutable reference to an empty interval")
+    }
     fn start(&self) -> T {
         self.start
     }
@@ -68,7 +79,7 @@ where
         unreachable!("Cannot update an immutable reference")
     }
     #[allow(unused)]
-    fn from(other: &Self) -> Self {
+    fn from<Iv>(other: &Iv) -> Self {
         unimplemented!("Cannot create a new reference from a reference")
     }
 }
@@ -77,6 +88,9 @@ where
     N: ChromBounds,
     T: ValueBounds,
 {
+    fn empty() -> Self {
+        unreachable!("Cannot create an immutable reference to an empty interval")
+    }
     fn start(&self) -> T {
         self.start
     }
@@ -96,7 +110,7 @@ where
         self.chr = val.clone();
     }
     #[allow(unused)]
-    fn from(other: &Self) -> Self {
+    fn from<Iv>(other: &Iv) -> Self {
         unimplemented!("Cannot create a new reference from a reference")
     }
 }

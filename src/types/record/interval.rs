@@ -1,4 +1,5 @@
 use crate::traits::{Coordinates, ValueBounds};
+use num_traits::zero;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -42,6 +43,13 @@ impl<T> Coordinates<T, T> for Interval<T>
 where
     T: ValueBounds,
 {
+    fn empty() -> Self {
+        Self {
+            chr: zero::<T>(),
+            start: zero::<T>(),
+            end: zero::<T>(),
+        }
+    }
     fn start(&self) -> T {
         self.start
     }
@@ -59,7 +67,7 @@ where
     }
     #[allow(unused)]
     fn update_chr(&mut self, val: &T) {}
-    fn from(other: &Self) -> Self {
+    fn from<Iv: Coordinates<T, T>>(other: &Iv) -> Self {
         Self {
             start: other.start(),
             end: other.end(),
@@ -71,6 +79,9 @@ impl<'a, T> Coordinates<T, T> for &'a Interval<T>
 where
     T: ValueBounds,
 {
+    fn empty() -> Self {
+        unreachable!("Cannot create an immutable reference to an empty interval")
+    }
     fn start(&self) -> T {
         self.start
     }
@@ -93,7 +104,7 @@ where
         unreachable!("Cannot update an immutable reference")
     }
     #[allow(unused)]
-    fn from(other: &Self) -> Self {
+    fn from<Iv>(other: &Iv) -> Self {
         unimplemented!("Cannot create a new reference from a reference")
     }
 }
@@ -101,6 +112,9 @@ impl<'a, T> Coordinates<T, T> for &'a mut Interval<T>
 where
     T: ValueBounds,
 {
+    fn empty() -> Self {
+        unreachable!("Cannot create an immutable reference to an empty interval")
+    }
     fn start(&self) -> T {
         self.start
     }
@@ -119,7 +133,7 @@ where
     #[allow(unused)]
     fn update_chr(&mut self, val: &T) {}
     #[allow(unused)]
-    fn from(other: &Self) -> Self {
+    fn from<Iv>(other: &Iv) -> Self {
         unimplemented!("Cannot create a new reference from a mutable reference")
     }
 }

@@ -1,4 +1,5 @@
 use crate::traits::{Coordinates, ValueBounds};
+use num_traits::zero;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -17,7 +18,7 @@ use serde::{Deserialize, Serialize};
 /// let b = GenomicInterval::new(1, 20, 30);
 /// assert!(a.overlaps(&b));
 /// ```
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct GenomicInterval<T> {
     chr: T,
@@ -29,6 +30,13 @@ impl<T> Coordinates<T, T> for GenomicInterval<T>
 where
     T: ValueBounds,
 {
+    fn empty() -> Self {
+        Self {
+            chr: zero::<T>(),
+            start: zero::<T>(),
+            end: zero::<T>(),
+        }
+    }
     fn start(&self) -> T {
         self.start
     }
@@ -47,7 +55,7 @@ where
     fn update_chr(&mut self, val: &T) {
         self.chr = *val;
     }
-    fn from(other: &Self) -> Self {
+    fn from<Iv: Coordinates<T, T>>(other: &Iv) -> Self {
         Self {
             chr: *other.chr(),
             start: other.start(),
@@ -59,6 +67,9 @@ impl<'a, T> Coordinates<T, T> for &'a GenomicInterval<T>
 where
     T: ValueBounds,
 {
+    fn empty() -> Self {
+        unreachable!("Cannot create an immutable empty reference")
+    }
     fn start(&self) -> T {
         self.start
     }
@@ -81,7 +92,7 @@ where
         unreachable!("Cannot update an immutable reference")
     }
     #[allow(unused)]
-    fn from(other: &Self) -> Self {
+    fn from<Iv>(other: &Iv) -> Self {
         unimplemented!("Cannot create a new reference from a reference")
     }
 }
@@ -89,6 +100,9 @@ impl<'a, T> Coordinates<T, T> for &'a mut GenomicInterval<T>
 where
     T: ValueBounds,
 {
+    fn empty() -> Self {
+        unreachable!("Cannot create an immutable empty reference")
+    }
     fn start(&self) -> T {
         self.start
     }
@@ -108,7 +122,7 @@ where
         self.chr = *val;
     }
     #[allow(unused)]
-    fn from(other: &Self) -> Self {
+    fn from<Iv>(other: &Iv) -> Self {
         unimplemented!("Cannot create a new reference from a mutable reference")
     }
 }
@@ -125,10 +139,9 @@ where
 #[cfg(test)]
 mod testing {
     use crate::{traits::Coordinates, types::GenomicInterval};
-    use std::cmp::Ordering;
-
     #[cfg(feature = "serde")]
     use bincode::{deserialize, serialize};
+    use std::cmp::Ordering;
 
     #[test]
     fn test_interval_init() {
@@ -178,10 +191,10 @@ mod testing {
     #[test]
     #[cfg(feature = "serde")]
     fn genomic_interval_serde() {
-        let a = GenomicInterval::new(1, 5, 100);
+        let a: GenomicInterval<usize> = GenomicInterval::new(1, 5, 100);
         let encoding = serialize(&a).unwrap();
         let b: GenomicInterval<usize> = deserialize(&encoding).unwrap();
-        assert_eq!(a, b);
+        assert_eq!(a.coord_cmp(&b), Ordering::Equal);
     }
 
     fn function_generic_reference<C: Coordinates<usize, usize>>(iv: C) {

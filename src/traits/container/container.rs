@@ -24,14 +24,14 @@ where
     /// # Examples
     ///
     /// ```
-    /// use bedrs::{GenomicInterval, GenomicIntervalSet, Container};
+    /// use bedrs::{GenomicInterval, Container, IntervalContainer};
     ///
     /// let ivs = vec![
     ///     GenomicInterval::new(1, 1, 10),
     ///     GenomicInterval::new(1, 20, 30),
     ///     GenomicInterval::new(1, 40, 50),
     /// ];
-    /// let set = GenomicIntervalSet::new(ivs);
+    /// let set = IntervalContainer::new(ivs);
     /// assert_eq!(set.len(), 3);
     /// ```
     fn new(records: Vec<I>) -> Self;
@@ -39,9 +39,9 @@ where
     /// Creates a new empty container
     ///
     /// # Examples
-    /// use bedrs::{GenomicInterval, GenomicIntervalSet, Container};
+    /// use bedrs::{GenomicInterval, Container, IntervalContainer};
     ///
-    /// let set = GenomicIntervalSet::<u32, GenomicInterval<u32>>::empty();
+    /// let set = IntervalContainer::<GenomicInterval<u32>, u32, u32>::empty();
     /// assert_eq!(set.len(), 0);
     /// ```
     fn empty() -> Self {
@@ -52,14 +52,14 @@ where
     ///
     /// # Examples
     /// ```
-    /// use bedrs::{GenomicInterval, GenomicIntervalSet, Container};
+    /// use bedrs::{GenomicInterval, Container, IntervalContainer};
     ///
     /// let ivs = vec![
     ///     GenomicInterval::new(1, 1, 10),
     ///     GenomicInterval::new(1, 20, 30),
     ///     GenomicInterval::new(1, 40, 50),
     /// ];
-    /// let set = GenomicIntervalSet::new(ivs);
+    /// let set = IntervalContainer::new(ivs);
     /// assert_eq!(set.records().len(), 3);
     /// ```
     fn records(&self) -> &Vec<I>;
@@ -125,13 +125,18 @@ where
 
     /// Updates the maximum length of the intervals in the container
     /// if the new interval is longer than the current maximum length.
-    fn update_max_len(&mut self, interval: &I) {
+    fn update_max_len<Iv, Co, To>(&mut self, interval: &Iv)
+    where
+        Iv: IntervalBounds<Co, To>,
+        Co: ChromBounds,
+        To: ValueBounds + Into<T>,
+    {
         if let Some(max_len) = self.max_len() {
-            if interval.len() > max_len {
-                *self.max_len_mut() = Some(interval.len());
+            if interval.len().into() > max_len {
+                *self.max_len_mut() = Some(interval.len().into());
             }
         } else {
-            *self.max_len_mut() = Some(interval.len());
+            *self.max_len_mut() = Some(interval.len().into());
         }
     }
 
@@ -308,7 +313,7 @@ where
 #[cfg(test)]
 mod testing {
     use super::Container;
-    use crate::{traits::Coordinates, types::Interval, IntervalSet};
+    use crate::{traits::Coordinates, types::Interval, IntervalContainer};
 
     struct CustomContainer {
         records: Vec<Interval<usize>>,
@@ -415,7 +420,7 @@ mod testing {
             Interval::new(10, 20),
             Interval::new(5, 15),
         ];
-        let set = IntervalSet::new(records);
+        let set = IntervalContainer::new(records);
         assert_eq!(set.len(), 3);
         assert!(!set.is_sorted());
         assert!(!set.is_empty());
@@ -429,7 +434,7 @@ mod testing {
             Interval::new(10, 15),
             Interval::new(15, 20),
         ];
-        let set = IntervalSet::from_sorted(records).unwrap();
+        let set = IntervalContainer::from_sorted(records).unwrap();
         assert_eq!(set.len(), 3);
         assert!(set.is_sorted());
         assert!(!set.is_empty());
@@ -443,7 +448,7 @@ mod testing {
             Interval::new(10, 20),
             Interval::new(5, 15),
         ];
-        let set = IntervalSet::from_unsorted(records);
+        let set = IntervalContainer::from_unsorted(records);
         assert_eq!(set.len(), 3);
         assert!(set.is_sorted());
         assert!(!set.is_empty());
@@ -457,7 +462,7 @@ mod testing {
             Interval::new(5, 10),
             Interval::new(15, 20),
         ];
-        let set = IntervalSet::from_sorted(records);
+        let set = IntervalContainer::from_sorted(records);
         assert!(set.is_err());
     }
 
@@ -468,7 +473,7 @@ mod testing {
             Interval::new(10, 20),
             Interval::new(5, 15),
         ];
-        let mut set = IntervalSet::from_unsorted(records);
+        let mut set = IntervalContainer::from_unsorted(records);
         set.apply_mut(|rec| rec.extend(&2));
         assert_eq!(set.records()[0].start(), 3);
         assert_eq!(set.records()[0].end(), 17);
@@ -480,7 +485,7 @@ mod testing {
 
     #[test]
     fn test_container_insert() {
-        let mut set = IntervalSet::empty();
+        let mut set = IntervalContainer::empty();
         set.insert(Interval::new(15, 25));
         set.insert(Interval::new(10, 20));
         assert_eq!(set.len(), 2);
@@ -488,7 +493,7 @@ mod testing {
 
     #[test]
     fn test_container_insert_sorted() {
-        let mut set = IntervalSet::empty();
+        let mut set = IntervalContainer::empty();
         set.insert_sorted(Interval::new(15, 25));
         set.insert_sorted(Interval::new(10, 20));
         assert_eq!(set.len(), 2);
@@ -503,7 +508,7 @@ mod testing {
             Interval::new(10, 20),
             Interval::new(5, 15),
         ];
-        let set = IntervalSet::from_unsorted(records);
+        let set = IntervalContainer::from_unsorted(records);
         let mut iter = set.iter();
         assert_eq!(iter.next().unwrap().start(), 5);
         assert_eq!(iter.next().unwrap().start(), 10);

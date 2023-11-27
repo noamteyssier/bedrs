@@ -271,6 +271,6 @@ pub use traits::{
     Overlap, Sample, SetSubtract, Subtract,
 };
 pub use types::{
-    GenomicInterval, GenomicIntervalSet, IntersectIter, Interval, IntervalIterOwned,
-    IntervalIterRef, IntervalSet, MergeIter, NamedInterval, Strand, StrandedGenomicInterval,
+    GenomicInterval, IntersectIter, Interval, IntervalContainer, IntervalIterOwned,
+    IntervalIterRef, MergeIter, NamedInterval, Strand, StrandedGenomicInterval,
 };

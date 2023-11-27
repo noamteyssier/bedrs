@@ -2,7 +2,7 @@ pub mod container;
 pub mod enums;
 pub mod iterator;
 pub mod record;
-pub use container::{GenomicIntervalSet, IntervalSet, MergeResults, StrandedGenomicIntervalSet};
+pub use container::{IntervalContainer, MergeResults};
 pub use enums::Strand;
 pub use iterator::{
     FindIter, FindIterSorted, IntersectIter, IntervalIterOwned, IntervalIterRef, MergeIter,
