@@ -45,11 +45,11 @@ where
 #[cfg(test)]
 mod testing {
     use super::*;
-    use crate::{Coordinates, Interval, IntervalSet};
+    use crate::{Coordinates, Interval, IntervalContainer};
 
     #[test]
     fn internal_unsorted() {
-        let set = IntervalSet::new(vec![
+        let set = IntervalContainer::new(vec![
             Interval::new(1, 5),
             Interval::new(2, 4),
             Interval::new(3, 6),
@@ -63,11 +63,11 @@ mod testing {
     /// ==================
     /// (i)      j-k
     fn internal_a() {
-        let set =
-            IntervalSet::from_sorted(vec![Interval::new(1, 3), Interval::new(6, 10)]).unwrap();
+        let set = IntervalContainer::from_sorted(vec![Interval::new(1, 3), Interval::new(6, 10)])
+            .unwrap();
         let span = set.span().unwrap();
         let sub = set.internal_unchecked(span);
-        let internal_set = IntervalSet::from_iter(sub);
+        let internal_set = IntervalContainer::from_iter(sub);
         assert_eq!(internal_set.len(), 1);
         assert_eq!(internal_set.records()[0].start(), 3);
         assert_eq!(internal_set.records()[0].end(), 6);
@@ -81,7 +81,7 @@ mod testing {
     /// (i)      j-k
     /// (ii)           l---m
     fn internal_b() {
-        let set = IntervalSet::from_sorted(vec![
+        let set = IntervalContainer::from_sorted(vec![
             Interval::new(1, 3),
             Interval::new(6, 10),
             Interval::new(12, 15),
@@ -89,7 +89,7 @@ mod testing {
         .unwrap();
         let span = set.span().unwrap();
         let sub = set.internal_unchecked(span);
-        let internal_set = IntervalSet::from_iter(sub);
+        let internal_set = IntervalContainer::from_iter(sub);
         assert_eq!(internal_set.len(), 2);
         assert_eq!(internal_set.records()[0].start(), 3);
         assert_eq!(internal_set.records()[0].end(), 6);

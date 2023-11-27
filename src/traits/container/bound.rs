@@ -24,7 +24,7 @@ where
     /// ## On base coordinates
     ///
     /// ```
-    /// use bedrs::{Bound, Container, Interval, IntervalSet};
+    /// use bedrs::{Bound, Container, Interval, IntervalContainer};
     ///
     /// let records = vec![
     ///     Interval::new(0, 10),
@@ -35,7 +35,7 @@ where
     ///     Interval::new(50, 60),
     /// ];
     /// let query = Interval::new(17, 27);
-    /// let mut set = IntervalSet::new(records);
+    /// let mut set = IntervalContainer::new(records);
     /// set.sort();
     /// let bound = set.lower_bound(&query);
     /// assert_eq!(bound, Ok(1));
@@ -44,7 +44,7 @@ where
     /// ## On genomic coordinates
     ///
     /// ```
-    /// use bedrs::{Bound, Container, GenomicInterval, GenomicIntervalSet};
+    /// use bedrs::{Bound, Container, GenomicInterval, IntervalContainer};
     ///
     /// let records = vec![
     ///     GenomicInterval::new(1, 10, 20),
@@ -54,7 +54,7 @@ where
     ///     GenomicInterval::new(3, 30, 20),
     ///     GenomicInterval::new(4, 10, 20),
     /// ];
-    /// let mut set = GenomicIntervalSet::new(records);
+    /// let mut set = IntervalContainer::new(records);
     /// set.sort();
     /// let query = GenomicInterval::new(3, 10, 20);
     /// let bound = set.lower_bound(&query);
@@ -82,7 +82,7 @@ where
     /// ## On base coordinates
     ///
     /// ```
-    /// use bedrs::{Bound, Interval, IntervalSet};
+    /// use bedrs::{Bound, Interval, IntervalContainer, Container};
     ///
     /// let records = vec![
     ///     Interval::new(0, 10),
@@ -93,7 +93,7 @@ where
     ///     Interval::new(50, 60),
     /// ];
     /// let query = Interval::new(17, 27);
-    /// let set = IntervalSet::new(records);
+    /// let set = IntervalContainer::new(records);
     /// let bound = set.lower_bound_unchecked(&query);
     /// assert_eq!(bound, 1);
     /// ```
@@ -101,7 +101,7 @@ where
     /// ## On genomic coordinates
     ///
     /// ```
-    /// use bedrs::{Bound, GenomicInterval, GenomicIntervalSet};
+    /// use bedrs::{Bound, GenomicInterval, IntervalContainer, Container};
     ///
     /// let records = vec![
     ///     GenomicInterval::new(1, 10, 20),
@@ -111,7 +111,7 @@ where
     ///     GenomicInterval::new(3, 30, 20),
     ///     GenomicInterval::new(4, 10, 20),
     /// ];
-    /// let set = GenomicIntervalSet::new(records);
+    /// let set = IntervalContainer::new(records);
     /// let query = GenomicInterval::new(3, 10, 20);
     /// let bound = set.lower_bound_unchecked(&query);
     /// assert_eq!(bound, 2);
@@ -423,15 +423,14 @@ where
 #[cfg(test)]
 mod testing {
     use crate::{
-        traits::errors::SetError, types::StrandedGenomicIntervalSet, Bound, Container,
-        GenomicInterval, GenomicIntervalSet, Interval, IntervalSet, Strand,
-        StrandedGenomicInterval,
+        traits::errors::SetError, Bound, Container, GenomicInterval, Interval, IntervalContainer,
+        Strand, StrandedGenomicInterval,
     };
 
     #[test]
     fn bsearch_unsorted_chr() {
         let records = (0..500).map(|x| Interval::new(x, x + 50)).collect();
-        let set = IntervalSet::new(records);
+        let set = IntervalContainer::new(records);
         let query = Interval::new(10, 20);
         let bound = set.lower_bound(&query);
         assert!(bound.is_err());
@@ -440,7 +439,7 @@ mod testing {
     #[test]
     fn bsearch_unsorted_chr_upstream() {
         let records = (0..500).map(|x| Interval::new(x, x + 50)).collect();
-        let set = IntervalSet::new(records);
+        let set = IntervalContainer::new(records);
         let query = Interval::new(10, 20);
         let bound = set.chr_bound_upstream(&query);
         assert!(bound.is_err());
@@ -449,7 +448,7 @@ mod testing {
     #[test]
     fn bsearch_unsorted_chr_downstream() {
         let records = (0..500).map(|x| Interval::new(x, x + 50)).collect();
-        let set = IntervalSet::new(records);
+        let set = IntervalContainer::new(records);
         let query = Interval::new(10, 20);
         let bound = set.chr_bound_downstream(&query);
         assert!(bound.is_err());
@@ -460,7 +459,7 @@ mod testing {
         let records = (0..500)
             .map(|x| StrandedGenomicInterval::new(1, x, x + 50, Strand::Forward))
             .collect();
-        let set = StrandedGenomicIntervalSet::new(records);
+        let set = IntervalContainer::new(records);
         let query = StrandedGenomicInterval::new(1, 10, 20, Strand::Forward);
         let bound = set.stranded_upstream_bound(&query);
         assert!(bound.is_err());
@@ -471,7 +470,7 @@ mod testing {
         let records = (0..500)
             .map(|x| StrandedGenomicInterval::new(1, x, x + 50, Strand::Forward))
             .collect();
-        let set = StrandedGenomicIntervalSet::new(records);
+        let set = IntervalContainer::new(records);
         let query = StrandedGenomicInterval::new(1, 10, 20, Strand::Forward);
         let bound = set.stranded_downstream_bound(&query);
         assert!(bound.is_err());
@@ -480,7 +479,7 @@ mod testing {
     #[test]
     fn bsearch_empty_chr() {
         let records = Vec::new();
-        let set = IntervalSet::new(records);
+        let set = IntervalContainer::new(records);
         let query = Interval::new(10, 20);
         let bound = set.lower_bound(&query);
         assert!(bound.is_err());
@@ -489,7 +488,7 @@ mod testing {
     #[test]
     fn bsearch_empty_chr_upstream() {
         let records = Vec::new();
-        let set = IntervalSet::new(records);
+        let set = IntervalContainer::new(records);
         let query = Interval::new(10, 20);
         let bound = set.chr_bound_upstream(&query);
         assert!(bound.is_err());
@@ -498,7 +497,7 @@ mod testing {
     #[test]
     fn bsearch_empty_chr_downstream() {
         let records = Vec::new();
-        let set = IntervalSet::new(records);
+        let set = IntervalContainer::new(records);
         let query = Interval::new(10, 20);
         let bound = set.chr_bound_downstream(&query);
         assert!(bound.is_err());
@@ -507,7 +506,7 @@ mod testing {
     #[test]
     fn bsearch_empty_chr_stranded_upstream() {
         let records = Vec::new();
-        let set = StrandedGenomicIntervalSet::new(records);
+        let set = IntervalContainer::new(records);
         let query = StrandedGenomicInterval::new(1, 10, 20, Strand::Forward);
         let bound = set.stranded_upstream_bound(&query);
         assert!(bound.is_err());
@@ -516,7 +515,7 @@ mod testing {
     #[test]
     fn bsearch_empty_chr_stranded_downstream() {
         let records = Vec::new();
-        let set = StrandedGenomicIntervalSet::new(records);
+        let set = IntervalContainer::new(records);
         let query = StrandedGenomicInterval::new(1, 10, 20, Strand::Forward);
         let bound = set.stranded_downstream_bound(&query);
         assert!(bound.is_err());
@@ -525,7 +524,7 @@ mod testing {
     #[test]
     fn bsearch_base_low() {
         let records = (0..500).map(|x| Interval::new(x, x + 50)).collect();
-        let mut set = IntervalSet::new(records);
+        let mut set = IntervalContainer::new(records);
         set.sort();
         let query = Interval::new(10, 20);
         let bound = set.lower_bound(&query);
@@ -535,7 +534,7 @@ mod testing {
     #[test]
     fn bsearch_base_high() {
         let records = (0..500).map(|x| Interval::new(x, x + 50)).collect();
-        let mut set = IntervalSet::new(records);
+        let mut set = IntervalContainer::new(records);
         set.sort();
         let query = Interval::new(300, 320);
         let bound = set.lower_bound(&query);
@@ -545,7 +544,7 @@ mod testing {
     #[test]
     fn bsearch_base_mid() {
         let records = (0..500).map(|x| Interval::new(x, x + 50)).collect();
-        let mut set = IntervalSet::new(records);
+        let mut set = IntervalContainer::new(records);
         set.sort();
         let query = Interval::new(200, 220);
         let bound = set.lower_bound(&query);
@@ -555,7 +554,7 @@ mod testing {
     #[test]
     fn bsearch_base_containing() {
         let records = (0..500).map(|x| Interval::new(x, x + 50)).collect();
-        let mut set = IntervalSet::new(records);
+        let mut set = IntervalContainer::new(records);
         set.sort();
         let query = Interval::new(0, 500);
         let bound = set.lower_bound(&query);
@@ -572,7 +571,7 @@ mod testing {
             GenomicInterval::new(3, 30, 20),
             GenomicInterval::new(4, 10, 20),
         ];
-        let mut set = GenomicIntervalSet::new(records);
+        let mut set = IntervalContainer::new(records);
         set.sort();
         let query = GenomicInterval::new(3, 10, 20);
         let bound = set.lower_bound(&query);
@@ -589,7 +588,7 @@ mod testing {
             GenomicInterval::new(3, 30, 40),
             GenomicInterval::new(4, 10, 20),
         ];
-        let mut set = GenomicIntervalSet::new(records);
+        let mut set = IntervalContainer::new(records);
         set.sort();
         let query = GenomicInterval::new(3, 25, 20);
         let bound = set.lower_bound(&query);
@@ -599,7 +598,7 @@ mod testing {
     #[test]
     fn bsearch_unsorted() {
         let records = (0..500).map(|x| Interval::new(x, x + 50)).collect();
-        let set = IntervalSet::new(records);
+        let set = IntervalContainer::new(records);
         let query = Interval::new(10, 20);
         let bound = set.lower_bound(&query);
         assert_eq!(bound, Err(SetError::UnsortedSet));
@@ -615,7 +614,7 @@ mod testing {
             Interval::new(50, 60),
         ];
         let query = Interval::new(20, 25);
-        let set = IntervalSet::new(records);
+        let set = IntervalContainer::new(records);
         let bound = set.lower_bound_unchecked(&query);
         assert_eq!(bound, 1);
     }
@@ -631,7 +630,7 @@ mod testing {
             Interval::new(50, 60),
         ];
         let query = Interval::new(5, 20);
-        let set = IntervalSet::new(records);
+        let set = IntervalContainer::new(records);
         let bound = set.lower_bound_unchecked(&query);
         assert_eq!(bound, 0);
     }
@@ -648,7 +647,7 @@ mod testing {
             Interval::new(50, 60),
         ];
         let query = Interval::new(5, 20);
-        let set = IntervalSet::new(records);
+        let set = IntervalContainer::new(records);
         let bound = set.lower_bound_unchecked(&query);
         assert_eq!(bound, 0);
     }
@@ -663,7 +662,7 @@ mod testing {
             GenomicInterval::new(2, 53, 353),
             GenomicInterval::new(2, 204, 504),
         ];
-        let set = GenomicIntervalSet::new(intervals);
+        let set = IntervalContainer::new(intervals);
         let bound = set.lower_bound_unchecked(&query);
         assert_eq!(bound, 1);
     }
@@ -671,7 +670,7 @@ mod testing {
     #[test]
     fn bsearch_no_max_len() {
         let records = (0..500).map(|x| Interval::new(x, x + 50)).collect();
-        let mut set = IntervalSet::from_sorted(records).unwrap();
+        let mut set = IntervalContainer::from_sorted(records).unwrap();
         let query = Interval::new(10, 20);
         set.max_len_mut().take();
         let bound = set.lower_bound(&query);
@@ -682,7 +681,7 @@ mod testing {
     #[should_panic]
     fn bsearch_no_max_len_unchecked_panic() {
         let records = (0..500).map(|x| Interval::new(x, x + 50)).collect();
-        let mut set = IntervalSet::from_sorted(records).unwrap();
+        let mut set = IntervalContainer::from_sorted(records).unwrap();
         let query = Interval::new(10, 20);
         set.max_len_mut().take();
         set.lower_bound_unchecked(&query);
@@ -697,7 +696,7 @@ mod testing {
             GenomicInterval::new(3, 53, 353),
         ];
         let query = GenomicInterval::new(2, 100, 300);
-        let set = GenomicIntervalSet::from_unsorted(intervals);
+        let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.chr_bound(&query).unwrap();
         assert_eq!(bound, Some(1));
     }
@@ -711,7 +710,7 @@ mod testing {
             GenomicInterval::new(4, 53, 353),
         ];
         let query = GenomicInterval::new(1, 100, 300);
-        let set = GenomicIntervalSet::from_unsorted(intervals);
+        let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.chr_bound(&query).unwrap();
         assert_eq!(bound, Some(0));
     }
@@ -725,7 +724,7 @@ mod testing {
             GenomicInterval::new(3, 53, 353), // <- min
         ];
         let query = GenomicInterval::new(3, 100, 300);
-        let set = GenomicIntervalSet::from_unsorted(intervals);
+        let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.chr_bound(&query).unwrap();
         assert_eq!(bound, Some(3));
     }
@@ -740,7 +739,7 @@ mod testing {
             GenomicInterval::new(3, 53, 353),
         ];
         let query = GenomicInterval::new(4, 100, 300);
-        let set = GenomicIntervalSet::from_unsorted(intervals);
+        let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.chr_bound(&query).unwrap();
         assert_eq!(bound, None);
     }
@@ -755,7 +754,7 @@ mod testing {
             GenomicInterval::new(5, 53, 353),
         ];
         let query = GenomicInterval::new(1, 100, 300);
-        let set = GenomicIntervalSet::from_unsorted(intervals);
+        let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.chr_bound(&query).unwrap();
         assert_eq!(bound, None);
     }
@@ -769,7 +768,7 @@ mod testing {
             GenomicInterval::new(3, 53, 353),
         ];
         let query = GenomicInterval::new(2, 100, 300);
-        let set = GenomicIntervalSet::from_unsorted(intervals);
+        let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.chr_bound_upstream(&query).unwrap();
         assert_eq!(bound, Some(2));
     }
@@ -783,7 +782,7 @@ mod testing {
             GenomicInterval::new(3, 53, 353),
         ];
         let query = GenomicInterval::new(2, 18, 300);
-        let set = GenomicIntervalSet::from_unsorted(intervals);
+        let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.chr_bound_upstream(&query).unwrap();
         assert_eq!(bound, Some(2));
     }
@@ -797,7 +796,7 @@ mod testing {
             GenomicInterval::new(3, 53, 353),
         ];
         let query = GenomicInterval::new(2, 53, 300);
-        let set = GenomicIntervalSet::from_unsorted(intervals);
+        let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.chr_bound_upstream(&query).unwrap();
         assert_eq!(bound, Some(2));
     }
@@ -811,7 +810,7 @@ mod testing {
             GenomicInterval::new(3, 53, 353), // <- min
         ];
         let query = GenomicInterval::new(3, 54, 300);
-        let set = GenomicIntervalSet::from_unsorted(intervals);
+        let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.chr_bound_upstream(&query).unwrap();
         assert_eq!(bound, Some(3));
     }
@@ -825,7 +824,7 @@ mod testing {
             GenomicInterval::new(3, 53, 353),
         ]; // no min
         let query = GenomicInterval::new(3, 50, 52);
-        let set = GenomicIntervalSet::from_unsorted(intervals);
+        let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.chr_bound_upstream(&query).unwrap();
         assert_eq!(bound, None);
     }
@@ -839,7 +838,7 @@ mod testing {
             GenomicInterval::new(4, 53, 353),
         ]; // no min
         let query = GenomicInterval::new(1, 50, 52);
-        let set = GenomicIntervalSet::from_unsorted(intervals);
+        let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.chr_bound_upstream(&query).unwrap();
         assert_eq!(bound, None);
     }
@@ -852,7 +851,7 @@ mod testing {
             GenomicInterval::new(1, 50, 60),
         ];
         let query = GenomicInterval::new(1, 22, 32);
-        let set = GenomicIntervalSet::from_unsorted(intervals);
+        let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.chr_bound_upstream(&query).unwrap();
         assert_eq!(bound, Some(0));
     }
@@ -866,7 +865,7 @@ mod testing {
             GenomicInterval::new(1, 50, 60),
         ];
         let query = GenomicInterval::new(1, 8, 32);
-        let set = GenomicIntervalSet::from_unsorted(intervals);
+        let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.chr_bound_upstream(&query).unwrap();
         assert_eq!(bound, None);
     }
@@ -882,7 +881,7 @@ mod testing {
             StrandedGenomicInterval::new(3, 53, 353, Strand::Forward),
         ];
         let query = StrandedGenomicInterval::new(2, 100, 300, Strand::Forward);
-        let set = StrandedGenomicIntervalSet::from_unsorted(intervals);
+        let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.stranded_upstream_bound(&query).unwrap();
         assert_eq!(bound, Some(2));
     }
@@ -896,7 +895,7 @@ mod testing {
             StrandedGenomicInterval::new(3, 53, 353, Strand::Forward),
         ];
         let query = StrandedGenomicInterval::new(2, 100, 300, Strand::Forward);
-        let set = StrandedGenomicIntervalSet::from_unsorted(intervals);
+        let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.stranded_upstream_bound(&query).unwrap();
         assert_eq!(bound, Some(1));
     }
@@ -909,7 +908,7 @@ mod testing {
             StrandedGenomicInterval::new(3, 53, 353, Strand::Forward),
         ];
         let query = StrandedGenomicInterval::new(2, 100, 300, Strand::Forward);
-        let set = StrandedGenomicIntervalSet::from_unsorted(intervals);
+        let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.stranded_upstream_bound(&query).unwrap();
         assert_eq!(bound, None);
     }
@@ -923,7 +922,7 @@ mod testing {
             StrandedGenomicInterval::new(3, 53, 353, Strand::Forward),
         ];
         let query = StrandedGenomicInterval::new(2, 100, 300, Strand::Forward);
-        let set = StrandedGenomicIntervalSet::from_unsorted(intervals);
+        let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.stranded_upstream_bound(&query).unwrap();
         assert_eq!(bound, Some(2));
     }
@@ -937,7 +936,7 @@ mod testing {
             GenomicInterval::new(3, 53, 353),
         ];
         let query = GenomicInterval::new(2, 10, 300);
-        let set = GenomicIntervalSet::from_unsorted(intervals);
+        let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.chr_bound_downstream(&query).unwrap();
         assert_eq!(bound, Some(2));
     }
@@ -951,7 +950,7 @@ mod testing {
             GenomicInterval::new(3, 53, 353), // <- min
         ];
         let query = GenomicInterval::new(3, 10, 300);
-        let set = GenomicIntervalSet::from_unsorted(intervals);
+        let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.chr_bound_downstream(&query).unwrap();
         assert_eq!(bound, Some(3));
     }
@@ -965,7 +964,7 @@ mod testing {
             GenomicInterval::new(3, 53, 353),
         ]; // no min
         let query = GenomicInterval::new(3, 54, 300);
-        let set = GenomicIntervalSet::from_unsorted(intervals);
+        let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.chr_bound_downstream(&query).unwrap();
         assert_eq!(bound, None);
     }
@@ -979,7 +978,7 @@ mod testing {
             GenomicInterval::new(4, 53, 353),
         ]; // no min
         let query = GenomicInterval::new(1, 54, 300);
-        let set = GenomicIntervalSet::from_unsorted(intervals);
+        let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.chr_bound_downstream(&query).unwrap();
         assert_eq!(bound, None);
     }
@@ -992,7 +991,7 @@ mod testing {
             GenomicInterval::new(1, 154, 304),
         ];
         let query = GenomicInterval::new(1, 21, 71);
-        let set = GenomicIntervalSet::from_unsorted(intervals);
+        let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.chr_bound_downstream(&query).unwrap();
         assert_eq!(bound, Some(0));
     }
@@ -1002,8 +1001,14 @@ mod testing {
         let chrs = (0..100).map(|x| x % 3).collect::<Vec<_>>();
         let starts = (0..100).step_by(1).collect::<Vec<_>>();
         let ends = (10..110).step_by(1).collect::<Vec<_>>();
-        let mut set = GenomicIntervalSet::from_endpoints(&chrs, &starts, &ends).unwrap();
-        set.sort();
+        let records = chrs
+            .iter()
+            .zip(starts.iter())
+            .zip(ends.iter())
+            .map(|((&chr, &start), &end)| GenomicInterval::new(chr, start, end))
+            .collect::<Vec<_>>();
+        let set = IntervalContainer::from_unsorted(records);
+        // set.sort();
         let query = GenomicInterval::new(0, 12, 15);
         let bound = set.chr_bound_downstream(&query).unwrap().unwrap();
         assert_eq!(bound, 4);
@@ -1019,7 +1024,7 @@ mod testing {
             StrandedGenomicInterval::new(3, 53, 353, Strand::Forward),
         ];
         let query = StrandedGenomicInterval::new(2, 10, 300, Strand::Forward);
-        let set = StrandedGenomicIntervalSet::from_unsorted(intervals);
+        let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.stranded_downstream_bound(&query).unwrap();
         assert_eq!(bound, Some(2));
     }
@@ -1034,7 +1039,7 @@ mod testing {
             StrandedGenomicInterval::new(3, 53, 353, Strand::Forward),
         ];
         let query = StrandedGenomicInterval::new(2, 10, 300, Strand::Forward);
-        let set = StrandedGenomicIntervalSet::from_unsorted(intervals);
+        let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.stranded_downstream_bound(&query).unwrap();
         assert_eq!(bound, Some(3));
     }
@@ -1050,7 +1055,7 @@ mod testing {
             StrandedGenomicInterval::new(3, 53, 353, Strand::Forward),
         ];
         let query = StrandedGenomicInterval::new(2, 10, 300, Strand::Forward);
-        let set = StrandedGenomicIntervalSet::from_unsorted(intervals);
+        let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.stranded_downstream_bound(&query).unwrap();
         assert_eq!(bound, Some(4));
     }
@@ -1066,7 +1071,7 @@ mod testing {
             StrandedGenomicInterval::new(3, 53, 353, Strand::Forward),
         ];
         let query = StrandedGenomicInterval::new(2, 10, 300, Strand::Forward);
-        let set = StrandedGenomicIntervalSet::from_unsorted(intervals);
+        let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.stranded_downstream_bound(&query).unwrap();
         assert_eq!(bound, None);
     }
@@ -1081,7 +1086,7 @@ mod testing {
             StrandedGenomicInterval::new(3, 53, 353, Strand::Forward),
         ];
         let query = StrandedGenomicInterval::new(1, 10, 300, Strand::Forward);
-        let set = StrandedGenomicIntervalSet::from_unsorted(intervals);
+        let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.stranded_downstream_bound(&query).unwrap();
         assert_eq!(bound, None);
     }

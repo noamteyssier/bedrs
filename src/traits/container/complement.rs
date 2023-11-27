@@ -18,7 +18,7 @@ use crate::{
 /// # Examples
 ///
 /// ```
-/// use bedrs::{Interval, IntervalSet, Complement, Container, Coordinates};
+/// use bedrs::{Interval, Complement, Container, Coordinates, IntervalContainer};
 ///
 /// let intervals = vec![
 ///     Interval::new(10, 20),
@@ -33,7 +33,7 @@ use crate::{
 ///     Interval::new(60, 70),
 /// ];
 ///
-/// let set = IntervalSet::from_unsorted(intervals);
+/// let set = IntervalContainer::from_unsorted(intervals);
 /// let comp_iter = set.complement().unwrap();
 /// let complements: Vec<_> = comp_iter.collect();
 ///
@@ -66,7 +66,7 @@ mod testing {
     use super::*;
     use crate::{
         traits::{ChromBounds, IntervalBounds, ValueBounds},
-        GenomicInterval, GenomicIntervalSet, Interval, IntervalSet,
+        GenomicInterval, Interval, IntervalContainer,
     };
 
     fn validate_records<I, C, T>(obs: &[I], exp: &[I])
@@ -84,7 +84,7 @@ mod testing {
     #[test]
     fn complement_unsorted() {
         let intervals = vec![Interval::new(10, 20), Interval::new(30, 40)];
-        let set = IntervalSet::from_iter(intervals);
+        let set = IntervalContainer::from_iter(intervals);
         assert!(set.complement().is_err());
     }
 
@@ -92,7 +92,7 @@ mod testing {
     #[should_panic]
     fn complement_unmerged_boundary() {
         let intervals = vec![Interval::new(10, 20), Interval::new(20, 30)];
-        let set = IntervalSet::from_iter(intervals);
+        let set = IntervalContainer::from_iter(intervals);
         let comp_iter = set.complement().unwrap();
         let _complements: Vec<_> = comp_iter.collect();
     }
@@ -101,7 +101,7 @@ mod testing {
     #[should_panic]
     fn complement_unmerged_overlapping() {
         let intervals = vec![Interval::new(10, 20), Interval::new(18, 30)];
-        let set = IntervalSet::from_iter(intervals);
+        let set = IntervalContainer::from_iter(intervals);
         let comp_iter = set.complement().unwrap();
         let _complements: Vec<_> = comp_iter.collect();
     }
@@ -113,7 +113,7 @@ mod testing {
     fn complement_a() {
         let intervals = vec![Interval::new(10, 20), Interval::new(30, 40)];
         let expected = vec![Interval::new(20, 30)];
-        let set = IntervalSet::from_unsorted(intervals);
+        let set = IntervalContainer::from_unsorted(intervals);
         let comp_iter = set.complement().unwrap();
         let complements: Vec<_> = comp_iter.collect();
         validate_records(&complements, &expected);
@@ -130,7 +130,7 @@ mod testing {
             Interval::new(50, 60),
         ];
         let expected = vec![Interval::new(20, 30), Interval::new(40, 50)];
-        let set = IntervalSet::from_unsorted(intervals);
+        let set = IntervalContainer::from_unsorted(intervals);
         let comp_iter = set.complement().unwrap();
         let complements: Vec<_> = comp_iter.collect();
         validate_records(&complements, &expected);
@@ -147,7 +147,7 @@ mod testing {
             GenomicInterval::new(2, 50, 60),
         ];
         let expected = vec![GenomicInterval::new(1, 20, 30)];
-        let set = GenomicIntervalSet::from_unsorted(intervals);
+        let set = IntervalContainer::from_unsorted(intervals);
         let comp_iter = set.complement().unwrap();
         let complements: Vec<_> = comp_iter.collect();
         validate_records(&complements, &expected);
@@ -168,7 +168,7 @@ mod testing {
             GenomicInterval::new(1, 20, 30),
             GenomicInterval::new(2, 20, 30),
         ];
-        let set = GenomicIntervalSet::from_unsorted(intervals);
+        let set = IntervalContainer::from_unsorted(intervals);
         let comp_iter = set.complement().unwrap();
         let complements: Vec<_> = comp_iter.collect();
         validate_records(&complements, &expected);

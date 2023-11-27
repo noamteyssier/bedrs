@@ -454,7 +454,7 @@ mod testing {
     use super::Find;
     use crate::{
         traits::{ChromBounds, Container, IntervalBounds, ValueBounds},
-        GenomicInterval, GenomicIntervalSet, Interval, IntervalSet,
+        Coordinates, GenomicInterval, Interval, IntervalContainer,
     };
 
     fn validate_set<Co, C, I, T>(set: &Co, expected: &[I])
@@ -490,7 +490,12 @@ mod testing {
         let query = Interval::new(17, 27);
         let starts = vec![10, 15, 20, 25];
         let ends = vec![40, 45, 50, 55];
-        let set = IntervalSet::from_endpoints_unchecked(&starts, &ends);
+        let records = starts
+            .iter()
+            .zip(ends.iter())
+            .map(|(s, e)| Interval::new(*s, *e))
+            .collect::<Vec<Interval<u32>>>();
+        let set = IntervalContainer::from_unsorted(records);
         let overlaps = set.find(&query);
         assert_eq!(overlaps.len(), 4);
     }
@@ -499,7 +504,7 @@ mod testing {
     fn find_containing() {
         let query = Interval::new(0, 100);
         let intervals = vec![Interval::new(10, 20)];
-        let set = IntervalSet::from_sorted(intervals).unwrap();
+        let set = IntervalContainer::from_sorted(intervals).unwrap();
         let overlaps = set.find(&query);
         assert_eq!(overlaps.len(), 1);
     }
@@ -508,7 +513,7 @@ mod testing {
     fn find_containing_iter_sorted() {
         let query = Interval::new(0, 100);
         let intervals = vec![Interval::new(10, 20)];
-        let set = IntervalSet::from_sorted(intervals).unwrap();
+        let set = IntervalContainer::from_sorted(intervals).unwrap();
         let overlaps = set.find_iter_sorted(&query).unwrap();
         let counts = overlaps.count();
         assert_eq!(counts, 1);
@@ -519,7 +524,12 @@ mod testing {
         let query = Interval::new(17, 27);
         let starts = vec![10, 15, 20, 25];
         let ends = vec![40, 45, 50, 55];
-        let set = IntervalSet::from_endpoints_unchecked(&starts, &ends);
+        let records = starts
+            .iter()
+            .zip(ends.iter())
+            .map(|(s, e)| Interval::new(*s, *e))
+            .collect::<Vec<Interval<u32>>>();
+        let set = IntervalContainer::from_unsorted(records);
         let overlaps = set.find_min(&query, 5);
         assert_eq!(overlaps.len(), 3);
     }
@@ -529,7 +539,12 @@ mod testing {
         let query = Interval::new(17, 27);
         let starts = vec![10, 15, 20, 25];
         let ends = vec![40, 45, 50, 55];
-        let set = IntervalSet::from_endpoints_unchecked(&starts, &ends);
+        let records = starts
+            .iter()
+            .zip(ends.iter())
+            .map(|(s, e)| Interval::new(*s, *e))
+            .collect::<Vec<Interval<u32>>>();
+        let set = IntervalContainer::from_unsorted(records);
         let overlaps = set.find_exact(&query, 7);
         assert_eq!(overlaps.len(), 1);
     }
@@ -539,7 +554,12 @@ mod testing {
         let query = Interval::new(5, 12);
         let starts = vec![10, 15, 20, 25];
         let ends = vec![40, 45, 50, 55];
-        let set = IntervalSet::from_endpoints_unchecked(&starts, &ends);
+        let records = starts
+            .iter()
+            .zip(ends.iter())
+            .map(|(s, e)| Interval::new(*s, *e))
+            .collect::<Vec<Interval<u32>>>();
+        let set = IntervalContainer::from_unsorted(records);
         let num_overlaps = set.find_iter(&query).count();
         assert_eq!(num_overlaps, 1);
     }
@@ -549,8 +569,12 @@ mod testing {
         let query = Interval::new(5, 12);
         let starts = vec![10, 15, 20, 25];
         let ends = vec![40, 45, 50, 55];
-        let mut set = IntervalSet::from_endpoints_unchecked(&starts, &ends);
-        set.sort();
+        let records = starts
+            .iter()
+            .zip(ends.iter())
+            .map(|(s, e)| Interval::new(*s, *e))
+            .collect::<Vec<Interval<u32>>>();
+        let set = IntervalContainer::from_unsorted(records);
         let num_overlaps = set.find_iter_sorted(&query).unwrap().count();
         assert_eq!(num_overlaps, 1);
     }
@@ -560,7 +584,12 @@ mod testing {
         let query = Interval::new(5, 12);
         let starts = vec![15, 20, 25, 10];
         let ends = vec![45, 50, 55, 40];
-        let set = IntervalSet::from_endpoints_unchecked(&starts, &ends);
+        let records = starts
+            .iter()
+            .zip(ends.iter())
+            .map(|(s, e)| Interval::new(*s, *e))
+            .collect::<Vec<Interval<u32>>>();
+        let set = IntervalContainer::from_iter(records);
         let overlaps = set.find_iter_sorted(&query);
         assert!(overlaps.is_err());
     }
@@ -570,7 +599,12 @@ mod testing {
         let query = Interval::new(17, 27);
         let starts = vec![10, 15, 20, 25];
         let ends = vec![40, 45, 50, 55];
-        let set = IntervalSet::from_endpoints_unchecked(&starts, &ends);
+        let records = starts
+            .iter()
+            .zip(ends.iter())
+            .map(|(s, e)| Interval::new(*s, *e))
+            .collect::<Vec<Interval<u32>>>();
+        let set = IntervalContainer::from_unsorted(records);
         let overlaps = set.find_iter_min(&query, 5);
         let num_overlaps = overlaps.count();
         assert_eq!(num_overlaps, 3);
@@ -581,7 +615,12 @@ mod testing {
         let query = Interval::new(17, 27);
         let starts = vec![10, 15, 20, 25];
         let ends = vec![40, 45, 50, 55];
-        let set = IntervalSet::from_endpoints_unchecked(&starts, &ends);
+        let records = starts
+            .iter()
+            .zip(ends.iter())
+            .map(|(s, e)| Interval::new(*s, *e))
+            .collect::<Vec<Interval<u32>>>();
+        let set = IntervalContainer::from_unsorted(records);
         let overlaps = set.find_iter_exact(&query, 7);
         let num_overlaps = overlaps.count();
         assert_eq!(num_overlaps, 1);
@@ -592,8 +631,12 @@ mod testing {
         let query = Interval::new(17, 27);
         let starts = vec![10, 15, 20, 25];
         let ends = vec![40, 45, 50, 55];
-        let mut set = IntervalSet::from_endpoints_unchecked(&starts, &ends);
-        set.sort();
+        let records = starts
+            .iter()
+            .zip(ends.iter())
+            .map(|(s, e)| Interval::new(*s, *e))
+            .collect::<Vec<Interval<u32>>>();
+        let set = IntervalContainer::from_unsorted(records);
         let overlaps = set.find_iter_sorted_min(&query, 5).unwrap();
         let num_overlaps = overlaps.count();
         assert_eq!(num_overlaps, 3);
@@ -604,8 +647,12 @@ mod testing {
         let query = Interval::new(17, 27);
         let starts = vec![10, 15, 20, 25];
         let ends = vec![40, 45, 50, 55];
-        let mut set = IntervalSet::from_endpoints_unchecked(&starts, &ends);
-        set.sort();
+        let records = starts
+            .iter()
+            .zip(ends.iter())
+            .map(|(s, e)| Interval::new(*s, *e))
+            .collect::<Vec<Interval<u32>>>();
+        let set = IntervalContainer::from_unsorted(records);
         let overlaps = set.find_iter_sorted_exact(&query, 7).unwrap();
         let num_overlaps = overlaps.count();
         assert_eq!(num_overlaps, 1);
@@ -624,7 +671,7 @@ mod testing {
             GenomicInterval::new(4, 10, 20),
             GenomicInterval::new(4, 25, 35),
         ];
-        let set = GenomicIntervalSet::from_sorted(intervals).unwrap();
+        let set = IntervalContainer::from_sorted(intervals).unwrap();
         let mut overlaps = set
             .find_iter_sorted_min(&query, 5)
             .unwrap()
@@ -632,8 +679,8 @@ mod testing {
             .cloned();
         let first = overlaps.next().unwrap();
         let last = overlaps.last().unwrap();
-        assert_eq!(first, GenomicInterval::new(3, 15, 25));
-        assert_eq!(last, GenomicInterval::new(3, 20, 30));
+        assert!(first.eq(&GenomicInterval::new(3, 15, 25)));
+        assert!(last.eq(&GenomicInterval::new(3, 20, 30)));
     }
 
     #[test]
@@ -649,7 +696,7 @@ mod testing {
             GenomicInterval::new(4, 10, 20),
             GenomicInterval::new(4, 25, 35),
         ];
-        let set = GenomicIntervalSet::from_sorted(intervals).unwrap();
+        let set = IntervalContainer::from_sorted(intervals).unwrap();
         let mut overlaps = set
             .find_iter_sorted_exact(&query, 7)
             .unwrap()
@@ -657,7 +704,7 @@ mod testing {
             .cloned();
         let first = overlaps.next().unwrap();
         let last = overlaps.last();
-        assert_eq!(first, GenomicInterval::new(3, 20, 30));
+        assert!(first.eq(&GenomicInterval::new(3, 20, 30)));
         assert!(last.is_none());
     }
 
@@ -680,7 +727,7 @@ mod testing {
             Interval::new(10, 20),
             Interval::new(15, 25),
         ];
-        let set = IntervalSet::from_sorted(intervals).unwrap();
+        let set = IntervalContainer::from_sorted(intervals).unwrap();
         let overlaps = set.find_query_frac(&query, frac).unwrap();
         validate_set(&overlaps, &expected);
     }
@@ -705,7 +752,7 @@ mod testing {
             Interval::new(15, 25),
             Interval::new(17, 27),
         ];
-        let set = IntervalSet::from_sorted(intervals).unwrap();
+        let set = IntervalContainer::from_sorted(intervals).unwrap();
         let overlaps = set.find_query_frac(&query, frac).unwrap();
         validate_set(&overlaps, &expected);
     }
@@ -724,7 +771,7 @@ mod testing {
             Interval::new(20, 30),
         ];
         let expected = vec![Interval::new(10, 20)];
-        let set = IntervalSet::from_sorted(intervals).unwrap();
+        let set = IntervalContainer::from_sorted(intervals).unwrap();
         let overlaps = set.find_query_frac(&query, frac).unwrap();
         validate_set(&overlaps, &expected);
     }
@@ -748,7 +795,7 @@ mod testing {
             Interval::new(10, 20),
             Interval::new(15, 25),
         ];
-        let set = IntervalSet::from_sorted(intervals).unwrap();
+        let set = IntervalContainer::from_sorted(intervals).unwrap();
         let overlap_iter = set
             .find_iter_sorted_query_frac(&query, frac)
             .unwrap()
@@ -773,7 +820,7 @@ mod testing {
             Interval::new(7, 17),
             Interval::new(10, 20),
         ];
-        let set = IntervalSet::from_sorted(intervals).unwrap();
+        let set = IntervalContainer::from_sorted(intervals).unwrap();
         let overlaps = set.find_target_frac(&query, frac).unwrap();
         validate_set(&overlaps, &expected)
     }
@@ -791,7 +838,7 @@ mod testing {
             Interval::new(12, 22), // bounded, but missing overlap req
         ];
         let expected = vec![Interval::new(10, 20)];
-        let set = IntervalSet::from_sorted(intervals).unwrap();
+        let set = IntervalContainer::from_sorted(intervals).unwrap();
         let overlaps = set.find_target_frac(&query, frac).unwrap();
         validate_set(&overlaps, &expected)
     }
@@ -812,7 +859,7 @@ mod testing {
             Interval::new(10, 20),
             Interval::new(11, 21),
         ];
-        let set = IntervalSet::from_sorted(intervals).unwrap();
+        let set = IntervalContainer::from_sorted(intervals).unwrap();
         let overlaps = set.find_target_frac(&query, frac).unwrap();
         validate_set(&overlaps, &expected)
     }
@@ -834,7 +881,7 @@ mod testing {
             Interval::new(7, 17),
             Interval::new(10, 20),
         ];
-        let set = IntervalSet::from_sorted(intervals).unwrap();
+        let set = IntervalContainer::from_sorted(intervals).unwrap();
         let overlap_iter = set
             .find_iter_sorted_target_frac(&query, frac)
             .unwrap()
@@ -859,7 +906,7 @@ mod testing {
             Interval::new(20, 30),
         ];
         let expected = vec![Interval::new(9, 19)];
-        let set = IntervalSet::from_sorted(intervals).unwrap();
+        let set = IntervalContainer::from_sorted(intervals).unwrap();
         let overlaps = set.find_reciprocal_frac(&query, frac, frac).unwrap();
         validate_set(&overlaps, &expected)
     }
@@ -881,7 +928,7 @@ mod testing {
             Interval::new(20, 30),
         ];
         let expected = vec![Interval::new(9, 19)];
-        let set = IntervalSet::from_sorted(intervals).unwrap();
+        let set = IntervalContainer::from_sorted(intervals).unwrap();
         let overlap_iter = set
             .find_iter_sorted_reciprocal_frac(&query, frac, frac)
             .unwrap()
@@ -908,7 +955,7 @@ mod testing {
             Interval::new(10, 20),
             Interval::new(11, 21),
         ];
-        let set = IntervalSet::from_sorted(intervals).unwrap();
+        let set = IntervalContainer::from_sorted(intervals).unwrap();
         let overlaps = set.find_reciprocal_frac(&query, f_query, f_target).unwrap();
         validate_set(&overlaps, &expected);
     }
@@ -934,7 +981,7 @@ mod testing {
             Interval::new(11, 21),
             Interval::new(12, 22),
         ];
-        let set = IntervalSet::from_sorted(intervals).unwrap();
+        let set = IntervalContainer::from_sorted(intervals).unwrap();
         let overlaps = set
             .find_reciprocal_frac_either(&query, f_query, f_target)
             .unwrap();
@@ -962,7 +1009,7 @@ mod testing {
             Interval::new(9, 20),
             Interval::new(15, 18),
         ];
-        let set = IntervalSet::from_sorted(intervals).unwrap();
+        let set = IntervalContainer::from_sorted(intervals).unwrap();
         let overlaps = set.find_reciprocal_frac_either(&query, frac, frac).unwrap();
         validate_set(&overlaps, &expected)
     }
@@ -988,7 +1035,7 @@ mod testing {
             Interval::new(9, 20),
             Interval::new(15, 18),
         ];
-        let set = IntervalSet::from_sorted(intervals).unwrap();
+        let set = IntervalContainer::from_sorted(intervals).unwrap();
         let overlap_iter = set
             .find_iter_sorted_reciprocal_frac_either(&query, frac, frac)
             .unwrap()
@@ -999,7 +1046,7 @@ mod testing {
     #[test]
     fn find_query_frac_unbounded() {
         let query = Interval::new(10, 20);
-        let set = IntervalSet::from_sorted(vec![Interval::new(0, 10)]).unwrap();
+        let set = IntervalContainer::from_sorted(vec![Interval::new(0, 10)]).unwrap();
         assert!(set.find_query_frac(&query, 0.0).is_err());
         assert!(set.find_query_frac(&query, 1.01).is_err());
     }
@@ -1007,7 +1054,7 @@ mod testing {
     #[test]
     fn find_target_frac_unbounded() {
         let query = Interval::new(10, 20);
-        let set = IntervalSet::from_sorted(vec![Interval::new(0, 10)]).unwrap();
+        let set = IntervalContainer::from_sorted(vec![Interval::new(0, 10)]).unwrap();
         assert!(set.find_target_frac(&query, 0.0).is_err());
         assert!(set.find_target_frac(&query, 1.01).is_err());
     }
@@ -1015,7 +1062,7 @@ mod testing {
     #[test]
     fn find_reciprocal_frac_unbounded() {
         let query = Interval::new(10, 20);
-        let set = IntervalSet::from_sorted(vec![Interval::new(0, 10)]).unwrap();
+        let set = IntervalContainer::from_sorted(vec![Interval::new(0, 10)]).unwrap();
         assert!(set.find_reciprocal_frac(&query, 0.0, 0.0).is_err());
         assert!(set.find_reciprocal_frac(&query, 1.01, 1.01).is_err());
     }
@@ -1023,7 +1070,7 @@ mod testing {
     #[test]
     fn find_reciprocal_frac_either_unbounded() {
         let query = Interval::new(10, 20);
-        let set = IntervalSet::from_sorted(vec![Interval::new(0, 10)]).unwrap();
+        let set = IntervalContainer::from_sorted(vec![Interval::new(0, 10)]).unwrap();
         assert!(set.find_reciprocal_frac_either(&query, 0.0, 0.0).is_err());
         assert!(set.find_reciprocal_frac_either(&query, 1.01, 1.01).is_err());
     }

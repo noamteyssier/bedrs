@@ -18,7 +18,7 @@ use serde::{Deserialize, Serialize};
 /// let b = GenomicInterval::new(1, 20, 30);
 /// assert!(a.overlaps(&b));
 /// ```
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct GenomicInterval<T> {
     chr: T,
@@ -139,10 +139,9 @@ where
 #[cfg(test)]
 mod testing {
     use crate::{traits::Coordinates, types::GenomicInterval};
-    use std::cmp::Ordering;
-
     #[cfg(feature = "serde")]
     use bincode::{deserialize, serialize};
+    use std::cmp::Ordering;
 
     #[test]
     fn test_interval_init() {
@@ -192,10 +191,10 @@ mod testing {
     #[test]
     #[cfg(feature = "serde")]
     fn genomic_interval_serde() {
-        let a = GenomicInterval::new(1, 5, 100);
+        let a: GenomicInterval<usize> = GenomicInterval::new(1, 5, 100);
         let encoding = serialize(&a).unwrap();
         let b: GenomicInterval<usize> = deserialize(&encoding).unwrap();
-        assert_eq!(a, b);
+        assert_eq!(a.coord_cmp(&b), Ordering::Equal);
     }
 
     fn function_generic_reference<C: Coordinates<usize, usize>>(iv: C) {

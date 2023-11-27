@@ -127,7 +127,7 @@ where
     /// let iv = GenomicInterval::new(1, 10, 20);
     /// let new_iv = <GenomicInterval<usize> as Coordinates<usize, usize>>::from(&iv);
     ///
-    /// assert_eq!(iv, new_iv);
+    /// assert!(iv.eq(&new_iv));
     /// ```
     fn from(other: &Self) -> Self;
 
@@ -155,10 +155,10 @@ where
     /// use bedrs::{Coordinates, GenomicInterval};
     ///
     /// let mut iv = GenomicInterval::new(1, 10, 20);
-    /// assert_eq!(iv, GenomicInterval::new(1, 10, 20));
+    /// assert!(iv.eq(&GenomicInterval::new(1, 10, 20)));
     ///
     /// iv.update_all(&2, &5, &10);
-    /// assert_eq!(iv, GenomicInterval::new(2, 5, 10));
+    /// assert!(iv.eq(&GenomicInterval::new(2, 5, 10)));
     /// ```
     fn update_all(&mut self, chr: &C, start: &T, end: &T) {
         self.update_chr(chr);
@@ -172,10 +172,10 @@ where
     /// use bedrs::{Coordinates, GenomicInterval};
     ///
     /// let mut iv = GenomicInterval::new(1, 10, 20);
-    /// assert_eq!(iv, GenomicInterval::new(1, 10, 20));
+    /// assert!(iv.eq(&GenomicInterval::new(1, 10, 20)));
     ///
     /// iv.update_endpoints(&5, &10);
-    /// assert_eq!(iv, GenomicInterval::new(1, 5, 10));
+    /// assert!(iv.eq(&GenomicInterval::new(1, 5, 10)));
     /// ```
     fn update_endpoints(&mut self, start: &T, end: &T) {
         self.update_start(start);
@@ -189,10 +189,10 @@ where
     /// use bedrs::{Coordinates, GenomicInterval};
     ///
     /// let mut iv = GenomicInterval::new(1, 10, 20);
-    /// assert_eq!(iv, GenomicInterval::new(1, 10, 20));
+    /// assert!(iv.eq(&GenomicInterval::new(1, 10, 20)));
     ///
     /// iv.update_all_from(&GenomicInterval::new(2, 5, 10));
-    /// assert_eq!(iv, GenomicInterval::new(2, 5, 10));
+    /// assert!(iv.eq(&GenomicInterval::new(2, 5, 10)));
     /// ```
     fn update_all_from<I: Coordinates<C, T>>(&mut self, other: &I) {
         self.update_chr(&other.chr());
@@ -206,10 +206,10 @@ where
     /// use bedrs::{Coordinates, GenomicInterval};
     ///
     /// let mut iv = GenomicInterval::new(1, 10, 20);
-    /// assert_eq!(iv, GenomicInterval::new(1, 10, 20));
+    /// assert!(iv.eq(&GenomicInterval::new(1, 10, 20)));
     ///
     /// iv.update_endpoints_from(&GenomicInterval::new(2, 5, 10));
-    /// assert_eq!(iv, GenomicInterval::new(1, 5, 10));
+    /// assert!(iv.eq(&GenomicInterval::new(1, 5, 10)));
     /// ```
     fn update_endpoints_from<I: Coordinates<C, T>>(&mut self, other: &I) {
         self.update_start(&other.start());
@@ -224,10 +224,10 @@ where
     /// use bedrs::{Coordinates, GenomicInterval};
     ///
     /// let mut iv = GenomicInterval::new(1, 10, 20);
-    /// assert_eq!(iv, GenomicInterval::new(1, 10, 20));
+    /// assert!(iv.eq(&GenomicInterval::new(1, 10, 20)));
     ///
     /// iv.extend_left(&5);
-    /// assert_eq!(iv, GenomicInterval::new(1, 5, 20));
+    /// assert!(iv.eq(&GenomicInterval::new(1, 5, 20)));
     /// ```
     fn extend_left(&mut self, val: &T) {
         self.update_start(&self.start().sub(*val));
@@ -241,10 +241,10 @@ where
     /// use bedrs::{Coordinates, GenomicInterval};
     ///
     /// let mut iv = GenomicInterval::new(1, 10, 20);
-    /// assert_eq!(iv, GenomicInterval::new(1, 10, 20));
+    /// assert!(iv.eq(&GenomicInterval::new(1, 10, 20)));
     ///
     /// iv.extend_right(&5);
-    /// assert_eq!(iv, GenomicInterval::new(1, 10, 25));
+    /// assert!(iv.eq(&GenomicInterval::new(1, 10, 25)));
     /// ```
     fn extend_right(&mut self, val: &T) {
         self.update_end(&self.end().add(*val));
@@ -259,10 +259,10 @@ where
     /// use bedrs::{Coordinates, GenomicInterval};
     ///
     /// let mut iv = GenomicInterval::new(1, 10, 20);
-    /// assert_eq!(iv, GenomicInterval::new(1, 10, 20));
+    /// assert!(iv.eq(&GenomicInterval::new(1, 10, 20)));
     ///
     /// iv.extend(&5);
-    /// assert_eq!(iv, GenomicInterval::new(1, 5, 25));
+    /// assert!(iv.eq(&GenomicInterval::new(1, 5, 25)));
     /// ```
     fn extend(&mut self, val: &T) {
         self.extend_left(val);

@@ -25,13 +25,13 @@ where
     /// // (s1) i--j
     /// // (s2)               m--n
     ///
-    /// use bedrs::{Container, Coordinates, SetSubtract, Interval, IntervalSet};
+    /// use bedrs::{Container, Coordinates, SetSubtract, Interval, IntervalContainer};
     ///
     /// let q = Interval::new(20, 40);
     /// let a = Interval::new(10, 15);
     /// let b = Interval::new(25, 35);
     /// let c = Interval::new(45, 50);
-    /// let set = IntervalSet::from_sorted(vec![a, b, c]).unwrap();
+    /// let set = IntervalContainer::from_sorted(vec![a, b, c]).unwrap();
     /// let mut subset = set.subtract(&q).unwrap();
     ///
     /// let iv = subset.next().unwrap();
@@ -69,12 +69,12 @@ where
     /// // (s2)       j---k
     /// // (s3)              l---y
     ///
-    /// use bedrs::{Container, Coordinates, Interval, IntervalSet, SetSubtract};
+    /// use bedrs::{Container, Coordinates, Interval, SetSubtract, IntervalContainer};
     ///
     /// let q = Interval::new(20, 40);
     /// let a = Interval::new(25, 27);
     /// let b = Interval::new(32, 35);
-    /// let set = IntervalSet::from_sorted(vec![a, b]).unwrap();
+    /// let set = IntervalContainer::from_sorted(vec![a, b]).unwrap();
     ///
     /// let mut subset = set.subtract_from(&q).unwrap();
     /// let iv = subset.next().unwrap();
@@ -107,7 +107,7 @@ where
 #[cfg(test)]
 mod testing {
     use super::SetSubtract;
-    use crate::{Container, Coordinates, Interval, IntervalSet};
+    use crate::{Container, Coordinates, Interval, IntervalContainer};
 
     #[test]
     fn set_subtract_unsorted() {
@@ -115,7 +115,7 @@ mod testing {
         let a = Interval::new(10, 15);
         let b = Interval::new(25, 35);
         let c = Interval::new(45, 50);
-        let set = IntervalSet::new(vec![a, b, c]);
+        let set = IntervalContainer::new(vec![a, b, c]);
         let subset = set.subtract(&q);
         assert!(subset.is_err());
     }
@@ -126,7 +126,7 @@ mod testing {
         let a = Interval::new(10, 15);
         let b = Interval::new(25, 35);
         let c = Interval::new(45, 50);
-        let set = IntervalSet::new(vec![a, b, c]);
+        let set = IntervalContainer::new(vec![a, b, c]);
         let subset = set.subtract_from(&q);
         assert!(subset.is_err());
     }
@@ -144,7 +144,7 @@ mod testing {
         let a = Interval::new(10, 15);
         let b = Interval::new(25, 35);
         let c = Interval::new(45, 50);
-        let set = IntervalSet::from_sorted(vec![a, b, c]).unwrap();
+        let set = IntervalContainer::from_sorted(vec![a, b, c]).unwrap();
         let mut subset = set.subtract(&q).unwrap();
 
         let iv = subset.next().unwrap();
@@ -169,7 +169,7 @@ mod testing {
         let a = Interval::new(10, 25);
         let b = Interval::new(25, 35);
         let c = Interval::new(45, 50);
-        let set = IntervalSet::from_sorted(vec![a, b, c]).unwrap();
+        let set = IntervalContainer::from_sorted(vec![a, b, c]).unwrap();
         let mut subset = set.subtract(&q).unwrap();
 
         let iv = subset.next().unwrap();
@@ -194,7 +194,7 @@ mod testing {
         let a = Interval::new(10, 15);
         let b = Interval::new(25, 35);
         let c = Interval::new(35, 50);
-        let set = IntervalSet::from_sorted(vec![a, b, c]).unwrap();
+        let set = IntervalContainer::from_sorted(vec![a, b, c]).unwrap();
         let mut subset = set.subtract(&q).unwrap();
 
         let iv = subset.next().unwrap();
@@ -219,7 +219,7 @@ mod testing {
         let a = Interval::new(10, 25);
         let b = Interval::new(25, 35);
         let c = Interval::new(35, 50);
-        let set = IntervalSet::from_sorted(vec![a, b, c]).unwrap();
+        let set = IntervalContainer::from_sorted(vec![a, b, c]).unwrap();
         let mut subset = set.subtract(&q).unwrap();
 
         let iv = subset.next().unwrap();
@@ -244,7 +244,7 @@ mod testing {
         let q = Interval::new(20, 40);
         let a = Interval::new(10, 50);
         let b = Interval::new(10, 50);
-        let set = IntervalSet::from_sorted_unchecked(vec![a, b]);
+        let set = IntervalContainer::from_sorted_unchecked(vec![a, b]);
         let mut subset = set.subtract(&q).unwrap();
 
         let iv = subset.next().unwrap();
@@ -275,7 +275,7 @@ mod testing {
         let a = Interval::new(10, 15);
         let b = Interval::new(25, 35);
         let c = Interval::new(45, 50);
-        let set = IntervalSet::from_sorted(vec![a, b, c]).unwrap();
+        let set = IntervalContainer::from_sorted(vec![a, b, c]).unwrap();
         let mut subset = set.subtract_from(&q).unwrap();
 
         let iv = subset.next().unwrap();
@@ -299,7 +299,7 @@ mod testing {
         let a = Interval::new(10, 25);
         let b = Interval::new(25, 35);
         let c = Interval::new(45, 50);
-        let set = IntervalSet::from_sorted(vec![a, b, c]).unwrap();
+        let set = IntervalContainer::from_sorted(vec![a, b, c]).unwrap();
 
         let mut subset = set.subtract_from(&q).unwrap();
 
@@ -321,7 +321,7 @@ mod testing {
         let a = Interval::new(10, 25);
         let b = Interval::new(25, 35);
         let c = Interval::new(35, 50);
-        let set = IntervalSet::from_sorted(vec![a, b, c]).unwrap();
+        let set = IntervalContainer::from_sorted(vec![a, b, c]).unwrap();
 
         let mut subset = set.subtract_from(&q).unwrap();
         assert!(subset.next().is_none());
@@ -339,7 +339,7 @@ mod testing {
         let q = Interval::new(20, 40);
         let a = Interval::new(25, 27);
         let b = Interval::new(32, 35);
-        let set = IntervalSet::from_sorted(vec![a, b]).unwrap();
+        let set = IntervalContainer::from_sorted(vec![a, b]).unwrap();
 
         let mut subset = set.subtract_from(&q).unwrap();
         let iv = subset.next().unwrap();
@@ -369,7 +369,7 @@ mod testing {
         let b = Interval::new(20, 30);
         let c = Interval::new(40, 50);
         let d = Interval::new(60, 70);
-        let set = IntervalSet::from_sorted(vec![b, c, d]).unwrap();
+        let set = IntervalContainer::from_sorted(vec![b, c, d]).unwrap();
 
         let mut subset = set.subtract_from(&a).unwrap();
         let iv = subset.next().unwrap();
@@ -401,7 +401,7 @@ mod testing {
         let b = Interval::new(20, 30);
         let c = Interval::new(40, 50);
         let d = Interval::new(60, 110);
-        let set = IntervalSet::from_sorted(vec![b, c, d]).unwrap();
+        let set = IntervalContainer::from_sorted(vec![b, c, d]).unwrap();
 
         let mut subset = set.subtract_from(&a).unwrap();
         let iv = subset.next().unwrap();
@@ -429,7 +429,7 @@ mod testing {
         let b = Interval::new(5, 15);
         let c = Interval::new(40, 50);
         let d = Interval::new(60, 110);
-        let set = IntervalSet::from_sorted(vec![b, c, d]).unwrap();
+        let set = IntervalContainer::from_sorted(vec![b, c, d]).unwrap();
 
         let mut subset = set.subtract_from(&a).unwrap();
         let iv = subset.next().unwrap();
@@ -454,7 +454,7 @@ mod testing {
         let b = Interval::new(20, 30);
         let c = Interval::new(45, 55);
         let d = Interval::new(70, 80);
-        let set = IntervalSet::from_sorted(vec![b, c, d]).unwrap();
+        let set = IntervalContainer::from_sorted(vec![b, c, d]).unwrap();
 
         let mut subset = set.subtract_from(&a).unwrap();
         let iv = subset.next().unwrap();
@@ -479,7 +479,7 @@ mod testing {
         let b = Interval::new(30, 40);
         let c = Interval::new(45, 55);
         let d = Interval::new(60, 70);
-        let set = IntervalSet::from_sorted(vec![b, c, d]).unwrap();
+        let set = IntervalContainer::from_sorted(vec![b, c, d]).unwrap();
 
         let mut subset = set.subtract_from(&a).unwrap();
         let iv = subset.next().unwrap();
@@ -501,7 +501,7 @@ mod testing {
         let a = Interval::new(40, 60);
         let b = Interval::new(30, 70);
         let c = Interval::new(30, 70);
-        let set = IntervalSet::from_sorted(vec![b, c]).unwrap();
+        let set = IntervalContainer::from_sorted(vec![b, c]).unwrap();
         let mut subset = set.subtract_from(&a).unwrap();
 
         assert!(subset.next().is_none());
@@ -516,7 +516,7 @@ mod testing {
     /// (s1)       j-k
     /// (s2)             l-m
     fn set_subtract_from_k() {
-        let set = IntervalSet::from_sorted(vec![
+        let set = IntervalContainer::from_sorted(vec![
             Interval::new(20, 30),
             Interval::new(40, 50),
             Interval::new(60, 70),
@@ -528,7 +528,7 @@ mod testing {
         let subset = set
             .subtract_from(&span)
             .unwrap()
-            .collect::<IntervalSet<usize>>();
+            .collect::<IntervalContainer<Interval<usize>, usize, usize>>();
         assert_eq!(subset.len(), 2);
         assert!(subset.records()[0].eq(&exp1));
         assert!(subset.records()[1].eq(&exp2));

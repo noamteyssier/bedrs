@@ -60,16 +60,18 @@ mod testing {
     use super::Merge;
     use crate::{
         traits::{Container, Coordinates},
-        types::{GenomicIntervalSet, IntervalSet, MergeResults},
-        Interval,
+        types::MergeResults,
+        GenomicInterval, Interval, IntervalContainer,
     };
 
     #[test]
     fn test_merging_one_cluster() {
-        let starts = vec![10, 15, 25];
-        let ends = vec![30, 20, 30];
-        let mut set = IntervalSet::from_endpoints_unchecked(&starts, &ends);
-        set.sort();
+        let records = vec![
+            Interval::new(10, 30),
+            Interval::new(15, 20),
+            Interval::new(25, 30),
+        ];
+        let set = IntervalContainer::from_unsorted(records);
         let merge_set = set.merge().unwrap();
         assert_eq!(merge_set.n_clusters(), 1);
         assert_eq!(merge_set.clusters(), &vec![0, 0, 0]);
@@ -79,10 +81,14 @@ mod testing {
 
     #[test]
     fn test_merging_two_clusters() {
-        let starts = vec![10, 15, 25, 35, 40];
-        let ends = vec![30, 20, 30, 50, 45];
-        let mut set = IntervalSet::from_endpoints_unchecked(&starts, &ends);
-        set.sort();
+        let records = vec![
+            Interval::new(10, 30),
+            Interval::new(15, 20),
+            Interval::new(25, 30),
+            Interval::new(35, 50),
+            Interval::new(40, 45),
+        ];
+        let set = IntervalContainer::from_unsorted(records);
         let merge_set = set.merge().unwrap();
         assert_eq!(merge_set.n_clusters(), 2);
         assert_eq!(merge_set.clusters(), &vec![0, 0, 0, 1, 1]);
@@ -94,20 +100,24 @@ mod testing {
 
     #[test]
     fn test_merging_one_cluster_unsort() {
-        let starts = vec![10, 15, 25];
-        let ends = vec![30, 20, 30];
-        let set = IntervalSet::from_endpoints_unchecked(&starts, &ends);
+        let records = vec![
+            Interval::new(10, 30),
+            Interval::new(15, 20),
+            Interval::new(25, 30),
+        ];
+        let set = IntervalContainer::from_iter(records);
         let merge_set = set.merge();
         assert!(merge_set.is_err());
     }
 
     #[test]
     fn test_merging_one_cluster_genomic() {
-        let chrs = vec![1, 1, 1];
-        let starts = vec![10, 15, 25];
-        let ends = vec![30, 20, 30];
-        let mut set = GenomicIntervalSet::from_endpoints_unchecked(&chrs, &starts, &ends);
-        set.sort();
+        let records = vec![
+            GenomicInterval::new(1, 10, 30),
+            GenomicInterval::new(1, 15, 20),
+            GenomicInterval::new(1, 25, 30),
+        ];
+        let set = IntervalContainer::from_unsorted(records);
         let merge_set = set.merge().unwrap();
         assert_eq!(merge_set.n_clusters(), 1);
         assert_eq!(merge_set.clusters(), &vec![0, 0, 0]);
@@ -117,11 +127,12 @@ mod testing {
 
     #[test]
     fn test_merging_two_cluster_genomic() {
-        let chrs = vec![1, 1, 2];
-        let starts = vec![10, 15, 25];
-        let ends = vec![30, 20, 30];
-        let mut set = GenomicIntervalSet::from_endpoints_unchecked(&chrs, &starts, &ends);
-        set.sort();
+        let records = vec![
+            GenomicInterval::new(1, 10, 30),
+            GenomicInterval::new(1, 15, 20),
+            GenomicInterval::new(2, 25, 30),
+        ];
+        let set = IntervalContainer::from_unsorted(records);
         let merge_set = set.merge().unwrap();
         assert_eq!(merge_set.n_clusters(), 2);
         assert_eq!(merge_set.clusters(), &vec![0, 0, 1]);
@@ -136,7 +147,7 @@ mod testing {
             Interval::new(20, 30),
             Interval::new(30, 40),
         ];
-        let set = IntervalSet::from_sorted_unchecked(records);
+        let set = IntervalContainer::from_sorted_unchecked(records);
         let merge_set = set.merge_unchecked();
         assert_eq!(merge_set.n_clusters(), 1);
         assert_eq!(merge_set.intervals()[0].start(), 10);
@@ -150,7 +161,7 @@ mod testing {
             Interval::new(20, 30),
             Interval::new(30, 40),
         ];
-        let set = IntervalSet::from_sorted_unchecked(records);
+        let set = IntervalContainer::from_sorted_unchecked(records);
         let mut merge_set = set.merge_unchecked();
         let mut_records = merge_set.records_mut();
         assert_eq!(mut_records.len(), 1);
