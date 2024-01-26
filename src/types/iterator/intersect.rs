@@ -1,10 +1,10 @@
+use super::find::predicate;
 use crate::{
     traits::{ChromBounds, IntervalBounds, ValueBounds},
+    types::QueryMethod,
     Intersect,
 };
 use std::{collections::VecDeque, fmt::Debug, marker::PhantomData};
-
-use super::{find::predicate, QueryMethod};
 
 /// An intersection iterator that operates on two sorted iterators
 ///
@@ -171,7 +171,7 @@ mod testing {
     use super::IntersectIter;
     use crate::{
         traits::{ChromBounds, IntervalBounds, ValueBounds},
-        types::iterator::QueryMethod,
+        types::QueryMethod,
         GenomicInterval, Interval,
     };
 

@@ -23,25 +23,25 @@ impl<T> ChromBounds for T where T: Clone + Default + Ord + Debug + Send {}
 /// of numeric values
 pub trait ValueBounds
 where
-    Self: Copy + ChromBounds + NumOps + ToPrimitive + FromPrimitive + Zero + Bounded,
+    Self: Copy + ChromBounds + NumOps + ToPrimitive + FromPrimitive + Zero + Bounded + Send + Sync,
 {
 }
 impl<T> ValueBounds for T where
-    T: Copy + ChromBounds + NumOps + ToPrimitive + FromPrimitive + Zero + Bounded
+    T: Copy + ChromBounds + NumOps + ToPrimitive + FromPrimitive + Zero + Bounded + Send + Sync
 {
 }
 
 /// Generic bounds for coordinates to be used within [Container]s
 pub trait IntervalBounds<C, T>
 where
-    Self: Coordinates<C, T> + Clone + Overlap<C, T> + Send,
+    Self: Coordinates<C, T> + Clone + Overlap<C, T> + Send + Sync,
     C: ChromBounds,
     T: ValueBounds,
 {
 }
 impl<I, C, T> IntervalBounds<C, T> for I
 where
-    I: Coordinates<C, T> + Clone + Overlap<C, T> + Send,
+    I: Coordinates<C, T> + Clone + Overlap<C, T> + Send + Sync,
     C: ChromBounds,
     T: ValueBounds,
 {

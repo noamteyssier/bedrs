@@ -1,4 +1,4 @@
-use super::{closest::Closest, Complement};
+use super::{closest::Closest, Complement, SetIntersect};
 use crate::{
     traits::{errors::SetError, ChromBounds, IntervalBounds, ValueBounds},
     types::{IntervalIterOwned, IntervalIterRef},
@@ -289,6 +289,15 @@ where
     I: IntervalBounds<C, T>,
     C: ChromBounds,
     T: ValueBounds,
+{
+}
+
+impl<'a, Co, C, T, I> SetIntersect<'a, C, T, I> for Co
+where
+    Co: Container<C, T, I>,
+    I: IntervalBounds<C, T> + 'a,
+    C: ChromBounds + 'a,
+    T: ValueBounds + 'a,
 {
 }
 
