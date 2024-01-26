@@ -4,6 +4,7 @@ use crate::{
     types::{iterator::QueryMethod, FindIter, FindIterSorted},
     Bound,
 };
+use anyhow::Result;
 
 /// A trait to query set overlaps through a container
 pub trait Find<C, T, I>: Container<C, T, I>
@@ -13,6 +14,29 @@ where
     I: IntervalBounds<C, T>,
 {
     type ContainerType: Container<C, T, I>;
+
+    fn find_method<Iv>(
+        &self,
+        query: &Iv,
+        method: QueryMethod<T>,
+    ) -> Result<Self::ContainerType, SetError>
+    where
+        Iv: IntervalBounds<C, T>,
+    {
+        match method {
+            QueryMethod::Compare => Ok(self.find(query)),
+            QueryMethod::CompareBy(minimum) => Ok(self.find_min(query, minimum)),
+            QueryMethod::CompareExact(exact) => Ok(self.find_exact(query, exact)),
+            QueryMethod::CompareByQueryFraction(frac) => self.find_query_frac(query, frac),
+            QueryMethod::CompareByTargetFraction(frac) => self.find_target_frac(query, frac),
+            QueryMethod::CompareReciprocalFractionOr(f_query, f_target) => {
+                self.find_reciprocal_frac_either(query, f_query, f_target)
+            }
+            QueryMethod::CompareReciprocalFractionAnd(f_query, f_target) => {
+                self.find_reciprocal_frac(query, f_query, f_target)
+            }
+        }
+    }
 
     /// Finds all intervals that overlap a query and returns
     /// the same `Container` type with all found regions.
@@ -533,6 +557,50 @@ where
             self.lower_bound_unchecked(query),
             QueryMethod::CompareReciprocalFractionOr(f_query, f_target),
         ))
+    }
+
+    /// Creates an Iterator that finds all overlapping regions
+    /// given some method of comparison
+    fn find_iter_sorted_method_unchecked<'a, Iv>(
+        &'a self,
+        query: &'a Iv,
+        method: QueryMethod<T>,
+    ) -> Result<FindIterSorted<'_, C, T, I, Iv>, SetError>
+    where
+        Iv: IntervalBounds<C, T>,
+    {
+        match method {
+            QueryMethod::Compare => {
+                let iter = self.find_iter_sorted_unchecked(query);
+                Ok(iter)
+            }
+            QueryMethod::CompareBy(minimum) => {
+                let iter = self.find_iter_sorted_min_unchecked(query, minimum);
+                Ok(iter)
+            }
+            QueryMethod::CompareExact(exact) => {
+                let iter = self.find_iter_sorted_exact_unchecked(query, exact);
+                Ok(iter)
+            }
+            QueryMethod::CompareByQueryFraction(frac) => {
+                let iter = self.find_iter_sorted_query_frac_unchecked(query, frac)?;
+                Ok(iter)
+            }
+            QueryMethod::CompareByTargetFraction(frac) => {
+                let iter = self.find_iter_sorted_target_frac_unchecked(query, frac)?;
+                Ok(iter)
+            }
+            QueryMethod::CompareReciprocalFractionAnd(f_query, f_target) => {
+                let iter =
+                    self.find_iter_sorted_reciprocal_frac_unchecked(query, f_query, f_target)?;
+                Ok(iter)
+            }
+            QueryMethod::CompareReciprocalFractionOr(f_query, f_target) => {
+                let iter = self
+                    .find_iter_sorted_reciprocal_frac_either_unchecked(query, f_query, f_target)?;
+                Ok(iter)
+            }
+        }
     }
 }
 

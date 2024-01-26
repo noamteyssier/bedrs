@@ -3,6 +3,8 @@ use std::marker::PhantomData;
 
 /// An enumeration of the different methods of querying a query
 /// interval and a target interval
+///
+/// TODO: Validate that the query method is valid and remove Result from Find methods
 #[derive(Debug, Default, Clone, Copy)]
 pub enum QueryMethod<T: ValueBounds> {
     /// Compare the query and target intervals using the `overlaps` method
