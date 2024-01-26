@@ -1,6 +1,6 @@
 use crate::{
     traits::{ChromBounds, IntervalBounds, ValueBounds},
-    types::iterator::QueryMethod,
+    types::QueryMethod,
     Container, Find, Intersect,
 };
 

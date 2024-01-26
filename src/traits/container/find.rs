@@ -1,7 +1,7 @@
 use super::Container;
 use crate::{
     traits::{errors::SetError, ChromBounds, IntervalBounds, ValueBounds},
-    types::{iterator::QueryMethod, FindIter, FindIterSorted},
+    types::{FindIter, FindIterSorted, QueryMethod},
     Bound,
 };
 use anyhow::Result;
