@@ -14,10 +14,10 @@ pub use interval::{Coordinates, Distance, Intersect, Overlap, Subtract};
 /// of Chromosome coordinates
 pub trait ChromBounds
 where
-    Self: Clone + Default + Ord + Debug + Send,
+    Self: Clone + Default + Ord + Debug + Send + Sync,
 {
 }
-impl<T> ChromBounds for T where T: Clone + Default + Ord + Debug + Send {}
+impl<T> ChromBounds for T where T: Clone + Default + Ord + Debug + Send + Sync {}
 
 /// Generic bounds for values to be used for [Coordinates] in the context
 /// of numeric values
@@ -30,6 +30,13 @@ impl<T> ValueBounds for T where
     T: Copy + ChromBounds + NumOps + ToPrimitive + FromPrimitive + Zero + Bounded + Send + Sync
 {
 }
+
+pub trait MetaBounds
+where
+    Self: Clone + Default + Ord + Debug + Send + Sync,
+{
+}
+impl<T> MetaBounds for T where T: Clone + Default + Ord + Debug + Send + Sync {}
 
 /// Generic bounds for coordinates to be used within [Container]s
 pub trait IntervalBounds<C, T>
