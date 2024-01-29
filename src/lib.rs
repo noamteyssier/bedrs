@@ -16,8 +16,7 @@
 //!
 //! This library will eventually be focused towards genome-specific arithmetic
 //! and focuses around a base [Coordinates] trait which includes methods to
-//! retrieve `<chr, start, stop>` and a base [Container] trait which includes
-//! methods to perform set operations.
+//! retrieve `<chr, start, stop>`.
 //!
 //! This is a work in progress and is subject to heavy changes.
 //!
@@ -34,10 +33,9 @@
 //! The advantage of this library is that all of the functionality is implemented
 //! via traits.
 //! As a result, if you have a custom data type - if you implement the traits then
-//! you get all the functionality for free. There are two main traits in this library.
+//! you get all the functionality for free. There is a single main trait in this library
 //!
 //! 1. [Coordinates] :: which applies to individual interval records.
-//! 2. [Container] :: which applies to sets of interval records.
 //!
 //! ### Coordinates
 //!
@@ -57,24 +55,8 @@
 //!
 //! ### Container
 //!
-//! The [Container] trait is the base trait for all interval containers.
-//! It is the trait that defines the methods for set operations.
-//! This trait is generic over the type of the coordinates.
-//! It is also generic over the type of the interval.
-//! This means that you can have a container of any interval type.
-//!
-//! You can explore the full functionality of this trait by looking at the
-//! [crate::traits::container] module.
-//!
-//! Some examples of the functionality are:
-//! - [Bound](crate::traits::container::Bound)
-//! - [Closest](crate::traits::container::Closest)
-//! - [Complement](crate::traits::container::Complement)
-//! - [Internal](crate::traits::container::Internal)
-//! - [Find](crate::traits::container::Find)
-//! - [Merge](crate::traits::container::Merge)
-//! - [Sample](crate::traits::container::Sample)
-//! - [SetSubtract](crate::traits::container::SetSubtract)
+//! The main container type in the library is the [IntervalContainer].
+//! It implements all the operations that you would expect from a bedtools-like library.
 //!
 //! ## Types
 //!
