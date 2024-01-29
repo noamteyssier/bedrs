@@ -1,12 +1,12 @@
 use crate::{
     traits::{ChromBounds, IntervalBounds, SetError, ValueBounds},
-    Container,
+    IntervalContainer,
 };
 use rand::{seq::SliceRandom, RngCore, SeedableRng};
 use rand_chacha::ChaChaRng;
 
 /// Utility functions for random sampling within a container.
-pub trait Sample<C, T, I>: Container<C, T, I>
+impl<I, C, T> IntervalContainer<I, C, T>
 where
     I: IntervalBounds<C, T>,
     C: ChromBounds,
@@ -16,7 +16,7 @@ where
     ///
     /// # Example
     /// ```
-    /// use bedrs::{Container, Interval, Sample, IntervalContainer};
+    /// use bedrs::{Interval, IntervalContainer};
     /// use rand::thread_rng;
     ///
     /// let intervals = vec![
@@ -28,7 +28,7 @@ where
     /// let mut set = IntervalContainer::from_sorted(intervals).unwrap();
     /// set.shuffle_rng(&mut thread_rng());
     /// ```
-    fn shuffle_rng(&mut self, rng: &mut impl RngCore) {
+    pub fn shuffle_rng(&mut self, rng: &mut impl RngCore) {
         self.records_mut().shuffle(rng);
         self.set_unsorted();
     }
@@ -37,7 +37,7 @@ where
     ///
     /// # Example
     /// ```
-    /// use bedrs::{Container, Interval, Sample, IntervalContainer};
+    /// use bedrs::{Interval, IntervalContainer};
     ///
     /// let intervals = vec![
     ///    Interval::new(10, 100),
@@ -48,7 +48,7 @@ where
     /// let mut set = IntervalContainer::from_sorted(intervals).unwrap();
     /// set.shuffle();
     /// ```
-    fn shuffle(&mut self) {
+    pub fn shuffle(&mut self) {
         let mut rng = rand::thread_rng();
         self.shuffle_rng(&mut rng);
     }
@@ -57,7 +57,7 @@ where
     ///
     /// # Example
     /// ```
-    /// use bedrs::{Container, Interval, Sample, IntervalContainer};
+    /// use bedrs::{Interval, IntervalContainer};
     ///
     /// let intervals = vec![
     ///    Interval::new(10, 100),
@@ -68,7 +68,7 @@ where
     /// let mut set = IntervalContainer::from_sorted(intervals).unwrap();
     /// set.shuffle_seed(42);
     /// ```
-    fn shuffle_seed(&mut self, seed: u64) {
+    pub fn shuffle_seed(&mut self, seed: u64) {
         let mut rng = ChaChaRng::seed_from_u64(seed);
         self.shuffle_rng(&mut rng);
     }
@@ -77,7 +77,7 @@ where
     ///
     /// # Example
     /// ```
-    /// use bedrs::{Container, Interval, Sample, IntervalContainer};
+    /// use bedrs::{Interval, IntervalContainer};
     ///
     /// let intervals = vec![
     ///     Interval::new(10, 100),
@@ -90,7 +90,7 @@ where
     /// let shuffled_set = set.sample_rng(2, &mut rng).unwrap();
     /// assert_eq!(shuffled_set.len(), 2);
     /// ```
-    fn sample_rng(&self, n: usize, rng: &mut impl RngCore) -> Result<Self, SetError> {
+    pub fn sample_rng(&self, n: usize, rng: &mut impl RngCore) -> Result<Self, SetError> {
         if n > self.records().len() {
             return Err(SetError::SampleSizeTooLarge);
         }
@@ -104,7 +104,7 @@ where
     ///
     /// # Example
     /// ```
-    /// use bedrs::{Container, Interval, Sample, IntervalContainer};
+    /// use bedrs::{Interval, IntervalContainer};
     ///
     /// let intervals = vec![
     ///     Interval::new(10, 100),
@@ -116,7 +116,7 @@ where
     /// let shuffled_set = set.sample(2).unwrap();
     /// assert_eq!(shuffled_set.len(), 2);
     /// ```
-    fn sample(&self, n: usize) -> Result<Self, SetError> {
+    pub fn sample(&self, n: usize) -> Result<Self, SetError> {
         if n > self.records().len() {
             return Err(SetError::SampleSizeTooLarge);
         }
@@ -128,7 +128,7 @@ where
     ///
     /// # Example
     /// ```
-    /// use bedrs::{Container, Interval, Sample, IntervalContainer};
+    /// use bedrs::{Interval, IntervalContainer};
     ///
     /// let intervals = vec![
     ///     Interval::new(10, 100),
@@ -142,7 +142,7 @@ where
     /// assert_eq!(shuffled_set_a.len(), 2);
     /// assert_eq!(shuffled_set_b.len(), 2);
     /// ```
-    fn sample_seed(&self, n: usize, seed: u64) -> Result<Self, SetError> {
+    pub fn sample_seed(&self, n: usize, seed: u64) -> Result<Self, SetError> {
         if n > self.records().len() {
             return Err(SetError::SampleSizeTooLarge);
         }
@@ -155,7 +155,7 @@ where
     ///
     /// # Example
     /// ```
-    /// use bedrs::{Container, Interval, Sample, IntervalContainer};
+    /// use bedrs::{Interval, IntervalContainer};
     ///
     /// let intervals = vec![
     ///    Interval::new(10, 100),
@@ -168,7 +168,7 @@ where
     /// let shuffled_iter = set.sample_iter_rng(2, &mut rng).unwrap();
     /// assert_eq!(shuffled_iter.count(), 2);
     /// ```
-    fn sample_iter_rng<'a>(
+    pub fn sample_iter_rng<'a>(
         &'a self,
         n: usize,
         rng: &mut impl RngCore,
@@ -184,7 +184,7 @@ where
     ///
     /// # Example
     /// ```
-    /// use bedrs::{Container, Interval, Sample, IntervalContainer};
+    /// use bedrs::{Interval, IntervalContainer};
     ///
     /// let intervals = vec![
     ///    Interval::new(10, 100),
@@ -195,7 +195,10 @@ where
     /// let set = IntervalContainer::from_sorted(intervals).unwrap();
     /// let shuffled_iter = set.sample_iter(2).unwrap();
     /// assert_eq!(shuffled_iter.count(), 2);
-    fn sample_iter<'a>(&'a self, n: usize) -> Result<Box<dyn Iterator<Item = &I> + 'a>, SetError> {
+    pub fn sample_iter<'a>(
+        &'a self,
+        n: usize,
+    ) -> Result<Box<dyn Iterator<Item = &I> + 'a>, SetError> {
         if n > self.records().len() {
             return Err(SetError::SampleSizeTooLarge);
         }
@@ -208,7 +211,7 @@ where
     ///
     /// # Example
     /// ```
-    /// use bedrs::{Container, Interval, Sample, IntervalContainer};
+    /// use bedrs::{Interval, IntervalContainer};
     ///
     /// let intervals = vec![
     ///    Interval::new(10, 100),
@@ -220,7 +223,7 @@ where
     /// let shuffled_iter = set.sample_iter_seed(2, 42).unwrap();
     /// assert_eq!(shuffled_iter.count(), 2);
     /// ```
-    fn sample_iter_seed<'a>(
+    pub fn sample_iter_seed<'a>(
         &'a self,
         n: usize,
         seed: u64,
@@ -235,7 +238,6 @@ where
 
 #[cfg(test)]
 mod testing {
-    use super::*;
     use crate::{Coordinates, Interval, IntervalContainer};
 
     #[test]

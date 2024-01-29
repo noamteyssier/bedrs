@@ -1,9 +1,11 @@
 use crate::{
-    traits::{ChromBounds, IntervalBounds, ValueBounds},
-    Container,
+    traits::{ChromBounds, IntervalBounds, SetError, ValueBounds},
+    IntervalIterOwned, IntervalIterRef,
 };
 use anyhow::{bail, Result};
 use num_traits::zero;
+#[cfg(feature = "rayon")]
+use rayon::prelude::*;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 use std::marker::PhantomData;
@@ -49,13 +51,14 @@ where
         }
     }
 }
-impl<I, C, T> Container<C, T, I> for IntervalContainer<I, C, T>
+
+impl<I, C, T> IntervalContainer<I, C, T>
 where
     I: IntervalBounds<C, T>,
     C: ChromBounds,
     T: ValueBounds,
 {
-    fn new(records: Vec<I>) -> Self {
+    pub fn new(records: Vec<I>) -> Self {
         let max_len = records.iter().map(|iv| iv.len()).max();
         Self {
             records,
@@ -64,31 +67,40 @@ where
             _phantom_c: PhantomData,
         }
     }
-    fn empty() -> Self {
+    pub fn len(&self) -> usize {
+        self.records.len()
+    }
+    pub fn empty() -> Self {
         Self::new(Vec::new())
     }
-    fn records(&self) -> &Vec<I> {
+    pub fn is_empty(&self) -> bool {
+        self.records.is_empty()
+    }
+    pub fn records(&self) -> &Vec<I> {
         &self.records
     }
-    fn records_mut(&mut self) -> &mut Vec<I> {
+    pub fn records_mut(&mut self) -> &mut Vec<I> {
         &mut self.records
     }
-    fn records_owned(self) -> Vec<I> {
+    pub fn records_owned(self) -> Vec<I> {
         self.records
     }
-    fn is_sorted(&self) -> bool {
+    pub fn is_sorted(&self) -> bool {
         self.is_sorted
     }
-    fn sorted_mut(&mut self) -> &mut bool {
+    pub fn set_unsorted(&mut self) {
+        self.is_sorted = false;
+    }
+    pub fn sorted_mut(&mut self) -> &mut bool {
         &mut self.is_sorted
     }
-    fn max_len(&self) -> Option<T> {
+    pub fn max_len(&self) -> Option<T> {
         self.max_len
     }
-    fn max_len_mut(&mut self) -> &mut Option<T> {
+    pub fn max_len_mut(&mut self) -> &mut Option<T> {
         &mut self.max_len
     }
-    fn span(&self) -> Result<I> {
+    pub fn span(&self) -> Result<I> {
         if self.is_empty() {
             bail!("Cannot get span of empty interval set")
         } else if !self.is_sorted() {
@@ -107,13 +119,128 @@ where
             }
         }
     }
+    pub fn iter(&self) -> IntervalIterRef<I, C, T> {
+        IntervalIterRef::new(&self.records())
+    }
+    pub fn into_iter(self) -> IntervalIterOwned<I, C, T> {
+        IntervalIterOwned::new(self.records_owned())
+    }
+
+    /// Sets the internal state to sorted
+    ///
+    /// >> This would likely not be used directly by the user.
+    /// >> If you are creating an interval set from presorted
+    /// >> intervals use the `from_sorted()` method instead of
+    /// >> the `new()` method.
+    fn set_sorted(&mut self) {
+        *self.sorted_mut() = true;
+    }
+
+    /// Sorts the internal interval vector on the chromosome and start position of the intervals.
+    pub fn sort(&mut self) {
+        self.records_mut().sort_unstable_by(|a, b| a.coord_cmp(b));
+        self.set_sorted();
+    }
+
+    /// Sorts the internal interval vector on the chromosome and start position of the intervals.
+    /// but parallelizes the sorting.
+    #[cfg(feature = "rayon")]
+    pub fn par_sort(&mut self) {
+        self.records_mut()
+            .par_sort_unstable_by(|a, b| a.coord_cmp(b));
+        self.set_sorted();
+    }
+
+    /// Updates the maximum length of the intervals in the container
+    /// if the new interval is longer than the current maximum length.
+    pub fn update_max_len<Iv, Co, To>(&mut self, interval: &Iv)
+    where
+        Iv: IntervalBounds<Co, To>,
+        Co: ChromBounds,
+        To: ValueBounds + Into<T>,
+    {
+        if let Some(max_len) = self.max_len() {
+            if interval.len().into() > max_len {
+                *self.max_len_mut() = Some(interval.len().into());
+            }
+        } else {
+            *self.max_len_mut() = Some(interval.len().into());
+        }
+    }
+
+    /// Inserts a new interval into the container
+    ///
+    /// This will not sort the container after insertion.
+    /// If you need to sort the container after insertion
+    /// use the `insert_sorted()` method instead.
+    ///
+    /// This is more efficient if you are inserting many
+    /// intervals at once.
+    pub fn insert(&mut self, interval: I) {
+        self.update_max_len(&interval);
+        self.records_mut().push(interval);
+        self.set_unsorted();
+    }
+
+    /// Inserts a new interval into the container and sorts the container
+    /// after insertion.
+    ///
+    /// This is less efficient than the `insert()` method if you are
+    /// inserting many intervals at once.
+    pub fn insert_sorted(&mut self, interval: I) {
+        self.insert(interval);
+        self.sort();
+    }
+
+    /// Creates a new container from presorted intervals
+    ///
+    /// First this validates that the intervals are truly presorted.
+    pub fn from_sorted(records: Vec<I>) -> Result<Self, SetError> {
+        if Self::valid_interval_sorting(&records) {
+            Ok(Self::from_sorted_unchecked(records))
+        } else {
+            Err(SetError::UnsortedIntervals)
+        }
+    }
+
+    /// Creates a new container from presorted intervals without
+    /// validating if the intervals are truly presorted.
+    pub fn from_sorted_unchecked(records: Vec<I>) -> Self {
+        let mut set = Self::new(records);
+        set.set_sorted();
+        set
+    }
+
+    /// Creates a new *sorted* container from unsorted intervals
+    pub fn from_unsorted(records: Vec<I>) -> Self {
+        let mut set = Self::new(records);
+        set.sort();
+        set
+    }
+
+    /// Validates that a set of intervals are sorted
+    pub fn valid_interval_sorting(records: &Vec<I>) -> bool {
+        records
+            .iter()
+            .enumerate()
+            .skip(1)
+            .map(|(idx, rec)| (rec, &records[idx - 1]))
+            .all(|(a, b)| a.coord_cmp(b).is_ge())
+    }
+
+    /// Applies a mutable function to each interval in the container
+    pub fn apply_mut<F>(&mut self, f: F)
+    where
+        F: Fn(&mut I),
+    {
+        self.records_mut().iter_mut().for_each(f);
+    }
 }
 
 #[cfg(test)]
 mod testing {
 
     use super::*;
-    use crate::Container;
     use crate::{
         Coordinates, GenomicInterval, Interval, NamedInterval, Strand, StrandedGenomicInterval,
     };
@@ -482,5 +609,107 @@ mod testing {
         let mut set = IntervalContainer::new(records);
         set.par_sort();
         assert!(set.is_sorted());
+    }
+
+    #[test]
+    fn test_container_init_new() {
+        let records = vec![
+            Interval::new(15, 25),
+            Interval::new(10, 20),
+            Interval::new(5, 15),
+        ];
+        let set = IntervalContainer::new(records);
+        assert_eq!(set.len(), 3);
+        assert!(!set.is_sorted());
+        assert!(!set.is_empty());
+        assert_eq!(set.records()[0].start(), 15);
+    }
+
+    #[test]
+    fn test_container_init_from_sorted() {
+        let records = vec![
+            Interval::new(5, 10),
+            Interval::new(10, 15),
+            Interval::new(15, 20),
+        ];
+        let set = IntervalContainer::from_sorted(records).unwrap();
+        assert_eq!(set.len(), 3);
+        assert!(set.is_sorted());
+        assert!(!set.is_empty());
+        assert_eq!(set.records()[0].start(), 5);
+    }
+
+    #[test]
+    fn test_container_init_from_unsorted() {
+        let records = vec![
+            Interval::new(15, 25),
+            Interval::new(10, 20),
+            Interval::new(5, 15),
+        ];
+        let set = IntervalContainer::from_unsorted(records);
+        assert_eq!(set.len(), 3);
+        assert!(set.is_sorted());
+        assert!(!set.is_empty());
+        assert_eq!(set.records()[0].start(), 5);
+    }
+
+    #[test]
+    fn test_container_init_from_sorted_false_sorting() {
+        let records = vec![
+            Interval::new(10, 15),
+            Interval::new(5, 10),
+            Interval::new(15, 20),
+        ];
+        let set = IntervalContainer::from_sorted(records);
+        assert!(set.is_err());
+    }
+
+    #[test]
+    fn test_container_apply_mut() {
+        let records = vec![
+            Interval::new(15, 25),
+            Interval::new(10, 20),
+            Interval::new(5, 15),
+        ];
+        let mut set = IntervalContainer::from_unsorted(records);
+        set.apply_mut(|rec| rec.extend(&2));
+        assert_eq!(set.records()[0].start(), 3);
+        assert_eq!(set.records()[0].end(), 17);
+        assert_eq!(set.records()[1].start(), 8);
+        assert_eq!(set.records()[1].end(), 22);
+        assert_eq!(set.records()[2].start(), 13);
+        assert_eq!(set.records()[2].end(), 27);
+    }
+
+    #[test]
+    fn test_container_insert() {
+        let mut set = IntervalContainer::empty();
+        set.insert(Interval::new(15, 25));
+        set.insert(Interval::new(10, 20));
+        assert_eq!(set.len(), 2);
+    }
+
+    #[test]
+    fn test_container_insert_sorted() {
+        let mut set = IntervalContainer::empty();
+        set.insert_sorted(Interval::new(15, 25));
+        set.insert_sorted(Interval::new(10, 20));
+        assert_eq!(set.len(), 2);
+        assert_eq!(set.records()[0].start(), 10);
+        assert!(set.is_sorted());
+    }
+
+    #[test]
+    fn container_iter() {
+        let records = vec![
+            Interval::new(15, 25),
+            Interval::new(10, 20),
+            Interval::new(5, 15),
+        ];
+        let set = IntervalContainer::from_unsorted(records);
+        let mut iter = set.iter();
+        assert_eq!(iter.next().unwrap().start(), 5);
+        assert_eq!(iter.next().unwrap().start(), 10);
+        assert_eq!(iter.next().unwrap().start(), 15);
     }
 }

@@ -1,26 +1,25 @@
 use crate::{
     traits::{ChromBounds, IntervalBounds, ValueBounds},
     types::QueryMethod,
-    Container, Find, Intersect,
+    Intersect, IntervalContainer,
 };
 
-pub trait SetIntersect<'a, C, T, I>: Container<C, T, I>
+impl<'a, I, C, T> IntervalContainer<I, C, T>
 where
-    C: ChromBounds + 'a,
-    T: ValueBounds + 'a,
-    I: IntervalBounds<C, T> + 'a,
+    I: IntervalBounds<C, T>,
+    C: ChromBounds,
+    T: ValueBounds,
 {
     /// Find the intersection of two sets of intervals.
     ///
     /// Returns the intersection of each interval in `self` with each interval in `other`
     /// as an iterator of interval type from `other`
-    fn ix_set_target<Co, Iv>(
+    pub fn ix_set_target<Co, Iv>(
         &'a self,
-        other: &'a Co,
+        other: &'a IntervalContainer<Iv, C, T>,
         query_method: QueryMethod<T>,
     ) -> Box<dyn Iterator<Item = Iv> + 'a>
     where
-        Co: Container<C, T, Iv> + 'a,
         Iv: IntervalBounds<C, T> + 'a,
     {
         let ix_iter = self.records().iter().flat_map(move |iv| {
@@ -40,13 +39,12 @@ where
     ///
     /// Returns the intersection of each interval in `self` with each interval in `other`
     /// as an iterator of interval type from `self`
-    fn ix_set_query<Co, Iv>(
+    pub fn ix_set_query<Co, Iv>(
         &'a self,
-        other: &'a Co,
+        other: &'a IntervalContainer<Iv, C, T>,
         query_method: QueryMethod<T>,
     ) -> Box<dyn Iterator<Item = I> + 'a>
     where
-        Co: Container<C, T, Iv> + 'a,
         Iv: IntervalBounds<C, T> + 'a,
     {
         let ix_iter = self.records().iter().flat_map(move |iv| {

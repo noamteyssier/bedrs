@@ -1,7 +1,6 @@
 use crate::{
     traits::{ChromBounds, IntervalBounds, ValueBounds},
-    types::MergeResults,
-    Container, Merge, Subtract,
+    IntervalContainer, Subtract,
 };
 use std::marker::PhantomData;
 
@@ -87,7 +86,7 @@ where
     C: ChromBounds,
     T: ValueBounds,
 {
-    inner: MergeResults<C, T, I>,
+    inner: IntervalContainer<I, C, T>,
     remainder: Iv,
     send_remainder: bool,
     offset: usize,
@@ -101,7 +100,7 @@ where
     C: ChromBounds,
     T: ValueBounds,
 {
-    pub fn new<Co: Container<C, T, I>>(container: &Co, query: &Iv) -> Self {
+    pub fn new(container: &IntervalContainer<I, C, T>, query: &Iv) -> Self {
         let merged_container = container.merge_unchecked();
         Self {
             inner: merged_container,

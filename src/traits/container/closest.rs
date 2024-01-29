@@ -1,16 +1,16 @@
 use crate::{
     traits::{ChromBounds, IntervalBounds, SetError, ValueBounds},
-    Bound, Container, Distance,
+    Distance, IntervalContainer,
 };
 use anyhow::Result;
 
-pub trait Closest<C, T, I>: Container<C, T, I>
+impl<I, C, T> IntervalContainer<I, C, T>
 where
+    I: IntervalBounds<C, T>,
     C: ChromBounds,
     T: ValueBounds,
-    I: IntervalBounds<C, T>,
 {
-    fn closest<Iv>(&self, query: &Iv) -> Result<Option<&I>, SetError>
+    pub fn closest<Iv>(&self, query: &Iv) -> Result<Option<&I>, SetError>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -24,7 +24,7 @@ where
         }
     }
 
-    fn closest_upstream<Iv>(&self, query: &Iv) -> Result<Option<&I>, SetError>
+    pub fn closest_upstream<Iv>(&self, query: &Iv) -> Result<Option<&I>, SetError>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -38,7 +38,7 @@ where
         }
     }
 
-    fn closest_downstream<Iv>(&self, query: &Iv) -> Result<Option<&I>, SetError>
+    pub fn closest_downstream<Iv>(&self, query: &Iv) -> Result<Option<&I>, SetError>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -52,7 +52,7 @@ where
         }
     }
 
-    fn closest_unchecked<Iv>(&self, query: &Iv) -> Option<&I>
+    pub fn closest_unchecked<Iv>(&self, query: &Iv) -> Option<&I>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -80,7 +80,7 @@ where
         Some(&self.records()[current_lowest])
     }
 
-    fn closest_upstream_unchecked<Iv>(&self, query: &Iv) -> Option<&I>
+    pub fn closest_upstream_unchecked<Iv>(&self, query: &Iv) -> Option<&I>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -111,7 +111,7 @@ where
         }
     }
 
-    fn closest_downstream_unchecked<Iv>(&self, query: &Iv) -> Option<&I>
+    pub fn closest_downstream_unchecked<Iv>(&self, query: &Iv) -> Option<&I>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -145,8 +145,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use super::Closest;
-    use crate::{Container, Coordinates, GenomicInterval, Interval, IntervalContainer};
+    use crate::{Coordinates, GenomicInterval, Interval, IntervalContainer};
 
     #[test]
     fn closest_unsorted() {
