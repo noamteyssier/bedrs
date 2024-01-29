@@ -4,7 +4,7 @@ use crate::{
 };
 use std::marker::PhantomData;
 
-pub struct SubtractIter<'a, C, T, I, Iv>
+pub struct SubtractIter<'a, I, Iv, C, T>
 where
     I: IntervalBounds<C, T> + 'a,
     Iv: IntervalBounds<C, T> + 'a,
@@ -18,7 +18,7 @@ where
     phantom_t: PhantomData<T>,
     phantom_c: PhantomData<C>,
 }
-impl<'a, C, T, I, Iv> SubtractIter<'a, C, T, I, Iv>
+impl<'a, I, Iv, C, T> SubtractIter<'a, I, Iv, C, T>
 where
     I: IntervalBounds<C, T>,
     Iv: IntervalBounds<C, T>,
@@ -36,7 +36,7 @@ where
         }
     }
 }
-impl<'a, C, T, I, Iv> Iterator for SubtractIter<'a, C, T, I, Iv>
+impl<'a, I, Iv, C, T> Iterator for SubtractIter<'a, I, Iv, C, T>
 where
     I: IntervalBounds<C, T>,
     Iv: IntervalBounds<C, T>,
@@ -79,7 +79,7 @@ where
     }
 }
 
-pub struct SubtractFromIter<C, T, I, Iv>
+pub struct SubtractFromIter<I, Iv, C, T>
 where
     I: IntervalBounds<C, T>,
     Iv: IntervalBounds<C, T>,
@@ -93,7 +93,7 @@ where
     phantom_t: PhantomData<T>,
     phantom_c: PhantomData<C>,
 }
-impl<C, T, I, Iv> SubtractFromIter<C, T, I, Iv>
+impl<C, T, I, Iv> SubtractFromIter<I, Iv, C, T>
 where
     I: IntervalBounds<C, T>,
     Iv: IntervalBounds<C, T>,
@@ -112,7 +112,7 @@ where
         }
     }
 }
-impl<C, T, I, Iv> Iterator for SubtractFromIter<C, T, I, Iv>
+impl<I, Iv, C, T> Iterator for SubtractFromIter<I, Iv, C, T>
 where
     I: IntervalBounds<C, T>,
     Iv: IntervalBounds<C, T>,

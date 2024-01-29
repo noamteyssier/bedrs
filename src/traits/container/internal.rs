@@ -24,7 +24,7 @@ where
     /// (i)          j---k
     /// (ii)                  l--m
     /// ```
-    pub fn internal<'a>(&'a self) -> Result<SubtractFromIter<C, T, I, I>> {
+    pub fn internal<'a>(&'a self) -> Result<SubtractFromIter<I, I, C, T>> {
         if self.is_sorted() {
             let span = self.span()?;
             Ok(self.internal_unchecked(span))
@@ -37,7 +37,7 @@ where
     //
     // Does not check if the interval set is sorted.
     // Span must still be valid.
-    pub fn internal_unchecked<'a>(&'a self, span: I) -> SubtractFromIter<C, T, I, I> {
+    pub fn internal_unchecked<'a>(&'a self, span: I) -> SubtractFromIter<I, I, C, T> {
         SubtractFromIter::new(self, &span)
     }
 }

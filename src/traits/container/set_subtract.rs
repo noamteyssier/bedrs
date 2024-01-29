@@ -42,7 +42,7 @@ where
     ///
     /// assert!(subset.next().is_none());
     /// ```
-    pub fn subtract<'a, Iv>(&'a self, query: &'a Iv) -> Result<SubtractIter<C, T, I, Iv>, SetError>
+    pub fn subtract<'a, Iv>(&'a self, query: &'a Iv) -> Result<SubtractIter<I, Iv, C, T>, SetError>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -56,7 +56,7 @@ where
     /// Unchecked version of [subtract](Self::subtract).
     ///
     /// Does not check if the container is sorted
-    pub fn subtract_unchecked<'a, Iv>(&'a self, query: &'a Iv) -> SubtractIter<C, T, I, Iv>
+    pub fn subtract_unchecked<'a, Iv>(&'a self, query: &'a Iv) -> SubtractIter<I, Iv, C, T>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -97,7 +97,7 @@ where
     pub fn subtract_from<'a, Iv>(
         &'a self,
         query: &'a Iv,
-    ) -> Result<SubtractFromIter<C, T, I, Iv>, SetError>
+    ) -> Result<SubtractFromIter<I, Iv, C, T>, SetError>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -111,7 +111,7 @@ where
     /// Unchecked version of [subtract_from](Self::subtract_from).
     ///
     /// Does not check if the container is sorted
-    pub fn subtract_from_unchecked<'a, Iv>(&'a self, query: &'a Iv) -> SubtractFromIter<C, T, I, Iv>
+    pub fn subtract_from_unchecked<'a, Iv>(&'a self, query: &'a Iv) -> SubtractFromIter<I, Iv, C, T>
     where
         Iv: IntervalBounds<C, T>,
     {
