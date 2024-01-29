@@ -1,7 +1,4 @@
-use bedrs::{
-    traits::{Container, Merge},
-    types::{GenomicInterval, Interval, IntervalContainer},
-};
+use bedrs::types::{GenomicInterval, Interval, IntervalContainer};
 use criterion::Criterion;
 
 pub fn merge_base(c: &mut Criterion) {

@@ -1,7 +1,4 @@
-use bedrs::{
-    traits::{Container, Find},
-    types::{GenomicInterval, Interval, IntervalContainer},
-};
+use bedrs::types::{GenomicInterval, Interval, IntervalContainer};
 use criterion::Criterion;
 
 const N: usize = 10000;
