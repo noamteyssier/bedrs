@@ -250,6 +250,6 @@ pub mod types;
 
 pub use traits::{Coordinates, Distance, Intersect, Overlap, Subtract};
 pub use types::{
-    GenomicInterval, IntersectIter, Interval, IntervalContainer, IntervalIterOwned,
-    IntervalIterRef, MergeIter, NamedInterval, Strand, StrandedGenomicInterval,
+    Bed12, Bed3, Bed4, Bed6, GenomicInterval, IntersectIter, Interval, IntervalContainer,
+    IntervalIterOwned, IntervalIterRef, MergeIter, NamedInterval, Strand, StrandedGenomicInterval,
 };
