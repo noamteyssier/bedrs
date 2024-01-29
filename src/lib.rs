@@ -266,10 +266,7 @@ pub mod traits;
 /// Types used within the library
 pub mod types;
 
-pub use traits::{
-    Bound, Closest, Complement, Container, Coordinates, Distance, Find, Internal, Intersect, Merge,
-    Overlap, Sample, SetSubtract, Subtract,
-};
+pub use traits::{Coordinates, Distance, Intersect, Overlap, Subtract};
 pub use types::{
     GenomicInterval, IntersectIter, Interval, IntervalContainer, IntervalIterOwned,
     IntervalIterRef, MergeIter, NamedInterval, Strand, StrandedGenomicInterval,
