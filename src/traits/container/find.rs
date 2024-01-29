@@ -1,25 +1,22 @@
-use super::Container;
+// use super::Container;
 use crate::{
     traits::{errors::SetError, ChromBounds, IntervalBounds, ValueBounds},
-    types::{FindIter, FindIterSorted, QueryMethod},
-    Bound,
+    types::{FindIter, FindIterSorted, IntervalContainer, QueryMethod},
 };
 use anyhow::Result;
 
 /// A trait to query set overlaps through a container
-pub trait Find<C, T, I>: Container<C, T, I>
+impl<I, C, T> IntervalContainer<I, C, T>
 where
+    I: IntervalBounds<C, T>,
     C: ChromBounds,
     T: ValueBounds,
-    I: IntervalBounds<C, T>,
 {
-    type ContainerType: Container<C, T, I>;
-
-    fn find_method<Iv>(
+    pub fn find_method<Iv>(
         &self,
         query: &Iv,
         method: QueryMethod<T>,
-    ) -> Result<Self::ContainerType, SetError>
+    ) -> Result<IntervalContainer<I, C, T>, SetError>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -40,7 +37,7 @@ where
 
     /// Finds all intervals that overlap a query and returns
     /// the same `Container` type with all found regions.
-    fn find<Iv>(&self, query: &Iv) -> Self::ContainerType
+    pub fn find<Iv>(&self, query: &Iv) -> IntervalContainer<I, C, T>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -49,12 +46,12 @@ where
             .into_iter()
             .map(|x| x.to_owned())
             .collect::<Vec<I>>();
-        Self::ContainerType::new(records)
+        IntervalContainer::new(records)
     }
 
     /// Finds all intervals that overlap a query by some minimum
     /// amount and returns the same `Container` type with all found regions.
-    fn find_min<Iv>(&self, query: &Iv, minimum: T) -> Self::ContainerType
+    pub fn find_min<Iv>(&self, query: &Iv, minimum: T) -> IntervalContainer<I, C, T>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -63,12 +60,12 @@ where
             .into_iter()
             .map(|x| x.to_owned())
             .collect::<Vec<I>>();
-        Self::ContainerType::new(records)
+        IntervalContainer::new(records)
     }
 
     /// Finds all intervals that overlap a query by some exact
     /// amount and returns the same `Container` type with all found regions.
-    fn find_exact<Iv>(&self, query: &Iv, exact: T) -> Self::ContainerType
+    pub fn find_exact<Iv>(&self, query: &Iv, exact: T) -> IntervalContainer<I, C, T>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -77,12 +74,16 @@ where
             .into_iter()
             .map(|x| x.to_owned())
             .collect::<Vec<I>>();
-        Self::ContainerType::new(records)
+        IntervalContainer::new(records)
     }
 
     /// Finds all intervals that overlap a query by some fraction
     /// of the query length and returns the same `Container` type with all found regions.
-    fn find_query_frac<Iv>(&self, query: &Iv, frac: f64) -> Result<Self::ContainerType, SetError>
+    pub fn find_query_frac<Iv>(
+        &self,
+        query: &Iv,
+        frac: f64,
+    ) -> Result<IntervalContainer<I, C, T>, SetError>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -90,12 +91,16 @@ where
             Ok(iter) => iter.into_iter().map(|x| x.to_owned()).collect::<Vec<I>>(),
             Err(e) => return Err(e),
         };
-        Ok(Self::ContainerType::new(records))
+        Ok(IntervalContainer::new(records))
     }
 
     /// Finds all intervals that overlap a query by some fraction
     /// of the target length and returns the same `Container` type with all found regions.
-    fn find_target_frac<Iv>(&self, query: &Iv, frac: f64) -> Result<Self::ContainerType, SetError>
+    pub fn find_target_frac<Iv>(
+        &self,
+        query: &Iv,
+        frac: f64,
+    ) -> Result<IntervalContainer<I, C, T>, SetError>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -103,18 +108,18 @@ where
             Ok(iter) => iter.into_iter().map(|x| x.to_owned()).collect::<Vec<I>>(),
             Err(e) => return Err(e),
         };
-        Ok(Self::ContainerType::new(records))
+        Ok(IntervalContainer::new(records))
     }
 
     /// Finds all intervals that overlap a query by some fraction
     /// of **both** the query and target lengths and returns the
     /// same `Container` type with all found regions.
-    fn find_reciprocal_frac<Iv>(
+    pub fn find_reciprocal_frac<Iv>(
         &self,
         query: &Iv,
         f_query: f64,
         f_target: f64,
-    ) -> Result<Self::ContainerType, SetError>
+    ) -> Result<IntervalContainer<I, C, T>, SetError>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -122,18 +127,18 @@ where
             Ok(iter) => iter.into_iter().map(|x| x.to_owned()).collect::<Vec<I>>(),
             Err(e) => return Err(e),
         };
-        Ok(Self::ContainerType::new(records))
+        Ok(IntervalContainer::new(records))
     }
 
     /// Finds all intervals that overlap a query by some fraction
     /// of **either** the query and target lengths and returns the
     /// same `Container` type with all found regions.
-    fn find_reciprocal_frac_either<Iv>(
+    pub fn find_reciprocal_frac_either<Iv>(
         &self,
         query: &Iv,
         f_query: f64,
         f_target: f64,
-    ) -> Result<Self::ContainerType, SetError>
+    ) -> Result<IntervalContainer<I, C, T>, SetError>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -141,13 +146,13 @@ where
             Ok(iter) => iter.into_iter().map(|x| x.to_owned()).collect::<Vec<I>>(),
             Err(e) => return Err(e),
         };
-        Ok(Self::ContainerType::new(records))
+        Ok(IntervalContainer::new(records))
     }
 
     /// Creates an iterator that finds all overlapping regions
     ///
     /// Does not assume a sorted Container
-    fn find_iter<'a, Iv>(&'a self, query: &'a Iv) -> FindIter<'_, C, T, I, Iv>
+    pub fn find_iter<'a, Iv>(&'a self, query: &'a Iv) -> FindIter<'_, C, T, I, Iv>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -158,7 +163,7 @@ where
     /// by some minimum overlap
     ///
     /// Does not assume a sorted Container
-    fn find_iter_min<'a, Iv>(&'a self, query: &'a Iv, minimum: T) -> FindIter<'_, C, T, I, Iv>
+    pub fn find_iter_min<'a, Iv>(&'a self, query: &'a Iv, minimum: T) -> FindIter<'_, C, T, I, Iv>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -169,7 +174,7 @@ where
     /// by some exact overlap
     ///
     /// Does not assume a sorted Container
-    fn find_iter_exact<'a, Iv>(&'a self, query: &'a Iv, exact: T) -> FindIter<'_, C, T, I, Iv>
+    pub fn find_iter_exact<'a, Iv>(&'a self, query: &'a Iv, exact: T) -> FindIter<'_, C, T, I, Iv>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -180,7 +185,7 @@ where
     /// by some fraction of the query length
     ///
     /// Does not assume a sorted Container
-    fn find_iter_query_frac<'a, Iv>(
+    pub fn find_iter_query_frac<'a, Iv>(
         &'a self,
         query: &'a Iv,
         frac: f64,
@@ -202,7 +207,7 @@ where
     /// by some fraction of the target length
     ///
     /// Does not assume a sorted Container
-    fn find_iter_target_frac<'a, Iv>(
+    pub fn find_iter_target_frac<'a, Iv>(
         &'a self,
         query: &'a Iv,
         frac: f64,
@@ -224,7 +229,7 @@ where
     /// by some fraction of **both** the query and target length
     ///
     /// Does not assume a sorted Container
-    fn find_iter_reciprocal_frac<'a, Iv>(
+    pub fn find_iter_reciprocal_frac<'a, Iv>(
         &'a self,
         query: &'a Iv,
         f_query: f64,
@@ -249,7 +254,7 @@ where
     /// by some fraction of **either** the query and target length
     ///
     /// Does not assume a sorted Container
-    fn find_iter_reciprocal_frac_either<'a, Iv>(
+    pub fn find_iter_reciprocal_frac_either<'a, Iv>(
         &'a self,
         query: &'a Iv,
         f_query: f64,
@@ -273,7 +278,7 @@ where
     /// Creates a Result Iterator that finds all overlapping regions
     ///
     /// First checks to see if container is sorted
-    fn find_iter_sorted<'a, Iv>(
+    pub fn find_iter_sorted<'a, Iv>(
         &'a self,
         query: &'a Iv,
     ) -> Result<FindIterSorted<'_, C, T, I, Iv>, SetError>
@@ -291,7 +296,7 @@ where
     /// by some minimum overlap
     ///
     /// First checks to see if container is sorted
-    fn find_iter_sorted_min<'a, Iv>(
+    pub fn find_iter_sorted_min<'a, Iv>(
         &'a self,
         query: &'a Iv,
         minimum: T,
@@ -310,7 +315,7 @@ where
     /// by some exact overlap
     ///
     /// First checks to see if container is sorted
-    fn find_iter_sorted_exact<'a, Iv>(
+    pub fn find_iter_sorted_exact<'a, Iv>(
         &'a self,
         query: &'a Iv,
         exact: T,
@@ -329,7 +334,7 @@ where
     /// by some fraction of the query length
     ///
     /// First checks to see if container is sorted
-    fn find_iter_sorted_query_frac<'a, Iv>(
+    pub fn find_iter_sorted_query_frac<'a, Iv>(
         &'a self,
         query: &'a Iv,
         frac: f64,
@@ -348,7 +353,7 @@ where
     /// by some fraction of the target length
     ///
     /// First checks to see if container is sorted
-    fn find_iter_sorted_target_frac<'a, Iv>(
+    pub fn find_iter_sorted_target_frac<'a, Iv>(
         &'a self,
         query: &'a Iv,
         frac: f64,
@@ -367,7 +372,7 @@ where
     /// by some fraction of **both** the query and target length
     ///
     /// First checks to see if container is sorted
-    fn find_iter_sorted_reciprocal_frac<'a, Iv>(
+    pub fn find_iter_sorted_reciprocal_frac<'a, Iv>(
         &'a self,
         query: &'a Iv,
         f_query: f64,
@@ -387,7 +392,7 @@ where
     /// by some fraction of **both** the query and target length
     ///
     /// First checks to see if container is sorted
-    fn find_iter_sorted_reciprocal_frac_either<'a, Iv>(
+    pub fn find_iter_sorted_reciprocal_frac_either<'a, Iv>(
         &'a self,
         query: &'a Iv,
         f_query: f64,
@@ -406,7 +411,7 @@ where
     /// Creates an Iterator that finds all overlapping regions
     ///
     /// Assumes a sorted Container.
-    fn find_iter_sorted_unchecked<'a, Iv>(
+    pub fn find_iter_sorted_unchecked<'a, Iv>(
         &'a self,
         query: &'a Iv,
     ) -> FindIterSorted<'_, C, T, I, Iv>
@@ -425,7 +430,7 @@ where
     /// by some minimum overlap
     ///
     /// Assumes a sorted Container.
-    fn find_iter_sorted_min_unchecked<'a, Iv>(
+    pub fn find_iter_sorted_min_unchecked<'a, Iv>(
         &'a self,
         query: &'a Iv,
         minimum: T,
@@ -445,7 +450,7 @@ where
     /// by some exact overlap
     ///
     /// Assumes a sorted Container.
-    fn find_iter_sorted_exact_unchecked<'a, Iv>(
+    pub fn find_iter_sorted_exact_unchecked<'a, Iv>(
         &'a self,
         query: &'a Iv,
         exact: T,
@@ -465,7 +470,7 @@ where
     /// by some fraction of the query length
     ///
     /// Assumes a sorted Container.
-    fn find_iter_sorted_query_frac_unchecked<'a, Iv>(
+    pub fn find_iter_sorted_query_frac_unchecked<'a, Iv>(
         &'a self,
         query: &'a Iv,
         frac: f64,
@@ -488,7 +493,7 @@ where
     /// by some fraction of the target length
     ///
     /// Assumes a sorted Container.
-    fn find_iter_sorted_target_frac_unchecked<'a, Iv>(
+    pub fn find_iter_sorted_target_frac_unchecked<'a, Iv>(
         &'a self,
         query: &'a Iv,
         frac: f64,
@@ -511,7 +516,7 @@ where
     /// by some fraction of **both** the query and target length
     ///
     /// Assumes a sorted Container.
-    fn find_iter_sorted_reciprocal_frac_unchecked<'a, Iv>(
+    pub fn find_iter_sorted_reciprocal_frac_unchecked<'a, Iv>(
         &'a self,
         query: &'a Iv,
         f_query: f64,
@@ -537,7 +542,7 @@ where
     /// by some fraction of **either** the query and target length
     ///
     /// Assumes a sorted Container.
-    fn find_iter_sorted_reciprocal_frac_either_unchecked<'a, Iv>(
+    pub fn find_iter_sorted_reciprocal_frac_either_unchecked<'a, Iv>(
         &'a self,
         query: &'a Iv,
         f_query: f64,
@@ -561,7 +566,7 @@ where
 
     /// Creates an Iterator that finds all overlapping regions
     /// given some method of comparison
-    fn find_iter_sorted_method_unchecked<'a, Iv>(
+    pub fn find_iter_sorted_method_unchecked<'a, Iv>(
         &'a self,
         query: &'a Iv,
         method: QueryMethod<T>,
@@ -606,15 +611,14 @@ where
 
 #[cfg(test)]
 mod testing {
-    use super::Find;
+    // use super::Find;
     use crate::{
-        traits::{ChromBounds, Container, IntervalBounds, ValueBounds},
+        traits::{ChromBounds, IntervalBounds, ValueBounds},
         Coordinates, GenomicInterval, Interval, IntervalContainer,
     };
 
-    fn validate_set<Co, C, I, T>(set: &Co, expected: &[I])
+    fn validate_set<C, I, T>(set: &IntervalContainer<I, C, T>, expected: &[I])
     where
-        Co: Container<C, T, I>,
         I: IntervalBounds<C, T>,
         C: ChromBounds,
         T: ValueBounds,

@@ -1,12 +1,11 @@
-use std::cmp::Ordering;
-
 use crate::{
     traits::{errors::SetError, ChromBounds, IntervalBounds, ValueBounds},
-    Container,
+    IntervalContainer,
 };
+use std::cmp::Ordering;
 
 /// Identifies the lower bound on a [Container] via a binary tree search
-pub trait Bound<C, T, I>: Container<C, T, I>
+impl<I, C, T> IntervalContainer<I, C, T>
 where
     I: IntervalBounds<C, T>,
     C: ChromBounds,
@@ -24,7 +23,7 @@ where
     /// ## On base coordinates
     ///
     /// ```
-    /// use bedrs::{Bound, Container, Interval, IntervalContainer};
+    /// use bedrs::{Interval, IntervalContainer};
     ///
     /// let records = vec![
     ///     Interval::new(0, 10),
@@ -44,7 +43,7 @@ where
     /// ## On genomic coordinates
     ///
     /// ```
-    /// use bedrs::{Bound, Container, GenomicInterval, IntervalContainer};
+    /// use bedrs::{GenomicInterval, IntervalContainer};
     ///
     /// let records = vec![
     ///     GenomicInterval::new(1, 10, 20),
@@ -60,7 +59,7 @@ where
     /// let bound = set.lower_bound(&query);
     /// assert_eq!(bound, Ok(2));
     /// ```
-    fn lower_bound<Iv>(&self, query: &Iv) -> Result<usize, SetError>
+    pub fn lower_bound<Iv>(&self, query: &Iv) -> Result<usize, SetError>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -85,7 +84,7 @@ where
     /// ## On base coordinates
     ///
     /// ```
-    /// use bedrs::{Bound, Interval, IntervalContainer, Container};
+    /// use bedrs::{Interval, IntervalContainer};
     ///
     /// let records = vec![
     ///     Interval::new(0, 10),
@@ -104,7 +103,7 @@ where
     /// ## On genomic coordinates
     ///
     /// ```
-    /// use bedrs::{Bound, GenomicInterval, IntervalContainer, Container};
+    /// use bedrs::{GenomicInterval, IntervalContainer};
     ///
     /// let records = vec![
     ///     GenomicInterval::new(1, 10, 20),
@@ -119,7 +118,7 @@ where
     /// let bound = set.lower_bound_unchecked(&query);
     /// assert_eq!(bound, 2);
     /// ```
-    fn lower_bound_unchecked<Iv>(&self, query: &Iv) -> usize
+    pub fn lower_bound_unchecked<Iv>(&self, query: &Iv) -> usize
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -139,7 +138,7 @@ where
 
     /// Finds the earliest record in the [Container] that shares a chromosome
     /// with the query. Can result in an error if the [Container] is not sorted.
-    fn chr_bound<Iv>(&self, query: &Iv) -> Result<Option<usize>, SetError>
+    pub fn chr_bound<Iv>(&self, query: &Iv) -> Result<Option<usize>, SetError>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -159,7 +158,7 @@ where
     ///
     /// Will return `None` if no record shares a chromosome with the query and is
     /// upstream.
-    fn chr_bound_upstream<Iv>(&self, query: &Iv) -> Result<Option<usize>, SetError>
+    pub fn chr_bound_upstream<Iv>(&self, query: &Iv) -> Result<Option<usize>, SetError>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -179,7 +178,7 @@ where
     ///
     /// Will return `None` if no record shares a chromosome and a strand with
     /// the query and is upstream.
-    fn stranded_upstream_bound<Iv>(&self, query: &Iv) -> Result<Option<usize>, SetError>
+    pub fn stranded_upstream_bound<Iv>(&self, query: &Iv) -> Result<Option<usize>, SetError>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -199,7 +198,7 @@ where
     ///
     /// Will return `None` if no record shares a chromosome with the query and is
     /// downstream.
-    fn chr_bound_downstream<Iv>(&self, query: &Iv) -> Result<Option<usize>, SetError>
+    pub fn chr_bound_downstream<Iv>(&self, query: &Iv) -> Result<Option<usize>, SetError>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -219,7 +218,7 @@ where
     ///
     /// Will return `None` if no record shares a chromosome and a strand with
     /// the query and is downstream.
-    fn stranded_downstream_bound<Iv>(&self, query: &Iv) -> Result<Option<usize>, SetError>
+    pub fn stranded_downstream_bound<Iv>(&self, query: &Iv) -> Result<Option<usize>, SetError>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -236,7 +235,7 @@ where
     /// Finds the earliest record in the [Container] that shares a chromosome
     /// with the query. Does not perform a check if it is sorted beforehand.
     /// Use at your own risk.
-    fn chr_bound_unchecked<Iv>(&self, query: &Iv) -> Option<usize>
+    pub fn chr_bound_unchecked<Iv>(&self, query: &Iv) -> Option<usize>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -272,7 +271,7 @@ where
     /// Finds the latest record in the [Container] that shares a chromosome
     /// and is upstream of the query. Does not perform a check if it is
     /// sorted beforehand. Use at your own risk.
-    fn chr_bound_upstream_unchecked<Iv>(&self, query: &Iv) -> Option<usize>
+    pub fn chr_bound_upstream_unchecked<Iv>(&self, query: &Iv) -> Option<usize>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -315,7 +314,7 @@ where
         }
     }
 
-    fn stranded_upstream_bound_unchecked<Iv>(&self, query: &Iv) -> Option<usize>
+    pub fn stranded_upstream_bound_unchecked<Iv>(&self, query: &Iv) -> Option<usize>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -366,7 +365,7 @@ where
     /// Finds the earliest record in the [Container] that shares a chromosome
     /// and is downstream of the query. Does not perform a check if it is
     /// sorted beforehand. Use at your own risk.
-    fn chr_bound_downstream_unchecked<Iv>(&self, query: &Iv) -> Option<usize>
+    pub fn chr_bound_downstream_unchecked<Iv>(&self, query: &Iv) -> Option<usize>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -404,7 +403,7 @@ where
     /// Finds the earliest record in the [Container] that shares a chromosome
     /// and is downstream of the query and shares a strand. Does not perform a check if it is
     /// sorted beforehand. Use at your own risk.
-    fn stranded_downstream_bound_unchecked<Iv>(&self, query: &Iv) -> Option<usize>
+    pub fn stranded_downstream_bound_unchecked<Iv>(&self, query: &Iv) -> Option<usize>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -459,8 +458,8 @@ where
 #[cfg(test)]
 mod testing {
     use crate::{
-        traits::errors::SetError, Bound, Container, GenomicInterval, Interval, IntervalContainer,
-        Strand, StrandedGenomicInterval,
+        traits::errors::SetError, GenomicInterval, Interval, IntervalContainer, Strand,
+        StrandedGenomicInterval,
     };
 
     #[test]

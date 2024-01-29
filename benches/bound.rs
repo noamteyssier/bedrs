@@ -1,4 +1,4 @@
-use bedrs::{Bound, Container, Interval, IntervalContainer};
+use bedrs::{Interval, IntervalContainer};
 use criterion::Criterion;
 
 const N: usize = 10000;

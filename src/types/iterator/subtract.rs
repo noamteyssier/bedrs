@@ -1,11 +1,10 @@
 use crate::{
     traits::{ChromBounds, IntervalBounds, ValueBounds},
-    types::MergeResults,
-    Container, Merge, Subtract,
+    IntervalContainer, Subtract,
 };
 use std::marker::PhantomData;
 
-pub struct SubtractIter<'a, C, T, I, Iv>
+pub struct SubtractIter<'a, I, Iv, C, T>
 where
     I: IntervalBounds<C, T> + 'a,
     Iv: IntervalBounds<C, T> + 'a,
@@ -19,7 +18,7 @@ where
     phantom_t: PhantomData<T>,
     phantom_c: PhantomData<C>,
 }
-impl<'a, C, T, I, Iv> SubtractIter<'a, C, T, I, Iv>
+impl<'a, I, Iv, C, T> SubtractIter<'a, I, Iv, C, T>
 where
     I: IntervalBounds<C, T>,
     Iv: IntervalBounds<C, T>,
@@ -37,7 +36,7 @@ where
         }
     }
 }
-impl<'a, C, T, I, Iv> Iterator for SubtractIter<'a, C, T, I, Iv>
+impl<'a, I, Iv, C, T> Iterator for SubtractIter<'a, I, Iv, C, T>
 where
     I: IntervalBounds<C, T>,
     Iv: IntervalBounds<C, T>,
@@ -80,28 +79,28 @@ where
     }
 }
 
-pub struct SubtractFromIter<C, T, I, Iv>
+pub struct SubtractFromIter<I, Iv, C, T>
 where
     I: IntervalBounds<C, T>,
     Iv: IntervalBounds<C, T>,
     C: ChromBounds,
     T: ValueBounds,
 {
-    inner: MergeResults<C, T, I>,
+    inner: IntervalContainer<I, C, T>,
     remainder: Iv,
     send_remainder: bool,
     offset: usize,
     phantom_t: PhantomData<T>,
     phantom_c: PhantomData<C>,
 }
-impl<C, T, I, Iv> SubtractFromIter<C, T, I, Iv>
+impl<C, T, I, Iv> SubtractFromIter<I, Iv, C, T>
 where
     I: IntervalBounds<C, T>,
     Iv: IntervalBounds<C, T>,
     C: ChromBounds,
     T: ValueBounds,
 {
-    pub fn new<Co: Container<C, T, I>>(container: &Co, query: &Iv) -> Self {
+    pub fn new(container: &IntervalContainer<I, C, T>, query: &Iv) -> Self {
         let merged_container = container.merge_unchecked();
         Self {
             inner: merged_container,
@@ -113,7 +112,7 @@ where
         }
     }
 }
-impl<C, T, I, Iv> Iterator for SubtractFromIter<C, T, I, Iv>
+impl<I, Iv, C, T> Iterator for SubtractFromIter<I, Iv, C, T>
 where
     I: IntervalBounds<C, T>,
     Iv: IntervalBounds<C, T>,

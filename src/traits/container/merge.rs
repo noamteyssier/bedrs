@@ -1,17 +1,17 @@
-use super::Container;
+// use super::Container;
 use crate::{
     traits::{errors::SetError, ChromBounds, IntervalBounds, ValueBounds},
-    types::MergeResults,
+    IntervalContainer,
 };
 
 /// A trait to merge overlapping interval regions within a container
-pub trait Merge<C, T, I>: Container<C, T, I>
+impl<I, C, T> IntervalContainer<I, C, T>
 where
+    I: IntervalBounds<C, T>,
     C: ChromBounds,
     T: ValueBounds,
-    I: IntervalBounds<C, T>,
 {
-    fn merge_unchecked(&self) -> MergeResults<C, T, I> {
+    pub fn merge_unchecked(&self) -> Self {
         let mut base_interval = I::from(&self.records()[0]);
 
         let mut cluster_intervals = Vec::with_capacity(self.len());
@@ -31,7 +31,7 @@ where
             cluster_ids.push(current_id);
         }
         cluster_intervals.push(base_interval.to_owned());
-        MergeResults::new(cluster_intervals, cluster_ids)
+        IntervalContainer::from_sorted_unchecked(cluster_intervals)
     }
 
     /// Merges overlapping intervals within a container
@@ -46,7 +46,7 @@ where
     /// (1)    i--------n
     /// (2)                  o------r
     /// ```
-    fn merge(&self) -> Result<MergeResults<C, T, I>, SetError> {
+    pub fn merge(&self) -> Result<Self, SetError> {
         if self.is_sorted() {
             Ok(self.merge_unchecked())
         } else {
@@ -57,12 +57,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use super::Merge;
-    use crate::{
-        traits::{Container, Coordinates},
-        types::MergeResults,
-        GenomicInterval, Interval, IntervalContainer,
-    };
+    use crate::{traits::Coordinates, GenomicInterval, Interval, IntervalContainer};
 
     #[test]
     fn test_merging_one_cluster() {
@@ -73,10 +68,14 @@ mod testing {
         ];
         let set = IntervalContainer::from_unsorted(records);
         let merge_set = set.merge().unwrap();
-        assert_eq!(merge_set.n_clusters(), 1);
-        assert_eq!(merge_set.clusters(), &vec![0, 0, 0]);
-        assert_eq!(merge_set.intervals()[0].start(), 10);
-        assert_eq!(merge_set.intervals()[0].end(), 30);
+        let iv = merge_set.records()[0];
+        assert_eq!(merge_set.len(), 1);
+        assert_eq!(iv.start(), 10);
+        assert_eq!(iv.end(), 30);
+        // assert_eq!(merge_set.n_clusters(), 1);
+        // assert_eq!(merge_set.clusters(), &vec![0, 0, 0]);
+        // assert_eq!(merge_set.intervals()[0].start(), 10);
+        // assert_eq!(merge_set.intervals()[0].end(), 30);
     }
 
     #[test]
@@ -90,12 +89,21 @@ mod testing {
         ];
         let set = IntervalContainer::from_unsorted(records);
         let merge_set = set.merge().unwrap();
-        assert_eq!(merge_set.n_clusters(), 2);
-        assert_eq!(merge_set.clusters(), &vec![0, 0, 0, 1, 1]);
-        assert_eq!(merge_set.intervals()[0].start(), 10);
-        assert_eq!(merge_set.intervals()[0].end(), 30);
-        assert_eq!(merge_set.intervals()[1].start(), 35);
-        assert_eq!(merge_set.intervals()[1].end(), 50);
+        let iv1 = merge_set.records()[0];
+        let iv2 = merge_set.records()[1];
+
+        assert_eq!(merge_set.len(), 2);
+        assert_eq!(iv1.start(), 10);
+        assert_eq!(iv1.end(), 30);
+        assert_eq!(iv2.start(), 35);
+        assert_eq!(iv2.end(), 50);
+
+        // assert_eq!(merge_set.n_clusters(), 2);
+        // assert_eq!(merge_set.clusters(), &vec![0, 0, 0, 1, 1]);
+        // assert_eq!(merge_set.intervals()[0].start(), 10);
+        // assert_eq!(merge_set.intervals()[0].end(), 30);
+        // assert_eq!(merge_set.intervals()[1].start(), 35);
+        // assert_eq!(merge_set.intervals()[1].end(), 50);
     }
 
     #[test]
@@ -119,10 +127,16 @@ mod testing {
         ];
         let set = IntervalContainer::from_unsorted(records);
         let merge_set = set.merge().unwrap();
-        assert_eq!(merge_set.n_clusters(), 1);
-        assert_eq!(merge_set.clusters(), &vec![0, 0, 0]);
-        assert_eq!(merge_set.intervals()[0].start(), 10);
-        assert_eq!(merge_set.intervals()[0].end(), 30);
+        let iv1 = merge_set.records()[0];
+
+        assert_eq!(merge_set.len(), 1);
+        assert_eq!(iv1.start(), 10);
+        assert_eq!(iv1.end(), 30);
+
+        // assert_eq!(merge_set.n_clusters(), 1);
+        // assert_eq!(merge_set.clusters(), &vec![0, 0, 0]);
+        // assert_eq!(merge_set.intervals()[0].start(), 10);
+        // assert_eq!(merge_set.intervals()[0].end(), 30);
     }
 
     #[test]
@@ -134,10 +148,19 @@ mod testing {
         ];
         let set = IntervalContainer::from_unsorted(records);
         let merge_set = set.merge().unwrap();
-        assert_eq!(merge_set.n_clusters(), 2);
-        assert_eq!(merge_set.clusters(), &vec![0, 0, 1]);
-        assert_eq!(merge_set.intervals()[0].start(), 10);
-        assert_eq!(merge_set.intervals()[0].end(), 30);
+        let iv1 = merge_set.records()[0];
+        let iv2 = merge_set.records()[1];
+
+        assert_eq!(merge_set.len(), 2);
+        assert_eq!(iv1.start(), 10);
+        assert_eq!(iv1.end(), 30);
+        assert_eq!(iv2.start(), 25);
+        assert_eq!(iv2.end(), 30);
+
+        // assert_eq!(merge_set.n_clusters(), 2);
+        // assert_eq!(merge_set.clusters(), &vec![0, 0, 1]);
+        // assert_eq!(merge_set.intervals()[0].start(), 10);
+        // assert_eq!(merge_set.intervals()[0].end(), 30);
     }
 
     #[test]
@@ -149,9 +172,15 @@ mod testing {
         ];
         let set = IntervalContainer::from_sorted_unchecked(records);
         let merge_set = set.merge_unchecked();
-        assert_eq!(merge_set.n_clusters(), 1);
-        assert_eq!(merge_set.intervals()[0].start(), 10);
-        assert_eq!(merge_set.intervals()[0].end(), 40);
+        let iv = merge_set.records()[0];
+
+        assert_eq!(merge_set.len(), 1);
+        assert_eq!(iv.start(), 10);
+        assert_eq!(iv.end(), 40);
+
+        // assert_eq!(merge_set.n_clusters(), 1);
+        // assert_eq!(merge_set.intervals()[0].start(), 10);
+        // assert_eq!(merge_set.intervals()[0].end(), 40);
     }
 
     #[test]
@@ -174,14 +203,14 @@ mod testing {
         assert_eq!(merge_set.max_len_mut().unwrap(), 30);
     }
 
-    #[test]
-    #[should_panic]
-    fn merge_container_new() {
-        let records = vec![
-            Interval::new(10, 20),
-            Interval::new(20, 30),
-            Interval::new(30, 40),
-        ];
-        let _merge_set: MergeResults<usize, usize, Interval<usize>> = Container::new(records);
-    }
+    // #[test]
+    // #[should_panic]
+    // fn merge_container_new() {
+    //     let records = vec![
+    //         Interval::new(10, 20),
+    //         Interval::new(20, 30),
+    //         Interval::new(30, 40),
+    //     ];
+    //     let _merge_set: MergeResults<usize, usize, Interval<usize>> = Container::new(records);
+    // }
 }

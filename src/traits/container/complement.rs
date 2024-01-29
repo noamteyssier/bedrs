@@ -3,7 +3,7 @@ use anyhow::{bail, Result};
 use crate::{
     traits::{ChromBounds, IntervalBounds, SetError, ValueBounds},
     types::{iterator::ComplementIter, IntervalIterOwned},
-    Container,
+    IntervalContainer,
 };
 
 /// A trait for interval containers that generates an iterator over the
@@ -18,7 +18,7 @@ use crate::{
 /// # Examples
 ///
 /// ```
-/// use bedrs::{Interval, Complement, Container, Coordinates, IntervalContainer};
+/// use bedrs::{Interval, Coordinates, IntervalContainer};
 ///
 /// let intervals = vec![
 ///     Interval::new(10, 20),
@@ -42,13 +42,13 @@ use crate::{
 ///    assert!(obs.eq(exp));
 /// }
 /// ```
-pub trait Complement<C, T, I>: Container<C, T, I>
+impl<I, C, T> IntervalContainer<I, C, T>
 where
+    I: IntervalBounds<C, T>,
     C: ChromBounds,
     T: ValueBounds,
-    I: IntervalBounds<C, T>,
 {
-    fn complement(self) -> Result<ComplementIter<IntervalIterOwned<I, C, T>, I, C, T>> {
+    pub fn complement(self) -> Result<ComplementIter<IntervalIterOwned<I, C, T>, I, C, T>> {
         if self.is_sorted() {
             Ok(self.complement_unchecked())
         } else {
@@ -56,14 +56,13 @@ where
         }
     }
 
-    fn complement_unchecked(self) -> ComplementIter<IntervalIterOwned<I, C, T>, I, C, T> {
+    pub fn complement_unchecked(self) -> ComplementIter<IntervalIterOwned<I, C, T>, I, C, T> {
         ComplementIter::new(self.into_iter())
     }
 }
 
 #[cfg(test)]
 mod testing {
-    use super::*;
     use crate::{
         traits::{ChromBounds, IntervalBounds, ValueBounds},
         GenomicInterval, Interval, IntervalContainer,

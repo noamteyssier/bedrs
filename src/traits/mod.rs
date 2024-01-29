@@ -4,9 +4,9 @@ use std::fmt::Debug;
 pub mod container;
 pub mod errors;
 pub mod interval;
-pub use container::{
-    Bound, Closest, Complement, Container, Find, Internal, Merge, Sample, SetSubtract,
-};
+// pub use container::{
+//     // Closest, Complement, Find, Internal, Merge, Sample, SetSubtract,
+// };
 pub use errors::SetError;
 pub use interval::{Coordinates, Distance, Intersect, Overlap, Subtract};
 

@@ -1,15 +1,15 @@
 use crate::{
     traits::{errors::SetError, ChromBounds, IntervalBounds, ValueBounds},
     types::{SubtractFromIter, SubtractIter},
-    Container,
+    IntervalContainer,
 };
 
 /// Performs interval subtraction at the set level.
-pub trait SetSubtract<C, T, I>: Container<C, T, I>
+impl<I, C, T> IntervalContainer<I, C, T>
 where
+    I: IntervalBounds<C, T>,
     C: ChromBounds,
     T: ValueBounds,
-    I: IntervalBounds<C, T>,
 {
     /// Subtract a query interval from the set.
     ///
@@ -25,7 +25,7 @@ where
     /// // (s1) i--j
     /// // (s2)               m--n
     ///
-    /// use bedrs::{Container, Coordinates, SetSubtract, Interval, IntervalContainer};
+    /// use bedrs::{Coordinates, Interval, IntervalContainer};
     ///
     /// let q = Interval::new(20, 40);
     /// let a = Interval::new(10, 15);
@@ -42,7 +42,7 @@ where
     ///
     /// assert!(subset.next().is_none());
     /// ```
-    fn subtract<'a, Iv>(&'a self, query: &'a Iv) -> Result<SubtractIter<C, T, I, Iv>, SetError>
+    pub fn subtract<'a, Iv>(&'a self, query: &'a Iv) -> Result<SubtractIter<I, Iv, C, T>, SetError>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -56,7 +56,7 @@ where
     /// Unchecked version of [subtract](Self::subtract).
     ///
     /// Does not check if the container is sorted
-    fn subtract_unchecked<'a, Iv>(&'a self, query: &'a Iv) -> SubtractIter<C, T, I, Iv>
+    pub fn subtract_unchecked<'a, Iv>(&'a self, query: &'a Iv) -> SubtractIter<I, Iv, C, T>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -75,7 +75,7 @@ where
     /// // (s2)       j---k
     /// // (s3)              l---y
     ///
-    /// use bedrs::{Container, Coordinates, Interval, SetSubtract, IntervalContainer};
+    /// use bedrs::{Coordinates, Interval, IntervalContainer};
     ///
     /// let q = Interval::new(20, 40);
     /// let a = Interval::new(25, 27);
@@ -94,10 +94,10 @@ where
     ///
     /// assert!(subset.next().is_none());
     /// ```
-    fn subtract_from<'a, Iv>(
+    pub fn subtract_from<'a, Iv>(
         &'a self,
         query: &'a Iv,
-    ) -> Result<SubtractFromIter<C, T, I, Iv>, SetError>
+    ) -> Result<SubtractFromIter<I, Iv, C, T>, SetError>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -111,7 +111,7 @@ where
     /// Unchecked version of [subtract_from](Self::subtract_from).
     ///
     /// Does not check if the container is sorted
-    fn subtract_from_unchecked<'a, Iv>(&'a self, query: &'a Iv) -> SubtractFromIter<C, T, I, Iv>
+    pub fn subtract_from_unchecked<'a, Iv>(&'a self, query: &'a Iv) -> SubtractFromIter<I, Iv, C, T>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -121,8 +121,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use super::SetSubtract;
-    use crate::{Container, Coordinates, Interval, IntervalContainer};
+    use crate::{Coordinates, Interval, IntervalContainer};
 
     #[test]
     fn set_subtract_unsorted() {
