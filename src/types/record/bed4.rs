@@ -3,6 +3,8 @@ use crate::{
     Bed12, Bed3, Bed6, Coordinates, Strand,
 };
 use num_traits::zero;
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 
 /// A representation of a Bed4 Interval.
 ///
