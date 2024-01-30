@@ -397,7 +397,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::{traits::Coordinates, Interval, Strand};
+    use crate::{traits::Coordinates, Interval};
 
     // define a custom interval struct for testing
     struct CustomInterval {
@@ -425,7 +425,6 @@ mod testing {
         }
         #[allow(unused)]
         fn update_chr(&mut self, val: &usize) {}
-        fn update_strand(&mut self, strand: Option<Strand>) {}
         fn from<Iv: Coordinates<usize, usize>>(other: &Iv) -> Self {
             Self {
                 left: other.start(),
@@ -463,7 +462,6 @@ mod testing {
         fn update_end(&mut self, val: &usize) {
             self.right = *val;
         }
-        fn update_strand(&mut self, strand: Option<Strand>) {}
         #[allow(unused)]
         fn update_chr(&mut self, val: &usize) {}
         fn from<Iv: Coordinates<usize, usize>>(other: &Iv) -> Self {
