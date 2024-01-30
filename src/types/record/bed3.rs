@@ -254,7 +254,7 @@ mod testing {
         assert_eq!(b.start(), 20);
         assert_eq!(b.end(), 30);
         assert_eq!(b.name(), &0);
-        assert_eq!(b.score(), 0);
+        assert_eq!(b.score(), &0);
         assert_eq!(b.strand(), Strand::Unknown);
         assert_eq!(b.thick_start(), 0);
         assert_eq!(b.thick_end(), 0);

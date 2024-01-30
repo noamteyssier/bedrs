@@ -54,7 +54,7 @@ where
     C: ChromBounds,
     T: ValueBounds,
     N: MetaBounds,
-    S: ValueBounds,
+    S: MetaBounds,
     Ts: ValueBounds,
     Te: ValueBounds,
     R: MetaBounds,
@@ -67,7 +67,7 @@ where
             start: zero::<T>(),
             end: zero::<T>(),
             name: N::default(),
-            score: zero::<S>(),
+            score: S::default(),
             strand: Strand::Unknown,
             thick_start: zero::<Ts>(),
             thick_end: zero::<Te>(),
@@ -101,7 +101,7 @@ where
             start: other.start(),
             end: other.end(),
             name: N::default(),
-            score: zero::<S>(),
+            score: S::default(),
             strand: Strand::Unknown,
             thick_start: zero::<Ts>(),
             thick_end: zero::<Te>(),
@@ -118,7 +118,7 @@ where
     C: ChromBounds,
     T: ValueBounds,
     N: MetaBounds,
-    S: ValueBounds,
+    S: MetaBounds,
     Ts: ValueBounds,
     Te: ValueBounds,
     R: MetaBounds,
@@ -160,7 +160,7 @@ where
     C: ChromBounds,
     T: ValueBounds,
     N: MetaBounds,
-    S: ValueBounds,
+    S: MetaBounds,
     Ts: ValueBounds,
     Te: ValueBounds,
     R: MetaBounds,
@@ -199,7 +199,7 @@ where
     C: ChromBounds,
     T: ValueBounds,
     N: MetaBounds,
-    S: ValueBounds,
+    S: MetaBounds,
     Ts: ValueBounds,
     Te: ValueBounds,
     R: MetaBounds,
@@ -240,8 +240,8 @@ where
         &self.name
     }
 
-    pub fn score(&self) -> S {
-        self.score
+    pub fn score(&self) -> &S {
+        &self.score
     }
 
     pub fn strand(&self) -> Strand {

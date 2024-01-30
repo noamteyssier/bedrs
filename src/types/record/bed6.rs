@@ -42,7 +42,7 @@ where
     C: ChromBounds,
     T: ValueBounds,
     N: MetaBounds,
-    S: ValueBounds,
+    S: MetaBounds,
 {
     fn empty() -> Self {
         Self {
@@ -50,7 +50,7 @@ where
             start: zero::<T>(),
             end: zero::<T>(),
             name: N::default(),
-            score: zero::<S>(),
+            score: S::default(),
             strand: Strand::Unknown,
         }
     }
@@ -78,7 +78,7 @@ where
             start: other.start(),
             end: other.end(),
             name: N::default(),
-            score: zero::<S>(),
+            score: S::default(),
             strand: Strand::Unknown,
         }
     }
@@ -158,7 +158,7 @@ where
     C: ChromBounds,
     T: ValueBounds,
     N: MetaBounds,
-    S: ValueBounds,
+    S: MetaBounds,
 {
     pub fn new(chr: C, start: T, end: T, name: N, score: S, strand: Strand) -> Self {
         Self {
@@ -189,7 +189,7 @@ where
     C: ChromBounds,
     T: ValueBounds,
     N: MetaBounds,
-    S: ValueBounds,
+    S: MetaBounds,
 {
     fn into(self) -> Bed3<C, T> {
         Bed3::new(self.chr, self.start, self.end)
@@ -201,7 +201,7 @@ where
     C: ChromBounds,
     T: ValueBounds,
     N: MetaBounds,
-    S: ValueBounds,
+    S: MetaBounds,
 {
     fn into(self) -> Bed4<C, T, N> {
         Bed4::new(self.chr, self.start, self.end, self.name)
@@ -213,7 +213,7 @@ where
     C: ChromBounds,
     T: ValueBounds,
     N: MetaBounds,
-    S: ValueBounds,
+    S: MetaBounds,
     Ts: ValueBounds,
     Te: ValueBounds,
     R: MetaBounds,
@@ -235,5 +235,93 @@ where
             Si::default(),
             St::default(),
         )
+    }
+}
+
+#[cfg(test)]
+mod testing {
+    use super::*;
+
+    #[test]
+    fn test_init_chrom_numeric() {
+        let a = Bed6::new(1, 10, 20, 0, 0, Strand::Unknown);
+        assert_eq!(a.chr(), &1);
+        assert_eq!(a.start(), 10);
+        assert_eq!(a.end(), 20);
+        assert_eq!(a.name(), &0);
+        assert_eq!(a.score(), &0);
+        assert_eq!(a.strand(), Strand::Unknown);
+    }
+
+    #[test]
+    fn test_init_chrom_string() {
+        let a = Bed6::new("chr1".to_string(), 10, 20, 0, 0, Strand::Unknown);
+        assert_eq!(a.chr(), &"chr1".to_string());
+        assert_eq!(a.start(), 10);
+        assert_eq!(a.end(), 20);
+        assert_eq!(a.name(), &0);
+        assert_eq!(a.score(), &0);
+        assert_eq!(a.strand(), Strand::Unknown);
+    }
+
+    #[test]
+    fn test_init_name_numeric() {
+        let a = Bed6::new(1, 10, 20, 0, 0, Strand::Unknown);
+        assert_eq!(a.name(), &0);
+    }
+
+    #[test]
+    fn test_init_name_string() {
+        let a = Bed6::new(1, 10, 20, "name".to_string(), 0, Strand::Unknown);
+        assert_eq!(a.name(), &"name".to_string());
+    }
+
+    #[test]
+    fn test_init_score_discrete() {
+        let a = Bed6::new(1, 10, 20, "name".to_string(), 11, Strand::Unknown);
+        assert_eq!(a.score(), &11);
+    }
+
+    #[test]
+    fn test_init_score_continuous() {
+        let a = Bed6::new(1, 10, 20, "name".to_string(), 11.1, Strand::Unknown);
+        assert_eq!(a.score(), &11.1);
+    }
+
+    #[test]
+    fn convert_to_bed3() {
+        let a = Bed6::new(1, 10, 20, "name".to_string(), 11.1, Strand::Forward);
+        let b: Bed3<i32, i32> = a.into();
+        assert_eq!(b.chr(), &1);
+        assert_eq!(b.start(), 10);
+        assert_eq!(b.end(), 20);
+    }
+
+    #[test]
+    fn convert_to_bed4() {
+        let a = Bed6::new(1, 10, 20, "name".to_string(), 11.1, Strand::Forward);
+        let b: Bed4<i32, i32, String> = a.into();
+        assert_eq!(b.chr(), &1);
+        assert_eq!(b.start(), 10);
+        assert_eq!(b.end(), 20);
+        assert_eq!(b.name(), "name");
+    }
+
+    #[test]
+    fn convert_to_bed12() {
+        let a = Bed6::new(1, 10, 20, "name".to_string(), 11.1, Strand::Forward);
+        let b: Bed12<i32, i32, String, f32, i32, i32, f32, i32, i32> = a.into();
+        assert_eq!(b.chr(), &1);
+        assert_eq!(b.start(), 10);
+        assert_eq!(b.end(), 20);
+        assert_eq!(b.name(), "name");
+        assert_eq!(b.score(), &11.1);
+        assert_eq!(b.strand(), Strand::Forward);
+        assert_eq!(b.thick_start(), 0);
+        assert_eq!(b.thick_end(), 0);
+        assert_eq!(b.item_rgb(), &0.0);
+        assert_eq!(b.block_count(), 0);
+        assert_eq!(b.block_sizes(), &0);
+        assert_eq!(b.block_starts(), &0);
     }
 }
