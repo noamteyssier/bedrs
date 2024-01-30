@@ -8,4 +8,6 @@ pub use iterator::{
     FindIter, FindIterSorted, IntersectIter, IntervalIterOwned, IntervalIterRef, MergeIter,
     SubtractFromIter, SubtractIter,
 };
-pub use record::{GenomicInterval, Interval, NamedInterval, StrandedGenomicInterval};
+pub use record::{
+    Bed12, Bed3, Bed4, Bed6, GenomicInterval, Interval, NamedInterval, StrandedGenomicInterval,
+};

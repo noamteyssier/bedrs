@@ -14,7 +14,7 @@ where
     ///
     /// Returns the intersection of each interval in `self` with each interval in `other`
     /// as an iterator of interval type from `other`
-    pub fn ix_set_target<Co, Iv>(
+    pub fn ix_set_target<Iv>(
         &'a self,
         other: &'a IntervalContainer<Iv, C, T>,
         query_method: QueryMethod<T>,
@@ -39,7 +39,7 @@ where
     ///
     /// Returns the intersection of each interval in `self` with each interval in `other`
     /// as an iterator of interval type from `self`
-    pub fn ix_set_query<Co, Iv>(
+    pub fn ix_set_query<Iv>(
         &'a self,
         other: &'a IntervalContainer<Iv, C, T>,
         query_method: QueryMethod<T>,

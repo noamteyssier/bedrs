@@ -1,7 +1,15 @@
+mod bed12;
+mod bed3;
+mod bed4;
+mod bed6;
 mod genomic_interval;
 mod interval;
 mod named_interval;
 mod stranded_genomic_interval;
+pub use bed12::Bed12;
+pub use bed3::Bed3;
+pub use bed4::Bed4;
+pub use bed6::Bed6;
 pub use genomic_interval::GenomicInterval;
 pub use interval::Interval;
 pub use named_interval::NamedInterval;
