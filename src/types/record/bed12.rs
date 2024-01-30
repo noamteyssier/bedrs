@@ -273,6 +273,42 @@ where
     pub fn block_starts(&self) -> &St {
         &self.block_starts
     }
+
+    pub fn update_name(&mut self, val: &N) {
+        self.name = val.clone();
+    }
+
+    pub fn update_score(&mut self, val: &S) {
+        self.score = val.clone();
+    }
+
+    pub fn update_strand(&mut self, val: Strand) {
+        self.strand = val;
+    }
+
+    pub fn update_thick_start(&mut self, val: &Ts) {
+        self.thick_start = *val;
+    }
+
+    pub fn update_thick_end(&mut self, val: &Te) {
+        self.thick_end = *val;
+    }
+
+    pub fn update_item_rgb(&mut self, val: &R) {
+        self.item_rgb = val.clone();
+    }
+
+    pub fn update_block_count(&mut self, val: &T) {
+        self.block_count = *val;
+    }
+
+    pub fn update_block_sizes(&mut self, val: &Si) {
+        self.block_sizes = val.clone();
+    }
+
+    pub fn update_block_starts(&mut self, val: &St) {
+        self.block_starts = val.clone();
+    }
 }
 
 impl<C, T, N, S, Ts, Te, R, Si, St> Into<Bed3<C, T>> for Bed12<C, T, N, S, Ts, Te, R, Si, St>

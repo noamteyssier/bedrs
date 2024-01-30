@@ -184,6 +184,18 @@ where
     pub fn strand(&self) -> Strand {
         self.strand
     }
+
+    pub fn update_name(&mut self, val: &N) {
+        self.name = val.clone();
+    }
+
+    pub fn update_score(&mut self, val: &S) {
+        self.score = val.clone();
+    }
+
+    pub fn update_strand(&mut self, val: Strand) {
+        self.strand = val;
+    }
 }
 
 impl<C, T, N, S> Into<Bed3<C, T>> for Bed6<C, T, N, S>

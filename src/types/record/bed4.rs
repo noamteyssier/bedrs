@@ -148,6 +148,7 @@ impl<C, T, N> Bed4<C, T, N>
 where
     C: ChromBounds,
     T: ValueBounds,
+    N: MetaBounds,
 {
     pub fn new(chr: C, start: T, end: T, name: N) -> Self {
         Self {
@@ -160,6 +161,10 @@ where
 
     pub fn name(&self) -> &N {
         &self.name
+    }
+
+    pub fn update_name(&mut self, val: &N) {
+        self.name = val.clone();
     }
 }
 
