@@ -150,7 +150,7 @@ impl<C, T, N> Into<Bed4<C, T, N>> for Bed3<C, T>
 where
     C: ChromBounds,
     T: ValueBounds,
-    N: ValueBounds,
+    N: MetaBounds,
 {
     fn into(self) -> Bed4<C, T, N> {
         Bed4::new(self.chr, self.start, self.end, N::default())
@@ -161,8 +161,8 @@ impl<C, T, N, S> Into<Bed6<C, T, N, S>> for Bed3<C, T>
 where
     C: ChromBounds,
     T: ValueBounds,
-    N: ValueBounds,
-    S: ValueBounds,
+    N: MetaBounds,
+    S: MetaBounds,
 {
     fn into(self) -> Bed6<C, T, N, S> {
         Bed6::new(
@@ -181,7 +181,7 @@ where
     C: ChromBounds,
     T: ValueBounds,
     N: MetaBounds,
-    S: ValueBounds,
+    S: MetaBounds,
     Ts: ValueBounds,
     Te: ValueBounds,
     R: MetaBounds,
@@ -264,5 +264,45 @@ mod testing {
         assert_eq!(b.block_count(), 0);
         assert_eq!(b.block_sizes(), &0);
         assert_eq!(b.block_starts(), &0);
+    }
+
+    #[test]
+    fn from_bed4() {
+        let a = Bed4::new("chr1", 20, 30, 40);
+        let b: Bed3<_, _> = a.into();
+        assert_eq!(*b.chr(), "chr1");
+        assert_eq!(b.start(), 20);
+        assert_eq!(b.end(), 30);
+    }
+
+    #[test]
+    fn from_bed6() {
+        let a = Bed6::new("chr1", 20, 30, 40, 50, Strand::Forward);
+        let b: Bed3<_, _> = a.into();
+        assert_eq!(*b.chr(), "chr1");
+        assert_eq!(b.start(), 20);
+        assert_eq!(b.end(), 30);
+    }
+
+    #[test]
+    fn from_bed12() {
+        let a = Bed12::new(
+            "chr1",
+            20,
+            30,
+            40,
+            50,
+            Strand::Forward,
+            60,
+            70,
+            80,
+            90,
+            100,
+            110,
+        );
+        let b: Bed3<_, _> = a.into();
+        assert_eq!(*b.chr(), "chr1");
+        assert_eq!(b.start(), 20);
+        assert_eq!(b.end(), 30);
     }
 }

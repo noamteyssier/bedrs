@@ -183,7 +183,7 @@ where
     C: ChromBounds,
     T: ValueBounds,
     N: MetaBounds,
-    S: ValueBounds,
+    S: MetaBounds,
 {
     fn into(self) -> Bed6<C, T, N, S> {
         Bed6::new(
@@ -202,7 +202,7 @@ where
     C: ChromBounds,
     T: ValueBounds,
     N: MetaBounds,
-    S: ValueBounds,
+    S: MetaBounds,
     Ts: ValueBounds,
     Te: ValueBounds,
     R: MetaBounds,
@@ -290,5 +290,48 @@ mod testing {
         assert_eq!(b12.block_count(), 0);
         assert_eq!(b12.block_sizes(), &0);
         assert_eq!(b12.block_starts(), &0);
+    }
+
+    #[test]
+    fn from_bed3() {
+        let b3 = Bed3::new(1, 10, 20);
+        let b4: Bed4<_, _, String> = b3.into();
+        assert_eq!(b4.chr(), &1);
+        assert_eq!(b4.start(), 10);
+        assert_eq!(b4.end(), 20);
+        assert_eq!(b4.name(), "");
+    }
+
+    #[test]
+    fn from_bed6() {
+        let b6 = Bed6::new(1, 10, 20, "test".to_string(), 30, Strand::Unknown);
+        let b4: Bed4<_, _, String> = b6.into();
+        assert_eq!(b4.chr(), &1);
+        assert_eq!(b4.start(), 10);
+        assert_eq!(b4.end(), 20);
+        assert_eq!(b4.name(), "test");
+    }
+
+    #[test]
+    fn from_bed12() {
+        let b12 = Bed12::new(
+            1,
+            10,
+            20,
+            "test".to_string(),
+            30,
+            Strand::Unknown,
+            40,
+            50,
+            60,
+            70,
+            80,
+            90,
+        );
+        let b4: Bed4<_, _, String> = b12.into();
+        assert_eq!(b4.chr(), &1);
+        assert_eq!(b4.start(), 10);
+        assert_eq!(b4.end(), 20);
+        assert_eq!(b4.name(), "test");
     }
 }

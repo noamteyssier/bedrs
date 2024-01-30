@@ -81,7 +81,7 @@ where
             end: other.end(),
             name: N::default(),
             score: S::default(),
-            strand: Strand::Unknown,
+            strand: other.strand().unwrap_or_default(),
         }
     }
 }
@@ -337,5 +337,54 @@ mod testing {
         assert_eq!(b.block_count(), 0);
         assert_eq!(b.block_sizes(), &0);
         assert_eq!(b.block_starts(), &0);
+    }
+
+    #[test]
+    fn from_bed3() {
+        let a = Bed3::new(1, 10, 20);
+        let b: Bed6<i32, i32, String, f32> = a.into();
+        assert_eq!(b.chr(), &1);
+        assert_eq!(b.start(), 10);
+        assert_eq!(b.end(), 20);
+        assert_eq!(b.name(), "");
+        assert_eq!(b.score(), &0.0);
+        assert_eq!(b.strand(), Strand::Unknown);
+    }
+
+    #[test]
+    fn from_bed4() {
+        let a = Bed4::new(1, 10, 20, "name".to_string());
+        let b: Bed6<i32, i32, String, f32> = a.into();
+        assert_eq!(b.chr(), &1);
+        assert_eq!(b.start(), 10);
+        assert_eq!(b.end(), 20);
+        assert_eq!(b.name(), "name");
+        assert_eq!(b.score(), &0.0);
+        assert_eq!(b.strand(), Strand::Unknown);
+    }
+
+    #[test]
+    fn from_bed12() {
+        let a = Bed12::new(
+            1,
+            10,
+            20,
+            "name".to_string(),
+            11.1,
+            Strand::Forward,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+        );
+        let b: Bed6<i32, i32, String, f32> = a.into();
+        assert_eq!(b.chr(), &1);
+        assert_eq!(b.start(), 10);
+        assert_eq!(b.end(), 20);
+        assert_eq!(b.name(), "name");
+        assert_eq!(b.score(), &11.1);
+        assert_eq!(b.strand(), Strand::Forward);
     }
 }
