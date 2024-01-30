@@ -132,7 +132,7 @@ where
     /// >> If you are creating an interval set from presorted
     /// >> intervals use the `from_sorted()` method instead of
     /// >> the `new()` method.
-    fn set_sorted(&mut self) {
+    pub fn set_sorted(&mut self) {
         *self.sorted_mut() = true;
     }
 
