@@ -175,7 +175,7 @@ impl<C, T, N, S> Into<Bed6<C, T, N, S>> for Bed4<C, T, N>
 where
     C: ChromBounds,
     T: ValueBounds,
-    N: ValueBounds,
+    N: MetaBounds,
     S: ValueBounds,
 {
     fn into(self) -> Bed6<C, T, N, S> {
@@ -222,100 +222,66 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::Bed3;
-    use crate::Coordinates;
-
     use super::*;
-    #[cfg(feature = "serde")]
-    use bincode::{deserialize, serialize};
-    use std::cmp::Ordering;
 
     #[test]
-    fn test_interval_init() {
-        let interval = Bed4::new(1, 10, 100, 0);
-        assert_eq!(*interval.chr(), 1);
-        assert_eq!(interval.start(), 10);
-        assert_eq!(interval.end(), 100);
-        assert_eq!(interval.name(), &0);
+    fn test_init_chrom_numeric() {
+        let b = Bed4::new(1, 10, 20, "test".to_string());
+        assert_eq!(b.chr(), &1);
     }
 
     #[test]
-    fn test_name_init() {
-        let interval = Bed4::new(1, 10, 100, 0);
-        assert_eq!(*interval.chr(), 1);
-        assert_eq!(interval.start(), 10);
-        assert_eq!(interval.end(), 100);
-        assert_eq!(interval.name(), &0);
+    fn test_init_chrom_string() {
+        let b = Bed4::new("chr1".to_string(), 10, 20, "test".to_string());
+        assert_eq!(b.chr(), "chr1");
     }
 
     #[test]
-    fn test_bed4_from_bed3() {
-        let iv = Bed3::new(1, 10, 100);
-        let iv2: Bed4<i32, i32, i32> = iv.into();
-        assert_eq!(*iv2.chr(), 1);
-        assert_eq!(iv2.start(), 10);
-        assert_eq!(iv2.end(), 100);
-        assert_eq!(iv2.name(), &0);
+    fn test_init_name_numeric() {
+        let b = Bed4::new(1, 10, 20, 30);
+        assert_eq!(b.name(), &30);
     }
 
     #[test]
-    fn test_interval_ordering_gt() {
-        let a = Bed4::new(1, 10, 100, 0);
-        let b = Bed4::new(1, 5, 100, 0);
-        assert_eq!(a.coord_cmp(&b), Ordering::Greater);
-
-        let a = Bed4::new(1, 10, 100, 0);
-        let b = Bed4::new(1, 10, 90, 0);
-        assert_eq!(a.coord_cmp(&b), Ordering::Greater);
-
-        let a = Bed4::new(2, 10, 100, 0);
-        let b = Bed4::new(1, 10, 100, 0);
-        assert_eq!(a.coord_cmp(&b), Ordering::Greater);
+    fn test_init_name_string() {
+        let b = Bed4::new(1, 10, 20, "test".to_string());
+        assert_eq!(b.name(), "test");
     }
 
     #[test]
-    fn test_interval_ordering_lt() {
-        let a = Bed4::new(1, 5, 100, 0);
-        let b = Bed4::new(1, 10, 100, 0);
-        assert_eq!(a.coord_cmp(&b), Ordering::Less);
-
-        let a = Bed4::new(1, 10, 100, 0);
-        let b = Bed4::new(2, 10, 100, 0);
-        assert_eq!(a.coord_cmp(&b), Ordering::Less);
+    fn convert_to_bed3() {
+        let b = Bed4::new(1, 10, 20, "test".to_string());
+        let b3: Bed3<_, _> = b.into();
+        assert_eq!(b3.chr(), &1);
+        assert_eq!(b3.start(), 10);
+        assert_eq!(b3.end(), 20);
     }
 
     #[test]
-    fn test_interval_ordering_eq() {
-        let a = Bed4::new(1, 5, 100, 0);
-        let b = Bed4::new(1, 5, 100, 0);
-        assert_eq!(a.coord_cmp(&b), Ordering::Equal);
-
-        let a = Bed4::new(2, 5, 100, 0);
-        let b = Bed4::new(2, 5, 100, 0);
-        assert_eq!(a.coord_cmp(&b), Ordering::Equal);
+    fn convert_to_bed6() {
+        let b = Bed4::new(1, 10, 20, "test".to_string());
+        let b6: Bed6<i32, i32, String, i32> = b.into();
+        assert_eq!(b6.chr(), &1);
+        assert_eq!(b6.start(), 10);
+        assert_eq!(b6.end(), 20);
+        assert_eq!(b6.name(), "test");
     }
 
     #[test]
-    #[cfg(feature = "serde")]
-    fn genomic_interval_serde() {
-        let a: Bed4<usize> = Bed4::new(1, 5, 100, 0);
-        let encoding = serialize(&a).unwrap();
-        let b: Bed4<usize> = deserialize(&encoding).unwrap();
-        assert_eq!(a.coord_cmp(&b), Ordering::Equal);
-    }
-
-    fn function_generic_reference<C: Coordinates<usize, usize>>(iv: C) {
-        assert_eq!(*iv.chr(), 1);
-        assert_eq!(iv.start(), 10);
-        assert_eq!(iv.end(), 100);
-        assert!(iv.strand().is_none());
-    }
-
-    #[test]
-    fn test_generic_reference() {
-        let mut iv = Bed4::new(1, 10, 100, 0);
-        function_generic_reference(&iv);
-        function_generic_reference(&mut iv);
-        function_generic_reference(iv);
+    fn convert_to_bed12() {
+        let b = Bed4::new(1, 10, 20, "test".to_string());
+        let b12: Bed12<i32, i32, String, i32, i32, i32, i32, i32, i32> = b.into();
+        assert_eq!(b12.chr(), &1);
+        assert_eq!(b12.start(), 10);
+        assert_eq!(b12.end(), 20);
+        assert_eq!(b12.name(), "test");
+        assert_eq!(b12.score(), 0);
+        assert_eq!(b12.strand(), Strand::Unknown);
+        assert_eq!(b12.thick_start(), 0);
+        assert_eq!(b12.thick_end(), 0);
+        assert_eq!(b12.item_rgb(), &0);
+        assert_eq!(b12.block_count(), 0);
+        assert_eq!(b12.block_sizes(), &0);
+        assert_eq!(b12.block_starts(), &0);
     }
 }
