@@ -278,7 +278,7 @@ where
     C: ChromBounds,
     T: ValueBounds,
     N: MetaBounds,
-    S: ValueBounds,
+    S: MetaBounds,
     Ts: ValueBounds,
     Te: ValueBounds,
     R: MetaBounds,
@@ -295,7 +295,7 @@ where
     C: ChromBounds,
     T: ValueBounds,
     N: MetaBounds,
-    S: ValueBounds,
+    S: MetaBounds,
     Ts: ValueBounds,
     Te: ValueBounds,
     R: MetaBounds,
@@ -312,7 +312,7 @@ where
     C: ChromBounds,
     T: ValueBounds,
     N: MetaBounds,
-    S: ValueBounds,
+    S: MetaBounds,
     Ts: ValueBounds,
     Te: ValueBounds,
     R: MetaBounds,
@@ -328,5 +328,260 @@ where
             self.score,
             self.strand,
         )
+    }
+}
+
+#[cfg(test)]
+mod testing {
+    use super::*;
+
+    #[test]
+    fn test_init_chrom_string() {
+        let a = Bed12::new(
+            "chr1".to_string(),
+            10,
+            20,
+            "name".to_string(),
+            1,
+            Strand::Forward,
+            1,
+            2,
+            "0,0,0".to_string(),
+            1,
+            vec![1],
+            vec![1],
+        );
+        assert_eq!(a.chr(), "chr1");
+        assert_eq!(a.start(), 10);
+        assert_eq!(a.end(), 20);
+        assert_eq!(a.name(), "name");
+        assert_eq!(a.score(), &1);
+        assert_eq!(a.strand(), Strand::Forward);
+        assert_eq!(a.thick_start(), 1);
+        assert_eq!(a.thick_end(), 2);
+        assert_eq!(a.item_rgb(), "0,0,0");
+        assert_eq!(a.block_count(), 1);
+        assert_eq!(a.block_sizes(), &vec![1]);
+        assert_eq!(a.block_starts(), &vec![1]);
+    }
+
+    #[test]
+    fn test_init_chrom_numeric() {
+        let a = Bed12::new(
+            1,
+            10,
+            20,
+            "name".to_string(),
+            1,
+            Strand::Forward,
+            1,
+            2,
+            "0,0,0".to_string(),
+            1,
+            vec![1],
+            vec![1],
+        );
+        assert_eq!(a.chr(), &1);
+        assert_eq!(a.start(), 10);
+        assert_eq!(a.end(), 20);
+        assert_eq!(a.name(), "name");
+        assert_eq!(a.score(), &1);
+        assert_eq!(a.strand(), Strand::Forward);
+        assert_eq!(a.thick_start(), 1);
+        assert_eq!(a.thick_end(), 2);
+        assert_eq!(a.item_rgb(), "0,0,0");
+        assert_eq!(a.block_count(), 1);
+        assert_eq!(a.block_sizes(), &vec![1]);
+        assert_eq!(a.block_starts(), &vec![1]);
+    }
+
+    #[test]
+    fn test_init_name_string() {
+        let a = Bed12::new(
+            "chr1".to_string(),
+            10,
+            20,
+            "name".to_string(),
+            1,
+            Strand::Forward,
+            1,
+            2,
+            "0,0,0".to_string(),
+            1,
+            vec![1],
+            vec![1],
+        );
+        assert_eq!(a.chr(), "chr1");
+        assert_eq!(a.start(), 10);
+        assert_eq!(a.end(), 20);
+        assert_eq!(a.name(), "name");
+        assert_eq!(a.score(), &1);
+        assert_eq!(a.strand(), Strand::Forward);
+        assert_eq!(a.thick_start(), 1);
+        assert_eq!(a.thick_end(), 2);
+        assert_eq!(a.item_rgb(), "0,0,0");
+        assert_eq!(a.block_count(), 1);
+        assert_eq!(a.block_sizes(), &vec![1]);
+        assert_eq!(a.block_starts(), &vec![1]);
+    }
+
+    #[test]
+    fn test_init_name_numeric() {
+        let a = Bed12::new(
+            "chr1".to_string(),
+            10,
+            20,
+            1,
+            1,
+            Strand::Forward,
+            1,
+            2,
+            "0,0,0".to_string(),
+            1,
+            vec![1],
+            vec![1],
+        );
+        assert_eq!(a.chr(), "chr1");
+        assert_eq!(a.start(), 10);
+        assert_eq!(a.end(), 20);
+        assert_eq!(a.name(), &1);
+        assert_eq!(a.score(), &1);
+        assert_eq!(a.strand(), Strand::Forward);
+        assert_eq!(a.thick_start(), 1);
+        assert_eq!(a.thick_end(), 2);
+        assert_eq!(a.item_rgb(), "0,0,0");
+        assert_eq!(a.block_count(), 1);
+        assert_eq!(a.block_sizes(), &vec![1]);
+        assert_eq!(a.block_starts(), &vec![1]);
+    }
+
+    #[test]
+    fn test_init_score_discrete() {
+        let a = Bed12::new(
+            "chr1".to_string(),
+            10,
+            20,
+            "name".to_string(),
+            1,
+            Strand::Forward,
+            1,
+            2,
+            "0,0,0".to_string(),
+            1,
+            vec![1],
+            vec![1],
+        );
+        assert_eq!(a.chr(), "chr1");
+        assert_eq!(a.start(), 10);
+        assert_eq!(a.end(), 20);
+        assert_eq!(a.name(), "name");
+        assert_eq!(a.score(), &1);
+        assert_eq!(a.strand(), Strand::Forward);
+        assert_eq!(a.thick_start(), 1);
+        assert_eq!(a.thick_end(), 2);
+        assert_eq!(a.item_rgb(), "0,0,0");
+        assert_eq!(a.block_count(), 1);
+        assert_eq!(a.block_sizes(), &vec![1]);
+        assert_eq!(a.block_starts(), &vec![1]);
+    }
+
+    #[test]
+    fn test_init_score_continuous() {
+        let a = Bed12::new(
+            "chr1".to_string(),
+            10,
+            20,
+            "name".to_string(),
+            1.1,
+            Strand::Forward,
+            1,
+            2,
+            "0,0,0".to_string(),
+            1,
+            vec![1],
+            vec![1],
+        );
+        assert_eq!(a.chr(), "chr1");
+        assert_eq!(a.start(), 10);
+        assert_eq!(a.end(), 20);
+        assert_eq!(a.name(), "name");
+        assert_eq!(a.score(), &1.1);
+        assert_eq!(a.strand(), Strand::Forward);
+        assert_eq!(a.thick_start(), 1);
+        assert_eq!(a.thick_end(), 2);
+        assert_eq!(a.item_rgb(), "0,0,0");
+        assert_eq!(a.block_count(), 1);
+        assert_eq!(a.block_sizes(), &vec![1]);
+        assert_eq!(a.block_starts(), &vec![1]);
+    }
+
+    #[test]
+    fn convert_to_bed3() {
+        let a = Bed12::new(
+            "chr1".to_string(),
+            10,
+            20,
+            "name".to_string(),
+            1.1,
+            Strand::Forward,
+            1,
+            2,
+            "0,0,0".to_string(),
+            1,
+            vec![1],
+            vec![1],
+        );
+        let b: Bed3<String, i32> = a.into();
+        assert_eq!(b.chr(), "chr1");
+        assert_eq!(b.start(), 10);
+        assert_eq!(b.end(), 20);
+    }
+
+    #[test]
+    fn convert_to_bed4() {
+        let a = Bed12::new(
+            "chr1".to_string(),
+            10,
+            20,
+            "name".to_string(),
+            1.1,
+            Strand::Forward,
+            1,
+            2,
+            "0,0,0".to_string(),
+            1,
+            vec![1],
+            vec![1],
+        );
+        let b: Bed4<String, i32, String> = a.into();
+        assert_eq!(b.chr(), "chr1");
+        assert_eq!(b.start(), 10);
+        assert_eq!(b.end(), 20);
+        assert_eq!(b.name(), "name");
+    }
+
+    #[test]
+    fn convert_to_bed6() {
+        let a = Bed12::new(
+            "chr1".to_string(),
+            10,
+            20,
+            "name".to_string(),
+            1.1,
+            Strand::Forward,
+            1,
+            2,
+            "0,0,0".to_string(),
+            1,
+            vec![1],
+            vec![1],
+        );
+        let b: Bed6<String, i32, String, f32> = a.into();
+        assert_eq!(b.chr(), "chr1");
+        assert_eq!(b.start(), 10);
+        assert_eq!(b.end(), 20);
+        assert_eq!(b.name(), "name");
+        assert_eq!(b.score(), &1.1);
+        assert_eq!(b.strand(), Strand::Forward);
     }
 }
