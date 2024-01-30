@@ -62,7 +62,6 @@ where
     fn update_chr(&mut self, val: &C) {
         self.chr = val.clone();
     }
-    fn update_strand(&mut self, strand: Option<Strand>) {}
     fn from<Iv: Coordinates<C, T>>(other: &Iv) -> Self {
         Self {
             chr: other.chr().clone(),
@@ -135,7 +134,6 @@ where
     fn update_chr(&mut self, val: &C) {
         self.chr = val.clone();
     }
-    fn update_strand(&mut self, strand: Option<Strand>) {}
     #[allow(unused)]
     fn from<Iv>(other: &Iv) -> Self {
         unimplemented!("Cannot create a new reference from a mutable reference")
