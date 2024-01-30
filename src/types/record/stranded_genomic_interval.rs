@@ -67,6 +67,9 @@ where
     fn update_chr(&mut self, val: &T) {
         self.chr = *val;
     }
+    fn update_strand(&mut self, strand: Option<Strand>) {
+        self.strand = strand.unwrap_or_default();
+    }
     fn from<Iv: Coordinates<T, T>>(other: &Iv) -> Self {
         Self {
             chr: *other.chr(),

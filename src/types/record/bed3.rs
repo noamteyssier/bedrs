@@ -62,6 +62,7 @@ where
     fn update_chr(&mut self, val: &C) {
         self.chr = val.clone();
     }
+    fn update_strand(&mut self, strand: Option<Strand>) {}
     fn from<Iv: Coordinates<C, T>>(other: &Iv) -> Self {
         Self {
             chr: other.chr().clone(),
@@ -100,6 +101,10 @@ where
         unreachable!("Cannot update an immutable reference")
     }
     #[allow(unused)]
+    fn update_strand(&mut self, strand: Option<Strand>) {
+        unreachable!("Cannot update an immutable reference")
+    }
+    #[allow(unused)]
     fn from<Iv>(other: &Iv) -> Self {
         unimplemented!("Cannot create a new reference from a reference")
     }
@@ -130,6 +135,7 @@ where
     fn update_chr(&mut self, val: &C) {
         self.chr = val.clone();
     }
+    fn update_strand(&mut self, strand: Option<Strand>) {}
     #[allow(unused)]
     fn from<Iv>(other: &Iv) -> Self {
         unimplemented!("Cannot create a new reference from a mutable reference")
@@ -245,7 +251,7 @@ mod testing {
         assert_eq!(b.end(), 30);
         assert_eq!(b.name(), &0);
         assert_eq!(b.score(), &0);
-        assert_eq!(b.strand(), Strand::Unknown);
+        assert_eq!(b.strand().unwrap(), Strand::Unknown);
     }
 
     #[test]
@@ -257,7 +263,7 @@ mod testing {
         assert_eq!(b.end(), 30);
         assert_eq!(b.name(), &0);
         assert_eq!(b.score(), &0);
-        assert_eq!(b.strand(), Strand::Unknown);
+        assert_eq!(b.strand().unwrap(), Strand::Unknown);
         assert_eq!(b.thick_start(), 0);
         assert_eq!(b.thick_end(), 0);
         assert_eq!(b.item_rgb(), &0);

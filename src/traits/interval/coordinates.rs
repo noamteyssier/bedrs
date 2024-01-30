@@ -114,6 +114,22 @@ where
     /// ```
     fn update_chr(&mut self, val: &C);
 
+    /// Update the strand of the interval.
+    ///
+    /// # Examples
+    /// ```
+    /// use bedrs::{Coordinates, StrandedGenomicInterval, Strand};
+    ///
+    /// let mut siv = StrandedGenomicInterval::new(1, 10, 20, Strand::Forward);
+    /// assert_eq!(siv.strand(), Some(Strand::Forward));
+    ///
+    /// siv.update_strand(Some(Strand::Reverse));
+    /// assert_eq!(siv.strand(), Some(Strand::Reverse));
+    /// ```
+    fn update_strand(&mut self, _strand: Option<Strand>) {
+        // Do nothing by default
+    }
+
     /// Create a new interval with the same coordinates as the current one.
     ///
     /// *Note*: This is less verbose when working with generic types.
@@ -381,7 +397,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::{traits::Coordinates, Interval};
+    use crate::{traits::Coordinates, Interval, Strand};
 
     // define a custom interval struct for testing
     struct CustomInterval {
@@ -409,6 +425,7 @@ mod testing {
         }
         #[allow(unused)]
         fn update_chr(&mut self, val: &usize) {}
+        fn update_strand(&mut self, strand: Option<Strand>) {}
         fn from<Iv: Coordinates<usize, usize>>(other: &Iv) -> Self {
             Self {
                 left: other.start(),
@@ -446,6 +463,7 @@ mod testing {
         fn update_end(&mut self, val: &usize) {
             self.right = *val;
         }
+        fn update_strand(&mut self, strand: Option<Strand>) {}
         #[allow(unused)]
         fn update_chr(&mut self, val: &usize) {}
         fn from<Iv: Coordinates<usize, usize>>(other: &Iv) -> Self {

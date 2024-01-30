@@ -65,6 +65,9 @@ where
     fn chr(&self) -> &C {
         &self.chr
     }
+    fn strand(&self) -> Option<Strand> {
+        Some(self.strand)
+    }
     fn update_start(&mut self, val: &T) {
         self.start = *val;
     }
@@ -73,6 +76,9 @@ where
     }
     fn update_chr(&mut self, val: &C) {
         self.chr = val.clone();
+    }
+    fn update_strand(&mut self, strand: Option<Strand>) {
+        self.strand = strand.unwrap_or_default();
     }
     fn from<Iv: Coordinates<C, T>>(other: &Iv) -> Self {
         Self {
@@ -104,6 +110,9 @@ where
     fn chr(&self) -> &C {
         &self.chr
     }
+    fn strand(&self) -> Option<Strand> {
+        Some(self.strand)
+    }
     #[allow(unused)]
     fn update_start(&mut self, val: &T) {
         unreachable!("Cannot update an immutable reference")
@@ -114,6 +123,10 @@ where
     }
     #[allow(unused)]
     fn update_chr(&mut self, val: &C) {
+        unreachable!("Cannot update an immutable reference")
+    }
+    #[allow(unused)]
+    fn update_strand(&mut self, strand: Option<Strand>) {
         unreachable!("Cannot update an immutable reference")
     }
     #[allow(unused)]
@@ -140,6 +153,9 @@ where
     fn chr(&self) -> &C {
         &self.chr
     }
+    fn strand(&self) -> Option<Strand> {
+        Some(self.strand)
+    }
     fn update_start(&mut self, val: &T) {
         self.start = *val;
     }
@@ -148,6 +164,9 @@ where
     }
     fn update_chr(&mut self, val: &C) {
         self.chr = val.clone();
+    }
+    fn update_strand(&mut self, strand: Option<Strand>) {
+        self.strand = strand.unwrap_or_default();
     }
     #[allow(unused)]
     fn from<Iv>(other: &Iv) -> Self {
@@ -181,20 +200,12 @@ where
         &self.score
     }
 
-    pub fn strand(&self) -> Strand {
-        self.strand
-    }
-
     pub fn update_name(&mut self, val: &N) {
         self.name = val.clone();
     }
 
     pub fn update_score(&mut self, val: &S) {
         self.score = val.clone();
-    }
-
-    pub fn update_strand(&mut self, val: Strand) {
-        self.strand = val;
     }
 }
 
@@ -254,6 +265,8 @@ where
 
 #[cfg(test)]
 mod testing {
+    use crate::IntervalContainer;
+
     use super::*;
 
     #[test]
@@ -264,7 +277,7 @@ mod testing {
         assert_eq!(a.end(), 20);
         assert_eq!(a.name(), &0);
         assert_eq!(a.score(), &0);
-        assert_eq!(a.strand(), Strand::Unknown);
+        assert_eq!(a.strand().unwrap(), Strand::Unknown);
     }
 
     #[test]
@@ -275,7 +288,7 @@ mod testing {
         assert_eq!(a.end(), 20);
         assert_eq!(a.name(), &0);
         assert_eq!(a.score(), &0);
-        assert_eq!(a.strand(), Strand::Unknown);
+        assert_eq!(a.strand().unwrap(), Strand::Unknown);
     }
 
     #[test]
@@ -330,7 +343,7 @@ mod testing {
         assert_eq!(b.end(), 20);
         assert_eq!(b.name(), "name");
         assert_eq!(b.score(), &11.1);
-        assert_eq!(b.strand(), Strand::Forward);
+        assert_eq!(b.strand().unwrap(), Strand::Forward);
         assert_eq!(b.thick_start(), 0);
         assert_eq!(b.thick_end(), 0);
         assert_eq!(b.item_rgb(), &0.0);
@@ -348,7 +361,7 @@ mod testing {
         assert_eq!(b.end(), 20);
         assert_eq!(b.name(), "");
         assert_eq!(b.score(), &0.0);
-        assert_eq!(b.strand(), Strand::Unknown);
+        assert_eq!(b.strand().unwrap(), Strand::Unknown);
     }
 
     #[test]
@@ -360,7 +373,7 @@ mod testing {
         assert_eq!(b.end(), 20);
         assert_eq!(b.name(), "name");
         assert_eq!(b.score(), &0.0);
-        assert_eq!(b.strand(), Strand::Unknown);
+        assert_eq!(b.strand().unwrap(), Strand::Unknown);
     }
 
     #[test]
@@ -385,6 +398,20 @@ mod testing {
         assert_eq!(b.end(), 20);
         assert_eq!(b.name(), "name");
         assert_eq!(b.score(), &11.1);
-        assert_eq!(b.strand(), Strand::Forward);
+        assert_eq!(b.strand().unwrap(), Strand::Forward);
+    }
+
+    #[test]
+    fn merge_bed6() {
+        let set = IntervalContainer::from_sorted_unchecked(vec![
+            Bed6::new(1, 10, 20, "name".to_string(), 0, Strand::Forward),
+            Bed6::new(1, 15, 25, "name".to_string(), 0, Strand::Forward),
+        ]);
+        let merged = set.merge_unchecked();
+        assert_eq!(merged.len(), 1);
+        assert_eq!(merged.records()[0].start(), 10);
+        assert_eq!(merged.records()[0].end(), 25);
+        assert_eq!(merged.records()[0].name(), "");
+        assert_eq!(merged.records()[0].strand().unwrap(), Strand::Forward);
     }
 }

@@ -272,6 +272,8 @@ mod testing {
         assert_eq!(b6.start(), 10);
         assert_eq!(b6.end(), 20);
         assert_eq!(b6.name(), "test");
+        assert_eq!(b6.score(), &0);
+        assert_eq!(b6.strand().unwrap(), Strand::Unknown);
     }
 
     #[test]
@@ -283,7 +285,7 @@ mod testing {
         assert_eq!(b12.end(), 20);
         assert_eq!(b12.name(), "test");
         assert_eq!(b12.score(), &0);
-        assert_eq!(b12.strand(), Strand::Unknown);
+        assert_eq!(b12.strand().unwrap(), Strand::Unknown);
         assert_eq!(b12.thick_start(), 0);
         assert_eq!(b12.thick_end(), 0);
         assert_eq!(b12.item_rgb(), &0);
