@@ -90,7 +90,7 @@ where
     C: ChromBounds,
     T: ValueBounds,
     N: MetaBounds,
-    S: ValueBounds,
+    S: MetaBounds,
 {
     fn empty() -> Self {
         unreachable!("Cannot create an immutable empty reference")
@@ -126,7 +126,7 @@ where
     C: ChromBounds,
     T: ValueBounds,
     N: MetaBounds,
-    S: ValueBounds,
+    S: MetaBounds,
 {
     fn empty() -> Self {
         unreachable!("Cannot create an immutable empty reference")
