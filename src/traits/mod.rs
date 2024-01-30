@@ -1,7 +1,6 @@
 use num_traits::{Bounded, FromPrimitive, NumOps, ToPrimitive, Zero};
 use std::fmt::Debug;
 
-pub mod container;
 pub mod errors;
 pub mod interval;
 // pub use container::{
