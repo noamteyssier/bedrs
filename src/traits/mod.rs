@@ -33,10 +33,10 @@ impl<T> ValueBounds for T where
 
 pub trait MetaBounds
 where
-    Self: Clone + Default + Ord + Debug + Send + Sync,
+    Self: Clone + Default + Debug + Send + Sync,
 {
 }
-impl<T> MetaBounds for T where T: Clone + Default + Ord + Debug + Send + Sync {}
+impl<T> MetaBounds for T where T: Clone + Default + Debug + Send + Sync {}
 
 /// Generic bounds for coordinates to be used within [Container]s
 pub trait IntervalBounds<C, T>
