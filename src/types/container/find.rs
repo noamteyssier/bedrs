@@ -1,7 +1,10 @@
 // use super::Container;
 use crate::{
     traits::{errors::SetError, ChromBounds, IntervalBounds, ValueBounds},
-    types::{FindIter, FindIterSorted, IntervalContainer, QueryMethod},
+    types::{
+        FindIter, FindIterOwned, FindIterSorted, FindIterSortedOwned, IntervalContainer,
+        QueryMethod,
+    },
 };
 use anyhow::Result;
 
@@ -157,6 +160,16 @@ where
         Iv: IntervalBounds<C, T>,
     {
         FindIter::new(self.records(), query, QueryMethod::Compare)
+    }
+
+    /// Creates an iterator that finds all overlapping regions
+    ///
+    /// Does not assume a sorted Container
+    pub fn find_iter_owned<Iv>(&self, query: Iv) -> FindIterOwned<'_, C, T, I, Iv>
+    where
+        Iv: IntervalBounds<C, T>,
+    {
+        FindIterOwned::new(self.records(), query, QueryMethod::Compare)
     }
 
     /// Creates an iterator that finds all overlapping regions
@@ -424,6 +437,20 @@ where
             self.lower_bound_unchecked(query),
             QueryMethod::Compare,
         )
+    }
+
+    /// Creates an Iterator that finds all overlapping regions
+    ///
+    /// Assumes a sorted Container.
+    pub fn find_iter_sorted_owned_unchecked<Iv>(
+        &self,
+        query: Iv,
+    ) -> FindIterSortedOwned<'_, C, T, I, Iv>
+    where
+        Iv: IntervalBounds<C, T>,
+    {
+        let offset = self.lower_bound_unchecked(&query);
+        FindIterSortedOwned::new(self.records(), query, offset, QueryMethod::Compare)
     }
 
     /// Creates an Iterator that finds all overlapping regions
@@ -724,6 +751,21 @@ mod testing {
     }
 
     #[test]
+    fn find_iter_owned() {
+        let query = Interval::new(5, 12);
+        let starts = vec![10, 15, 20, 25];
+        let ends = vec![40, 45, 50, 55];
+        let records = starts
+            .iter()
+            .zip(ends.iter())
+            .map(|(s, e)| Interval::new(*s, *e))
+            .collect::<Vec<Interval<u32>>>();
+        let set = IntervalContainer::from_unsorted(records);
+        let num_overlaps = set.find_iter_owned(query).count();
+        assert_eq!(num_overlaps, 1);
+    }
+
+    #[test]
     fn find_iter_sorted() {
         let query = Interval::new(5, 12);
         let starts = vec![10, 15, 20, 25];
@@ -735,6 +777,21 @@ mod testing {
             .collect::<Vec<Interval<u32>>>();
         let set = IntervalContainer::from_unsorted(records);
         let num_overlaps = set.find_iter_sorted(&query).unwrap().count();
+        assert_eq!(num_overlaps, 1);
+    }
+
+    #[test]
+    fn find_iter_sorted_owned() {
+        let query = Interval::new(5, 12);
+        let starts = vec![10, 15, 20, 25];
+        let ends = vec![40, 45, 50, 55];
+        let records = starts
+            .iter()
+            .zip(ends.iter())
+            .map(|(s, e)| Interval::new(*s, *e))
+            .collect::<Vec<Interval<u32>>>();
+        let set = IntervalContainer::from_unsorted(records);
+        let num_overlaps = set.find_iter_sorted_owned_unchecked(query).count();
         assert_eq!(num_overlaps, 1);
     }
 

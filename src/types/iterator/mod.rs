@@ -5,7 +5,7 @@ mod interval;
 mod merge;
 mod subtract;
 pub use complement::ComplementIter;
-pub use find::{FindIter, FindIterSorted};
+pub use find::{FindIter, FindIterOwned, FindIterSorted, FindIterSortedOwned};
 pub use intersect::IntersectIter;
 pub use interval::{IntervalIterOwned, IntervalIterRef};
 pub use merge::MergeIter;
