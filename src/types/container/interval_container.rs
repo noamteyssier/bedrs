@@ -672,7 +672,7 @@ mod testing {
             Interval::new(5, 15),
         ];
         let mut set = IntervalContainer::from_unsorted(records);
-        set.apply_mut(|rec| rec.extend(&2));
+        set.apply_mut(|rec| rec.extend(&2, None));
         assert_eq!(set.records()[0].start(), 3);
         assert_eq!(set.records()[0].end(), 17);
         assert_eq!(set.records()[1].start(), 8);

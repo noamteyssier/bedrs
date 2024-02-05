@@ -246,11 +246,18 @@ where
     /// assert!(iv.eq(&GenomicInterval::new(1, 5, 20)));
     /// ```
     fn extend_left(&mut self, val: &T) {
-        self.update_start(&self.start().sub(*val));
+        if self.start().lt(val) {
+            self.update_start(&T::zero());
+        } else {
+            self.update_start(&self.start().sub(*val));
+        }
     }
 
     /// Extend the interval to the right by a value.
     /// This is equivalent to adding the value to the end coordinate.
+    ///
+    /// If a maximum bound is provided, the new end coordinate will be capped
+    /// at that maximum value.
     ///
     /// # Examples
     /// ```
@@ -259,17 +266,28 @@ where
     /// let mut iv = GenomicInterval::new(1, 10, 20);
     /// assert!(iv.eq(&GenomicInterval::new(1, 10, 20)));
     ///
-    /// iv.extend_right(&5);
+    /// iv.extend_right(&5, None);
     /// assert!(iv.eq(&GenomicInterval::new(1, 10, 25)));
+    ///
+    /// iv.extend_right(&5, Some(27));
+    /// assert!(iv.eq(&GenomicInterval::new(1, 10, 27)));
     /// ```
-    fn extend_right(&mut self, val: &T) {
-        self.update_end(&self.end().add(*val));
+    fn extend_right(&mut self, val: &T, max_bound: Option<T>) {
+        let new_end = self.end().add(*val);
+        if let Some(max) = max_bound {
+            self.update_end(&new_end.min(max));
+        } else {
+            self.update_end(&new_end);
+        }
     }
 
     /// Extend the interval to the left and right by a value.
     /// This is equivalent to subtracting the value from the start coordinate
     /// and adding the value to the end coordinate.
     ///
+    /// If a maximum bound is provided, the new end coordinate will be capped
+    /// at that maximum value.
+    ///
     /// # Examples
     /// ```
     /// use bedrs::{Coordinates, GenomicInterval};
@@ -277,12 +295,32 @@ where
     /// let mut iv = GenomicInterval::new(1, 10, 20);
     /// assert!(iv.eq(&GenomicInterval::new(1, 10, 20)));
     ///
-    /// iv.extend(&5);
+    /// iv.extend(&5, None);
     /// assert!(iv.eq(&GenomicInterval::new(1, 5, 25)));
+
+    /// iv.extend(&5, Some(27));
+    /// assert!(iv.eq(&GenomicInterval::new(1, 0, 27)));
     /// ```
-    fn extend(&mut self, val: &T) {
+    fn extend(&mut self, val: &T, max_bound: Option<T>) {
         self.extend_left(val);
-        self.extend_right(val);
+        self.extend_right(val, max_bound);
+    }
+
+    /// Calculate the length of the interval as a fraction of the total length.
+    ///
+    /// # Examples
+    /// ```
+    /// use bedrs::{Coordinates, GenomicInterval};
+    ///
+    /// let iv = GenomicInterval::new(1, 10, 20);
+    /// assert_eq!(iv.f_len(0.5), 5);
+    /// assert_eq!(iv.f_len(0.3), 3);
+    /// assert_eq!(iv.f_len(2.0), 20);
+    /// ```
+    fn f_len(&self, frac: f64) -> T {
+        let len_f: f64 = self.len().to_f64().unwrap();
+        let n = len_f * frac;
+        T::from_f64(n.round()).unwrap()
     }
 
     /// Compare two intervals by their genomic coordinates.
@@ -568,20 +606,47 @@ mod testing {
     }
 
     #[test]
+    fn test_extend_left_bounded() {
+        let mut a = Interval::new(10, 20);
+        let val = 11;
+        a.extend_left(&val);
+        assert_eq!(a.start(), 0);
+        assert_eq!(a.end(), 20);
+    }
+
+    #[test]
     fn test_extend_right() {
         let mut a = Interval::new(10, 20);
         let val = 5;
-        a.extend_right(&val);
+        a.extend_right(&val, None);
         assert_eq!(a.start(), 10);
         assert_eq!(a.end(), 25);
+    }
+
+    #[test]
+    fn test_extend_right_bounded() {
+        let mut a = Interval::new(10, 20);
+        let val = 5;
+        a.extend_right(&val, Some(22));
+        assert_eq!(a.start(), 10);
+        assert_eq!(a.end(), 22);
     }
 
     #[test]
     fn test_extend_both() {
         let mut a = Interval::new(10, 20);
         let val = 5;
-        a.extend(&val);
+        a.extend(&val, None);
         assert_eq!(a.start(), 5);
         assert_eq!(a.end(), 25);
+    }
+
+    #[test]
+    fn test_extend_both_bounded() {
+        let mut a = Interval::new(10, 20);
+        let val = 5;
+        a.extend(&val, Some(22));
+        assert_eq!(a.start(), 5);
+        assert_eq!(a.end(), 22);
     }
 }
