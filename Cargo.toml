@@ -25,7 +25,7 @@ serde = ["dep:serde"]
 rayon = ["dep:rayon"]
 
 [dev-dependencies]
-criterion = "0.4.0"
+criterion = "0.5.1"
 bincode = "1.3.3"
 tinystr = "0.7.1"
 
