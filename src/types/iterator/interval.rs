@@ -65,6 +65,7 @@ where
     C: ChromBounds,
     T: ValueBounds,
 {
+    #[must_use]
     pub fn new(records: Vec<I>) -> Self {
         Self {
             internal: records.into(),

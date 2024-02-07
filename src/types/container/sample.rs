@@ -294,9 +294,9 @@ mod testing {
             Interval::new(40, 400),
         ];
         let mut set = IntervalContainer::from_sorted(intervals).unwrap();
-        assert_eq!(set.is_sorted(), true);
+        assert!(set.is_sorted());
         set.shuffle();
-        assert_eq!(set.is_sorted(), false);
+        assert!(!set.is_sorted());
     }
 
     #[test]

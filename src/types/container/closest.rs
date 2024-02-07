@@ -72,7 +72,7 @@ where
             if distance < current_dist {
                 current_dist = distance;
                 current_lowest = position;
-            } else if distance > current_dist || distance == current_dist {
+            } else if distance >= current_dist {
                 break;
             }
             position += 1;
@@ -100,7 +100,7 @@ where
                 if distance < current_dist {
                     current_dist = distance;
                     current_lowest = position;
-                } else if distance > current_dist || distance == current_dist {
+                } else if distance >= current_dist {
                     break;
                 }
                 position += 1;
@@ -131,7 +131,7 @@ where
                 if distance < current_dist {
                     current_dist = distance;
                     current_lowest = position;
-                } else if distance > current_dist || distance == current_dist {
+                } else if distance >= current_dist {
                     break;
                 }
                 position += 1;

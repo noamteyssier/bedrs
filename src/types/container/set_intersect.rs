@@ -14,6 +14,10 @@ where
     ///
     /// Returns the intersection of each interval in `self` with each interval in `other`
     /// as an iterator of interval type from `other`
+    ///
+    /// # Panics
+    /// Panics if the intersection of two intervals fails to be computed (like from unsorted
+    /// containers)
     pub fn ix_set_target<Iv>(
         &'a self,
         other: &'a IntervalContainer<Iv, C, T>,
@@ -26,11 +30,10 @@ where
             let overlaps = other
                 .find_method(iv, query_method)
                 .expect("Failed to find overlaps with provided query method");
-            let intersections = overlaps.into_iter().map(|ov| match iv.intersect(&ov) {
+            overlaps.into_iter().map(|ov| match iv.intersect(&ov) {
                 Some(x) => x,
                 None => panic!("Interval intersection failed"),
-            });
-            intersections
+            })
         });
         Box::new(ix_iter)
     }
@@ -39,6 +42,10 @@ where
     ///
     /// Returns the intersection of each interval in `self` with each interval in `other`
     /// as an iterator of interval type from `self`
+    ///
+    /// # Panics
+    /// Panics if the intersection of two intervals fails to be computed (like from unsorted
+    /// containers)
     pub fn ix_set_query<Iv>(
         &'a self,
         other: &'a IntervalContainer<Iv, C, T>,
@@ -51,11 +58,10 @@ where
             let overlaps = other
                 .find_method(iv, query_method)
                 .expect("Failed to find overlaps with provided query method");
-            let intersections = overlaps.into_iter().map(|ov| match ov.intersect(iv) {
+            overlaps.into_iter().map(|ov| match ov.intersect(iv) {
                 Some(x) => x,
                 None => panic!("Interval intersection failed"),
-            });
-            intersections
+            })
         });
         Box::new(ix_iter)
     }

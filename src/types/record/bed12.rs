@@ -204,7 +204,7 @@ where
         self.end = *val;
     }
     fn update_chr(&mut self, val: &C) {
-        self.chr = val.clone()
+        self.chr = val.clone();
     }
     fn update_strand(&mut self, strand: Option<Strand>) {
         self.strand = strand.unwrap_or_default();
@@ -227,6 +227,7 @@ where
     Si: MetaBounds,
     St: MetaBounds,
 {
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         chr: C,
         start: T,
@@ -322,7 +323,7 @@ where
     }
 }
 
-impl<C, T, N, S, Ts, Te, R, Si, St> Into<Bed3<C, T>> for Bed12<C, T, N, S, Ts, Te, R, Si, St>
+impl<C, T, N, S, Ts, Te, R, Si, St> From<Bed12<C, T, N, S, Ts, Te, R, Si, St>> for Bed3<C, T>
 where
     C: ChromBounds,
     T: ValueBounds,
@@ -334,12 +335,12 @@ where
     Si: MetaBounds,
     St: MetaBounds,
 {
-    fn into(self) -> Bed3<C, T> {
-        Bed3::new(self.chr, self.start, self.end)
+    fn from(bed: Bed12<C, T, N, S, Ts, Te, R, Si, St>) -> Self {
+        Bed3::new(bed.chr, bed.start, bed.end)
     }
 }
 
-impl<C, T, N, S, Ts, Te, R, Si, St> Into<Bed4<C, T, N>> for Bed12<C, T, N, S, Ts, Te, R, Si, St>
+impl<C, T, N, S, Ts, Te, R, Si, St> From<Bed12<C, T, N, S, Ts, Te, R, Si, St>> for Bed4<C, T, N>
 where
     C: ChromBounds,
     T: ValueBounds,
@@ -351,12 +352,12 @@ where
     Si: MetaBounds,
     St: MetaBounds,
 {
-    fn into(self) -> Bed4<C, T, N> {
-        Bed4::new(self.chr, self.start, self.end, self.name)
+    fn from(bed: Bed12<C, T, N, S, Ts, Te, R, Si, St>) -> Self {
+        Bed4::new(bed.chr, bed.start, bed.end, bed.name)
     }
 }
 
-impl<C, T, N, S, Ts, Te, R, Si, St> Into<Bed6<C, T, N, S>> for Bed12<C, T, N, S, Ts, Te, R, Si, St>
+impl<C, T, N, S, Ts, Te, R, Si, St> From<Bed12<C, T, N, S, Ts, Te, R, Si, St>> for Bed6<C, T, N, S>
 where
     C: ChromBounds,
     T: ValueBounds,
@@ -368,19 +369,13 @@ where
     Si: MetaBounds,
     St: MetaBounds,
 {
-    fn into(self) -> Bed6<C, T, N, S> {
-        Bed6::new(
-            self.chr,
-            self.start,
-            self.end,
-            self.name,
-            self.score,
-            self.strand,
-        )
+    fn from(bed: Bed12<C, T, N, S, Ts, Te, R, Si, St>) -> Self {
+        Bed6::new(bed.chr, bed.start, bed.end, bed.name, bed.score, bed.strand)
     }
 }
 
 #[cfg(test)]
+#[allow(clippy::float_cmp)]
 mod testing {
     use super::*;
 

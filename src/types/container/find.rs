@@ -40,42 +40,39 @@ where
 
     /// Finds all intervals that overlap a query and returns
     /// the same `Container` type with all found regions.
+    #[must_use]
     pub fn find<Iv>(&self, query: &Iv) -> IntervalContainer<I, C, T>
     where
         Iv: IntervalBounds<C, T>,
     {
-        let records = self
-            .find_iter(query)
-            .into_iter()
-            .map(|x| x.to_owned())
-            .collect::<Vec<I>>();
+        let records = self.find_iter(query).cloned().collect::<Vec<I>>();
         IntervalContainer::new(records)
     }
 
     /// Finds all intervals that overlap a query by some minimum
     /// amount and returns the same `Container` type with all found regions.
+    #[must_use]
     pub fn find_min<Iv>(&self, query: &Iv, minimum: T) -> IntervalContainer<I, C, T>
     where
         Iv: IntervalBounds<C, T>,
     {
         let records = self
             .find_iter_min(query, minimum)
-            .into_iter()
-            .map(|x| x.to_owned())
+            .cloned()
             .collect::<Vec<I>>();
         IntervalContainer::new(records)
     }
 
     /// Finds all intervals that overlap a query by some exact
     /// amount and returns the same `Container` type with all found regions.
+    #[must_use]
     pub fn find_exact<Iv>(&self, query: &Iv, exact: T) -> IntervalContainer<I, C, T>
     where
         Iv: IntervalBounds<C, T>,
     {
         let records = self
             .find_iter_exact(query, exact)
-            .into_iter()
-            .map(|x| x.to_owned())
+            .cloned()
             .collect::<Vec<I>>();
         IntervalContainer::new(records)
     }
@@ -91,7 +88,7 @@ where
         Iv: IntervalBounds<C, T>,
     {
         let records = match self.find_iter_query_frac(query, frac) {
-            Ok(iter) => iter.into_iter().map(|x| x.to_owned()).collect::<Vec<I>>(),
+            Ok(iter) => iter.into_iter().cloned().collect::<Vec<I>>(),
             Err(e) => return Err(e),
         };
         Ok(IntervalContainer::new(records))
@@ -108,7 +105,7 @@ where
         Iv: IntervalBounds<C, T>,
     {
         let records = match self.find_iter_target_frac(query, frac) {
-            Ok(iter) => iter.into_iter().map(|x| x.to_owned()).collect::<Vec<I>>(),
+            Ok(iter) => iter.into_iter().cloned().collect::<Vec<I>>(),
             Err(e) => return Err(e),
         };
         Ok(IntervalContainer::new(records))
@@ -127,7 +124,7 @@ where
         Iv: IntervalBounds<C, T>,
     {
         let records = match self.find_iter_reciprocal_frac(query, f_query, f_target) {
-            Ok(iter) => iter.into_iter().map(|x| x.to_owned()).collect::<Vec<I>>(),
+            Ok(iter) => iter.into_iter().cloned().collect::<Vec<I>>(),
             Err(e) => return Err(e),
         };
         Ok(IntervalContainer::new(records))
@@ -146,7 +143,7 @@ where
         Iv: IntervalBounds<C, T>,
     {
         let records = match self.find_iter_reciprocal_frac_either(query, f_query, f_target) {
-            Ok(iter) => iter.into_iter().map(|x| x.to_owned()).collect::<Vec<I>>(),
+            Ok(iter) => iter.into_iter().cloned().collect::<Vec<I>>(),
             Err(e) => return Err(e),
         };
         Ok(IntervalContainer::new(records))
@@ -637,6 +634,7 @@ where
 }
 
 #[cfg(test)]
+#[allow(clippy::needless_range_loop)]
 mod testing {
     // use super::Find;
     use crate::{
@@ -653,7 +651,7 @@ mod testing {
         for idx in 0..expected.len() {
             let c1 = &set.records()[idx];
             let c2 = &expected[idx];
-            assert!(c1.eq(c2))
+            assert!(c1.eq(c2));
         }
     }
 
@@ -667,15 +665,15 @@ mod testing {
         for idx in 0..expected.len() {
             let c1 = &observed[idx];
             let c2 = &expected[idx];
-            assert!(c1.eq(c2))
+            assert!(c1.eq(c2));
         }
     }
 
     #[test]
     fn find() {
         let query = Interval::new(17, 27);
-        let starts = vec![10, 15, 20, 25];
-        let ends = vec![40, 45, 50, 55];
+        let starts = [10, 15, 20, 25];
+        let ends = [40, 45, 50, 55];
         let records = starts
             .iter()
             .zip(ends.iter())
@@ -708,8 +706,8 @@ mod testing {
     #[test]
     fn find_minimum() {
         let query = Interval::new(17, 27);
-        let starts = vec![10, 15, 20, 25];
-        let ends = vec![40, 45, 50, 55];
+        let starts = [10, 15, 20, 25];
+        let ends = [40, 45, 50, 55];
         let records = starts
             .iter()
             .zip(ends.iter())
@@ -723,8 +721,8 @@ mod testing {
     #[test]
     fn find_exact() {
         let query = Interval::new(17, 27);
-        let starts = vec![10, 15, 20, 25];
-        let ends = vec![40, 45, 50, 55];
+        let starts = [10, 15, 20, 25];
+        let ends = [40, 45, 50, 55];
         let records = starts
             .iter()
             .zip(ends.iter())
@@ -738,8 +736,8 @@ mod testing {
     #[test]
     fn find_iter() {
         let query = Interval::new(5, 12);
-        let starts = vec![10, 15, 20, 25];
-        let ends = vec![40, 45, 50, 55];
+        let starts = [10, 15, 20, 25];
+        let ends = [40, 45, 50, 55];
         let records = starts
             .iter()
             .zip(ends.iter())
@@ -753,8 +751,8 @@ mod testing {
     #[test]
     fn find_iter_owned() {
         let query = Interval::new(5, 12);
-        let starts = vec![10, 15, 20, 25];
-        let ends = vec![40, 45, 50, 55];
+        let starts = [10, 15, 20, 25];
+        let ends = [40, 45, 50, 55];
         let records = starts
             .iter()
             .zip(ends.iter())
@@ -768,8 +766,8 @@ mod testing {
     #[test]
     fn find_iter_sorted() {
         let query = Interval::new(5, 12);
-        let starts = vec![10, 15, 20, 25];
-        let ends = vec![40, 45, 50, 55];
+        let starts = [10, 15, 20, 25];
+        let ends = [40, 45, 50, 55];
         let records = starts
             .iter()
             .zip(ends.iter())
@@ -783,8 +781,8 @@ mod testing {
     #[test]
     fn find_iter_sorted_owned() {
         let query = Interval::new(5, 12);
-        let starts = vec![10, 15, 20, 25];
-        let ends = vec![40, 45, 50, 55];
+        let starts = [10, 15, 20, 25];
+        let ends = [40, 45, 50, 55];
         let records = starts
             .iter()
             .zip(ends.iter())
@@ -798,8 +796,8 @@ mod testing {
     #[test]
     fn find_iter_sorted_wrong_order() {
         let query = Interval::new(5, 12);
-        let starts = vec![15, 20, 25, 10];
-        let ends = vec![45, 50, 55, 40];
+        let starts = [15, 20, 25, 10];
+        let ends = [45, 50, 55, 40];
         let records = starts
             .iter()
             .zip(ends.iter())
@@ -813,8 +811,8 @@ mod testing {
     #[test]
     fn find_iter_min() {
         let query = Interval::new(17, 27);
-        let starts = vec![10, 15, 20, 25];
-        let ends = vec![40, 45, 50, 55];
+        let starts = [10, 15, 20, 25];
+        let ends = [40, 45, 50, 55];
         let records = starts
             .iter()
             .zip(ends.iter())
@@ -829,8 +827,8 @@ mod testing {
     #[test]
     fn find_iter_exact() {
         let query = Interval::new(17, 27);
-        let starts = vec![10, 15, 20, 25];
-        let ends = vec![40, 45, 50, 55];
+        let starts = [10, 15, 20, 25];
+        let ends = [40, 45, 50, 55];
         let records = starts
             .iter()
             .zip(ends.iter())
@@ -845,8 +843,8 @@ mod testing {
     #[test]
     fn find_iter_sorted_min() {
         let query = Interval::new(17, 27);
-        let starts = vec![10, 15, 20, 25];
-        let ends = vec![40, 45, 50, 55];
+        let starts = [10, 15, 20, 25];
+        let ends = [40, 45, 50, 55];
         let records = starts
             .iter()
             .zip(ends.iter())
@@ -861,8 +859,8 @@ mod testing {
     #[test]
     fn find_iter_sorted_exact() {
         let query = Interval::new(17, 27);
-        let starts = vec![10, 15, 20, 25];
-        let ends = vec![40, 45, 50, 55];
+        let starts = [10, 15, 20, 25];
+        let ends = [40, 45, 50, 55];
         let records = starts
             .iter()
             .zip(ends.iter())
@@ -888,11 +886,7 @@ mod testing {
             GenomicInterval::new(4, 25, 35),
         ];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
-        let mut overlaps = set
-            .find_iter_sorted_min(&query, 5)
-            .unwrap()
-            .into_iter()
-            .cloned();
+        let mut overlaps = set.find_iter_sorted_min(&query, 5).unwrap().copied();
         let first = overlaps.next().unwrap();
         let last = overlaps.last().unwrap();
         assert!(first.eq(&GenomicInterval::new(3, 15, 25)));
@@ -913,11 +907,7 @@ mod testing {
             GenomicInterval::new(4, 25, 35),
         ];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
-        let mut overlaps = set
-            .find_iter_sorted_exact(&query, 7)
-            .unwrap()
-            .into_iter()
-            .cloned();
+        let mut overlaps = set.find_iter_sorted_exact(&query, 7).unwrap().copied();
         let first = overlaps.next().unwrap();
         let last = overlaps.last();
         assert!(first.eq(&GenomicInterval::new(3, 20, 30)));
@@ -1015,7 +1005,7 @@ mod testing {
         let overlap_iter = set
             .find_iter_sorted_query_frac(&query, frac)
             .unwrap()
-            .cloned();
+            .copied();
         validate_iter(overlap_iter, &expected);
     }
 
@@ -1038,7 +1028,7 @@ mod testing {
         ];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
         let overlaps = set.find_target_frac(&query, frac).unwrap();
-        validate_set(&overlaps, &expected)
+        validate_set(&overlaps, &expected);
     }
 
     #[test]
@@ -1056,7 +1046,7 @@ mod testing {
         let expected = vec![Interval::new(10, 20)];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
         let overlaps = set.find_target_frac(&query, frac).unwrap();
-        validate_set(&overlaps, &expected)
+        validate_set(&overlaps, &expected);
     }
 
     #[test]
@@ -1077,7 +1067,7 @@ mod testing {
         ];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
         let overlaps = set.find_target_frac(&query, frac).unwrap();
-        validate_set(&overlaps, &expected)
+        validate_set(&overlaps, &expected);
     }
 
     #[test]
@@ -1101,7 +1091,7 @@ mod testing {
         let overlap_iter = set
             .find_iter_sorted_target_frac(&query, frac)
             .unwrap()
-            .cloned();
+            .copied();
         validate_iter(overlap_iter, &expected);
     }
 
@@ -1124,7 +1114,7 @@ mod testing {
         let expected = vec![Interval::new(9, 19)];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
         let overlaps = set.find_reciprocal_frac(&query, frac, frac).unwrap();
-        validate_set(&overlaps, &expected)
+        validate_set(&overlaps, &expected);
     }
 
     #[test]
@@ -1148,7 +1138,7 @@ mod testing {
         let overlap_iter = set
             .find_iter_sorted_reciprocal_frac(&query, frac, frac)
             .unwrap()
-            .cloned();
+            .copied();
         validate_iter(overlap_iter, &expected);
     }
 
@@ -1227,7 +1217,7 @@ mod testing {
         ];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
         let overlaps = set.find_reciprocal_frac_either(&query, frac, frac).unwrap();
-        validate_set(&overlaps, &expected)
+        validate_set(&overlaps, &expected);
     }
 
     #[test]
@@ -1255,7 +1245,7 @@ mod testing {
         let overlap_iter = set
             .find_iter_sorted_reciprocal_frac_either(&query, frac, frac)
             .unwrap()
-            .cloned();
+            .copied();
         validate_iter(overlap_iter, &expected);
     }
 

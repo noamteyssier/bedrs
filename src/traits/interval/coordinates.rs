@@ -7,6 +7,7 @@ use std::cmp::Ordering;
 use super::Distance;
 
 /// The main trait representing an interval.
+#[allow(clippy::len_without_is_empty)]
 pub trait Coordinates<C, T>
 where
     C: ChromBounds,
@@ -211,7 +212,7 @@ where
     /// assert!(iv.eq(&GenomicInterval::new(2, 5, 10)));
     /// ```
     fn update_all_from<I: Coordinates<C, T>>(&mut self, other: &I) {
-        self.update_chr(&other.chr());
+        self.update_chr(other.chr());
         self.update_endpoints(&other.start(), &other.end());
     }
 
@@ -348,7 +349,7 @@ where
     /// assert_eq!(a.coord_cmp(&e), std::cmp::Ordering::Greater);
     /// ```
     fn coord_cmp<I: Coordinates<C, T>>(&self, other: &I) -> Ordering {
-        match self.chr().cmp(&other.chr()) {
+        match self.chr().cmp(other.chr()) {
             Ordering::Equal => match self.start().cmp(&other.start()) {
                 Ordering::Equal => match self.end().cmp(&other.end()) {
                     Ordering::Equal => self.strand().cmp(&other.strand()),
@@ -365,7 +366,7 @@ where
     /// Used to find the lower bound of an interval in a sorted container
     /// where the maximum range of the intervals is known a priori.
     fn biased_coord_cmp<I: Coordinates<C, T>>(&self, other: &I, bias: T) -> Ordering {
-        match self.chr().cmp(&other.chr()) {
+        match self.chr().cmp(other.chr()) {
             Ordering::Equal => {
                 let comp = if other.start() < bias {
                     None // can't compare the intervals since they both bias below zero

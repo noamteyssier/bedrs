@@ -14,7 +14,7 @@ where
         let start = self.start().max(other.start());
         let end = self.end().min(other.end());
         let mut interval = I::from(other);
-        interval.update_all(&chr, &start, &end);
+        interval.update_all(chr, &start, &end);
         interval
     }
 
@@ -67,6 +67,7 @@ where
 }
 
 #[cfg(test)]
+#[allow(clippy::many_single_char_names)]
 mod testing {
     use super::Intersect;
     use crate::{Coordinates, GenomicInterval, Interval, Strand, StrandedGenomicInterval};

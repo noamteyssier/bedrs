@@ -141,14 +141,11 @@ where
                 // if the interval is right shifted
                 // and there is a remainder send the remainder
                 // otherwise return none
-                if iv.gt(&self.remainder) {
-                    if self.send_remainder {
-                        let some_iv = self.remainder.to_owned();
-                        let some_iv = I::from(&some_iv);
-                        self.send_remainder = false;
-                        // self.remainder = iv.to_owned();
-                        return Some(some_iv);
-                    }
+                if iv.gt(&self.remainder) && self.send_remainder {
+                    let some_iv = self.remainder.to_owned();
+                    let some_iv = I::from(&some_iv);
+                    self.send_remainder = false;
+                    return Some(some_iv);
                 }
 
                 // if left shifted: skip to next interval
@@ -170,12 +167,10 @@ where
                 if some_iv.gt(&self.remainder) {
                     self.remainder.update_start(&some_iv.start());
                     continue;
-
-                // case where interval is right-shifted to query
-                } else {
-                    self.send_remainder = false;
-                    Some(some_iv)
                 }
+                // case where interval is right-shifted to query
+                self.send_remainder = false;
+                Some(some_iv)
             };
 
             let return_iv = return_iv.map(|iv| I::from(&iv));

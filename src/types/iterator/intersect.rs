@@ -119,16 +119,13 @@ where
     type Item = I;
     fn next(&mut self) -> Option<Self::Item> {
         let query = self.next_interval_left()?;
-        let mut target = if let Some(t) = self.next_target() {
-            t
-        } else {
+        let Some(mut target) = self.next_target() else {
             // if there are no more targets and we have a new query we're done
             if self.is_new {
                 return None;
-            // otherwise we advance the query and try again
-            } else {
-                return self.next();
             }
+            // otherwise we advance the query and try again
+            return self.next();
         };
 
         loop {
@@ -144,19 +141,15 @@ where
 
                 // return the intersection
                 return ix;
-            } else {
-                // push the target back onto the queue
-                if query.lt(&target) {
-                    self.queue_right.push_front(target);
-                    break;
-
-                // keep popping from the right until we find an interval
-                // that overlaps, is greater than the query, or we run out
-                } else {
-                    target = self.next_target()?;
-                    continue;
-                }
             }
+            // push the target back onto the queue
+            if query.lt(&target) {
+                self.queue_right.push_front(target);
+                break;
+            }
+            // keep popping from the right until we find an interval
+            // that overlaps, is greater than the query, or we run out
+            target = self.next_target()?;
         }
 
         // if we get here, we've exhausted the right iterator
@@ -335,7 +328,7 @@ mod testing {
     }
 
     #[test]
-    /// q_min = 0.5
+    /// `q_min` = 0.5
     ///     x---------y    x-----------y
     ///     i-----j        i--j
     /// ===================================
@@ -353,7 +346,7 @@ mod testing {
     }
 
     #[test]
-    /// t_min = 0.5
+    /// `t_min` = 0.5
     ///     x---------y    x-----------y
     ///     i-----j        i--j
     /// ===================================

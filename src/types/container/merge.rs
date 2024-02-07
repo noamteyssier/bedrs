@@ -11,6 +11,7 @@ where
     C: ChromBounds,
     T: ValueBounds,
 {
+    #[must_use]
     pub fn merge_unchecked(&self) -> Self {
         let mut base_interval = I::from(&self.records()[0]);
 
@@ -18,15 +19,15 @@ where
         let mut cluster_ids = Vec::with_capacity(self.len());
         let mut current_id = 0;
 
-        for interval in self.records().iter() {
+        for interval in self.records() {
             if base_interval.overlaps(interval) || base_interval.borders(interval) {
                 let new_min = base_interval.start().min(interval.start());
                 let new_max = base_interval.end().max(interval.end());
                 base_interval.update_endpoints(&new_min, &new_max);
-                if base_interval.strand() != interval.strand() {
-                    base_interval.update_strand(None);
-                } else {
+                if base_interval.strand() == interval.strand() {
                     base_interval.update_strand(interval.strand());
+                } else {
+                    base_interval.update_strand(None);
                 }
             } else {
                 cluster_intervals.push(base_interval.to_owned());

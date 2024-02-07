@@ -6,6 +6,8 @@ use crate::{
     IntervalContainer,
 };
 
+type ComplementIterOwned<I, C, T> = ComplementIter<IntervalIterOwned<I, C, T>, I, C, T>;
+
 /// A trait for interval containers that generates an iterator over the
 /// complement of the intervals in the container.
 ///
@@ -48,7 +50,7 @@ where
     C: ChromBounds,
     T: ValueBounds,
 {
-    pub fn complement(self) -> Result<ComplementIter<IntervalIterOwned<I, C, T>, I, C, T>> {
+    pub fn complement(self) -> Result<ComplementIterOwned<I, C, T>> {
         if self.is_sorted() {
             Ok(self.complement_unchecked())
         } else {
@@ -56,7 +58,7 @@ where
         }
     }
 
-    pub fn complement_unchecked(self) -> ComplementIter<IntervalIterOwned<I, C, T>, I, C, T> {
+    pub fn complement_unchecked(self) -> ComplementIterOwned<I, C, T> {
         ComplementIter::new(self.into_iter())
     }
 }

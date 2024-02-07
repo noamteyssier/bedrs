@@ -5,7 +5,7 @@
     clippy::missing_errors_doc
 )]
 
-//! # BEDrs
+//! # BEDRS
 //! bedtools-like functionality for interval sets in rust
 //!
 //! ## Summary
@@ -45,7 +45,7 @@
 //! This trait is generic over the type of the coordinates.
 //!
 //! You can explore the full functionality of this trait by looking at the
-//! [crate::traits::interval] module.
+//! [`crate::traits::interval`] module.
 //!
 //! Some examples of the functionality are:
 //! - [Distance](crate::traits::interval::Distance)
@@ -55,7 +55,7 @@
 //!
 //! ### Container
 //!
-//! The main container type in the library is the [IntervalContainer].
+//! The main container type in the library is the [`IntervalContainer`].
 //! It implements all the operations that you would expect from a bedtools-like library.
 //!
 //! ## Types
@@ -84,7 +84,7 @@
 //!
 //! ### Genomic Interval
 //!
-//! Here is an example of a [GenomicInterval](types::GenomicInterval).
+//! Here is an example of a [`GenomicInterval`](types::GenomicInterval).
 //!
 //! This is the bread and butter of genomic arithmetic and has three
 //! coordinates: `chr`, `start`, and `end`.
@@ -104,7 +104,7 @@
 //! ## Interval Operations
 //!
 //! The following operations with be shown with the base [Interval], but
-//! the same operations can be done with a [GenomicInterval] or any other
+//! the same operations can be done with a [`GenomicInterval`] or any other
 //! custom type which implements the [Coordinates] trait.
 //!
 //! ### Overlap

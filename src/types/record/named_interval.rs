@@ -251,6 +251,7 @@ mod testing {
         assert_eq!(a, b);
     }
 
+    #[allow(clippy::needless_pass_by_value)]
     fn function_generic_reference<'a, C: Coordinates<&'a str, usize>>(iv: C) {
         assert_eq!(*iv.chr(), "chr1");
         assert_eq!(iv.start(), 10);

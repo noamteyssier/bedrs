@@ -118,6 +118,9 @@ where
     /// let bound = set.lower_bound_unchecked(&query);
     /// assert_eq!(bound, 2);
     /// ```
+    ///
+    /// ## Panics
+    /// This will panic if the [Container] is empty or if the `max_len` is None.
     pub fn lower_bound_unchecked<Iv>(&self, query: &Iv) -> usize
     where
         Iv: IntervalBounds<C, T>,
@@ -420,8 +423,7 @@ where
             .iter()
             .enumerate()
             .take_while(|(_, iv)| iv.bounded_chr(query))
-            .filter(|(_, iv)| iv.bounded_strand(query))
-            .next()?
+            .find(|(_, iv)| iv.bounded_strand(query))?
             .0;
 
         let low = lt_bound + strand_bound;

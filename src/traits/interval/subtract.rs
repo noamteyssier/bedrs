@@ -9,18 +9,20 @@ where
     C: ChromBounds,
     T: ValueBounds,
 {
+    #[must_use]
     fn build_left_contained<I: Coordinates<C, T>>(&self, other: &I) -> Self {
         let left_start = self.start().min(other.start());
         let left_end = self.start().max(other.start());
         let mut left_sub = Self::from(other);
-        left_sub.update_all(&other.chr(), &left_start, &left_end);
+        left_sub.update_all(other.chr(), &left_start, &left_end);
         left_sub
     }
+    #[must_use]
     fn build_right_contained<I: Coordinates<C, T>>(&self, other: &I) -> Self {
         let right_start = self.end().min(other.end());
         let right_end = self.end().max(other.end());
         let mut right_sub = Self::from(other);
-        right_sub.update_all(&other.chr(), &right_start, &right_end);
+        right_sub.update_all(other.chr(), &right_start, &right_end);
         right_sub
     }
     fn build_contained_iter<I: Coordinates<C, T>>(
@@ -32,29 +34,32 @@ where
     {
         if self.start() == other.start() {
             let iter = std::iter::once(self.build_right_contained(other));
-            return Box::new(iter);
+            Box::new(iter)
         } else if self.end() == other.end() {
             let iter = std::iter::once(self.build_left_contained(other));
-            return Box::new(iter);
+            Box::new(iter)
         } else {
             let iter = std::iter::once(self.build_left_contained(other))
                 .chain(std::iter::once(self.build_right_contained(other)));
-            return Box::new(iter);
+            Box::new(iter)
         }
     }
+    #[must_use]
     fn build_gt<I: Coordinates<C, T>>(&self, other: &I) -> Self {
         let mut sub = Self::from(other);
-        sub.update_all(&other.chr(), &other.end(), &self.end());
+        sub.update_all(other.chr(), &other.end(), &self.end());
         sub
     }
+    #[must_use]
     fn build_lt<I: Coordinates<C, T>>(&self, other: &I) -> Self {
         let mut sub = Self::from(other);
-        sub.update_all(&other.chr(), &self.start(), &other.start());
+        sub.update_all(other.chr(), &self.start(), &other.start());
         sub
     }
+    #[must_use]
     fn build_self<I: Coordinates<C, T>>(&self, other: &I) -> Self {
         let mut sub = Self::from(other);
-        sub.update_all(&other.chr(), &self.start(), &self.end());
+        sub.update_all(other.chr(), &self.start(), &self.end());
         sub
     }
     /// Perform subtraction between two coordinates.

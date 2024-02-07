@@ -1,6 +1,6 @@
 use crate::{
     traits::{ChromBounds, IntervalBounds, SetError, ValueBounds},
-    IntervalIterOwned, IntervalIterRef,
+    Coordinates, IntervalIterOwned, IntervalIterRef,
 };
 use anyhow::{bail, Result};
 use num_traits::zero;
@@ -58,8 +58,9 @@ where
     C: ChromBounds,
     T: ValueBounds,
 {
+    #[must_use]
     pub fn new(records: Vec<I>) -> Self {
-        let max_len = records.iter().map(|iv| iv.len()).max();
+        let max_len = records.iter().map(Coordinates::len).max();
         Self {
             records,
             is_sorted: false,
@@ -70,6 +71,7 @@ where
     pub fn len(&self) -> usize {
         self.records.len()
     }
+    #[must_use]
     pub fn empty() -> Self {
         Self::new(Vec::new())
     }
@@ -100,28 +102,32 @@ where
     pub fn max_len_mut(&mut self) -> &mut Option<T> {
         &mut self.max_len
     }
+    /// Returns the span of the interval set
     pub fn span(&self) -> Result<I> {
         if self.is_empty() {
             bail!("Cannot get span of empty interval set")
         } else if !self.is_sorted() {
             bail!("Cannot get span of unsorted interval set")
-        } else {
-            let first = self.records().first().unwrap();
-            let last = self.records().last().unwrap();
-            if first.chr() != last.chr() {
-                bail!("Cannot get span of interval set spanning multiple chromosomes")
-            } else {
-                let mut iv = I::empty();
-                iv.update_chr(first.chr());
-                iv.update_start(&first.start());
-                iv.update_end(&last.end());
-                Ok(iv)
-            }
         }
+        let Some(first) = self.records().first() else {
+            bail!("Cannot recover the first interval")
+        };
+        let Some(last) = self.records().last() else {
+            bail!("Cannot recover the last interval")
+        };
+        if first.chr() != last.chr() {
+            bail!("Cannot get span of interval set spanning multiple chromosomes")
+        }
+        let mut iv = I::empty();
+        iv.update_chr(first.chr());
+        iv.update_start(&first.start());
+        iv.update_end(&last.end());
+        Ok(iv)
     }
     pub fn iter(&self) -> IntervalIterRef<I, C, T> {
-        IntervalIterRef::new(&self.records())
+        IntervalIterRef::new(self.records())
     }
+    #[allow(clippy::should_implement_trait)]
     pub fn into_iter(self) -> IntervalIterOwned<I, C, T> {
         IntervalIterOwned::new(self.records_owned())
     }
@@ -138,7 +144,7 @@ where
 
     /// Sorts the internal interval vector on the chromosome and start position of the intervals.
     pub fn sort(&mut self) {
-        self.records_mut().sort_unstable_by(|a, b| a.coord_cmp(b));
+        self.records_mut().sort_unstable_by(Coordinates::coord_cmp);
         self.set_sorted();
     }
 
@@ -147,7 +153,7 @@ where
     #[cfg(feature = "rayon")]
     pub fn par_sort(&mut self) {
         self.records_mut()
-            .par_sort_unstable_by(|a, b| a.coord_cmp(b));
+            .par_sort_unstable_by(Coordinates::coord_cmp);
         self.set_sorted();
     }
 
@@ -205,6 +211,7 @@ where
 
     /// Creates a new container from presorted intervals without
     /// validating if the intervals are truly presorted.
+    #[must_use]
     pub fn from_sorted_unchecked(records: Vec<I>) -> Self {
         let mut set = Self::new(records);
         set.set_sorted();
@@ -212,6 +219,7 @@ where
     }
 
     /// Creates a new *sorted* container from unsorted intervals
+    #[must_use]
     pub fn from_unsorted(records: Vec<I>) -> Self {
         let mut set = Self::new(records);
         set.sort();
@@ -219,7 +227,8 @@ where
     }
 
     /// Validates that a set of intervals are sorted
-    pub fn valid_interval_sorting(records: &Vec<I>) -> bool {
+    #[must_use]
+    pub fn valid_interval_sorting(records: &[I]) -> bool {
         records
             .iter()
             .enumerate()
@@ -459,9 +468,9 @@ mod testing {
         let n_intervals = 10;
         let records = vec![StrandedGenomicInterval::new(1, 10, 100, Strand::Reverse); n_intervals];
         let mut set = IntervalContainer::new(records);
-        assert_eq!(set.is_sorted(), false);
+        assert!(!set.is_sorted);
         set.set_sorted();
-        assert_eq!(set.is_sorted(), true);
+        assert!(set.is_sorted());
     }
 
     #[test]

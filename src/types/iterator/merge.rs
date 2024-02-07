@@ -103,7 +103,7 @@ mod testing {
             Interval::new(7, 10),
             Interval::new(8, 12),
         ];
-        let expected = vec![Interval::new(1, 6), Interval::new(7, 12)];
+        let expected = [Interval::new(1, 6), Interval::new(7, 12)];
         let interval_iter = intervals.into_iter();
         let merge_iter = MergeIter::new(interval_iter);
         let result: Vec<Interval<u32>> = merge_iter.collect();
@@ -124,7 +124,7 @@ mod testing {
             GenomicInterval::new(2, 5, 10),
             GenomicInterval::new(2, 7, 15),
         ];
-        let expected = vec![
+        let expected = [
             GenomicInterval::new(1, 5, 15),
             GenomicInterval::new(1, 22, 35),
             GenomicInterval::new(2, 5, 15),

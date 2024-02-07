@@ -197,6 +197,7 @@ mod testing {
         assert_eq!(a.coord_cmp(&b), Ordering::Equal);
     }
 
+    #[allow(clippy::needless_pass_by_value)]
     fn function_generic_reference<C: Coordinates<usize, usize>>(iv: C) {
         assert_eq!(*iv.chr(), 1);
         assert_eq!(iv.start(), 10);

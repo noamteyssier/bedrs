@@ -108,7 +108,7 @@ where
         }
     }
 
-    /// Unchecked version of [subtract_from](Self::subtract_from).
+    /// Unchecked version of [`subtract_from`](Self::subtract_from).
     ///
     /// Does not check if the container is sorted
     pub fn subtract_from_unchecked<'a, Iv>(&'a self, query: &'a Iv) -> SubtractFromIter<I, Iv, C, T>

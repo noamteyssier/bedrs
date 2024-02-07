@@ -108,7 +108,8 @@ impl TryFrom<u8> for Strand {
         }
     }
 }
-impl Into<char> for Strand {
+
+impl From<Strand> for char {
     /// Convert a Strand to a char
     ///
     /// # Example
@@ -124,15 +125,15 @@ impl Into<char> for Strand {
     /// assert_eq!(char_reverse, '-');
     /// assert_eq!(char_unknown, '.');
     /// ```
-    fn into(self) -> char {
-        match self {
+    fn from(s: Strand) -> char {
+        match s {
             Strand::Forward => '+',
             Strand::Reverse => '-',
             Strand::Unknown => '.',
         }
     }
 }
-impl Into<u8> for Strand {
+impl From<Strand> for u8 {
     /// Convert a Strand to a u8
     ///
     /// # Example
@@ -148,8 +149,8 @@ impl Into<u8> for Strand {
     /// assert_eq!(u8_reverse, b'-');
     /// assert_eq!(u8_unknown, b'.');
     /// ```
-    fn into(self) -> u8 {
-        match self {
+    fn from(s: Strand) -> u8 {
+        match s {
             Strand::Forward => b'+',
             Strand::Reverse => b'-',
             Strand::Unknown => b'.',
@@ -174,17 +175,18 @@ impl Ord for Strand {
     /// Sort order for Strand
     ///
     /// - Forward < Reverse < Unknown
+    #[allow(clippy::unnested_or_patterns)]
     fn cmp(&self, other: &Self) -> Ordering {
         match (self, other) {
-            (Strand::Forward, Strand::Forward) => Ordering::Equal,
-            (Strand::Forward, Strand::Reverse) => Ordering::Less,
-            (Strand::Forward, Strand::Unknown) => Ordering::Less,
-            (Strand::Reverse, Strand::Forward) => Ordering::Greater,
-            (Strand::Reverse, Strand::Reverse) => Ordering::Equal,
-            (Strand::Reverse, Strand::Unknown) => Ordering::Less,
-            (Strand::Unknown, Strand::Forward) => Ordering::Greater,
-            (Strand::Unknown, Strand::Reverse) => Ordering::Greater,
-            (Strand::Unknown, Strand::Unknown) => Ordering::Equal,
+            (Strand::Forward, Strand::Forward)
+            | (Strand::Reverse, Strand::Reverse)
+            | (Strand::Unknown, Strand::Unknown) => Ordering::Equal,
+            (Strand::Forward, Strand::Reverse)
+            | (Strand::Forward, Strand::Unknown)
+            | (Strand::Reverse, Strand::Unknown) => Ordering::Less,
+            (Strand::Reverse, Strand::Forward)
+            | (Strand::Unknown, Strand::Forward)
+            | (Strand::Unknown, Strand::Reverse) => Ordering::Greater,
         }
     }
 }

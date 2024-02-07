@@ -562,6 +562,7 @@ where
 }
 
 #[cfg(test)]
+#[allow(clippy::many_single_char_names)]
 mod testing {
     use super::Overlap;
     use crate::{

@@ -168,36 +168,36 @@ where
     }
 }
 
-impl<C, T, N> Into<Bed3<C, T>> for Bed4<C, T, N>
+impl<C, T, N> From<Bed4<C, T, N>> for Bed3<C, T>
 where
     C: ChromBounds,
     T: ValueBounds,
 {
-    fn into(self) -> Bed3<C, T> {
-        Bed3::new(self.chr, self.start, self.end)
+    fn from(bed: Bed4<C, T, N>) -> Self {
+        Self::new(bed.chr, bed.start, bed.end)
     }
 }
 
-impl<C, T, N, S> Into<Bed6<C, T, N, S>> for Bed4<C, T, N>
+impl<C, T, N, S> From<Bed4<C, T, N>> for Bed6<C, T, N, S>
 where
     C: ChromBounds,
     T: ValueBounds,
     N: MetaBounds,
     S: MetaBounds,
 {
-    fn into(self) -> Bed6<C, T, N, S> {
-        Bed6::new(
-            self.chr,
-            self.start,
-            self.end,
-            self.name,
+    fn from(bed: Bed4<C, T, N>) -> Self {
+        Self::new(
+            bed.chr,
+            bed.start,
+            bed.end,
+            bed.name,
             S::default(),
             Strand::Unknown,
         )
     }
 }
 
-impl<C, T, N, S, Ts, Te, R, Si, St> Into<Bed12<C, T, N, S, Ts, Te, R, Si, St>> for Bed4<C, T, N>
+impl<C, T, N, S, Ts, Te, R, Si, St> From<Bed4<C, T, N>> for Bed12<C, T, N, S, Ts, Te, R, Si, St>
 where
     C: ChromBounds,
     T: ValueBounds,
@@ -209,12 +209,12 @@ where
     Si: MetaBounds,
     St: MetaBounds,
 {
-    fn into(self) -> Bed12<C, T, N, S, Ts, Te, R, Si, St> {
-        Bed12::new(
-            self.chr,
-            self.start,
-            self.end,
-            self.name,
+    fn from(bed: Bed4<C, T, N>) -> Self {
+        Self::new(
+            bed.chr,
+            bed.start,
+            bed.end,
+            bed.name,
             S::default(),
             Strand::Unknown,
             Ts::default(),

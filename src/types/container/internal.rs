@@ -24,10 +24,10 @@ where
     /// (i)          j---k
     /// (ii)                  l--m
     /// ```
-    pub fn internal<'a>(&'a self) -> Result<SubtractFromIter<I, I, C, T>> {
+    pub fn internal(&self) -> Result<SubtractFromIter<I, I, C, T>> {
         if self.is_sorted() {
             let span = self.span()?;
-            Ok(self.internal_unchecked(span))
+            Ok(self.internal_unchecked(&span))
         } else {
             bail!(SetError::UnsortedSet)
         }
@@ -37,8 +37,8 @@ where
     //
     // Does not check if the interval set is sorted.
     // Span must still be valid.
-    pub fn internal_unchecked<'a>(&'a self, span: I) -> SubtractFromIter<I, I, C, T> {
-        SubtractFromIter::new(self, &span)
+    pub fn internal_unchecked(&self, span: &I) -> SubtractFromIter<I, I, C, T> {
+        SubtractFromIter::new(self, span)
     }
 }
 
@@ -65,8 +65,7 @@ mod testing {
         let set = IntervalContainer::from_sorted(vec![Interval::new(1, 3), Interval::new(6, 10)])
             .unwrap();
         let span = set.span().unwrap();
-        let sub = set.internal_unchecked(span);
-        let internal_set = IntervalContainer::from_iter(sub);
+        let internal_set: IntervalContainer<_, _, _> = set.internal_unchecked(&span).collect();
         assert_eq!(internal_set.len(), 1);
         assert_eq!(internal_set.records()[0].start(), 3);
         assert_eq!(internal_set.records()[0].end(), 6);
@@ -87,8 +86,7 @@ mod testing {
         ])
         .unwrap();
         let span = set.span().unwrap();
-        let sub = set.internal_unchecked(span);
-        let internal_set = IntervalContainer::from_iter(sub);
+        let internal_set: IntervalContainer<_, _, _> = set.internal_unchecked(&span).collect();
         assert_eq!(internal_set.len(), 2);
         assert_eq!(internal_set.records()[0].start(), 3);
         assert_eq!(internal_set.records()[0].end(), 6);

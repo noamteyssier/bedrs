@@ -209,31 +209,31 @@ where
     }
 }
 
-impl<C, T, N, S> Into<Bed3<C, T>> for Bed6<C, T, N, S>
+impl<C, T, N, S> From<Bed6<C, T, N, S>> for Bed3<C, T>
 where
     C: ChromBounds,
     T: ValueBounds,
     N: MetaBounds,
     S: MetaBounds,
 {
-    fn into(self) -> Bed3<C, T> {
-        Bed3::new(self.chr, self.start, self.end)
+    fn from(bed: Bed6<C, T, N, S>) -> Self {
+        Self::new(bed.chr, bed.start, bed.end)
     }
 }
 
-impl<C, T, N, S> Into<Bed4<C, T, N>> for Bed6<C, T, N, S>
+impl<C, T, N, S> From<Bed6<C, T, N, S>> for Bed4<C, T, N>
 where
     C: ChromBounds,
     T: ValueBounds,
     N: MetaBounds,
     S: MetaBounds,
 {
-    fn into(self) -> Bed4<C, T, N> {
-        Bed4::new(self.chr, self.start, self.end, self.name)
+    fn from(bed: Bed6<C, T, N, S>) -> Self {
+        Self::new(bed.chr, bed.start, bed.end, bed.name)
     }
 }
 
-impl<C, T, N, S, Ts, Te, R, Si, St> Into<Bed12<C, T, N, S, Ts, Te, R, Si, St>> for Bed6<C, T, N, S>
+impl<C, T, N, S, Ts, Te, R, Si, St> From<Bed6<C, T, N, S>> for Bed12<C, T, N, S, Ts, Te, R, Si, St>
 where
     C: ChromBounds,
     T: ValueBounds,
@@ -245,14 +245,14 @@ where
     Si: MetaBounds,
     St: MetaBounds,
 {
-    fn into(self) -> Bed12<C, T, N, S, Ts, Te, R, Si, St> {
-        Bed12::new(
-            self.chr,
-            self.start,
-            self.end,
-            self.name,
-            self.score,
-            self.strand,
+    fn from(bed: Bed6<C, T, N, S>) -> Self {
+        Self::new(
+            bed.chr,
+            bed.start,
+            bed.end,
+            bed.name,
+            bed.score,
+            bed.strand,
             Ts::default(),
             Te::default(),
             R::default(),
@@ -264,6 +264,7 @@ where
 }
 
 #[cfg(test)]
+#[allow(clippy::float_cmp)]
 mod testing {
     use crate::IntervalContainer;
 

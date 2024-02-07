@@ -95,6 +95,7 @@ where
 }
 
 #[cfg(test)]
+#[allow(clippy::doc_markdown)]
 mod testing {
     use crate::{traits::interval::Distance, GenomicInterval, Interval};
 
