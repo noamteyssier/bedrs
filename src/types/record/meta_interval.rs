@@ -162,6 +162,9 @@ where
     pub fn meta(&self) -> &M {
         &self.meta
     }
+    pub fn update_meta(&mut self, val: &M) {
+        self.meta = val.clone();
+    }
 }
 
 #[cfg(test)]
