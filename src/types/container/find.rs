@@ -639,7 +639,7 @@ mod testing {
     // use super::Find;
     use crate::{
         traits::{ChromBounds, IntervalBounds, ValueBounds},
-        Coordinates, GenomicInterval, Interval, IntervalContainer,
+        BaseInterval, Bed3, Coordinates, IntervalContainer,
     };
 
     fn validate_set<C, I, T>(set: &IntervalContainer<I, C, T>, expected: &[I])
@@ -671,14 +671,14 @@ mod testing {
 
     #[test]
     fn find() {
-        let query = Interval::new(17, 27);
+        let query = BaseInterval::new(17, 27);
         let starts = [10, 15, 20, 25];
         let ends = [40, 45, 50, 55];
         let records = starts
             .iter()
             .zip(ends.iter())
-            .map(|(s, e)| Interval::new(*s, *e))
-            .collect::<Vec<Interval<u32>>>();
+            .map(|(s, e)| BaseInterval::new(*s, *e))
+            .collect::<Vec<BaseInterval<u32>>>();
         let set = IntervalContainer::from_unsorted(records);
         let overlaps = set.find(&query);
         assert_eq!(overlaps.len(), 4);
@@ -686,8 +686,8 @@ mod testing {
 
     #[test]
     fn find_containing() {
-        let query = Interval::new(0, 100);
-        let intervals = vec![Interval::new(10, 20)];
+        let query = BaseInterval::new(0, 100);
+        let intervals = vec![BaseInterval::new(10, 20)];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
         let overlaps = set.find(&query);
         assert_eq!(overlaps.len(), 1);
@@ -695,8 +695,8 @@ mod testing {
 
     #[test]
     fn find_containing_iter_sorted() {
-        let query = Interval::new(0, 100);
-        let intervals = vec![Interval::new(10, 20)];
+        let query = BaseInterval::new(0, 100);
+        let intervals = vec![BaseInterval::new(10, 20)];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
         let overlaps = set.find_iter_sorted(&query).unwrap();
         let counts = overlaps.count();
@@ -705,14 +705,14 @@ mod testing {
 
     #[test]
     fn find_minimum() {
-        let query = Interval::new(17, 27);
+        let query = BaseInterval::new(17, 27);
         let starts = [10, 15, 20, 25];
         let ends = [40, 45, 50, 55];
         let records = starts
             .iter()
             .zip(ends.iter())
-            .map(|(s, e)| Interval::new(*s, *e))
-            .collect::<Vec<Interval<u32>>>();
+            .map(|(s, e)| BaseInterval::new(*s, *e))
+            .collect::<Vec<BaseInterval<u32>>>();
         let set = IntervalContainer::from_unsorted(records);
         let overlaps = set.find_min(&query, 5);
         assert_eq!(overlaps.len(), 3);
@@ -720,14 +720,14 @@ mod testing {
 
     #[test]
     fn find_exact() {
-        let query = Interval::new(17, 27);
+        let query = BaseInterval::new(17, 27);
         let starts = [10, 15, 20, 25];
         let ends = [40, 45, 50, 55];
         let records = starts
             .iter()
             .zip(ends.iter())
-            .map(|(s, e)| Interval::new(*s, *e))
-            .collect::<Vec<Interval<u32>>>();
+            .map(|(s, e)| BaseInterval::new(*s, *e))
+            .collect::<Vec<BaseInterval<u32>>>();
         let set = IntervalContainer::from_unsorted(records);
         let overlaps = set.find_exact(&query, 7);
         assert_eq!(overlaps.len(), 1);
@@ -735,14 +735,14 @@ mod testing {
 
     #[test]
     fn find_iter() {
-        let query = Interval::new(5, 12);
+        let query = BaseInterval::new(5, 12);
         let starts = [10, 15, 20, 25];
         let ends = [40, 45, 50, 55];
         let records = starts
             .iter()
             .zip(ends.iter())
-            .map(|(s, e)| Interval::new(*s, *e))
-            .collect::<Vec<Interval<u32>>>();
+            .map(|(s, e)| BaseInterval::new(*s, *e))
+            .collect::<Vec<BaseInterval<u32>>>();
         let set = IntervalContainer::from_unsorted(records);
         let num_overlaps = set.find_iter(&query).count();
         assert_eq!(num_overlaps, 1);
@@ -750,14 +750,14 @@ mod testing {
 
     #[test]
     fn find_iter_owned() {
-        let query = Interval::new(5, 12);
+        let query = BaseInterval::new(5, 12);
         let starts = [10, 15, 20, 25];
         let ends = [40, 45, 50, 55];
         let records = starts
             .iter()
             .zip(ends.iter())
-            .map(|(s, e)| Interval::new(*s, *e))
-            .collect::<Vec<Interval<u32>>>();
+            .map(|(s, e)| BaseInterval::new(*s, *e))
+            .collect::<Vec<BaseInterval<u32>>>();
         let set = IntervalContainer::from_unsorted(records);
         let num_overlaps = set.find_iter_owned(query).count();
         assert_eq!(num_overlaps, 1);
@@ -765,14 +765,14 @@ mod testing {
 
     #[test]
     fn find_iter_sorted() {
-        let query = Interval::new(5, 12);
+        let query = BaseInterval::new(5, 12);
         let starts = [10, 15, 20, 25];
         let ends = [40, 45, 50, 55];
         let records = starts
             .iter()
             .zip(ends.iter())
-            .map(|(s, e)| Interval::new(*s, *e))
-            .collect::<Vec<Interval<u32>>>();
+            .map(|(s, e)| BaseInterval::new(*s, *e))
+            .collect::<Vec<BaseInterval<u32>>>();
         let set = IntervalContainer::from_unsorted(records);
         let num_overlaps = set.find_iter_sorted(&query).unwrap().count();
         assert_eq!(num_overlaps, 1);
@@ -780,14 +780,14 @@ mod testing {
 
     #[test]
     fn find_iter_sorted_owned() {
-        let query = Interval::new(5, 12);
+        let query = BaseInterval::new(5, 12);
         let starts = [10, 15, 20, 25];
         let ends = [40, 45, 50, 55];
         let records = starts
             .iter()
             .zip(ends.iter())
-            .map(|(s, e)| Interval::new(*s, *e))
-            .collect::<Vec<Interval<u32>>>();
+            .map(|(s, e)| BaseInterval::new(*s, *e))
+            .collect::<Vec<BaseInterval<u32>>>();
         let set = IntervalContainer::from_unsorted(records);
         let num_overlaps = set.find_iter_sorted_owned_unchecked(query).count();
         assert_eq!(num_overlaps, 1);
@@ -795,14 +795,14 @@ mod testing {
 
     #[test]
     fn find_iter_sorted_wrong_order() {
-        let query = Interval::new(5, 12);
+        let query = BaseInterval::new(5, 12);
         let starts = [15, 20, 25, 10];
         let ends = [45, 50, 55, 40];
         let records = starts
             .iter()
             .zip(ends.iter())
-            .map(|(s, e)| Interval::new(*s, *e))
-            .collect::<Vec<Interval<u32>>>();
+            .map(|(s, e)| BaseInterval::new(*s, *e))
+            .collect::<Vec<BaseInterval<u32>>>();
         let set = IntervalContainer::from_iter(records);
         let overlaps = set.find_iter_sorted(&query);
         assert!(overlaps.is_err());
@@ -810,14 +810,14 @@ mod testing {
 
     #[test]
     fn find_iter_min() {
-        let query = Interval::new(17, 27);
+        let query = BaseInterval::new(17, 27);
         let starts = [10, 15, 20, 25];
         let ends = [40, 45, 50, 55];
         let records = starts
             .iter()
             .zip(ends.iter())
-            .map(|(s, e)| Interval::new(*s, *e))
-            .collect::<Vec<Interval<u32>>>();
+            .map(|(s, e)| BaseInterval::new(*s, *e))
+            .collect::<Vec<BaseInterval<u32>>>();
         let set = IntervalContainer::from_unsorted(records);
         let overlaps = set.find_iter_min(&query, 5);
         let num_overlaps = overlaps.count();
@@ -826,14 +826,14 @@ mod testing {
 
     #[test]
     fn find_iter_exact() {
-        let query = Interval::new(17, 27);
+        let query = BaseInterval::new(17, 27);
         let starts = [10, 15, 20, 25];
         let ends = [40, 45, 50, 55];
         let records = starts
             .iter()
             .zip(ends.iter())
-            .map(|(s, e)| Interval::new(*s, *e))
-            .collect::<Vec<Interval<u32>>>();
+            .map(|(s, e)| BaseInterval::new(*s, *e))
+            .collect::<Vec<BaseInterval<u32>>>();
         let set = IntervalContainer::from_unsorted(records);
         let overlaps = set.find_iter_exact(&query, 7);
         let num_overlaps = overlaps.count();
@@ -842,14 +842,14 @@ mod testing {
 
     #[test]
     fn find_iter_sorted_min() {
-        let query = Interval::new(17, 27);
+        let query = BaseInterval::new(17, 27);
         let starts = [10, 15, 20, 25];
         let ends = [40, 45, 50, 55];
         let records = starts
             .iter()
             .zip(ends.iter())
-            .map(|(s, e)| Interval::new(*s, *e))
-            .collect::<Vec<Interval<u32>>>();
+            .map(|(s, e)| BaseInterval::new(*s, *e))
+            .collect::<Vec<BaseInterval<u32>>>();
         let set = IntervalContainer::from_unsorted(records);
         let overlaps = set.find_iter_sorted_min(&query, 5).unwrap();
         let num_overlaps = overlaps.count();
@@ -858,14 +858,14 @@ mod testing {
 
     #[test]
     fn find_iter_sorted_exact() {
-        let query = Interval::new(17, 27);
+        let query = BaseInterval::new(17, 27);
         let starts = [10, 15, 20, 25];
         let ends = [40, 45, 50, 55];
         let records = starts
             .iter()
             .zip(ends.iter())
-            .map(|(s, e)| Interval::new(*s, *e))
-            .collect::<Vec<Interval<u32>>>();
+            .map(|(s, e)| BaseInterval::new(*s, *e))
+            .collect::<Vec<BaseInterval<u32>>>();
         let set = IntervalContainer::from_unsorted(records);
         let overlaps = set.find_iter_sorted_exact(&query, 7).unwrap();
         let num_overlaps = overlaps.count();
@@ -874,64 +874,64 @@ mod testing {
 
     #[test]
     fn find_iter_sorted_min_genomic() {
-        let query = GenomicInterval::new(3, 17, 27);
+        let query = Bed3::new(3, 17, 27);
         let intervals = vec![
-            GenomicInterval::new(1, 10, 20),
-            GenomicInterval::new(2, 15, 25),
-            GenomicInterval::new(3, 10, 20), // bounded, but missing overlap req
-            GenomicInterval::new(3, 15, 25), // first
-            GenomicInterval::new(3, 20, 30), // last
-            GenomicInterval::new(3, 40, 50), // unbounded
-            GenomicInterval::new(4, 10, 20),
-            GenomicInterval::new(4, 25, 35),
+            Bed3::new(1, 10, 20),
+            Bed3::new(2, 15, 25),
+            Bed3::new(3, 10, 20), // bounded, but missing overlap req
+            Bed3::new(3, 15, 25), // first
+            Bed3::new(3, 20, 30), // last
+            Bed3::new(3, 40, 50), // unbounded
+            Bed3::new(4, 10, 20),
+            Bed3::new(4, 25, 35),
         ];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
         let mut overlaps = set.find_iter_sorted_min(&query, 5).unwrap().copied();
         let first = overlaps.next().unwrap();
         let last = overlaps.last().unwrap();
-        assert!(first.eq(&GenomicInterval::new(3, 15, 25)));
-        assert!(last.eq(&GenomicInterval::new(3, 20, 30)));
+        assert!(first.eq(&Bed3::new(3, 15, 25)));
+        assert!(last.eq(&Bed3::new(3, 20, 30)));
     }
 
     #[test]
     fn find_iter_sorted_exact_genomic() {
-        let query = GenomicInterval::new(3, 17, 27);
+        let query = Bed3::new(3, 17, 27);
         let intervals = vec![
-            GenomicInterval::new(1, 10, 20),
-            GenomicInterval::new(2, 15, 25),
-            GenomicInterval::new(3, 10, 20), // bounded, but missing overlap req
-            GenomicInterval::new(3, 15, 25), // bounded, but missing overlap req
-            GenomicInterval::new(3, 20, 30), // first and last
-            GenomicInterval::new(3, 40, 50), // unbounded
-            GenomicInterval::new(4, 10, 20),
-            GenomicInterval::new(4, 25, 35),
+            Bed3::new(1, 10, 20),
+            Bed3::new(2, 15, 25),
+            Bed3::new(3, 10, 20), // bounded, but missing overlap req
+            Bed3::new(3, 15, 25), // bounded, but missing overlap req
+            Bed3::new(3, 20, 30), // first and last
+            Bed3::new(3, 40, 50), // unbounded
+            Bed3::new(4, 10, 20),
+            Bed3::new(4, 25, 35),
         ];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
         let mut overlaps = set.find_iter_sorted_exact(&query, 7).unwrap().copied();
         let first = overlaps.next().unwrap();
         let last = overlaps.last();
-        assert!(first.eq(&GenomicInterval::new(3, 20, 30)));
+        assert!(first.eq(&Bed3::new(3, 20, 30)));
         assert!(last.is_none());
     }
 
     #[test]
     fn find_query_frac_a() {
-        let query = Interval::new(10, 20);
+        let query = BaseInterval::new(10, 20);
         let frac = 0.5;
         let intervals = vec![
-            Interval::new(0, 10),
-            Interval::new(5, 15), // first
-            Interval::new(7, 17),
-            Interval::new(10, 20),
-            Interval::new(15, 25),
-            Interval::new(17, 27), // bounded, but missing overlap req
-            Interval::new(20, 30),
+            BaseInterval::new(0, 10),
+            BaseInterval::new(5, 15), // first
+            BaseInterval::new(7, 17),
+            BaseInterval::new(10, 20),
+            BaseInterval::new(15, 25),
+            BaseInterval::new(17, 27), // bounded, but missing overlap req
+            BaseInterval::new(20, 30),
         ];
         let expected = vec![
-            Interval::new(5, 15),
-            Interval::new(7, 17),
-            Interval::new(10, 20),
-            Interval::new(15, 25),
+            BaseInterval::new(5, 15),
+            BaseInterval::new(7, 17),
+            BaseInterval::new(10, 20),
+            BaseInterval::new(15, 25),
         ];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
         let overlaps = set.find_query_frac(&query, frac).unwrap();
@@ -940,23 +940,23 @@ mod testing {
 
     #[test]
     fn find_query_frac_b() {
-        let query = Interval::new(10, 20);
+        let query = BaseInterval::new(10, 20);
         let frac = 0.2;
         let intervals = vec![
-            Interval::new(0, 10),
-            Interval::new(5, 15), // first
-            Interval::new(7, 17),
-            Interval::new(10, 20),
-            Interval::new(15, 25),
-            Interval::new(17, 27), // last
-            Interval::new(20, 30),
+            BaseInterval::new(0, 10),
+            BaseInterval::new(5, 15), // first
+            BaseInterval::new(7, 17),
+            BaseInterval::new(10, 20),
+            BaseInterval::new(15, 25),
+            BaseInterval::new(17, 27), // last
+            BaseInterval::new(20, 30),
         ];
         let expected = vec![
-            Interval::new(5, 15),
-            Interval::new(7, 17),
-            Interval::new(10, 20),
-            Interval::new(15, 25),
-            Interval::new(17, 27),
+            BaseInterval::new(5, 15),
+            BaseInterval::new(7, 17),
+            BaseInterval::new(10, 20),
+            BaseInterval::new(15, 25),
+            BaseInterval::new(17, 27),
         ];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
         let overlaps = set.find_query_frac(&query, frac).unwrap();
@@ -965,18 +965,18 @@ mod testing {
 
     #[test]
     fn find_query_frac_c() {
-        let query = Interval::new(10, 20);
+        let query = BaseInterval::new(10, 20);
         let frac = 1.0;
         let intervals = vec![
-            Interval::new(0, 10),
-            Interval::new(5, 15),
-            Interval::new(7, 17),
-            Interval::new(10, 20), // only
-            Interval::new(15, 25),
-            Interval::new(17, 27),
-            Interval::new(20, 30),
+            BaseInterval::new(0, 10),
+            BaseInterval::new(5, 15),
+            BaseInterval::new(7, 17),
+            BaseInterval::new(10, 20), // only
+            BaseInterval::new(15, 25),
+            BaseInterval::new(17, 27),
+            BaseInterval::new(20, 30),
         ];
-        let expected = vec![Interval::new(10, 20)];
+        let expected = vec![BaseInterval::new(10, 20)];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
         let overlaps = set.find_query_frac(&query, frac).unwrap();
         validate_set(&overlaps, &expected);
@@ -984,22 +984,22 @@ mod testing {
 
     #[test]
     fn find_iter_sorted_query_frac() {
-        let query = Interval::new(10, 20);
+        let query = BaseInterval::new(10, 20);
         let frac = 0.5;
         let intervals = vec![
-            Interval::new(0, 10),
-            Interval::new(5, 15), // first
-            Interval::new(7, 17),
-            Interval::new(10, 20),
-            Interval::new(15, 25),
-            Interval::new(17, 27), // bounded, but missing overlap req
-            Interval::new(20, 30),
+            BaseInterval::new(0, 10),
+            BaseInterval::new(5, 15), // first
+            BaseInterval::new(7, 17),
+            BaseInterval::new(10, 20),
+            BaseInterval::new(15, 25),
+            BaseInterval::new(17, 27), // bounded, but missing overlap req
+            BaseInterval::new(20, 30),
         ];
         let expected = vec![
-            Interval::new(5, 15),
-            Interval::new(7, 17),
-            Interval::new(10, 20),
-            Interval::new(15, 25),
+            BaseInterval::new(5, 15),
+            BaseInterval::new(7, 17),
+            BaseInterval::new(10, 20),
+            BaseInterval::new(15, 25),
         ];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
         let overlap_iter = set
@@ -1011,20 +1011,20 @@ mod testing {
 
     #[test]
     fn find_target_frac_a() {
-        let query = Interval::new(10, 20);
+        let query = BaseInterval::new(10, 20);
         let frac = 0.5;
         let intervals = vec![
-            Interval::new(2, 12), // bounded, but missing overlap req
-            Interval::new(5, 15), // first
-            Interval::new(7, 17),
-            Interval::new(7, 37),  // bounded, but missing overlap req
-            Interval::new(10, 20), // last
-            Interval::new(12, 22), // bounded, but missing overlap req
+            BaseInterval::new(2, 12), // bounded, but missing overlap req
+            BaseInterval::new(5, 15), // first
+            BaseInterval::new(7, 17),
+            BaseInterval::new(7, 37),  // bounded, but missing overlap req
+            BaseInterval::new(10, 20), // last
+            BaseInterval::new(12, 22), // bounded, but missing overlap req
         ];
         let expected = vec![
-            Interval::new(5, 15),
-            Interval::new(7, 17),
-            Interval::new(10, 20),
+            BaseInterval::new(5, 15),
+            BaseInterval::new(7, 17),
+            BaseInterval::new(10, 20),
         ];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
         let overlaps = set.find_target_frac(&query, frac).unwrap();
@@ -1033,17 +1033,17 @@ mod testing {
 
     #[test]
     fn find_target_frac_b() {
-        let query = Interval::new(10, 20);
+        let query = BaseInterval::new(10, 20);
         let frac = 1.0;
         let intervals = vec![
-            Interval::new(2, 12),  // bounded, but missing overlap req
-            Interval::new(5, 15),  // bounded, but missing overlap req
-            Interval::new(7, 17),  // bounded, but missing overlap req
-            Interval::new(7, 37),  // bounded, but missing overlap req
-            Interval::new(10, 20), // only
-            Interval::new(12, 22), // bounded, but missing overlap req
+            BaseInterval::new(2, 12),  // bounded, but missing overlap req
+            BaseInterval::new(5, 15),  // bounded, but missing overlap req
+            BaseInterval::new(7, 17),  // bounded, but missing overlap req
+            BaseInterval::new(7, 37),  // bounded, but missing overlap req
+            BaseInterval::new(10, 20), // only
+            BaseInterval::new(12, 22), // bounded, but missing overlap req
         ];
-        let expected = vec![Interval::new(10, 20)];
+        let expected = vec![BaseInterval::new(10, 20)];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
         let overlaps = set.find_target_frac(&query, frac).unwrap();
         validate_set(&overlaps, &expected);
@@ -1051,19 +1051,19 @@ mod testing {
 
     #[test]
     fn find_target_frac_c() {
-        let query = Interval::new(10, 20);
+        let query = BaseInterval::new(10, 20);
         let frac = 0.9;
         let intervals = vec![
-            Interval::new(8, 18), // bounded, but missing overlap req
-            Interval::new(9, 19), // first
-            Interval::new(10, 20),
-            Interval::new(11, 21), // last
-            Interval::new(12, 22), // bounded, but missing overlap req
+            BaseInterval::new(8, 18), // bounded, but missing overlap req
+            BaseInterval::new(9, 19), // first
+            BaseInterval::new(10, 20),
+            BaseInterval::new(11, 21), // last
+            BaseInterval::new(12, 22), // bounded, but missing overlap req
         ];
         let expected = vec![
-            Interval::new(9, 19),
-            Interval::new(10, 20),
-            Interval::new(11, 21),
+            BaseInterval::new(9, 19),
+            BaseInterval::new(10, 20),
+            BaseInterval::new(11, 21),
         ];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
         let overlaps = set.find_target_frac(&query, frac).unwrap();
@@ -1072,20 +1072,20 @@ mod testing {
 
     #[test]
     fn find_iter_sorted_target_frac() {
-        let query = Interval::new(10, 20);
+        let query = BaseInterval::new(10, 20);
         let frac = 0.5;
         let intervals = vec![
-            Interval::new(2, 12), // bounded, but missing overlap req
-            Interval::new(5, 15), // first
-            Interval::new(7, 17),
-            Interval::new(7, 37),  // bounded, but missing overlap req
-            Interval::new(10, 20), // last
-            Interval::new(12, 22), // bounded, but missing overlap req
+            BaseInterval::new(2, 12), // bounded, but missing overlap req
+            BaseInterval::new(5, 15), // first
+            BaseInterval::new(7, 17),
+            BaseInterval::new(7, 37),  // bounded, but missing overlap req
+            BaseInterval::new(10, 20), // last
+            BaseInterval::new(12, 22), // bounded, but missing overlap req
         ];
         let expected = vec![
-            Interval::new(5, 15),
-            Interval::new(7, 17),
-            Interval::new(10, 20),
+            BaseInterval::new(5, 15),
+            BaseInterval::new(7, 17),
+            BaseInterval::new(10, 20),
         ];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
         let overlap_iter = set
@@ -1097,21 +1097,21 @@ mod testing {
 
     #[test]
     fn find_reciprocal_frac_a() {
-        let query = Interval::new(10, 20);
+        let query = BaseInterval::new(10, 20);
         let frac = 0.9;
         let intervals = vec![
             // overlaps by 80% of target
-            Interval::new(8, 18),
+            BaseInterval::new(8, 18),
             // overlaps by 90% of target and query
-            Interval::new(9, 19), // only
+            BaseInterval::new(9, 19), // only
             // overlaps by 90% of query but not target
-            Interval::new(9, 20),
+            BaseInterval::new(9, 20),
             // overlaps by >90% of target but not query
-            Interval::new(15, 18),
+            BaseInterval::new(15, 18),
             // outside interval
-            Interval::new(20, 30),
+            BaseInterval::new(20, 30),
         ];
-        let expected = vec![Interval::new(9, 19)];
+        let expected = vec![BaseInterval::new(9, 19)];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
         let overlaps = set.find_reciprocal_frac(&query, frac, frac).unwrap();
         validate_set(&overlaps, &expected);
@@ -1119,21 +1119,21 @@ mod testing {
 
     #[test]
     fn find_iter_sorted_reciprocal_frac_a() {
-        let query = Interval::new(10, 20);
+        let query = BaseInterval::new(10, 20);
         let frac = 0.9;
         let intervals = vec![
             // overlaps by 80% of target
-            Interval::new(8, 18),
+            BaseInterval::new(8, 18),
             // overlaps by 90% of target and query
-            Interval::new(9, 19), // only
+            BaseInterval::new(9, 19), // only
             // overlaps by 90% of query but not target
-            Interval::new(9, 20),
+            BaseInterval::new(9, 20),
             // overlaps by >90% of target but not query
-            Interval::new(15, 18),
+            BaseInterval::new(15, 18),
             // outside interval
-            Interval::new(20, 30),
+            BaseInterval::new(20, 30),
         ];
-        let expected = vec![Interval::new(9, 19)];
+        let expected = vec![BaseInterval::new(9, 19)];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
         let overlap_iter = set
             .find_iter_sorted_reciprocal_frac(&query, frac, frac)
@@ -1144,22 +1144,22 @@ mod testing {
 
     #[test]
     fn find_reciprocal_frac_uneven() {
-        let query = Interval::new(10, 20);
+        let query = BaseInterval::new(10, 20);
         let f_query = 0.9;
         let f_target = 0.8;
         let intervals = vec![
-            Interval::new(7, 17), // bounded, but missing overlap req
-            Interval::new(8, 18), // bounded, but missing overlap req on query
-            Interval::new(9, 19), // first
-            Interval::new(10, 20),
-            Interval::new(11, 21), // last
-            Interval::new(12, 22), // bounded, but missing overlap req on query
-            Interval::new(13, 23), // bounded, but missing overlap req
+            BaseInterval::new(7, 17), // bounded, but missing overlap req
+            BaseInterval::new(8, 18), // bounded, but missing overlap req on query
+            BaseInterval::new(9, 19), // first
+            BaseInterval::new(10, 20),
+            BaseInterval::new(11, 21), // last
+            BaseInterval::new(12, 22), // bounded, but missing overlap req on query
+            BaseInterval::new(13, 23), // bounded, but missing overlap req
         ];
         let expected = vec![
-            Interval::new(9, 19),
-            Interval::new(10, 20),
-            Interval::new(11, 21),
+            BaseInterval::new(9, 19),
+            BaseInterval::new(10, 20),
+            BaseInterval::new(11, 21),
         ];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
         let overlaps = set.find_reciprocal_frac(&query, f_query, f_target).unwrap();
@@ -1168,24 +1168,24 @@ mod testing {
 
     #[test]
     fn find_reciprocal_frac_either_uneven() {
-        let query = Interval::new(10, 20);
+        let query = BaseInterval::new(10, 20);
         let f_query = 0.9;
         let f_target = 0.8;
         let intervals = vec![
-            Interval::new(7, 17), // bounded, but missing overlap req
-            Interval::new(8, 18), // first
-            Interval::new(9, 19),
-            Interval::new(10, 20),
-            Interval::new(11, 21),
-            Interval::new(12, 22), // last
-            Interval::new(13, 23), // bounded, but missing overlap req
+            BaseInterval::new(7, 17), // bounded, but missing overlap req
+            BaseInterval::new(8, 18), // first
+            BaseInterval::new(9, 19),
+            BaseInterval::new(10, 20),
+            BaseInterval::new(11, 21),
+            BaseInterval::new(12, 22), // last
+            BaseInterval::new(13, 23), // bounded, but missing overlap req
         ];
         let expected = vec![
-            Interval::new(8, 18),
-            Interval::new(9, 19),
-            Interval::new(10, 20),
-            Interval::new(11, 21),
-            Interval::new(12, 22),
+            BaseInterval::new(8, 18),
+            BaseInterval::new(9, 19),
+            BaseInterval::new(10, 20),
+            BaseInterval::new(11, 21),
+            BaseInterval::new(12, 22),
         ];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
         let overlaps = set
@@ -1196,24 +1196,24 @@ mod testing {
 
     #[test]
     fn find_reciprocal_frac_either_a() {
-        let query = Interval::new(10, 20);
+        let query = BaseInterval::new(10, 20);
         let frac = 0.9;
         let intervals = vec![
             // overlaps by 80% of target
-            Interval::new(8, 18),
+            BaseInterval::new(8, 18),
             // overlaps by 90% of target and query
-            Interval::new(9, 19), // first
+            BaseInterval::new(9, 19), // first
             // overlaps by 90% of query but not target
-            Interval::new(9, 20),
+            BaseInterval::new(9, 20),
             // overlaps by >90% of target but not query
-            Interval::new(15, 18), // last
+            BaseInterval::new(15, 18), // last
             // outside interval
-            Interval::new(20, 30),
+            BaseInterval::new(20, 30),
         ];
         let expected = vec![
-            Interval::new(9, 19),
-            Interval::new(9, 20),
-            Interval::new(15, 18),
+            BaseInterval::new(9, 19),
+            BaseInterval::new(9, 20),
+            BaseInterval::new(15, 18),
         ];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
         let overlaps = set.find_reciprocal_frac_either(&query, frac, frac).unwrap();
@@ -1222,24 +1222,24 @@ mod testing {
 
     #[test]
     fn find_iter_sorted_reciprocal_frac_either_a() {
-        let query = Interval::new(10, 20);
+        let query = BaseInterval::new(10, 20);
         let frac = 0.9;
         let intervals = vec![
             // overlaps by 80% of target
-            Interval::new(8, 18),
+            BaseInterval::new(8, 18),
             // overlaps by 90% of target and query
-            Interval::new(9, 19), // first
+            BaseInterval::new(9, 19), // first
             // overlaps by 90% of query but not target
-            Interval::new(9, 20),
+            BaseInterval::new(9, 20),
             // overlaps by >90% of target but not query
-            Interval::new(15, 18), // last
+            BaseInterval::new(15, 18), // last
             // outside interval
-            Interval::new(20, 30),
+            BaseInterval::new(20, 30),
         ];
         let expected = vec![
-            Interval::new(9, 19),
-            Interval::new(9, 20),
-            Interval::new(15, 18),
+            BaseInterval::new(9, 19),
+            BaseInterval::new(9, 20),
+            BaseInterval::new(15, 18),
         ];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
         let overlap_iter = set
@@ -1251,32 +1251,32 @@ mod testing {
 
     #[test]
     fn find_query_frac_unbounded() {
-        let query = Interval::new(10, 20);
-        let set = IntervalContainer::from_sorted(vec![Interval::new(0, 10)]).unwrap();
+        let query = BaseInterval::new(10, 20);
+        let set = IntervalContainer::from_sorted(vec![BaseInterval::new(0, 10)]).unwrap();
         assert!(set.find_query_frac(&query, 0.0).is_err());
         assert!(set.find_query_frac(&query, 1.01).is_err());
     }
 
     #[test]
     fn find_target_frac_unbounded() {
-        let query = Interval::new(10, 20);
-        let set = IntervalContainer::from_sorted(vec![Interval::new(0, 10)]).unwrap();
+        let query = BaseInterval::new(10, 20);
+        let set = IntervalContainer::from_sorted(vec![BaseInterval::new(0, 10)]).unwrap();
         assert!(set.find_target_frac(&query, 0.0).is_err());
         assert!(set.find_target_frac(&query, 1.01).is_err());
     }
 
     #[test]
     fn find_reciprocal_frac_unbounded() {
-        let query = Interval::new(10, 20);
-        let set = IntervalContainer::from_sorted(vec![Interval::new(0, 10)]).unwrap();
+        let query = BaseInterval::new(10, 20);
+        let set = IntervalContainer::from_sorted(vec![BaseInterval::new(0, 10)]).unwrap();
         assert!(set.find_reciprocal_frac(&query, 0.0, 0.0).is_err());
         assert!(set.find_reciprocal_frac(&query, 1.01, 1.01).is_err());
     }
 
     #[test]
     fn find_reciprocal_frac_either_unbounded() {
-        let query = Interval::new(10, 20);
-        let set = IntervalContainer::from_sorted(vec![Interval::new(0, 10)]).unwrap();
+        let query = BaseInterval::new(10, 20);
+        let set = IntervalContainer::from_sorted(vec![BaseInterval::new(0, 10)]).unwrap();
         assert!(set.find_reciprocal_frac_either(&query, 0.0, 0.0).is_err());
         assert!(set.find_reciprocal_frac_either(&query, 1.01, 1.01).is_err());
     }

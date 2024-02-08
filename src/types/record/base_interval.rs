@@ -8,18 +8,18 @@ use serde::{Deserialize, Serialize};
 /// Has two coordinates: `start` and `end`.
 ///
 /// ```
-/// use bedrs::{Coordinates, Interval, Overlap};
+/// use bedrs::{Coordinates, BaseInterval, Overlap};
 ///
-/// let a = Interval::new(20, 30);
+/// let a = BaseInterval::new(20, 30);
 /// assert_eq!(a.start(), 20);
 /// assert_eq!(a.end(), 30);
 ///
-/// let b = Interval::new(25, 35);
+/// let b = BaseInterval::new(25, 35);
 /// assert!(a.overlaps(&b));
 /// ```
 #[derive(Debug, Clone, Copy, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct Interval<T>
+pub struct BaseInterval<T>
 where
     T: ValueBounds,
 {
@@ -27,7 +27,7 @@ where
     start: T,
     end: T,
 }
-impl<T> Interval<T>
+impl<T> BaseInterval<T>
 where
     T: ValueBounds,
 {
@@ -39,7 +39,7 @@ where
         }
     }
 }
-impl<T> Coordinates<T, T> for Interval<T>
+impl<T> Coordinates<T, T> for BaseInterval<T>
 where
     T: ValueBounds,
 {
@@ -75,7 +75,7 @@ where
         }
     }
 }
-impl<'a, T> Coordinates<T, T> for &'a Interval<T>
+impl<'a, T> Coordinates<T, T> for &'a BaseInterval<T>
 where
     T: ValueBounds,
 {
@@ -108,7 +108,7 @@ where
         unimplemented!("Cannot create a new reference from a reference")
     }
 }
-impl<'a, T> Coordinates<T, T> for &'a mut Interval<T>
+impl<'a, T> Coordinates<T, T> for &'a mut BaseInterval<T>
 where
     T: ValueBounds,
 {
@@ -140,7 +140,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::{traits::Coordinates, types::Interval};
+    use crate::{traits::Coordinates, types::BaseInterval};
     #[cfg(feature = "serde")]
     use bincode::{deserialize, serialize};
     use std::cmp::Ordering;
@@ -149,47 +149,47 @@ mod testing {
     fn test_interval_init() {
         let start = 10;
         let end = 100;
-        let interval = Interval::new(start, end);
+        let iv = BaseInterval::new(start, end);
 
-        assert_eq!(interval.start(), start);
-        assert_eq!(interval.end(), end);
+        assert_eq!(iv.start(), start);
+        assert_eq!(iv.end(), end);
     }
 
     #[test]
     fn test_interval_ordering_gt() {
-        let a = Interval::new(10, 100);
-        let b = Interval::new(5, 100);
+        let a = BaseInterval::new(10, 100);
+        let b = BaseInterval::new(5, 100);
         assert_eq!(a.coord_cmp(&b), Ordering::Greater);
 
-        let a = Interval::new(10, 100);
-        let b = Interval::new(10, 90);
+        let a = BaseInterval::new(10, 100);
+        let b = BaseInterval::new(10, 90);
         assert_eq!(a.coord_cmp(&b), Ordering::Greater);
     }
 
     #[test]
     fn test_interval_ordering_lt() {
-        let a = Interval::new(5, 100);
-        let b = Interval::new(10, 100);
+        let a = BaseInterval::new(5, 100);
+        let b = BaseInterval::new(10, 100);
         assert_eq!(a.coord_cmp(&b), Ordering::Less);
 
-        let a = Interval::new(5, 90);
-        let b = Interval::new(5, 100);
+        let a = BaseInterval::new(5, 90);
+        let b = BaseInterval::new(5, 100);
         assert_eq!(a.coord_cmp(&b), Ordering::Less);
     }
 
     #[test]
     fn test_interval_ordering_eq() {
-        let a = Interval::new(5, 100);
-        let b = Interval::new(5, 100);
+        let a = BaseInterval::new(5, 100);
+        let b = BaseInterval::new(5, 100);
         assert_eq!(a.coord_cmp(&b), Ordering::Equal);
     }
 
     #[test]
     #[cfg(feature = "serde")]
     fn interval_serde() {
-        let a = Interval::new(5, 100);
+        let a = BaseInterval::new(5, 100);
         let encoding = serialize(&a).unwrap();
-        let b: Interval<usize> = deserialize(&encoding).unwrap();
+        let b: BaseInterval<usize> = deserialize(&encoding).unwrap();
         assert!(a.eq(&b));
     }
 
@@ -203,7 +203,7 @@ mod testing {
 
     #[test]
     fn test_generic_reference() {
-        let mut iv = Interval::new(10, 100);
+        let mut iv = BaseInterval::new(10, 100);
         function_generic_reference(&iv);
         function_generic_reference(&mut iv);
         function_generic_reference(iv);

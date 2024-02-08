@@ -13,28 +13,28 @@ use serde::{Deserialize, Serialize};
 /// This is an associated metadata and is not used in comparisons.
 ///
 /// ```
-/// use bedrs::{Coordinates, StrandedGenomicInterval, Overlap, Strand};
+/// use bedrs::{Coordinates, StrandedBed3, Overlap, Strand};
 ///
-/// let a = StrandedGenomicInterval::new(1, 20, 30, Strand::Forward);
+/// let a = StrandedBed3::new(1, 20, 30, Strand::Forward);
 /// assert_eq!(*a.chr(), 1);
 /// assert_eq!(a.start(), 20);
 /// assert_eq!(a.end(), 30);
 /// assert_eq!(a.strand(), Some(Strand::Forward));
 ///
-/// let b = StrandedGenomicInterval::new(1, 20, 30, Strand::Reverse);
+/// let b = StrandedBed3::new(1, 20, 30, Strand::Reverse);
 /// assert!(a.overlaps(&b));
 /// assert!(!a.stranded_overlaps(&b));
 /// ```
 #[derive(Debug, Clone, Copy)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct StrandedGenomicInterval<T> {
+pub struct StrandedBed3<T> {
     chr: T,
     start: T,
     end: T,
     strand: Strand,
 }
 
-impl<T> Coordinates<T, T> for StrandedGenomicInterval<T>
+impl<T> Coordinates<T, T> for StrandedBed3<T>
 where
     T: ValueBounds,
 {
@@ -80,7 +80,7 @@ where
     }
 }
 
-impl<'a, T> Coordinates<T, T> for &'a StrandedGenomicInterval<T>
+impl<'a, T> Coordinates<T, T> for &'a StrandedBed3<T>
 where
     T: ValueBounds,
 {
@@ -117,7 +117,7 @@ where
     }
 }
 
-impl<'a, T> Coordinates<T, T> for &'a mut StrandedGenomicInterval<T>
+impl<'a, T> Coordinates<T, T> for &'a mut StrandedBed3<T>
 where
     T: ValueBounds,
 {
@@ -151,17 +151,17 @@ where
     }
 }
 
-impl<T> StrandedGenomicInterval<T>
+impl<T> StrandedBed3<T>
 where
     T: ValueBounds,
 {
-    /// Create a new `StrandedGenomicInterval`
+    /// Create a new `StrandedBed3`
     ///
     /// # Examples
     ///
     /// ```
-    /// use bedrs::{Coordinates, StrandedGenomicInterval, Strand};
-    /// let a = StrandedGenomicInterval::new(1, 20, 30, Strand::Forward);
+    /// use bedrs::{Coordinates, StrandedBed3, Strand};
+    /// let a = StrandedBed3::new(1, 20, 30, Strand::Forward);
     /// assert_eq!(*a.chr(), 1);
     /// assert_eq!(a.start(), 20);
     /// assert_eq!(a.end(), 30);
@@ -181,9 +181,9 @@ where
     /// # Examples
     ///
     /// ```
-    /// use bedrs::{Coordinates, StrandedGenomicInterval, Strand};
+    /// use bedrs::{Coordinates, StrandedBed3, Strand};
     ///
-    /// let mut a = StrandedGenomicInterval::new(1, 20, 30, Strand::Forward);
+    /// let mut a = StrandedBed3::new(1, 20, 30, Strand::Forward);
     /// assert_eq!(a.strand(), Some(Strand::Forward));
     /// a.set_strand(Strand::Reverse);
     /// assert_eq!(a.strand(), Some(Strand::Reverse));
@@ -197,7 +197,7 @@ where
 mod testing {
     use crate::{
         traits::Coordinates,
-        types::{Strand, StrandedGenomicInterval},
+        types::{Strand, StrandedBed3},
         Subtract,
     };
     #[cfg(feature = "serde")]
@@ -206,7 +206,7 @@ mod testing {
 
     #[test]
     fn test_interval_init() {
-        let interval = StrandedGenomicInterval::new(1, 10, 100, Strand::Forward);
+        let interval = StrandedBed3::new(1, 10, 100, Strand::Forward);
         assert_eq!(*interval.chr(), 1);
         assert_eq!(interval.start(), 10);
         assert_eq!(interval.end(), 100);
@@ -214,44 +214,44 @@ mod testing {
 
     #[test]
     fn test_interval_ordering_gt() {
-        let a = StrandedGenomicInterval::new(1, 10, 100, Strand::Forward);
-        let b = StrandedGenomicInterval::new(1, 5, 100, Strand::Forward);
+        let a = StrandedBed3::new(1, 10, 100, Strand::Forward);
+        let b = StrandedBed3::new(1, 5, 100, Strand::Forward);
         assert_eq!(a.coord_cmp(&b), Ordering::Greater);
 
-        let a = StrandedGenomicInterval::new(1, 10, 100, Strand::Forward);
-        let b = StrandedGenomicInterval::new(1, 10, 90, Strand::Forward);
+        let a = StrandedBed3::new(1, 10, 100, Strand::Forward);
+        let b = StrandedBed3::new(1, 10, 90, Strand::Forward);
         assert_eq!(a.coord_cmp(&b), Ordering::Greater);
 
-        let a = StrandedGenomicInterval::new(2, 10, 100, Strand::Forward);
-        let b = StrandedGenomicInterval::new(1, 10, 100, Strand::Forward);
+        let a = StrandedBed3::new(2, 10, 100, Strand::Forward);
+        let b = StrandedBed3::new(1, 10, 100, Strand::Forward);
         assert_eq!(a.coord_cmp(&b), Ordering::Greater);
     }
 
     #[test]
     fn test_interval_ordering_lt() {
-        let a = StrandedGenomicInterval::new(1, 5, 100, Strand::Forward);
-        let b = StrandedGenomicInterval::new(1, 10, 100, Strand::Forward);
+        let a = StrandedBed3::new(1, 5, 100, Strand::Forward);
+        let b = StrandedBed3::new(1, 10, 100, Strand::Forward);
         assert_eq!(a.coord_cmp(&b), Ordering::Less);
 
-        let a = StrandedGenomicInterval::new(1, 10, 100, Strand::Forward);
-        let b = StrandedGenomicInterval::new(2, 10, 100, Strand::Forward);
+        let a = StrandedBed3::new(1, 10, 100, Strand::Forward);
+        let b = StrandedBed3::new(2, 10, 100, Strand::Forward);
         assert_eq!(a.coord_cmp(&b), Ordering::Less);
     }
 
     #[test]
     fn test_interval_ordering_eq() {
-        let a = StrandedGenomicInterval::new(1, 5, 100, Strand::Forward);
-        let b = StrandedGenomicInterval::new(1, 5, 100, Strand::Forward);
+        let a = StrandedBed3::new(1, 5, 100, Strand::Forward);
+        let b = StrandedBed3::new(1, 5, 100, Strand::Forward);
         assert_eq!(a.coord_cmp(&b), Ordering::Equal);
 
-        let a = StrandedGenomicInterval::new(2, 5, 100, Strand::Forward);
-        let b = StrandedGenomicInterval::new(2, 5, 100, Strand::Forward);
+        let a = StrandedBed3::new(2, 5, 100, Strand::Forward);
+        let b = StrandedBed3::new(2, 5, 100, Strand::Forward);
         assert_eq!(a.coord_cmp(&b), Ordering::Equal);
     }
 
     #[test]
     fn test_set_strand() {
-        let mut a = StrandedGenomicInterval::new(1, 5, 100, Strand::Forward);
+        let mut a = StrandedBed3::new(1, 5, 100, Strand::Forward);
         assert_eq!(a.strand(), Some(Strand::Forward));
         a.set_strand(Strand::Reverse);
         assert_eq!(a.strand(), Some(Strand::Reverse));
@@ -259,8 +259,8 @@ mod testing {
 
     #[test]
     fn test_subtraction_a() {
-        let a = StrandedGenomicInterval::new(1, 5, 100, Strand::Forward);
-        let b = StrandedGenomicInterval::new(1, 10, 100, Strand::Forward);
+        let a = StrandedBed3::new(1, 5, 100, Strand::Forward);
+        let b = StrandedBed3::new(1, 10, 100, Strand::Forward);
         let sub = a.subtract(&b).unwrap();
         assert_eq!(sub.len(), 1);
         assert_eq!(sub[0].start(), 5);
@@ -270,8 +270,8 @@ mod testing {
 
     #[test]
     fn test_subtraction_b() {
-        let a = StrandedGenomicInterval::new(1, 5, 100, Strand::Reverse);
-        let b = StrandedGenomicInterval::new(1, 10, 100, Strand::Forward);
+        let a = StrandedBed3::new(1, 5, 100, Strand::Reverse);
+        let b = StrandedBed3::new(1, 10, 100, Strand::Forward);
         let sub = a.subtract(&b).unwrap();
         assert_eq!(sub.len(), 1);
         assert_eq!(sub[0].start(), 5);
@@ -281,8 +281,8 @@ mod testing {
 
     #[test]
     fn test_subtraction_c() {
-        let a = StrandedGenomicInterval::new(1, 5, 100, Strand::Reverse);
-        let b = StrandedGenomicInterval::new(1, 10, 100, Strand::Reverse);
+        let a = StrandedBed3::new(1, 5, 100, Strand::Reverse);
+        let b = StrandedBed3::new(1, 10, 100, Strand::Reverse);
         let sub = a.subtract(&b).unwrap();
         assert_eq!(sub.len(), 1);
         assert_eq!(sub[0].start(), 5);
@@ -292,17 +292,17 @@ mod testing {
 
     #[test]
     fn test_from() {
-        let a = StrandedGenomicInterval::new(1, 5, 100, Strand::Reverse);
-        let b: StrandedGenomicInterval<usize> = Coordinates::from(&a);
+        let a = StrandedBed3::new(1, 5, 100, Strand::Reverse);
+        let b: StrandedBed3<usize> = Coordinates::from(&a);
         assert!(a.eq(&b));
     }
 
     #[test]
     #[cfg(feature = "serde")]
     fn stranded_genomic_interval_serde() {
-        let a = StrandedGenomicInterval::new(1, 5, 100, Strand::Reverse);
+        let a = StrandedBed3::new(1, 5, 100, Strand::Reverse);
         let serialized = serialize(&a).unwrap();
-        let deserialized: StrandedGenomicInterval<u32> = deserialize(&serialized).unwrap();
+        let deserialized: StrandedBed3<u32> = deserialize(&serialized).unwrap();
         assert!(a.eq(&deserialized));
     }
 
@@ -316,7 +316,7 @@ mod testing {
 
     #[test]
     fn test_generic_reference() {
-        let mut iv = StrandedGenomicInterval::new(1, 10, 100, Strand::Forward);
+        let mut iv = StrandedBed3::new(1, 10, 100, Strand::Forward);
         function_generic_reference(&iv);
         function_generic_reference(&mut iv);
         function_generic_reference(iv);

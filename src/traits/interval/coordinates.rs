@@ -17,9 +17,9 @@ where
     ///
     /// # Examples
     /// ```
-    /// use bedrs::{Coordinates, GenomicInterval};
+    /// use bedrs::{Coordinates, Bed3};
     ///
-    /// let iv = GenomicInterval::new(1, 10, 20);
+    /// let iv = Bed3::new(1, 10, 20);
     /// assert_eq!(iv.start(), 10);
     /// ```
     fn start(&self) -> T;
@@ -28,9 +28,9 @@ where
     ///
     /// # Examples
     /// ```
-    /// use bedrs::{Coordinates, GenomicInterval};
+    /// use bedrs::{Coordinates, Bed3};
     ///
-    /// let iv = GenomicInterval::new(1, 10, 20);
+    /// let iv = Bed3::new(1, 10, 20);
     /// assert_eq!(iv.end(), 20);
     /// ```
     fn end(&self) -> T;
@@ -42,9 +42,9 @@ where
     ///
     /// # Examples
     /// ```
-    /// use bedrs::{Coordinates, GenomicInterval};
+    /// use bedrs::{Coordinates, Bed3};
     ///
-    /// let iv = GenomicInterval::new(1, 10, 20);
+    /// let iv = Bed3::new(1, 10, 20);
     /// assert_eq!(iv.chr(), &1);
     /// ```
     fn chr(&self) -> &C;
@@ -57,12 +57,12 @@ where
     /// # Examples
     ///
     /// ```
-    /// use bedrs::{Coordinates, GenomicInterval, Strand, StrandedGenomicInterval};
+    /// use bedrs::{Coordinates, Bed3, Strand, StrandedBed3};
     ///
-    /// let iv = GenomicInterval::new(1, 10, 20);
+    /// let iv = Bed3::new(1, 10, 20);
     /// assert_eq!(iv.strand(), None);
     ///
-    /// let siv = StrandedGenomicInterval::new(1, 10, 20, Strand::Forward);
+    /// let siv = StrandedBed3::new(1, 10, 20, Strand::Forward);
     /// assert_eq!(siv.strand(), Some(Strand::Forward));
     /// ```
     fn strand(&self) -> Option<Strand> {
@@ -75,9 +75,9 @@ where
     /// # Examples
     ///
     /// ```
-    /// use bedrs::{Coordinates, GenomicInterval};
+    /// use bedrs::{Coordinates, Bed3};
     ///
-    /// let mut iv = GenomicInterval::new(1, 10, 20);
+    /// let mut iv = Bed3::new(1, 10, 20);
     /// assert_eq!(iv.start(), 10);
     ///
     /// iv.update_start(&5);
@@ -90,9 +90,9 @@ where
     /// # Examples
     ///
     /// ```
-    /// use bedrs::{Coordinates, GenomicInterval};
+    /// use bedrs::{Coordinates, Bed3};
     ///
-    /// let mut iv = GenomicInterval::new(1, 10, 20);
+    /// let mut iv = Bed3::new(1, 10, 20);
     /// assert_eq!(iv.end(), 20);
     ///
     /// iv.update_end(&30);
@@ -105,9 +105,9 @@ where
     /// # Examples
     ///
     /// ```
-    /// use bedrs::{Coordinates, GenomicInterval};
+    /// use bedrs::{Coordinates, Bed3};
     ///
-    /// let mut iv = GenomicInterval::new(1, 10, 20);
+    /// let mut iv = Bed3::new(1, 10, 20);
     /// assert_eq!(iv.chr(), &1);
     ///
     /// iv.update_chr(&2);
@@ -119,9 +119,9 @@ where
     ///
     /// # Examples
     /// ```
-    /// use bedrs::{Coordinates, StrandedGenomicInterval, Strand};
+    /// use bedrs::{Coordinates, StrandedBed3, Strand};
     ///
-    /// let mut siv = StrandedGenomicInterval::new(1, 10, 20, Strand::Forward);
+    /// let mut siv = StrandedBed3::new(1, 10, 20, Strand::Forward);
     /// assert_eq!(siv.strand(), Some(Strand::Forward));
     ///
     /// siv.update_strand(Some(Strand::Reverse));
@@ -139,10 +139,10 @@ where
     /// # Examples
     ///
     /// ```
-    /// use bedrs::{Coordinates, GenomicInterval};
+    /// use bedrs::{Coordinates, Bed3};
     ///
-    /// let iv = GenomicInterval::new(1, 10, 20);
-    /// let new_iv = <GenomicInterval<usize> as Coordinates<usize, usize>>::from(&iv);
+    /// let iv = Bed3::new(1, 10, 20);
+    /// let new_iv = <Bed3<usize, usize> as Coordinates<usize, usize>>::from(&iv);
     ///
     /// assert!(iv.eq(&new_iv));
     /// ```
@@ -156,9 +156,9 @@ where
     /// # Examples
     ///
     /// ```
-    /// use bedrs::{Coordinates, GenomicInterval};
+    /// use bedrs::{Coordinates, Bed3};
     ///
-    /// let iv = GenomicInterval::new(1, 10, 20);
+    /// let iv = Bed3::new(1, 10, 20);
     /// assert_eq!(iv.len(), 10);
     /// ```
     fn len(&self) -> T {
@@ -169,13 +169,13 @@ where
     ///
     /// # Examples
     /// ```
-    /// use bedrs::{Coordinates, GenomicInterval};
+    /// use bedrs::{Coordinates, Bed3};
     ///
-    /// let mut iv = GenomicInterval::new(1, 10, 20);
-    /// assert!(iv.eq(&GenomicInterval::new(1, 10, 20)));
+    /// let mut iv = Bed3::new(1, 10, 20);
+    /// assert!(iv.eq(&Bed3::new(1, 10, 20)));
     ///
     /// iv.update_all(&2, &5, &10);
-    /// assert!(iv.eq(&GenomicInterval::new(2, 5, 10)));
+    /// assert!(iv.eq(&Bed3::new(2, 5, 10)));
     /// ```
     fn update_all(&mut self, chr: &C, start: &T, end: &T) {
         self.update_chr(chr);
@@ -186,13 +186,13 @@ where
     ///
     /// # Examples
     /// ```
-    /// use bedrs::{Coordinates, GenomicInterval};
+    /// use bedrs::{Coordinates, Bed3};
     ///
-    /// let mut iv = GenomicInterval::new(1, 10, 20);
-    /// assert!(iv.eq(&GenomicInterval::new(1, 10, 20)));
+    /// let mut iv = Bed3::new(1, 10, 20);
+    /// assert!(iv.eq(&Bed3::new(1, 10, 20)));
     ///
     /// iv.update_endpoints(&5, &10);
-    /// assert!(iv.eq(&GenomicInterval::new(1, 5, 10)));
+    /// assert!(iv.eq(&Bed3::new(1, 5, 10)));
     /// ```
     fn update_endpoints(&mut self, start: &T, end: &T) {
         self.update_start(start);
@@ -203,13 +203,13 @@ where
     ///
     /// # Examples
     /// ```
-    /// use bedrs::{Coordinates, GenomicInterval};
+    /// use bedrs::{Coordinates, Bed3};
     ///
-    /// let mut iv = GenomicInterval::new(1, 10, 20);
-    /// assert!(iv.eq(&GenomicInterval::new(1, 10, 20)));
+    /// let mut iv = Bed3::new(1, 10, 20);
+    /// assert!(iv.eq(&Bed3::new(1, 10, 20)));
     ///
-    /// iv.update_all_from(&GenomicInterval::new(2, 5, 10));
-    /// assert!(iv.eq(&GenomicInterval::new(2, 5, 10)));
+    /// iv.update_all_from(&Bed3::new(2, 5, 10));
+    /// assert!(iv.eq(&Bed3::new(2, 5, 10)));
     /// ```
     fn update_all_from<I: Coordinates<C, T>>(&mut self, other: &I) {
         self.update_chr(other.chr());
@@ -220,13 +220,13 @@ where
     ///
     /// # Examples
     /// ```
-    /// use bedrs::{Coordinates, GenomicInterval};
+    /// use bedrs::{Coordinates, Bed3};
     ///
-    /// let mut iv = GenomicInterval::new(1, 10, 20);
-    /// assert!(iv.eq(&GenomicInterval::new(1, 10, 20)));
+    /// let mut iv = Bed3::new(1, 10, 20);
+    /// assert!(iv.eq(&Bed3::new(1, 10, 20)));
     ///
-    /// iv.update_endpoints_from(&GenomicInterval::new(2, 5, 10));
-    /// assert!(iv.eq(&GenomicInterval::new(1, 5, 10)));
+    /// iv.update_endpoints_from(&Bed3::new(2, 5, 10));
+    /// assert!(iv.eq(&Bed3::new(1, 5, 10)));
     /// ```
     fn update_endpoints_from<I: Coordinates<C, T>>(&mut self, other: &I) {
         self.update_start(&other.start());
@@ -238,13 +238,13 @@ where
     ///
     /// # Examples
     /// ```
-    /// use bedrs::{Coordinates, GenomicInterval};
+    /// use bedrs::{Coordinates, Bed3};
     ///
-    /// let mut iv = GenomicInterval::new(1, 10, 20);
-    /// assert!(iv.eq(&GenomicInterval::new(1, 10, 20)));
+    /// let mut iv = Bed3::new(1, 10, 20);
+    /// assert!(iv.eq(&Bed3::new(1, 10, 20)));
     ///
     /// iv.extend_left(&5);
-    /// assert!(iv.eq(&GenomicInterval::new(1, 5, 20)));
+    /// assert!(iv.eq(&Bed3::new(1, 5, 20)));
     /// ```
     fn extend_left(&mut self, val: &T) {
         if self.start().lt(val) {
@@ -262,16 +262,16 @@ where
     ///
     /// # Examples
     /// ```
-    /// use bedrs::{Coordinates, GenomicInterval};
+    /// use bedrs::{Coordinates, Bed3};
     ///
-    /// let mut iv = GenomicInterval::new(1, 10, 20);
-    /// assert!(iv.eq(&GenomicInterval::new(1, 10, 20)));
+    /// let mut iv = Bed3::new(1, 10, 20);
+    /// assert!(iv.eq(&Bed3::new(1, 10, 20)));
     ///
     /// iv.extend_right(&5, None);
-    /// assert!(iv.eq(&GenomicInterval::new(1, 10, 25)));
+    /// assert!(iv.eq(&Bed3::new(1, 10, 25)));
     ///
     /// iv.extend_right(&5, Some(27));
-    /// assert!(iv.eq(&GenomicInterval::new(1, 10, 27)));
+    /// assert!(iv.eq(&Bed3::new(1, 10, 27)));
     /// ```
     fn extend_right(&mut self, val: &T, max_bound: Option<T>) {
         let new_end = self.end().add(*val);
@@ -291,16 +291,16 @@ where
     ///
     /// # Examples
     /// ```
-    /// use bedrs::{Coordinates, GenomicInterval};
+    /// use bedrs::{Coordinates, Bed3};
     ///
-    /// let mut iv = GenomicInterval::new(1, 10, 20);
-    /// assert!(iv.eq(&GenomicInterval::new(1, 10, 20)));
+    /// let mut iv = Bed3::new(1, 10, 20);
+    /// assert!(iv.eq(&Bed3::new(1, 10, 20)));
     ///
     /// iv.extend(&5, None);
-    /// assert!(iv.eq(&GenomicInterval::new(1, 5, 25)));
+    /// assert!(iv.eq(&Bed3::new(1, 5, 25)));
 
     /// iv.extend(&5, Some(27));
-    /// assert!(iv.eq(&GenomicInterval::new(1, 0, 27)));
+    /// assert!(iv.eq(&Bed3::new(1, 0, 27)));
     /// ```
     fn extend(&mut self, val: &T, max_bound: Option<T>) {
         self.extend_left(val);
@@ -311,9 +311,9 @@ where
     ///
     /// # Examples
     /// ```
-    /// use bedrs::{Coordinates, GenomicInterval};
+    /// use bedrs::{Coordinates, Bed3};
     ///
-    /// let iv = GenomicInterval::new(1, 10, 20);
+    /// let iv = Bed3::new(1, 10, 20);
     /// assert_eq!(iv.f_len(0.5), 5);
     /// assert_eq!(iv.f_len(0.3), 3);
     /// assert_eq!(iv.f_len(2.0), 20);
@@ -328,13 +328,13 @@ where
     ///
     /// # Examples
     /// ```
-    /// use bedrs::{Coordinates, GenomicInterval};
+    /// use bedrs::{Coordinates, Bed3};
     ///
-    /// let a = GenomicInterval::new(1, 10, 20);
-    /// let b = GenomicInterval::new(1, 10, 20);
-    /// let c = GenomicInterval::new(1, 20, 30);
-    /// let d = GenomicInterval::new(2, 10, 20);
-    /// let e = GenomicInterval::new(1, 5, 10);
+    /// let a = Bed3::new(1, 10, 20);
+    /// let b = Bed3::new(1, 10, 20);
+    /// let c = Bed3::new(1, 20, 30);
+    /// let d = Bed3::new(2, 10, 20);
+    /// let e = Bed3::new(1, 5, 10);
     ///
     /// // a == b
     /// assert_eq!(a.coord_cmp(&b), std::cmp::Ordering::Equal);
@@ -436,7 +436,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::{traits::Coordinates, Interval};
+    use crate::{traits::Coordinates, BaseInterval};
 
     // define a custom interval struct for testing
     struct CustomInterval {
@@ -589,9 +589,9 @@ mod testing {
 
     #[test]
     fn test_convenience_methods() {
-        let a = Interval::new(10, 20);
-        let b = Interval::new(30, 50);
-        let c = Interval::new(30, 50);
+        let a = BaseInterval::new(10, 20);
+        let b = BaseInterval::new(30, 50);
+        let c = BaseInterval::new(30, 50);
         assert!(a.lt(&b));
         assert!(b.gt(&a));
         assert!(b.eq(&c));
@@ -599,7 +599,7 @@ mod testing {
 
     #[test]
     fn test_extend_left() {
-        let mut a = Interval::new(10, 20);
+        let mut a = BaseInterval::new(10, 20);
         let val = 5;
         a.extend_left(&val);
         assert_eq!(a.start(), 5);
@@ -608,7 +608,7 @@ mod testing {
 
     #[test]
     fn test_extend_left_bounded() {
-        let mut a = Interval::new(10, 20);
+        let mut a = BaseInterval::new(10, 20);
         let val = 11;
         a.extend_left(&val);
         assert_eq!(a.start(), 0);
@@ -617,7 +617,7 @@ mod testing {
 
     #[test]
     fn test_extend_right() {
-        let mut a = Interval::new(10, 20);
+        let mut a = BaseInterval::new(10, 20);
         let val = 5;
         a.extend_right(&val, None);
         assert_eq!(a.start(), 10);
@@ -626,7 +626,7 @@ mod testing {
 
     #[test]
     fn test_extend_right_bounded() {
-        let mut a = Interval::new(10, 20);
+        let mut a = BaseInterval::new(10, 20);
         let val = 5;
         a.extend_right(&val, Some(22));
         assert_eq!(a.start(), 10);
@@ -635,7 +635,7 @@ mod testing {
 
     #[test]
     fn test_extend_both() {
-        let mut a = Interval::new(10, 20);
+        let mut a = BaseInterval::new(10, 20);
         let val = 5;
         a.extend(&val, None);
         assert_eq!(a.start(), 5);
@@ -644,7 +644,7 @@ mod testing {
 
     #[test]
     fn test_extend_both_bounded() {
-        let mut a = Interval::new(10, 20);
+        let mut a = BaseInterval::new(10, 20);
         let val = 5;
         a.extend(&val, Some(22));
         assert_eq!(a.start(), 5);

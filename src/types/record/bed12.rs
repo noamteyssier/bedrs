@@ -6,7 +6,7 @@ use num_traits::zero;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
-/// A representation of a Bed12 Interval.
+/// A representation of a Bed12 interval.
 ///
 /// Has twelve values
 ///     1. `chr`

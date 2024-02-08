@@ -260,37 +260,37 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::{Coordinates, Interval};
+    use crate::{BaseInterval, Coordinates};
 
     #[test]
     fn test_f_len_a() {
-        let interval = Interval::new(0, 100);
+        let iv = BaseInterval::new(0, 100);
         let frac = 0.5;
-        let len = interval.f_len(frac);
+        let len = iv.f_len(frac);
         assert_eq!(len, 50);
     }
 
     #[test]
     fn test_f_len_b() {
-        let interval = Interval::new(0, 100);
+        let iv = BaseInterval::new(0, 100);
         let frac = 0.3;
-        let len = interval.f_len(frac);
+        let len = iv.f_len(frac);
         assert_eq!(len, 30);
     }
 
     #[test]
     fn test_f_len_c() {
-        let interval = Interval::new(0, 100);
+        let iv = BaseInterval::new(0, 100);
         let frac = 0.301;
-        let len = interval.f_len(frac);
+        let len = iv.f_len(frac);
         assert_eq!(len, 30);
     }
 
     #[test]
     fn test_f_len_d() {
-        let interval = Interval::new(0, 100);
+        let iv = BaseInterval::new(0, 100);
         let frac = 0.299;
-        let len = interval.f_len(frac);
+        let len = iv.f_len(frac);
         assert_eq!(len, 30);
     }
 }

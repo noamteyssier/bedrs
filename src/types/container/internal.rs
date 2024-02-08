@@ -44,14 +44,14 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::{Coordinates, Interval, IntervalContainer};
+    use crate::{Coordinates, BaseInterval, IntervalContainer};
 
     #[test]
     fn internal_unsorted() {
         let set = IntervalContainer::new(vec![
-            Interval::new(1, 5),
-            Interval::new(2, 4),
-            Interval::new(3, 6),
+            BaseInterval::new(1, 5),
+            BaseInterval::new(2, 4),
+            BaseInterval::new(3, 6),
         ]);
         assert!(set.internal().is_err());
     }
@@ -62,7 +62,7 @@ mod testing {
     /// ==================
     /// (i)      j-k
     fn internal_a() {
-        let set = IntervalContainer::from_sorted(vec![Interval::new(1, 3), Interval::new(6, 10)])
+        let set = IntervalContainer::from_sorted(vec![BaseInterval::new(1, 3), BaseInterval::new(6, 10)])
             .unwrap();
         let span = set.span().unwrap();
         let internal_set: IntervalContainer<_, _, _> = set.internal_unchecked(&span).collect();
@@ -80,9 +80,9 @@ mod testing {
     /// (ii)           l---m
     fn internal_b() {
         let set = IntervalContainer::from_sorted(vec![
-            Interval::new(1, 3),
-            Interval::new(6, 10),
-            Interval::new(12, 15),
+            BaseInterval::new(1, 3),
+            BaseInterval::new(6, 10),
+            BaseInterval::new(12, 15),
         ])
         .unwrap();
         let span = set.span().unwrap();

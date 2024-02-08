@@ -20,19 +20,19 @@ type ComplementIterOwned<I, C, T> = ComplementIter<IntervalIterOwned<I, C, T>, I
 /// # Examples
 ///
 /// ```
-/// use bedrs::{Interval, Coordinates, IntervalContainer};
+/// use bedrs::{BaseInterval, Coordinates, IntervalContainer};
 ///
 /// let intervals = vec![
-///     Interval::new(10, 20),
-///     Interval::new(30, 40),
-///     Interval::new(50, 60),
-///     Interval::new(70, 80),
+///     BaseInterval::new(10, 20),
+///     BaseInterval::new(30, 40),
+///     BaseInterval::new(50, 60),
+///     BaseInterval::new(70, 80),
 /// ];
 ///
 /// let expected = vec![
-///     Interval::new(20, 30),
-///     Interval::new(40, 50),
-///     Interval::new(60, 70),
+///     BaseInterval::new(20, 30),
+///     BaseInterval::new(40, 50),
+///     BaseInterval::new(60, 70),
 /// ];
 ///
 /// let set = IntervalContainer::from_unsorted(intervals);
@@ -67,7 +67,7 @@ where
 mod testing {
     use crate::{
         traits::{ChromBounds, IntervalBounds, ValueBounds},
-        GenomicInterval, Interval, IntervalContainer,
+        Bed3, BaseInterval, IntervalContainer,
     };
 
     fn validate_records<I, C, T>(obs: &[I], exp: &[I])
@@ -84,27 +84,25 @@ mod testing {
 
     #[test]
     fn complement_unsorted() {
-        let intervals = vec![Interval::new(10, 20), Interval::new(30, 40)];
+        let intervals = vec![BaseInterval::new(10, 20), BaseInterval::new(30, 40)];
         let set = IntervalContainer::from_iter(intervals);
         assert!(set.complement().is_err());
     }
 
     #[test]
-    #[should_panic]
     fn complement_unmerged_boundary() {
-        let intervals = vec![Interval::new(10, 20), Interval::new(20, 30)];
+        let intervals = vec![BaseInterval::new(10, 20), BaseInterval::new(20, 30)];
         let set = IntervalContainer::from_iter(intervals);
-        let comp_iter = set.complement().unwrap();
-        let _complements: Vec<_> = comp_iter.collect();
+        let comp_iter = set.complement();
+        assert!(comp_iter.is_err());
     }
 
     #[test]
-    #[should_panic]
     fn complement_unmerged_overlapping() {
-        let intervals = vec![Interval::new(10, 20), Interval::new(18, 30)];
+        let intervals = vec![BaseInterval::new(10, 20), BaseInterval::new(18, 30)];
         let set = IntervalContainer::from_iter(intervals);
-        let comp_iter = set.complement().unwrap();
-        let _complements: Vec<_> = comp_iter.collect();
+        let comp_iter = set.complement();
+        assert!(comp_iter.is_err());
     }
 
     #[test]
@@ -112,8 +110,8 @@ mod testing {
     /// ================================
     ///                 y----i
     fn complement_a() {
-        let intervals = vec![Interval::new(10, 20), Interval::new(30, 40)];
-        let expected = vec![Interval::new(20, 30)];
+        let intervals = vec![BaseInterval::new(10, 20), BaseInterval::new(30, 40)];
+        let expected = vec![BaseInterval::new(20, 30)];
         let set = IntervalContainer::from_unsorted(intervals);
         let comp_iter = set.complement().unwrap();
         let complements: Vec<_> = comp_iter.collect();
@@ -126,11 +124,11 @@ mod testing {
     ///                 y----i        j-k
     fn complement_b() {
         let intervals = vec![
-            Interval::new(10, 20),
-            Interval::new(30, 40),
-            Interval::new(50, 60),
+            BaseInterval::new(10, 20),
+            BaseInterval::new(30, 40),
+            BaseInterval::new(50, 60),
         ];
-        let expected = vec![Interval::new(20, 30), Interval::new(40, 50)];
+        let expected = vec![BaseInterval::new(20, 30), BaseInterval::new(40, 50)];
         let set = IntervalContainer::from_unsorted(intervals);
         let comp_iter = set.complement().unwrap();
         let complements: Vec<_> = comp_iter.collect();
@@ -143,11 +141,11 @@ mod testing {
     /// |1|                 y----i
     fn complement_c() {
         let intervals = vec![
-            GenomicInterval::new(1, 10, 20),
-            GenomicInterval::new(1, 30, 40),
-            GenomicInterval::new(2, 50, 60),
+            Bed3::new(1, 10, 20),
+            Bed3::new(1, 30, 40),
+            Bed3::new(2, 50, 60),
         ];
-        let expected = vec![GenomicInterval::new(1, 20, 30)];
+        let expected = vec![Bed3::new(1, 20, 30)];
         let set = IntervalContainer::from_unsorted(intervals);
         let comp_iter = set.complement().unwrap();
         let complements: Vec<_> = comp_iter.collect();
@@ -160,14 +158,14 @@ mod testing {
     /// |1|                 y----i          |2|      l--m
     fn complement_d() {
         let intervals = vec![
-            GenomicInterval::new(1, 10, 20),
-            GenomicInterval::new(1, 30, 40),
-            GenomicInterval::new(2, 10, 20),
-            GenomicInterval::new(2, 30, 40),
+            Bed3::new(1, 10, 20),
+            Bed3::new(1, 30, 40),
+            Bed3::new(2, 10, 20),
+            Bed3::new(2, 30, 40),
         ];
         let expected = vec![
-            GenomicInterval::new(1, 20, 30),
-            GenomicInterval::new(2, 20, 30),
+            Bed3::new(1, 20, 30),
+            Bed3::new(2, 20, 30),
         ];
         let set = IntervalContainer::from_unsorted(intervals);
         let comp_iter = set.complement().unwrap();
