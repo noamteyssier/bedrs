@@ -716,6 +716,7 @@ mod testing {
 
     #[test]
     #[should_panic]
+    #[allow(clippy::should_panic_without_expect)]
     fn bsearch_no_max_len_unchecked_panic() {
         let records = (0..500).map(|x| Interval::new(x, x + 50)).collect();
         let mut set = IntervalContainer::from_sorted(records).unwrap();

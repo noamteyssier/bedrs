@@ -90,21 +90,19 @@ mod testing {
     }
 
     #[test]
-    #[should_panic]
     fn complement_unmerged_boundary() {
         let intervals = vec![Interval::new(10, 20), Interval::new(20, 30)];
         let set = IntervalContainer::from_iter(intervals);
-        let comp_iter = set.complement().unwrap();
-        let _complements: Vec<_> = comp_iter.collect();
+        let comp_iter = set.complement();
+        assert!(comp_iter.is_err());
     }
 
     #[test]
-    #[should_panic]
     fn complement_unmerged_overlapping() {
         let intervals = vec![Interval::new(10, 20), Interval::new(18, 30)];
         let set = IntervalContainer::from_iter(intervals);
-        let comp_iter = set.complement().unwrap();
-        let _complements: Vec<_> = comp_iter.collect();
+        let comp_iter = set.complement();
+        assert!(comp_iter.is_err());
     }
 
     #[test]
