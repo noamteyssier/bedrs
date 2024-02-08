@@ -9,5 +9,6 @@ pub use iterator::{
     IntervalIterRef, MergeIter, SubtractFromIter, SubtractIter,
 };
 pub use record::{
-    Bed12, Bed3, Bed4, Bed6, GenomicInterval, Interval, NamedInterval, StrandedGenomicInterval,
+    Bed12, Bed3, Bed4, Bed6, GenomicInterval, Interval, MetaInterval, NamedInterval,
+    StrandedGenomicInterval,
 };
