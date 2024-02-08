@@ -250,20 +250,20 @@ where
 mod testing {
 
     use super::*;
-    use crate::{Bed3, Coordinates, Interval, Strand, StrandedBed3};
+    use crate::{Bed3, Coordinates, BaseInterval, Strand, StrandedBed3};
     #[cfg(feature = "serde")]
     use bincode::{deserialize, serialize};
 
     // --------------------- //
-    // Base Interval Testing //
+    // Base BaseInterval Testing //
     // --------------------- //
 
     #[test]
     fn build_interval_container() {
         let records = vec![
-            Interval::new(1, 10),
-            Interval::new(2, 20),
-            Interval::new(3, 30),
+            BaseInterval::new(1, 10),
+            BaseInterval::new(2, 20),
+            BaseInterval::new(3, 30),
         ];
         let container = IntervalContainer::from_unsorted(records);
         assert_eq!(container.len(), 3);
@@ -272,7 +272,7 @@ mod testing {
     #[test]
     fn test_base_interval_set_init_from_records() {
         let n_intervals = 10;
-        let records = vec![Interval::new(10, 100); n_intervals];
+        let records = vec![BaseInterval::new(10, 100); n_intervals];
         let set = IntervalContainer::new(records);
         assert_eq!(set.len(), n_intervals);
     }
@@ -280,7 +280,7 @@ mod testing {
     #[test]
     fn test_base_interval_set_init_from_endpoints() {
         let n_intervals = 10;
-        let records = vec![Interval::new(10, 100); n_intervals];
+        let records = vec![BaseInterval::new(10, 100); n_intervals];
         let set = IntervalContainer::new(records);
         assert_eq!(set.len(), n_intervals);
     }
@@ -288,7 +288,7 @@ mod testing {
     #[test]
     fn test_base_from_iterator() {
         let n_intervals = 10;
-        let records = vec![Interval::new(10, 100); n_intervals];
+        let records = vec![BaseInterval::new(10, 100); n_intervals];
         let set = IntervalContainer::from_iter(records);
         assert_eq!(set.len(), n_intervals);
     }
@@ -297,10 +297,10 @@ mod testing {
     #[cfg(feature = "serde")]
     fn test_base_serialization() {
         let n_intervals = 10;
-        let records = vec![Interval::new(10, 100); n_intervals];
+        let records = vec![BaseInterval::new(10, 100); n_intervals];
         let set = IntervalContainer::new(records);
         let serialized = serialize(&set).unwrap();
-        let deserialized: IntervalContainer<Interval<usize>, usize, usize> =
+        let deserialized: IntervalContainer<BaseInterval<usize>, usize, usize> =
             deserialize(&serialized).unwrap();
         for (iv1, iv2) in set.records().iter().zip(deserialized.records().iter()) {
             assert!(iv1.eq(iv2));
@@ -311,7 +311,7 @@ mod testing {
     #[cfg(feature = "rayon")]
     fn test_base_par_sort() {
         let n_intervals = 10;
-        let records = vec![Interval::new(10, 100); n_intervals];
+        let records = vec![BaseInterval::new(10, 100); n_intervals];
         let mut set = IntervalContainer::new(records);
         set.par_sort();
         assert!(set.is_sorted());
@@ -568,9 +568,9 @@ mod testing {
     #[test]
     fn test_container_init_new() {
         let records = vec![
-            Interval::new(15, 25),
-            Interval::new(10, 20),
-            Interval::new(5, 15),
+            BaseInterval::new(15, 25),
+            BaseInterval::new(10, 20),
+            BaseInterval::new(5, 15),
         ];
         let set = IntervalContainer::new(records);
         assert_eq!(set.len(), 3);
@@ -582,9 +582,9 @@ mod testing {
     #[test]
     fn test_container_init_from_sorted() {
         let records = vec![
-            Interval::new(5, 10),
-            Interval::new(10, 15),
-            Interval::new(15, 20),
+            BaseInterval::new(5, 10),
+            BaseInterval::new(10, 15),
+            BaseInterval::new(15, 20),
         ];
         let set = IntervalContainer::from_sorted(records).unwrap();
         assert_eq!(set.len(), 3);
@@ -596,9 +596,9 @@ mod testing {
     #[test]
     fn test_container_init_from_unsorted() {
         let records = vec![
-            Interval::new(15, 25),
-            Interval::new(10, 20),
-            Interval::new(5, 15),
+            BaseInterval::new(15, 25),
+            BaseInterval::new(10, 20),
+            BaseInterval::new(5, 15),
         ];
         let set = IntervalContainer::from_unsorted(records);
         assert_eq!(set.len(), 3);
@@ -610,9 +610,9 @@ mod testing {
     #[test]
     fn test_container_init_from_sorted_false_sorting() {
         let records = vec![
-            Interval::new(10, 15),
-            Interval::new(5, 10),
-            Interval::new(15, 20),
+            BaseInterval::new(10, 15),
+            BaseInterval::new(5, 10),
+            BaseInterval::new(15, 20),
         ];
         let set = IntervalContainer::from_sorted(records);
         assert!(set.is_err());
@@ -621,9 +621,9 @@ mod testing {
     #[test]
     fn test_container_apply_mut() {
         let records = vec![
-            Interval::new(15, 25),
-            Interval::new(10, 20),
-            Interval::new(5, 15),
+            BaseInterval::new(15, 25),
+            BaseInterval::new(10, 20),
+            BaseInterval::new(5, 15),
         ];
         let mut set = IntervalContainer::from_unsorted(records);
         set.apply_mut(|rec| rec.extend(&2, None));
@@ -638,16 +638,16 @@ mod testing {
     #[test]
     fn test_container_insert() {
         let mut set = IntervalContainer::empty();
-        set.insert(Interval::new(15, 25));
-        set.insert(Interval::new(10, 20));
+        set.insert(BaseInterval::new(15, 25));
+        set.insert(BaseInterval::new(10, 20));
         assert_eq!(set.len(), 2);
     }
 
     #[test]
     fn test_container_insert_sorted() {
         let mut set = IntervalContainer::empty();
-        set.insert_sorted(Interval::new(15, 25));
-        set.insert_sorted(Interval::new(10, 20));
+        set.insert_sorted(BaseInterval::new(15, 25));
+        set.insert_sorted(BaseInterval::new(10, 20));
         assert_eq!(set.len(), 2);
         assert_eq!(set.records()[0].start(), 10);
         assert!(set.is_sorted());
@@ -656,9 +656,9 @@ mod testing {
     #[test]
     fn container_iter() {
         let records = vec![
-            Interval::new(15, 25),
-            Interval::new(10, 20),
-            Interval::new(5, 15),
+            BaseInterval::new(15, 25),
+            BaseInterval::new(10, 20),
+            BaseInterval::new(5, 15),
         ];
         let set = IntervalContainer::from_unsorted(records);
         let mut iter = set.iter();

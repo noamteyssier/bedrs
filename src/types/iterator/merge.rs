@@ -90,22 +90,22 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::{Bed3, Coordinates, Interval};
+    use crate::{Bed3, Coordinates, BaseInterval};
     use super::*;
 
     #[test]
     fn merge_iter_base() {
         let intervals = vec![
-            Interval::new(1, 5),
-            Interval::new(2, 4),
-            Interval::new(3, 6),
-            Interval::new(7, 10),
-            Interval::new(8, 12),
+            BaseInterval::new(1, 5),
+            BaseInterval::new(2, 4),
+            BaseInterval::new(3, 6),
+            BaseInterval::new(7, 10),
+            BaseInterval::new(8, 12),
         ];
-        let expected = [Interval::new(1, 6), Interval::new(7, 12)];
+        let expected = [BaseInterval::new(1, 6), BaseInterval::new(7, 12)];
         let interval_iter = intervals.into_iter();
         let merge_iter = MergeIter::new(interval_iter);
-        let result: Vec<Interval<u32>> = merge_iter.collect();
+        let result: Vec<BaseInterval<u32>> = merge_iter.collect();
         assert_eq!(result.len(), expected.len());
         for (res, exp) in result.iter().zip(expected.iter()) {
             assert!(res.eq(exp));

@@ -145,7 +145,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::{Bed3, Coordinates, Interval, IntervalContainer};
+    use crate::{Bed3, Coordinates, BaseInterval, IntervalContainer};
 
     #[test]
     fn closest_unsorted() {
@@ -387,12 +387,12 @@ mod testing {
         let starts = (0..100).step_by(1).collect::<Vec<_>>();
         let ends = (10..110).step_by(1).collect::<Vec<_>>();
         let records = (0..100)
-            .map(|x| Interval::new(starts[x], ends[x]))
+            .map(|x| BaseInterval::new(starts[x], ends[x]))
             .collect::<Vec<_>>();
         let intervals = IntervalContainer::from_unsorted(records);
-        let query = Interval::new(12, 15);
+        let query = BaseInterval::new(12, 15);
         let closest = intervals.closest_downstream(&query).unwrap().unwrap();
-        assert!(closest.eq(&Interval::new(12, 22)));
+        assert!(closest.eq(&BaseInterval::new(12, 22)));
     }
 
     #[test]

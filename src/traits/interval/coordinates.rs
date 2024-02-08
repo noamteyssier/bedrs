@@ -436,7 +436,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::{traits::Coordinates, Interval};
+    use crate::{traits::Coordinates, BaseInterval};
 
     // define a custom interval struct for testing
     struct CustomInterval {
@@ -589,9 +589,9 @@ mod testing {
 
     #[test]
     fn test_convenience_methods() {
-        let a = Interval::new(10, 20);
-        let b = Interval::new(30, 50);
-        let c = Interval::new(30, 50);
+        let a = BaseInterval::new(10, 20);
+        let b = BaseInterval::new(30, 50);
+        let c = BaseInterval::new(30, 50);
         assert!(a.lt(&b));
         assert!(b.gt(&a));
         assert!(b.eq(&c));
@@ -599,7 +599,7 @@ mod testing {
 
     #[test]
     fn test_extend_left() {
-        let mut a = Interval::new(10, 20);
+        let mut a = BaseInterval::new(10, 20);
         let val = 5;
         a.extend_left(&val);
         assert_eq!(a.start(), 5);
@@ -608,7 +608,7 @@ mod testing {
 
     #[test]
     fn test_extend_left_bounded() {
-        let mut a = Interval::new(10, 20);
+        let mut a = BaseInterval::new(10, 20);
         let val = 11;
         a.extend_left(&val);
         assert_eq!(a.start(), 0);
@@ -617,7 +617,7 @@ mod testing {
 
     #[test]
     fn test_extend_right() {
-        let mut a = Interval::new(10, 20);
+        let mut a = BaseInterval::new(10, 20);
         let val = 5;
         a.extend_right(&val, None);
         assert_eq!(a.start(), 10);
@@ -626,7 +626,7 @@ mod testing {
 
     #[test]
     fn test_extend_right_bounded() {
-        let mut a = Interval::new(10, 20);
+        let mut a = BaseInterval::new(10, 20);
         let val = 5;
         a.extend_right(&val, Some(22));
         assert_eq!(a.start(), 10);
@@ -635,7 +635,7 @@ mod testing {
 
     #[test]
     fn test_extend_both() {
-        let mut a = Interval::new(10, 20);
+        let mut a = BaseInterval::new(10, 20);
         let val = 5;
         a.extend(&val, None);
         assert_eq!(a.start(), 5);
@@ -644,7 +644,7 @@ mod testing {
 
     #[test]
     fn test_extend_both_bounded() {
-        let mut a = Interval::new(10, 20);
+        let mut a = BaseInterval::new(10, 20);
         let val = 5;
         a.extend(&val, Some(22));
         assert_eq!(a.start(), 5);

@@ -77,19 +77,19 @@ where
     /// # Example
     ///
     /// ```
-    /// use bedrs::{Interval, Overlap};
+    /// use bedrs::{BaseInterval, Overlap};
     ///
     /// // base interval
-    /// let interval1 = Interval::new(100, 200);
+    /// let interval1 = BaseInterval::new(100, 200);
     ///
     /// // overlapping on right
-    /// let interval2 = Interval::new(150, 250);
+    /// let interval2 = BaseInterval::new(150, 250);
     ///
     /// // overlapping on left
-    /// let interval3 = Interval::new(50, 150);
+    /// let interval3 = BaseInterval::new(50, 150);
     ///
     /// // non-overlapping
-    /// let interval4 = Interval::new(250, 350);
+    /// let interval4 = BaseInterval::new(250, 350);
     ///
     /// assert!(interval1.interval_overlap(&interval2));
     /// assert!(interval1.interval_overlap(&interval3));
@@ -115,10 +115,10 @@ where
     /// # Example
     ///
     /// ```
-    /// use bedrs::{Interval, Overlap};
+    /// use bedrs::{BaseInterval, Overlap};
     ///
-    /// let interval1 = Interval::new(100, 200);
-    /// let interval2 = Interval::new(150, 160);
+    /// let interval1 = BaseInterval::new(100, 200);
+    /// let interval2 = BaseInterval::new(150, 160);
     ///
     /// assert!(interval1.interval_contains(&interval2));
     /// ```
@@ -146,11 +146,11 @@ where
     ///
     /// # Example
     /// ```
-    /// use bedrs::{Interval, Overlap};
+    /// use bedrs::{BaseInterval, Overlap};
     ///
-    /// let interval1 = Interval::new(100, 200);
-    /// let interval2 = Interval::new(200, 300);
-    /// let interval3 = Interval::new(50, 100);
+    /// let interval1 = BaseInterval::new(100, 200);
+    /// let interval2 = BaseInterval::new(200, 300);
+    /// let interval3 = BaseInterval::new(50, 100);
     ///
     /// assert!(interval1.interval_borders(&interval2));
     /// assert!(interval1.interval_borders(&interval3));
@@ -566,45 +566,45 @@ where
 mod testing {
     use super::Overlap;
     use crate::{
-        types::{record::Bed3, Interval},
+        types::{record::Bed3, BaseInterval},
         Coordinates, Strand, StrandedBed3,
     };
 
     #[test]
     fn test_overlap_self() {
-        let a = Interval::new(10, 20);
+        let a = BaseInterval::new(10, 20);
         assert!(a.overlaps(&a));
     }
 
     #[test]
     fn test_overlap_reciprocity() {
-        let a = Interval::new(10, 20);
-        let b = Interval::new(15, 25);
+        let a = BaseInterval::new(10, 20);
+        let b = BaseInterval::new(15, 25);
         assert!(a.overlaps(&b));
 
-        let a = Interval::new(15, 25);
-        let b = Interval::new(10, 20);
+        let a = BaseInterval::new(15, 25);
+        let b = BaseInterval::new(10, 20);
         assert!(a.overlaps(&b));
     }
 
     #[test]
     fn test_overlap_negative_reciprocity() {
-        let a = Interval::new(10, 20);
-        let b = Interval::new(25, 35);
+        let a = BaseInterval::new(10, 20);
+        let b = BaseInterval::new(25, 35);
         assert!(!a.overlaps(&b));
 
-        let a = Interval::new(25, 35);
-        let b = Interval::new(10, 20);
+        let a = BaseInterval::new(25, 35);
+        let b = BaseInterval::new(10, 20);
         assert!(!a.overlaps(&b));
     }
 
     #[test]
     fn test_overlap_boundary() {
-        let a = Interval::new(10, 20);
-        let b = Interval::new(20, 30);
+        let a = BaseInterval::new(10, 20);
+        let b = BaseInterval::new(20, 30);
         assert!(!a.overlaps(&b));
-        let a = Interval::new(20, 30);
-        let b = Interval::new(10, 20);
+        let a = BaseInterval::new(20, 30);
+        let b = BaseInterval::new(10, 20);
         assert!(!a.overlaps(&b));
     }
 
@@ -645,10 +645,10 @@ mod testing {
 
     #[test]
     fn test_base_contained() {
-        let a = Interval::new(10, 30);
-        let b = Interval::new(15, 25);
-        let c = Interval::new(10, 30);
-        let d = Interval::new(9, 31);
+        let a = BaseInterval::new(10, 30);
+        let b = BaseInterval::new(15, 25);
+        let c = BaseInterval::new(10, 30);
+        let d = BaseInterval::new(9, 31);
         assert!(a.contains(&b));
         assert!(b.contained_by(&a));
         assert!(a.contains(&c));
@@ -659,8 +659,8 @@ mod testing {
 
     #[test]
     fn test_overlapping_contains() {
-        let a = Interval::new(10, 30);
-        let b = Interval::new(15, 25);
+        let a = BaseInterval::new(10, 30);
+        let b = BaseInterval::new(15, 25);
         assert!(a.overlaps(&b));
         assert!(b.overlaps(&a));
     }
@@ -684,15 +684,15 @@ mod testing {
 
     #[test]
     fn test_overlap_identity() {
-        let a = Interval::new(10, 20);
-        let b = Interval::new(10, 20);
+        let a = BaseInterval::new(10, 20);
+        let b = BaseInterval::new(10, 20);
         assert!(a.overlaps(&b));
     }
 
     #[test]
     fn base_borders() {
-        let a = Interval::new(10, 20);
-        let b = Interval::new(20, 30);
+        let a = BaseInterval::new(10, 20);
+        let b = BaseInterval::new(20, 30);
         assert!(a.borders(&b));
         assert!(b.borders(&a));
     }
@@ -710,127 +710,127 @@ mod testing {
 
     #[test]
     fn overlap_size_lt() {
-        let a = Interval::new(10, 20);
-        let b = Interval::new(15, 25);
+        let a = BaseInterval::new(10, 20);
+        let b = BaseInterval::new(15, 25);
         assert_eq!(a.overlap_size(&b), Some(5));
 
-        let a = Interval::new(10, 20);
-        let b = Interval::new(14, 25);
+        let a = BaseInterval::new(10, 20);
+        let b = BaseInterval::new(14, 25);
         assert_eq!(a.overlap_size(&b), Some(6));
 
-        let a = Interval::new(10, 20);
-        let b = Interval::new(16, 25);
+        let a = BaseInterval::new(10, 20);
+        let b = BaseInterval::new(16, 25);
         assert_eq!(a.overlap_size(&b), Some(4));
     }
 
     #[test]
     fn overlap_size_gt() {
-        let a = Interval::new(15, 25);
-        let b = Interval::new(10, 20);
+        let a = BaseInterval::new(15, 25);
+        let b = BaseInterval::new(10, 20);
         assert_eq!(a.overlap_size(&b), Some(5));
 
-        let a = Interval::new(14, 25);
-        let b = Interval::new(10, 20);
+        let a = BaseInterval::new(14, 25);
+        let b = BaseInterval::new(10, 20);
         assert_eq!(a.overlap_size(&b), Some(6));
 
-        let a = Interval::new(16, 25);
-        let b = Interval::new(10, 20);
+        let a = BaseInterval::new(16, 25);
+        let b = BaseInterval::new(10, 20);
         assert_eq!(a.overlap_size(&b), Some(4));
     }
 
     #[test]
     fn overlap_size_none() {
-        let a = Interval::new(10, 20);
-        let b = Interval::new(21, 25);
+        let a = BaseInterval::new(10, 20);
+        let b = BaseInterval::new(21, 25);
         assert_eq!(a.overlap_size(&b), None);
 
-        let a = Interval::new(21, 25);
-        let b = Interval::new(10, 20);
+        let a = BaseInterval::new(21, 25);
+        let b = BaseInterval::new(10, 20);
         assert_eq!(a.overlap_size(&b), None);
     }
 
     #[test]
     fn overlaps_by_lt() {
-        let a = Interval::new(10, 20);
-        let b = Interval::new(15, 25);
+        let a = BaseInterval::new(10, 20);
+        let b = BaseInterval::new(15, 25);
         assert!(a.overlaps_by(&b, 5));
 
-        let a = Interval::new(10, 20);
-        let b = Interval::new(16, 25);
+        let a = BaseInterval::new(10, 20);
+        let b = BaseInterval::new(16, 25);
         assert!(!a.overlaps_by(&b, 5));
 
-        let a = Interval::new(10, 20);
-        let b = Interval::new(14, 25);
+        let a = BaseInterval::new(10, 20);
+        let b = BaseInterval::new(14, 25);
         assert!(a.overlaps_by(&b, 5));
     }
 
     #[test]
     fn overlaps_by_gt() {
-        let a = Interval::new(15, 25);
-        let b = Interval::new(10, 20);
+        let a = BaseInterval::new(15, 25);
+        let b = BaseInterval::new(10, 20);
         assert!(a.overlaps_by(&b, 5));
 
-        let a = Interval::new(16, 25);
-        let b = Interval::new(10, 20);
+        let a = BaseInterval::new(16, 25);
+        let b = BaseInterval::new(10, 20);
         assert!(!a.overlaps_by(&b, 5));
 
-        let a = Interval::new(14, 25);
-        let b = Interval::new(10, 20);
+        let a = BaseInterval::new(14, 25);
+        let b = BaseInterval::new(10, 20);
         assert!(a.overlaps_by(&b, 5));
     }
 
     #[test]
     fn overlaps_by_none() {
-        let a = Interval::new(10, 20);
-        let b = Interval::new(21, 25);
+        let a = BaseInterval::new(10, 20);
+        let b = BaseInterval::new(21, 25);
         assert!(!a.overlaps_by(&b, 5));
 
-        let a = Interval::new(21, 25);
-        let b = Interval::new(10, 20);
+        let a = BaseInterval::new(21, 25);
+        let b = BaseInterval::new(10, 20);
         assert!(!a.overlaps_by(&b, 5));
     }
 
     #[test]
     fn overlaps_exact_lt() {
-        let a = Interval::new(10, 20);
-        let b = Interval::new(15, 25);
+        let a = BaseInterval::new(10, 20);
+        let b = BaseInterval::new(15, 25);
         assert!(a.overlaps_by_exactly(&b, 5));
 
-        let a = Interval::new(10, 20);
-        let b = Interval::new(16, 25);
+        let a = BaseInterval::new(10, 20);
+        let b = BaseInterval::new(16, 25);
         assert!(!a.overlaps_by_exactly(&b, 5));
 
-        let a = Interval::new(10, 20);
-        let b = Interval::new(14, 25);
+        let a = BaseInterval::new(10, 20);
+        let b = BaseInterval::new(14, 25);
         assert!(!a.overlaps_by_exactly(&b, 5));
     }
 
     #[test]
     fn overlaps_exact_gt() {
-        let a = Interval::new(15, 25);
-        let b = Interval::new(10, 20);
+        let a = BaseInterval::new(15, 25);
+        let b = BaseInterval::new(10, 20);
         assert!(a.overlaps_by_exactly(&b, 5));
 
-        let a = Interval::new(16, 25);
-        let b = Interval::new(10, 20);
+        let a = BaseInterval::new(16, 25);
+        let b = BaseInterval::new(10, 20);
         assert!(!a.overlaps_by_exactly(&b, 5));
 
-        let a = Interval::new(14, 25);
-        let b = Interval::new(10, 20);
+        let a = BaseInterval::new(14, 25);
+        let b = BaseInterval::new(10, 20);
         assert!(!a.overlaps_by_exactly(&b, 5));
     }
 
     #[test]
     fn overlap_size_contains() {
-        let a = Interval::new(15, 25);
-        let b = Interval::new(17, 23);
+        let a = BaseInterval::new(15, 25);
+        let b = BaseInterval::new(17, 23);
         assert_eq!(a.overlap_size(&b), Some(b.len()));
     }
 
     #[test]
     fn overlap_size_contained_by() {
-        let a = Interval::new(17, 23);
-        let b = Interval::new(15, 25);
+        let a = BaseInterval::new(17, 23);
+        let b = BaseInterval::new(15, 25);
         assert_eq!(a.overlap_size(&b), Some(a.len()));
     }
 

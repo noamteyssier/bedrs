@@ -63,14 +63,14 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::{traits::Coordinates, Bed3, Interval, IntervalContainer};
+    use crate::{traits::Coordinates, Bed3, BaseInterval, IntervalContainer};
 
     #[test]
     fn test_merging_one_cluster() {
         let records = vec![
-            Interval::new(10, 30),
-            Interval::new(15, 20),
-            Interval::new(25, 30),
+            BaseInterval::new(10, 30),
+            BaseInterval::new(15, 20),
+            BaseInterval::new(25, 30),
         ];
         let set = IntervalContainer::from_unsorted(records);
         let merge_set = set.merge().unwrap();
@@ -87,11 +87,11 @@ mod testing {
     #[test]
     fn test_merging_two_clusters() {
         let records = vec![
-            Interval::new(10, 30),
-            Interval::new(15, 20),
-            Interval::new(25, 30),
-            Interval::new(35, 50),
-            Interval::new(40, 45),
+            BaseInterval::new(10, 30),
+            BaseInterval::new(15, 20),
+            BaseInterval::new(25, 30),
+            BaseInterval::new(35, 50),
+            BaseInterval::new(40, 45),
         ];
         let set = IntervalContainer::from_unsorted(records);
         let merge_set = set.merge().unwrap();
@@ -115,9 +115,9 @@ mod testing {
     #[test]
     fn test_merging_one_cluster_unsort() {
         let records = vec![
-            Interval::new(10, 30),
-            Interval::new(15, 20),
-            Interval::new(25, 30),
+            BaseInterval::new(10, 30),
+            BaseInterval::new(15, 20),
+            BaseInterval::new(25, 30),
         ];
         let set = IntervalContainer::from_iter(records);
         let merge_set = set.merge();
@@ -172,9 +172,9 @@ mod testing {
     #[test]
     fn merging_base_borders() {
         let records = vec![
-            Interval::new(10, 20),
-            Interval::new(20, 30),
-            Interval::new(30, 40),
+            BaseInterval::new(10, 20),
+            BaseInterval::new(20, 30),
+            BaseInterval::new(30, 40),
         ];
         let set = IntervalContainer::from_sorted_unchecked(records);
         let merge_set = set.merge_unchecked();
@@ -192,9 +192,9 @@ mod testing {
     #[test]
     fn merge_container_methods() {
         let records = vec![
-            Interval::new(10, 20),
-            Interval::new(20, 30),
-            Interval::new(30, 40),
+            BaseInterval::new(10, 20),
+            BaseInterval::new(20, 30),
+            BaseInterval::new(30, 40),
         ];
         let set = IntervalContainer::from_sorted_unchecked(records);
         let mut merge_set = set.merge_unchecked();
@@ -213,10 +213,10 @@ mod testing {
     // #[should_panic]
     // fn merge_container_new() {
     //     let records = vec![
-    //         Interval::new(10, 20),
-    //         Interval::new(20, 30),
-    //         Interval::new(30, 40),
+    //         BaseInterval::new(10, 20),
+    //         BaseInterval::new(20, 30),
+    //         BaseInterval::new(30, 40),
     //     ];
-    //     let _merge_set: MergeResults<usize, usize, Interval<usize>> = Container::new(records);
+    //     let _merge_set: MergeResults<usize, usize, BaseInterval<usize>> = Container::new(records);
     // }
 }

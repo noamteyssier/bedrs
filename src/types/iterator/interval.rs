@@ -16,9 +16,9 @@ use std::{collections::VecDeque, marker::PhantomData};
 /// use bedrs::*;
 ///
 /// let intervals = vec![
-///     Interval::new(1, 10),
-///     Interval::new(2, 20),
-///     Interval::new(3, 30),
+///     BaseInterval::new(1, 10),
+///     BaseInterval::new(2, 20),
+///     BaseInterval::new(3, 30),
 /// ];
 ///
 /// // build an iterator over the vector
@@ -36,9 +36,9 @@ use std::{collections::VecDeque, marker::PhantomData};
 /// use bedrs::*;
 ///
 /// let intervals = vec![
-///     Interval::new(1, 10),
-///     Interval::new(2, 20),
-///     Interval::new(3, 30),
+///     BaseInterval::new(1, 10),
+///     BaseInterval::new(2, 20),
+///     BaseInterval::new(3, 30),
 /// ];
 ///
 /// // build a container of interval records
@@ -101,9 +101,9 @@ where
 /// use bedrs::*;
 ///
 /// let intervals = vec![
-///     Interval::new(1, 10),
-///     Interval::new(2, 20),
-///     Interval::new(3, 30),
+///     BaseInterval::new(1, 10),
+///     BaseInterval::new(2, 20),
+///     BaseInterval::new(3, 30),
 /// ];
 ///
 /// // build an iterator over the vector
@@ -124,9 +124,9 @@ where
 /// use bedrs::*;
 ///
 /// let intervals = vec![
-///     Interval::new(1, 10),
-///     Interval::new(2, 20),
-///     Interval::new(3, 30),
+///     BaseInterval::new(1, 10),
+///     BaseInterval::new(2, 20),
+///     BaseInterval::new(3, 30),
 /// ];
 ///
 /// // build a container of interval records
@@ -186,14 +186,14 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::{Coordinates, Interval, IntervalContainer};
+    use crate::{Coordinates, BaseInterval, IntervalContainer};
 
     #[test]
     fn iterator_owned() {
         let intervals = vec![
-            Interval::new(1, 10),
-            Interval::new(2, 20),
-            Interval::new(3, 30),
+            BaseInterval::new(1, 10),
+            BaseInterval::new(2, 20),
+            BaseInterval::new(3, 30),
         ];
         let set = IntervalContainer::from_iter(intervals);
         let mut iter = set.into_iter();
@@ -206,9 +206,9 @@ mod testing {
     #[test]
     fn iterator_ref() {
         let intervals = vec![
-            Interval::new(1, 10),
-            Interval::new(2, 20),
-            Interval::new(3, 30),
+            BaseInterval::new(1, 10),
+            BaseInterval::new(2, 20),
+            BaseInterval::new(3, 30),
         ];
         let set = IntervalContainer::from_iter(intervals);
         let mut iter = set.iter();

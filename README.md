@@ -103,10 +103,10 @@ It still implements the `chr()` method, but will return the
 default of its generic type.
 
 ```rust
-use bedrs::{Overlap, Interval};
+use bedrs::{Overlap, BaseInterval};
 
-let a = Interval::new(10, 20);
-let b = Interval::new(15, 25);
+let a = BaseInterval::new(10, 20);
+let b = BaseInterval::new(15, 25);
 assert!(a.overlaps(&b));
 ```
 

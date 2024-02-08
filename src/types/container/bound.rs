@@ -23,17 +23,17 @@ where
     /// ## On base coordinates
     ///
     /// ```
-    /// use bedrs::{Interval, IntervalContainer};
+    /// use bedrs::{BaseInterval, IntervalContainer};
     ///
     /// let records = vec![
-    ///     Interval::new(0, 10),
-    ///     Interval::new(10, 20), // <- min
-    ///     Interval::new(20, 30),
-    ///     Interval::new(30, 40),
-    ///     Interval::new(40, 50),
-    ///     Interval::new(50, 60),
+    ///     BaseInterval::new(0, 10),
+    ///     BaseInterval::new(10, 20), // <- min
+    ///     BaseInterval::new(20, 30),
+    ///     BaseInterval::new(30, 40),
+    ///     BaseInterval::new(40, 50),
+    ///     BaseInterval::new(50, 60),
     /// ];
-    /// let query = Interval::new(17, 27);
+    /// let query = BaseInterval::new(17, 27);
     /// let mut set = IntervalContainer::new(records);
     /// set.sort();
     /// let bound = set.lower_bound(&query);
@@ -84,17 +84,17 @@ where
     /// ## On base coordinates
     ///
     /// ```
-    /// use bedrs::{Interval, IntervalContainer};
+    /// use bedrs::{BaseInterval, IntervalContainer};
     ///
     /// let records = vec![
-    ///     Interval::new(0, 10),
-    ///     Interval::new(10, 20), // <- min
-    ///     Interval::new(20, 30),
-    ///     Interval::new(30, 40),
-    ///     Interval::new(40, 50),
-    ///     Interval::new(50, 60),
+    ///     BaseInterval::new(0, 10),
+    ///     BaseInterval::new(10, 20), // <- min
+    ///     BaseInterval::new(20, 30),
+    ///     BaseInterval::new(30, 40),
+    ///     BaseInterval::new(40, 50),
+    ///     BaseInterval::new(50, 60),
     /// ];
-    /// let query = Interval::new(17, 27);
+    /// let query = BaseInterval::new(17, 27);
     /// let set = IntervalContainer::new(records);
     /// let bound = set.lower_bound_unchecked(&query);
     /// assert_eq!(bound, 1);
@@ -460,33 +460,33 @@ where
 #[cfg(test)]
 mod testing {
     use crate::{
-        traits::errors::SetError, Bed3, Interval, IntervalContainer, Strand,
+        traits::errors::SetError, Bed3, BaseInterval, IntervalContainer, Strand,
         StrandedBed3,
     };
 
     #[test]
     fn bsearch_unsorted_chr() {
-        let records = (0..500).map(|x| Interval::new(x, x + 50)).collect();
+        let records = (0..500).map(|x| BaseInterval::new(x, x + 50)).collect();
         let set = IntervalContainer::new(records);
-        let query = Interval::new(10, 20);
+        let query = BaseInterval::new(10, 20);
         let bound = set.lower_bound(&query);
         assert!(bound.is_err());
     }
 
     #[test]
     fn bsearch_unsorted_chr_upstream() {
-        let records = (0..500).map(|x| Interval::new(x, x + 50)).collect();
+        let records = (0..500).map(|x| BaseInterval::new(x, x + 50)).collect();
         let set = IntervalContainer::new(records);
-        let query = Interval::new(10, 20);
+        let query = BaseInterval::new(10, 20);
         let bound = set.chr_bound_upstream(&query);
         assert!(bound.is_err());
     }
 
     #[test]
     fn bsearch_unsorted_chr_downstream() {
-        let records = (0..500).map(|x| Interval::new(x, x + 50)).collect();
+        let records = (0..500).map(|x| BaseInterval::new(x, x + 50)).collect();
         let set = IntervalContainer::new(records);
-        let query = Interval::new(10, 20);
+        let query = BaseInterval::new(10, 20);
         let bound = set.chr_bound_downstream(&query);
         assert!(bound.is_err());
     }
@@ -515,34 +515,34 @@ mod testing {
 
     #[test]
     fn bsearch_empty_chr() {
-        let records: Vec<Interval<_>> = Vec::new();
+        let records: Vec<BaseInterval<_>> = Vec::new();
         let set = IntervalContainer::new(records);
-        let query = Interval::new(10, 20);
+        let query = BaseInterval::new(10, 20);
         let bound = set.lower_bound(&query);
         assert!(bound.is_err());
     }
 
     #[test]
     fn bsearch_empty_chr_upstream() {
-        let records: Vec<Interval<_>> = Vec::new();
+        let records: Vec<BaseInterval<_>> = Vec::new();
         let set = IntervalContainer::new(records);
-        let query = Interval::new(10, 20);
+        let query = BaseInterval::new(10, 20);
         let bound = set.chr_bound_upstream(&query);
         assert!(bound.is_err());
     }
 
     #[test]
     fn bsearch_empty_chr_downstream() {
-        let records: Vec<Interval<_>> = Vec::new();
+        let records: Vec<BaseInterval<_>> = Vec::new();
         let set = IntervalContainer::new(records);
-        let query = Interval::new(10, 20);
+        let query = BaseInterval::new(10, 20);
         let bound = set.chr_bound_downstream(&query);
         assert!(bound.is_err());
     }
 
     #[test]
     fn bsearch_empty_chr_stranded_upstream() {
-        let records: Vec<Interval<_>> = Vec::new();
+        let records: Vec<BaseInterval<_>> = Vec::new();
         let set = IntervalContainer::new(records);
         let query = StrandedBed3::new(1, 10, 20, Strand::Forward);
         let bound = set.stranded_upstream_bound(&query);
@@ -551,7 +551,7 @@ mod testing {
 
     #[test]
     fn bsearch_empty_chr_stranded_downstream() {
-        let records: Vec<Interval<_>> = Vec::new();
+        let records: Vec<BaseInterval<_>> = Vec::new();
         let set = IntervalContainer::new(records);
         let query = StrandedBed3::new(1, 10, 20, Strand::Forward);
         let bound = set.stranded_downstream_bound(&query);
@@ -560,40 +560,40 @@ mod testing {
 
     #[test]
     fn bsearch_base_low() {
-        let records = (0..500).map(|x| Interval::new(x, x + 50)).collect();
+        let records = (0..500).map(|x| BaseInterval::new(x, x + 50)).collect();
         let mut set = IntervalContainer::new(records);
         set.sort();
-        let query = Interval::new(10, 20);
+        let query = BaseInterval::new(10, 20);
         let bound = set.lower_bound(&query);
         assert_eq!(bound, Ok(0));
     }
 
     #[test]
     fn bsearch_base_high() {
-        let records = (0..500).map(|x| Interval::new(x, x + 50)).collect();
+        let records = (0..500).map(|x| BaseInterval::new(x, x + 50)).collect();
         let mut set = IntervalContainer::new(records);
         set.sort();
-        let query = Interval::new(300, 320);
+        let query = BaseInterval::new(300, 320);
         let bound = set.lower_bound(&query);
         assert_eq!(bound, Ok(251));
     }
 
     #[test]
     fn bsearch_base_mid() {
-        let records = (0..500).map(|x| Interval::new(x, x + 50)).collect();
+        let records = (0..500).map(|x| BaseInterval::new(x, x + 50)).collect();
         let mut set = IntervalContainer::new(records);
         set.sort();
-        let query = Interval::new(200, 220);
+        let query = BaseInterval::new(200, 220);
         let bound = set.lower_bound(&query);
         assert_eq!(bound, Ok(151));
     }
 
     #[test]
     fn bsearch_base_containing() {
-        let records = (0..500).map(|x| Interval::new(x, x + 50)).collect();
+        let records = (0..500).map(|x| BaseInterval::new(x, x + 50)).collect();
         let mut set = IntervalContainer::new(records);
         set.sort();
-        let query = Interval::new(0, 500);
+        let query = BaseInterval::new(0, 500);
         let bound = set.lower_bound(&query);
         assert_eq!(bound, Ok(0));
     }
@@ -634,9 +634,9 @@ mod testing {
 
     #[test]
     fn bsearch_unsorted() {
-        let records = (0..500).map(|x| Interval::new(x, x + 50)).collect();
+        let records = (0..500).map(|x| BaseInterval::new(x, x + 50)).collect();
         let set = IntervalContainer::new(records);
-        let query = Interval::new(10, 20);
+        let query = BaseInterval::new(10, 20);
         let bound = set.lower_bound(&query);
         assert_eq!(bound, Err(SetError::UnsortedSet));
     }
@@ -644,13 +644,13 @@ mod testing {
     #[test]
     fn bsearch_equality() {
         let records = vec![
-            Interval::new(10, 20),
-            Interval::new(20, 30), // <- min
-            Interval::new(30, 40),
-            Interval::new(40, 50),
-            Interval::new(50, 60),
+            BaseInterval::new(10, 20),
+            BaseInterval::new(20, 30), // <- min
+            BaseInterval::new(30, 40),
+            BaseInterval::new(40, 50),
+            BaseInterval::new(50, 60),
         ];
-        let query = Interval::new(20, 25);
+        let query = BaseInterval::new(20, 25);
         let set = IntervalContainer::new(records);
         let bound = set.lower_bound_unchecked(&query);
         assert_eq!(bound, 1);
@@ -659,14 +659,14 @@ mod testing {
     #[test]
     fn bsearch_zero() {
         let records = vec![
-            Interval::new(0, 10), // <- min
-            Interval::new(10, 20),
-            Interval::new(20, 30),
-            Interval::new(30, 40),
-            Interval::new(40, 50),
-            Interval::new(50, 60),
+            BaseInterval::new(0, 10), // <- min
+            BaseInterval::new(10, 20),
+            BaseInterval::new(20, 30),
+            BaseInterval::new(30, 40),
+            BaseInterval::new(40, 50),
+            BaseInterval::new(50, 60),
         ];
-        let query = Interval::new(5, 20);
+        let query = BaseInterval::new(5, 20);
         let set = IntervalContainer::new(records);
         let bound = set.lower_bound_unchecked(&query);
         assert_eq!(bound, 0);
@@ -675,15 +675,15 @@ mod testing {
     #[test]
     fn bsearch_multizero() {
         let records = vec![
-            Interval::new(0, 10), // <- min
-            Interval::new(0, 10),
-            Interval::new(10, 20),
-            Interval::new(20, 30),
-            Interval::new(30, 40),
-            Interval::new(40, 50),
-            Interval::new(50, 60),
+            BaseInterval::new(0, 10), // <- min
+            BaseInterval::new(0, 10),
+            BaseInterval::new(10, 20),
+            BaseInterval::new(20, 30),
+            BaseInterval::new(30, 40),
+            BaseInterval::new(40, 50),
+            BaseInterval::new(50, 60),
         ];
-        let query = Interval::new(5, 20);
+        let query = BaseInterval::new(5, 20);
         let set = IntervalContainer::new(records);
         let bound = set.lower_bound_unchecked(&query);
         assert_eq!(bound, 0);
@@ -706,9 +706,9 @@ mod testing {
 
     #[test]
     fn bsearch_no_max_len() {
-        let records = (0..500).map(|x| Interval::new(x, x + 50)).collect();
+        let records = (0..500).map(|x| BaseInterval::new(x, x + 50)).collect();
         let mut set = IntervalContainer::from_sorted(records).unwrap();
-        let query = Interval::new(10, 20);
+        let query = BaseInterval::new(10, 20);
         set.max_len_mut().take();
         let bound = set.lower_bound(&query);
         assert_eq!(bound, Err(SetError::MissingMaxLen));
@@ -718,9 +718,9 @@ mod testing {
     #[should_panic]
     #[allow(clippy::should_panic_without_expect)]
     fn bsearch_no_max_len_unchecked_panic() {
-        let records = (0..500).map(|x| Interval::new(x, x + 50)).collect();
+        let records = (0..500).map(|x| BaseInterval::new(x, x + 50)).collect();
         let mut set = IntervalContainer::from_sorted(records).unwrap();
-        let query = Interval::new(10, 20);
+        let query = BaseInterval::new(10, 20);
         set.max_len_mut().take();
         set.lower_bound_unchecked(&query);
     }

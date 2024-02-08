@@ -65,17 +65,17 @@
 //!
 //! ### Base Interval
 //!
-//! Here is an example of the base [Interval](types::Interval).
+//! Here is an example of the base [`BaseInterval`](types::BaseInterval).
 //!
 //! This interval only has two coordinates: `start` and `end`.
 //! This is the classic interval type.
 //!
 //! ```
-//! use bedrs::{Overlap, Interval};
+//! use bedrs::{Overlap, BaseInterval};
 //!
-//! let a = Interval::new(10, 20);
-//! let b = Interval::new(15, 25);
-//! let c = Interval::new(20, 30);
+//! let a = BaseInterval::new(10, 20);
+//! let b = BaseInterval::new(15, 25);
+//! let c = BaseInterval::new(20, 30);
 //!
 //! assert!(a.overlaps(&b));
 //! assert!(!a.overlaps(&c));
@@ -103,16 +103,16 @@
 //!
 //! ## Interval Operations
 //!
-//! The following operations with be shown with the base [Interval], but
+//! The following operations with be shown with the base [`BaseInterval`], but
 //! the same operations can be done with a [`Bed3`] or any other
 //! custom type which implements the [Coordinates] trait.
 //!
 //! ### Overlap
 //! ```
-//! use bedrs::{Overlap, Interval};
+//! use bedrs::{Overlap, BaseInterval};
 //!
-//! let a = Interval::new(10, 20);
-//! let b = Interval::new(15, 25);
+//! let a = BaseInterval::new(10, 20);
+//! let b = BaseInterval::new(15, 25);
 //! assert!(a.overlaps(&b));
 //! ```
 //!
@@ -121,10 +121,10 @@
 //! Whether an interval is contained by another.
 //!
 //! ```
-//! use bedrs::{Overlap, Interval};
+//! use bedrs::{Overlap, BaseInterval};
 //!
-//! let a = Interval::new(10, 30);
-//! let b = Interval::new(15, 25);
+//! let a = BaseInterval::new(10, 30);
+//! let b = BaseInterval::new(15, 25);
 //! assert!(a.contains(&b));
 //! assert!(b.contained_by(&a));
 //! ```
@@ -134,14 +134,14 @@
 //! Whether an interval is bordered by another.
 //!
 //! ```
-//! use bedrs::{Overlap, Interval};
+//! use bedrs::{Overlap, BaseInterval};
 //!
-//! let a = Interval::new(10, 30);
-//! let b = Interval::new(30, 50);
+//! let a = BaseInterval::new(10, 30);
+//! let b = BaseInterval::new(30, 50);
 //! assert!(a.borders(&b));
 //! ```
 //!
-//! ## Interval Functions
+//! ## `BaseInterval` Functions
 //!
 //! The following are active functions to generate more intervals using
 //! some query intervals.
@@ -151,10 +151,10 @@
 //! Here is an example of a positive intersect
 //!
 //! ```
-//! use bedrs::{Interval, Coordinates, Intersect};
+//! use bedrs::{BaseInterval, Coordinates, Intersect};
 //!
-//! let a = Interval::new(10, 30);
-//! let b = Interval::new(20, 40);
+//! let a = BaseInterval::new(10, 30);
+//! let b = BaseInterval::new(20, 40);
 //! let ix = a.intersect(&b).unwrap();
 //! assert_eq!(ix.start(), 20);
 //! assert_eq!(ix.end(), 30);
@@ -163,10 +163,10 @@
 //! Here is an example of a negative intersect
 //!
 //! ```
-//! use bedrs::{Interval, Coordinates, Intersect};
+//! use bedrs::{BaseInterval, Coordinates, Intersect};
 //!
-//! let a = Interval::new(10, 30);
-//! let b = Interval::new(30, 40);
+//! let a = BaseInterval::new(10, 30);
+//! let b = BaseInterval::new(30, 40);
 //! let ix = a.intersect(&b);
 //! assert!(ix.is_none());
 //! ```
@@ -180,10 +180,10 @@
 //! #### Left-Hand Subtraction
 //!
 //! ```
-//! use bedrs::{Interval, Coordinates, Subtract};
+//! use bedrs::{BaseInterval, Coordinates, Subtract};
 //!
-//! let a = Interval::new(10, 30);
-//! let b = Interval::new(20, 40);
+//! let a = BaseInterval::new(10, 30);
+//! let b = BaseInterval::new(20, 40);
 //! let sub = a.subtract(&b).unwrap();
 //! assert_eq!(sub.len(), 1);
 //! assert_eq!(sub[0].start(), 10);
@@ -193,10 +193,10 @@
 //! #### Right-Hand Subtraction
 //!
 //! ```
-//! use bedrs::{Interval, Coordinates, Subtract};
+//! use bedrs::{BaseInterval, Coordinates, Subtract};
 //!
-//! let a = Interval::new(20, 40);
-//! let b = Interval::new(10, 30);
+//! let a = BaseInterval::new(20, 40);
+//! let b = BaseInterval::new(10, 30);
 //! let sub = a.subtract(&b).unwrap();
 //! assert_eq!(sub.len(), 1);
 //! assert_eq!(sub[0].start(), 30);
@@ -206,10 +206,10 @@
 //! #### Contained Subtraction
 //!
 //! ```
-//! use bedrs::{Interval, Coordinates, Subtract};
+//! use bedrs::{BaseInterval, Coordinates, Subtract};
 //!
-//! let a = Interval::new(10, 40);
-//! let b = Interval::new(20, 30);
+//! let a = BaseInterval::new(10, 40);
+//! let b = BaseInterval::new(20, 30);
 //! let sub = a.subtract(&b).unwrap();
 //! assert_eq!(sub.len(), 2);
 //! assert_eq!(sub[0].start(), 10);
@@ -221,10 +221,10 @@
 //! #### Contained-By Subtraction
 //!
 //! ```
-//! use bedrs::{Interval, Coordinates, Subtract};
+//! use bedrs::{BaseInterval, Coordinates, Subtract};
 //!
-//! let a = Interval::new(20, 30);
-//! let b = Interval::new(10, 40);
+//! let a = BaseInterval::new(20, 30);
+//! let b = BaseInterval::new(10, 40);
 //! let sub = a.subtract(&b);
 //! assert!(sub.is_none());
 //! ```
@@ -232,10 +232,10 @@
 //! #### No Overlap Subtraction
 //!
 //! ```
-//! use bedrs::{Interval, Coordinates, Subtract};
+//! use bedrs::{BaseInterval, Coordinates, Subtract};
 //!
-//! let a = Interval::new(10, 20);
-//! let b = Interval::new(20, 30);
+//! let a = BaseInterval::new(10, 20);
+//! let b = BaseInterval::new(20, 30);
 //! let sub = a.subtract(&b).unwrap();
 //! assert_eq!(sub.len(), 1);
 //! assert_eq!(sub[0].start(), 10);
@@ -250,6 +250,6 @@ pub mod types;
 
 pub use traits::{Coordinates, Distance, Intersect, Overlap, Subtract};
 pub use types::{
-    Bed12, Bed3, Bed4, Bed6, IntersectIter, Interval, IntervalContainer, IntervalIterOwned,
+    BaseInterval, Bed12, Bed3, Bed4, Bed6, IntersectIter, IntervalContainer, IntervalIterOwned,
     IntervalIterRef, MergeIter, MetaInterval, Strand, StrandedBed3,
 };

@@ -1,12 +1,12 @@
 use bedrs::{
     traits::Overlap,
-    types::{Bed3, Interval},
+    types::{Bed3, BaseInterval},
 };
 use criterion::Criterion;
 
 pub fn overlap_base(c: &mut Criterion) {
-    let a = Interval::new(10, 100);
-    let b = Interval::new(50, 150);
+    let a = BaseInterval::new(10, 100);
+    let b = BaseInterval::new(50, 150);
     c.bench_function("overlap-base", |bench| bench.iter(|| a.overlaps(&b)));
 }
 

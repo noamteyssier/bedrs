@@ -70,15 +70,15 @@ where
     ///
     /// ## Left Overlap
     /// ```
-    /// use bedrs::{Coordinates, Subtract, Interval};
+    /// use bedrs::{Coordinates, Subtract, BaseInterval};
     ///
     /// // (a)       x-------y
     /// // (b)   i-----j
     /// // ======================
     /// // (s)         j----y
     ///
-    /// let a = Interval::new(20, 30);
-    /// let b = Interval::new(15, 25);
+    /// let a = BaseInterval::new(20, 30);
+    /// let b = BaseInterval::new(15, 25);
     /// let s = a.subtract(&b).unwrap();
     /// assert_eq!(s.len(), 1);
     /// assert_eq!(s[0].start(), 25);
@@ -87,15 +87,15 @@ where
     ///
     /// ## Right Overlap
     /// ```
-    /// use bedrs::{Coordinates, Subtract, Interval};
+    /// use bedrs::{Coordinates, Subtract, BaseInterval};
     ///
     /// // (a)   x-----y
     /// // (b)       i-------j
     /// // =======================
     /// // (s)   x---i
     ///
-    /// let a = Interval::new(15, 25);
-    /// let b = Interval::new(20, 30);
+    /// let a = BaseInterval::new(15, 25);
+    /// let b = BaseInterval::new(20, 30);
     /// let s = a.subtract(&b).unwrap();
     /// assert_eq!(s.len(), 1);
     /// assert_eq!(s[0].start(), 15);
@@ -104,15 +104,15 @@ where
     ///
     /// ## Contains
     /// ```
-    /// use bedrs::{Coordinates, Subtract, Interval};
+    /// use bedrs::{Coordinates, Subtract, BaseInterval};
     ///
     /// // (a)   x-----------y
     /// // (b)       i--j
     /// // =======================
     /// // (s)   x---i  j----y
     ///
-    /// let a = Interval::new(10, 40);
-    /// let b = Interval::new(20, 30);
+    /// let a = BaseInterval::new(10, 40);
+    /// let b = BaseInterval::new(20, 30);
     /// let s = a.subtract(&b).unwrap();
     /// assert_eq!(s.len(), 2);
     /// assert_eq!(s[0].start(), 10);
@@ -123,45 +123,45 @@ where
     ///
     /// ## Contained by
     /// ```
-    /// use bedrs::{Coordinates, Subtract, Interval};
+    /// use bedrs::{Coordinates, Subtract, BaseInterval};
     ///
     /// // (a)       x--y
     /// // (b)   i-----------j
     /// // =======================
     /// // (s) None
     ///
-    /// let a = Interval::new(20, 30);
-    /// let b = Interval::new(10, 40);
+    /// let a = BaseInterval::new(20, 30);
+    /// let b = BaseInterval::new(10, 40);
     /// let s = a.subtract(&b);
     /// assert!(s.is_none());
     /// ```
     ///
     /// ## Complete Overlap
     /// ```
-    /// use bedrs::{Coordinates, Subtract, Interval};
+    /// use bedrs::{Coordinates, Subtract, BaseInterval};
     ///
     /// // (a)       x--y
     /// // (b)       i--j
     /// // =======================
     /// // (s) None
     ///
-    /// let a = Interval::new(10, 30);
-    /// let b = Interval::new(10, 30);
+    /// let a = BaseInterval::new(10, 30);
+    /// let b = BaseInterval::new(10, 30);
     /// let s = a.subtract(&b);
     /// assert!(s.is_none());
     /// ```
     ///
     /// ## No Overlap
     /// ```
-    /// use bedrs::{Coordinates, Subtract, Interval};
+    /// use bedrs::{Coordinates, Subtract, BaseInterval};
     ///
     /// // (a)  x--y
     /// // (b)       i--j
     /// // =======================
     /// // (s)  x--y
     ///
-    /// let a = Interval::new(10, 20);
-    /// let b = Interval::new(30, 40);
+    /// let a = BaseInterval::new(10, 20);
+    /// let b = BaseInterval::new(30, 40);
     /// let s = a.subtract(&b).unwrap();
     /// assert_eq!(s.len(), 1);
     /// assert_eq!(s[0].start(), 10);
@@ -221,7 +221,7 @@ where
 #[cfg(test)]
 mod testing {
     use super::Subtract;
-    use crate::{Coordinates, Bed3, Interval};
+    use crate::{Coordinates, Bed3, BaseInterval};
 
     #[test]
     ///      x-------y
@@ -229,8 +229,8 @@ mod testing {
     /// ==================
     ///         j----y
     fn subtraction_case_a() {
-        let a = Interval::new(20, 30);
-        let b = Interval::new(15, 25);
+        let a = BaseInterval::new(20, 30);
+        let b = BaseInterval::new(15, 25);
         let sub = a.subtract(&b).unwrap();
         assert_eq!(sub.len(), 1);
         assert_eq!(sub[0].start(), 25);
@@ -253,8 +253,8 @@ mod testing {
 
     #[test]
     fn subtraction_case_a_iter() {
-        let a = Interval::new(20, 30);
-        let b = Interval::new(15, 25);
+        let a = BaseInterval::new(20, 30);
+        let b = BaseInterval::new(15, 25);
         let mut sub = a.subtract_iter(&b);
         assert_eq!(sub.next().unwrap().start(), 25);
         assert!(sub.next().is_none());
@@ -266,8 +266,8 @@ mod testing {
     /// ==================
     ///   x--i
     fn subtraction_case_b() {
-        let a = Interval::new(15, 25);
-        let b = Interval::new(20, 30);
+        let a = BaseInterval::new(15, 25);
+        let b = BaseInterval::new(20, 30);
         let sub = a.subtract(&b).unwrap();
         assert_eq!(sub.len(), 1);
         assert_eq!(sub[0].start(), 15);
@@ -276,8 +276,8 @@ mod testing {
 
     #[test]
     fn subtraction_case_b_iter() {
-        let a = Interval::new(15, 25);
-        let b = Interval::new(20, 30);
+        let a = BaseInterval::new(15, 25);
+        let b = BaseInterval::new(20, 30);
         let mut sub = a.subtract_iter(&b);
         assert_eq!(sub.next().unwrap().start(), 15);
         assert!(sub.next().is_none());
@@ -289,8 +289,8 @@ mod testing {
     /// ==================
     ///   x-i  j-y
     fn subtraction_case_c() {
-        let a = Interval::new(10, 40);
-        let b = Interval::new(20, 30);
+        let a = BaseInterval::new(10, 40);
+        let b = BaseInterval::new(20, 30);
         let sub = a.subtract(&b).unwrap();
         assert_eq!(sub.len(), 2);
         assert_eq!(sub[0].start(), 10);
@@ -301,8 +301,8 @@ mod testing {
 
     #[test]
     fn subtraction_case_c_iter() {
-        let a = Interval::new(10, 40);
-        let b = Interval::new(20, 30);
+        let a = BaseInterval::new(10, 40);
+        let b = BaseInterval::new(20, 30);
         let mut sub = a.subtract_iter(&b);
         assert_eq!(sub.next().unwrap().start(), 10);
         assert_eq!(sub.next().unwrap().start(), 30);
@@ -315,16 +315,16 @@ mod testing {
     /// ==================
     ///   none
     fn subtraction_case_d() {
-        let a = Interval::new(20, 30);
-        let b = Interval::new(10, 40);
+        let a = BaseInterval::new(20, 30);
+        let b = BaseInterval::new(10, 40);
         let sub = a.subtract(&b);
         assert!(sub.is_none());
     }
 
     #[test]
     fn subtraction_case_d_iter() {
-        let a = Interval::new(20, 30);
-        let b = Interval::new(10, 40);
+        let a = BaseInterval::new(20, 30);
+        let b = BaseInterval::new(10, 40);
         let mut sub = a.subtract_iter(&b);
         assert!(sub.next().is_none());
     }
@@ -335,16 +335,16 @@ mod testing {
     /// ==================
     /// none
     fn subtraction_case_e() {
-        let a = Interval::new(10, 30);
-        let b = Interval::new(10, 30);
+        let a = BaseInterval::new(10, 30);
+        let b = BaseInterval::new(10, 30);
         let sub = a.subtract(&b);
         assert!(sub.is_none());
     }
 
     #[test]
     fn subtraction_case_e_iter() {
-        let a = Interval::new(10, 30);
-        let b = Interval::new(10, 30);
+        let a = BaseInterval::new(10, 30);
+        let b = BaseInterval::new(10, 30);
         let mut sub = a.subtract_iter(&b);
         assert!(sub.next().is_none());
     }
@@ -400,8 +400,8 @@ mod testing {
     /// ==================
     ///   x--y
     fn subtraction_case_f() {
-        let a = Interval::new(10, 20);
-        let b = Interval::new(30, 40);
+        let a = BaseInterval::new(10, 20);
+        let b = BaseInterval::new(30, 40);
         let sub = a.subtract(&b).unwrap();
         assert_eq!(sub.len(), 1);
         assert_eq!(sub[0].start(), 10);
@@ -410,8 +410,8 @@ mod testing {
 
     #[test]
     fn subtraction_case_f_iter() {
-        let a = Interval::new(10, 20);
-        let b = Interval::new(30, 40);
+        let a = BaseInterval::new(10, 20);
+        let b = BaseInterval::new(30, 40);
         let mut sub = a.subtract_iter(&b);
         let first = sub.next().unwrap();
         assert_eq!(first.start(), 10);
@@ -425,8 +425,8 @@ mod testing {
     /// ===============
     ///       j----y
     fn subtraction_case_g() {
-        let a = Interval::new(10, 40);
-        let b = Interval::new(10, 20);
+        let a = BaseInterval::new(10, 40);
+        let b = BaseInterval::new(10, 20);
         let sub = a.subtract(&b).unwrap();
         assert_eq!(sub.len(), 1);
         assert_eq!(sub[0].start(), 20);
@@ -435,8 +435,8 @@ mod testing {
 
     #[test]
     fn subtraction_case_g_iter() {
-        let a = Interval::new(10, 40);
-        let b = Interval::new(10, 20);
+        let a = BaseInterval::new(10, 40);
+        let b = BaseInterval::new(10, 20);
         let mut sub = a.subtract_iter(&b);
         let first = sub.next().unwrap();
         assert_eq!(first.start(), 20);
@@ -450,8 +450,8 @@ mod testing {
     /// ===============
     ///   x----i
     fn subtraction_case_h() {
-        let a = Interval::new(10, 40);
-        let b = Interval::new(30, 40);
+        let a = BaseInterval::new(10, 40);
+        let b = BaseInterval::new(30, 40);
         let sub = a.subtract(&b).unwrap();
         assert_eq!(sub.len(), 1);
         assert_eq!(sub[0].start(), 10);
@@ -460,8 +460,8 @@ mod testing {
 
     #[test]
     fn subtraction_case_h_iter() {
-        let a = Interval::new(10, 40);
-        let b = Interval::new(30, 40);
+        let a = BaseInterval::new(10, 40);
+        let b = BaseInterval::new(30, 40);
         let mut sub = a.subtract_iter(&b);
         let first = sub.next().unwrap();
         assert_eq!(first.start(), 10);
@@ -475,16 +475,16 @@ mod testing {
     /// ===============
     /// none
     fn subtraction_case_i() {
-        let a = Interval::new(20, 30);
-        let b = Interval::new(10, 30);
+        let a = BaseInterval::new(20, 30);
+        let b = BaseInterval::new(10, 30);
         let sub = a.subtract(&b);
         assert!(sub.is_none());
     }
 
     #[test]
     fn subtraction_case_i_iter() {
-        let a = Interval::new(20, 30);
-        let b = Interval::new(10, 30);
+        let a = BaseInterval::new(20, 30);
+        let b = BaseInterval::new(10, 30);
         let mut sub = a.subtract_iter(&b);
         assert!(sub.next().is_none());
     }
@@ -495,16 +495,16 @@ mod testing {
     /// ===============
     /// none
     fn subtraction_case_j() {
-        let a = Interval::new(10, 30);
-        let b = Interval::new(10, 40);
+        let a = BaseInterval::new(10, 30);
+        let b = BaseInterval::new(10, 40);
         let sub = a.subtract(&b);
         assert!(sub.is_none());
     }
 
     #[test]
     fn subtraction_case_j_iter() {
-        let a = Interval::new(10, 30);
-        let b = Interval::new(10, 40);
+        let a = BaseInterval::new(10, 30);
+        let b = BaseInterval::new(10, 40);
         let mut sub = a.subtract_iter(&b);
         assert!(sub.next().is_none());
     }

@@ -16,14 +16,14 @@ where
     ///
     /// # Example
     /// ```
-    /// use bedrs::{Interval, IntervalContainer};
+    /// use bedrs::{BaseInterval, IntervalContainer};
     /// use rand::thread_rng;
     ///
     /// let intervals = vec![
-    ///     Interval::new(10, 100),
-    ///     Interval::new(20, 200),
-    ///     Interval::new(30, 300),
-    ///     Interval::new(40, 400),
+    ///     BaseInterval::new(10, 100),
+    ///     BaseInterval::new(20, 200),
+    ///     BaseInterval::new(30, 300),
+    ///     BaseInterval::new(40, 400),
     /// ];
     /// let mut set = IntervalContainer::from_sorted(intervals).unwrap();
     /// set.shuffle_rng(&mut thread_rng());
@@ -37,13 +37,13 @@ where
     ///
     /// # Example
     /// ```
-    /// use bedrs::{Interval, IntervalContainer};
+    /// use bedrs::{BaseInterval, IntervalContainer};
     ///
     /// let intervals = vec![
-    ///    Interval::new(10, 100),
-    ///    Interval::new(20, 200),
-    ///    Interval::new(30, 300),
-    ///    Interval::new(40, 400),
+    ///    BaseInterval::new(10, 100),
+    ///    BaseInterval::new(20, 200),
+    ///    BaseInterval::new(30, 300),
+    ///    BaseInterval::new(40, 400),
     /// ];
     /// let mut set = IntervalContainer::from_sorted(intervals).unwrap();
     /// set.shuffle();
@@ -57,13 +57,13 @@ where
     ///
     /// # Example
     /// ```
-    /// use bedrs::{Interval, IntervalContainer};
+    /// use bedrs::{BaseInterval, IntervalContainer};
     ///
     /// let intervals = vec![
-    ///    Interval::new(10, 100),
-    ///    Interval::new(20, 200),
-    ///    Interval::new(30, 300),
-    ///    Interval::new(40, 400),
+    ///    BaseInterval::new(10, 100),
+    ///    BaseInterval::new(20, 200),
+    ///    BaseInterval::new(30, 300),
+    ///    BaseInterval::new(40, 400),
     /// ];
     /// let mut set = IntervalContainer::from_sorted(intervals).unwrap();
     /// set.shuffle_seed(42);
@@ -77,13 +77,13 @@ where
     ///
     /// # Example
     /// ```
-    /// use bedrs::{Interval, IntervalContainer};
+    /// use bedrs::{BaseInterval, IntervalContainer};
     ///
     /// let intervals = vec![
-    ///     Interval::new(10, 100),
-    ///     Interval::new(20, 200),
-    ///     Interval::new(30, 300),
-    ///     Interval::new(40, 400),
+    ///     BaseInterval::new(10, 100),
+    ///     BaseInterval::new(20, 200),
+    ///     BaseInterval::new(30, 300),
+    ///     BaseInterval::new(40, 400),
     /// ];
     /// let set = IntervalContainer::from_sorted(intervals).unwrap();
     /// let mut rng = rand::thread_rng();
@@ -104,13 +104,13 @@ where
     ///
     /// # Example
     /// ```
-    /// use bedrs::{Interval, IntervalContainer};
+    /// use bedrs::{BaseInterval, IntervalContainer};
     ///
     /// let intervals = vec![
-    ///     Interval::new(10, 100),
-    ///     Interval::new(20, 200),
-    ///     Interval::new(30, 300),
-    ///     Interval::new(40, 400),
+    ///     BaseInterval::new(10, 100),
+    ///     BaseInterval::new(20, 200),
+    ///     BaseInterval::new(30, 300),
+    ///     BaseInterval::new(40, 400),
     /// ];
     /// let set = IntervalContainer::from_sorted(intervals).unwrap();
     /// let shuffled_set = set.sample(2).unwrap();
@@ -128,13 +128,13 @@ where
     ///
     /// # Example
     /// ```
-    /// use bedrs::{Interval, IntervalContainer};
+    /// use bedrs::{BaseInterval, IntervalContainer};
     ///
     /// let intervals = vec![
-    ///     Interval::new(10, 100),
-    ///     Interval::new(20, 200),
-    ///     Interval::new(30, 300),
-    ///     Interval::new(40, 400),
+    ///     BaseInterval::new(10, 100),
+    ///     BaseInterval::new(20, 200),
+    ///     BaseInterval::new(30, 300),
+    ///     BaseInterval::new(40, 400),
     /// ];
     /// let set = IntervalContainer::from_sorted(intervals).unwrap();
     /// let shuffled_set_a = set.sample_seed(2, 42).unwrap();
@@ -155,13 +155,13 @@ where
     ///
     /// # Example
     /// ```
-    /// use bedrs::{Interval, IntervalContainer};
+    /// use bedrs::{BaseInterval, IntervalContainer};
     ///
     /// let intervals = vec![
-    ///    Interval::new(10, 100),
-    ///    Interval::new(20, 200),
-    ///    Interval::new(30, 300),
-    ///    Interval::new(40, 400),
+    ///    BaseInterval::new(10, 100),
+    ///    BaseInterval::new(20, 200),
+    ///    BaseInterval::new(30, 300),
+    ///    BaseInterval::new(40, 400),
     /// ];
     /// let set = IntervalContainer::from_sorted(intervals).unwrap();
     /// let mut rng = rand::thread_rng();
@@ -184,13 +184,13 @@ where
     ///
     /// # Example
     /// ```
-    /// use bedrs::{Interval, IntervalContainer};
+    /// use bedrs::{BaseInterval, IntervalContainer};
     ///
     /// let intervals = vec![
-    ///    Interval::new(10, 100),
-    ///    Interval::new(20, 200),
-    ///    Interval::new(30, 300),
-    ///    Interval::new(40, 400),
+    ///    BaseInterval::new(10, 100),
+    ///    BaseInterval::new(20, 200),
+    ///    BaseInterval::new(30, 300),
+    ///    BaseInterval::new(40, 400),
     /// ];
     /// let set = IntervalContainer::from_sorted(intervals).unwrap();
     /// let shuffled_iter = set.sample_iter(2).unwrap();
@@ -211,13 +211,13 @@ where
     ///
     /// # Example
     /// ```
-    /// use bedrs::{Interval, IntervalContainer};
+    /// use bedrs::{BaseInterval, IntervalContainer};
     ///
     /// let intervals = vec![
-    ///    Interval::new(10, 100),
-    ///    Interval::new(20, 200),
-    ///    Interval::new(30, 300),
-    ///    Interval::new(40, 400),
+    ///    BaseInterval::new(10, 100),
+    ///    BaseInterval::new(20, 200),
+    ///    BaseInterval::new(30, 300),
+    ///    BaseInterval::new(40, 400),
     /// ];
     /// let set = IntervalContainer::from_sorted(intervals).unwrap();
     /// let shuffled_iter = set.sample_iter_seed(2, 42).unwrap();
@@ -238,19 +238,19 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::{Coordinates, Interval, IntervalContainer};
+    use crate::{Coordinates, BaseInterval, IntervalContainer};
 
     #[test]
     fn shuffle_rng() {
         let intervals = vec![
-            Interval::new(10, 100),
-            Interval::new(20, 200),
-            Interval::new(30, 300),
-            Interval::new(40, 400),
-            Interval::new(10, 100),
-            Interval::new(20, 200),
-            Interval::new(30, 300),
-            Interval::new(40, 400),
+            BaseInterval::new(10, 100),
+            BaseInterval::new(20, 200),
+            BaseInterval::new(30, 300),
+            BaseInterval::new(40, 400),
+            BaseInterval::new(10, 100),
+            BaseInterval::new(20, 200),
+            BaseInterval::new(30, 300),
+            BaseInterval::new(40, 400),
         ];
         let set = IntervalContainer::new(intervals);
         let mut shuffled_set = set.clone();
@@ -264,14 +264,14 @@ mod testing {
     #[test]
     fn shuffle_rng_seed() {
         let intervals = vec![
-            Interval::new(10, 100),
-            Interval::new(20, 200),
-            Interval::new(30, 300),
-            Interval::new(40, 400),
-            Interval::new(10, 100),
-            Interval::new(20, 200),
-            Interval::new(30, 300),
-            Interval::new(40, 400),
+            BaseInterval::new(10, 100),
+            BaseInterval::new(20, 200),
+            BaseInterval::new(30, 300),
+            BaseInterval::new(40, 400),
+            BaseInterval::new(10, 100),
+            BaseInterval::new(20, 200),
+            BaseInterval::new(30, 300),
+            BaseInterval::new(40, 400),
         ];
         let set = IntervalContainer::new(intervals);
         let mut shuffled_set_a = set.clone();
@@ -288,10 +288,10 @@ mod testing {
     #[test]
     fn shuffle_sorted_toggle() {
         let intervals = vec![
-            Interval::new(10, 100),
-            Interval::new(20, 200),
-            Interval::new(30, 300),
-            Interval::new(40, 400),
+            BaseInterval::new(10, 100),
+            BaseInterval::new(20, 200),
+            BaseInterval::new(30, 300),
+            BaseInterval::new(40, 400),
         ];
         let mut set = IntervalContainer::from_sorted(intervals).unwrap();
         assert!(set.is_sorted());
@@ -302,10 +302,10 @@ mod testing {
     #[test]
     fn sample() {
         let intervals = vec![
-            Interval::new(10, 100),
-            Interval::new(20, 200),
-            Interval::new(30, 300),
-            Interval::new(40, 400),
+            BaseInterval::new(10, 100),
+            BaseInterval::new(20, 200),
+            BaseInterval::new(30, 300),
+            BaseInterval::new(40, 400),
         ];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
         let sampled_set = set.sample(4).unwrap();
@@ -316,10 +316,10 @@ mod testing {
     #[test]
     fn sample_seed() {
         let intervals = vec![
-            Interval::new(10, 100),
-            Interval::new(20, 200),
-            Interval::new(30, 300),
-            Interval::new(40, 400),
+            BaseInterval::new(10, 100),
+            BaseInterval::new(20, 200),
+            BaseInterval::new(30, 300),
+            BaseInterval::new(40, 400),
         ];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
         let sampled_set_a = set.sample_seed(4, 0).unwrap();
@@ -332,10 +332,10 @@ mod testing {
     #[test]
     fn sample_oversized() {
         let intervals = vec![
-            Interval::new(10, 100),
-            Interval::new(20, 200),
-            Interval::new(30, 300),
-            Interval::new(40, 400),
+            BaseInterval::new(10, 100),
+            BaseInterval::new(20, 200),
+            BaseInterval::new(30, 300),
+            BaseInterval::new(40, 400),
         ];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
         let sampled_set = set.sample(5);
@@ -345,10 +345,10 @@ mod testing {
     #[test]
     fn sample_iter() {
         let intervals = vec![
-            Interval::new(10, 100),
-            Interval::new(20, 200),
-            Interval::new(30, 300),
-            Interval::new(40, 400),
+            BaseInterval::new(10, 100),
+            BaseInterval::new(20, 200),
+            BaseInterval::new(30, 300),
+            BaseInterval::new(40, 400),
         ];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
         let sampled_iter = set.sample_iter(2).unwrap();
@@ -358,10 +358,10 @@ mod testing {
     #[test]
     fn sample_iter_seed() {
         let intervals = vec![
-            Interval::new(10, 100),
-            Interval::new(20, 200),
-            Interval::new(30, 300),
-            Interval::new(40, 400),
+            BaseInterval::new(10, 100),
+            BaseInterval::new(20, 200),
+            BaseInterval::new(30, 300),
+            BaseInterval::new(40, 400),
         ];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
         let sampled_iter_a = set.sample_iter_seed(2, 0).unwrap();
@@ -374,10 +374,10 @@ mod testing {
     #[test]
     fn sample_iter_oversized() {
         let intervals = vec![
-            Interval::new(10, 100),
-            Interval::new(20, 200),
-            Interval::new(30, 300),
-            Interval::new(40, 400),
+            BaseInterval::new(10, 100),
+            BaseInterval::new(20, 200),
+            BaseInterval::new(30, 300),
+            BaseInterval::new(40, 400),
         ];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
         let sampled_iter = set.sample_iter(5);

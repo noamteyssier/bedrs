@@ -21,10 +21,10 @@ where
     /// Calculates the intersection between two coordinates if they overlap.
     ///
     /// ```
-    /// use bedrs::{Coordinates, Intersect, Interval};
+    /// use bedrs::{Coordinates, Intersect, BaseInterval};
     ///
-    /// let a = Interval::new(10, 20);
-    /// let b = Interval::new(15, 25);
+    /// let a = BaseInterval::new(10, 20);
+    /// let b = BaseInterval::new(15, 25);
     /// let ix = a.intersect(&b).unwrap();
     ///
     /// assert_eq!(ix.start(), 15);
@@ -70,7 +70,7 @@ where
 #[allow(clippy::many_single_char_names)]
 mod testing {
     use super::Intersect;
-    use crate::{Coordinates, Bed3, Interval, Strand, StrandedBed3};
+    use crate::{Coordinates, Bed3, BaseInterval, Strand, StrandedBed3};
 
     #[test]
     ///       x-------y
@@ -78,8 +78,8 @@ mod testing {
     /// =====================
     ///       x---j
     fn intersection_case_a() {
-        let a = Interval::new(20, 30);
-        let b = Interval::new(15, 25);
+        let a = BaseInterval::new(20, 30);
+        let b = BaseInterval::new(15, 25);
         let ix = a.intersect(&b).unwrap();
         assert_eq!(ix.start(), 20);
         assert_eq!(ix.end(), 25);
@@ -118,8 +118,8 @@ mod testing {
     /// ==================
     ///        i---y
     fn intersection_case_b() {
-        let a = Interval::new(20, 30);
-        let b = Interval::new(25, 35);
+        let a = BaseInterval::new(20, 30);
+        let b = BaseInterval::new(25, 35);
         let ix = a.intersect(&b).unwrap();
         assert_eq!(ix.start(), 25);
         assert_eq!(ix.end(), 30);
@@ -158,8 +158,8 @@ mod testing {
     /// ==================
     ///       i--j
     fn intersection_case_c() {
-        let a = Interval::new(20, 40);
-        let b = Interval::new(25, 35);
+        let a = BaseInterval::new(20, 40);
+        let b = BaseInterval::new(25, 35);
         let ix = a.intersect(&b).unwrap();
         assert_eq!(ix.start(), 25);
         assert_eq!(ix.end(), 35);
@@ -198,8 +198,8 @@ mod testing {
     /// ==================
     ///       x--y
     fn intersection_case_d() {
-        let a = Interval::new(25, 35);
-        let b = Interval::new(20, 40);
+        let a = BaseInterval::new(25, 35);
+        let b = BaseInterval::new(20, 40);
         let ix = a.intersect(&b).unwrap();
         assert_eq!(ix.start(), 25);
         assert_eq!(ix.end(), 35);
@@ -238,8 +238,8 @@ mod testing {
     /// ==================
     ///       x--y
     fn intersection_case_e() {
-        let a = Interval::new(20, 40);
-        let b = Interval::new(20, 40);
+        let a = BaseInterval::new(20, 40);
+        let b = BaseInterval::new(20, 40);
         let ix = a.intersect(&b).unwrap();
         assert_eq!(ix.start(), 20);
         assert_eq!(ix.end(), 40);
@@ -278,8 +278,8 @@ mod testing {
     /// ==================
     ///       none
     fn intersection_case_none() {
-        let a = Interval::new(10, 15);
-        let b = Interval::new(20, 25);
+        let a = BaseInterval::new(10, 15);
+        let b = BaseInterval::new(20, 25);
         let ix = a.intersect(&b);
         assert!(ix.is_none());
     }

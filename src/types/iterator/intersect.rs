@@ -165,7 +165,7 @@ mod testing {
     use crate::{
         traits::{ChromBounds, IntervalBounds, ValueBounds},
         types::QueryMethod,
-        Bed3, Interval,
+        Bed3, BaseInterval,
     };
 
     fn validate_records<I, C, T>(obs: &[I], exp: &[I])
@@ -187,16 +187,16 @@ mod testing {
     ///        i---j        i-j
     fn intersections_a() {
         let intervals_a = vec![
-            Interval::new(100, 300),
-            Interval::new(400, 475),
-            Interval::new(500, 550),
+            BaseInterval::new(100, 300),
+            BaseInterval::new(400, 475),
+            BaseInterval::new(500, 550),
         ];
         let intervals_b = vec![
-            Interval::new(120, 160),
-            Interval::new(460, 470),
-            Interval::new(490, 500),
+            BaseInterval::new(120, 160),
+            BaseInterval::new(460, 470),
+            BaseInterval::new(490, 500),
         ];
-        let expected = vec![Interval::new(120, 160), Interval::new(460, 470)];
+        let expected = vec![BaseInterval::new(120, 160), BaseInterval::new(460, 470)];
 
         let iter_a = intervals_a.into_iter();
         let iter_b = intervals_b.into_iter();
@@ -211,9 +211,9 @@ mod testing {
     ///  =========================
     ///       x-j           i--y
     fn intersections_b() {
-        let intervals_a = vec![Interval::new(100, 300), Interval::new(400, 475)];
-        let intervals_b = vec![Interval::new(80, 120), Interval::new(460, 480)];
-        let expected = vec![Interval::new(100, 120), Interval::new(460, 475)];
+        let intervals_a = vec![BaseInterval::new(100, 300), BaseInterval::new(400, 475)];
+        let intervals_b = vec![BaseInterval::new(80, 120), BaseInterval::new(460, 480)];
+        let expected = vec![BaseInterval::new(100, 120), BaseInterval::new(460, 475)];
         let iter_a = intervals_a.into_iter();
         let iter_b = intervals_b.into_iter();
         let ix_iter = IntersectIter::new(iter_a, iter_b);
@@ -227,9 +227,9 @@ mod testing {
     /// ===============================
     ///        i---y   x----j
     fn intersections_c() {
-        let intervals_a = vec![Interval::new(10, 30), Interval::new(40, 60)];
-        let intervals_b = vec![Interval::new(20, 50)];
-        let expected = vec![Interval::new(20, 30), Interval::new(40, 50)];
+        let intervals_a = vec![BaseInterval::new(10, 30), BaseInterval::new(40, 60)];
+        let intervals_b = vec![BaseInterval::new(20, 50)];
+        let expected = vec![BaseInterval::new(20, 30), BaseInterval::new(40, 50)];
         let iter_a = intervals_a.into_iter();
         let iter_b = intervals_b.into_iter();
         let ix_iter = IntersectIter::new(iter_a, iter_b);
@@ -243,9 +243,9 @@ mod testing {
     /// ===============================
     ///        i---y   x----j
     fn intersections_d() {
-        let intervals_a = vec![Interval::new(20, 50)];
-        let intervals_b = vec![Interval::new(10, 30), Interval::new(40, 60)];
-        let expected = vec![Interval::new(20, 30), Interval::new(40, 50)];
+        let intervals_a = vec![BaseInterval::new(20, 50)];
+        let intervals_b = vec![BaseInterval::new(10, 30), BaseInterval::new(40, 60)];
+        let expected = vec![BaseInterval::new(20, 30), BaseInterval::new(40, 50)];
         let iter_a = intervals_a.into_iter();
         let iter_b = intervals_b.into_iter();
         let ix_iter = IntersectIter::new(iter_a, iter_b);
@@ -260,16 +260,16 @@ mod testing {
     ///        i---y   x----j    i---y   x-----j
     fn intersections_e() {
         let intervals_a = vec![
-            Interval::new(10, 30),
-            Interval::new(40, 60),
-            Interval::new(70, 90),
+            BaseInterval::new(10, 30),
+            BaseInterval::new(40, 60),
+            BaseInterval::new(70, 90),
         ];
-        let intervals_b = vec![Interval::new(20, 50), Interval::new(50, 80)];
+        let intervals_b = vec![BaseInterval::new(20, 50), BaseInterval::new(50, 80)];
         let expected = vec![
-            Interval::new(20, 30),
-            Interval::new(40, 50),
-            Interval::new(50, 60),
-            Interval::new(70, 80),
+            BaseInterval::new(20, 30),
+            BaseInterval::new(40, 50),
+            BaseInterval::new(50, 60),
+            BaseInterval::new(70, 80),
         ];
         let iter_a = intervals_a.into_iter();
         let iter_b = intervals_b.into_iter();
@@ -284,17 +284,17 @@ mod testing {
     /// ==============================================
     ///        i---y   x----j    i---y   x-----j
     fn intersections_f() {
-        let intervals_a = vec![Interval::new(20, 50), Interval::new(50, 80)];
+        let intervals_a = vec![BaseInterval::new(20, 50), BaseInterval::new(50, 80)];
         let intervals_b = vec![
-            Interval::new(10, 30),
-            Interval::new(40, 60),
-            Interval::new(70, 90),
+            BaseInterval::new(10, 30),
+            BaseInterval::new(40, 60),
+            BaseInterval::new(70, 90),
         ];
         let expected = vec![
-            Interval::new(20, 30),
-            Interval::new(40, 50),
-            Interval::new(50, 60),
-            Interval::new(70, 80),
+            BaseInterval::new(20, 30),
+            BaseInterval::new(40, 50),
+            BaseInterval::new(50, 60),
+            BaseInterval::new(70, 80),
         ];
         let iter_a = intervals_a.into_iter();
         let iter_b = intervals_b.into_iter();
@@ -310,15 +310,15 @@ mod testing {
     ///        i---y   x----j               i----j
     fn intersections_g() {
         let intervals_a = vec![
-            Interval::new(10, 30),
-            Interval::new(40, 60),
-            Interval::new(70, 90),
+            BaseInterval::new(10, 30),
+            BaseInterval::new(40, 60),
+            BaseInterval::new(70, 90),
         ];
-        let intervals_b = vec![Interval::new(20, 50), Interval::new(75, 85)];
+        let intervals_b = vec![BaseInterval::new(20, 50), BaseInterval::new(75, 85)];
         let expected = vec![
-            Interval::new(20, 30),
-            Interval::new(40, 50),
-            Interval::new(75, 85),
+            BaseInterval::new(20, 30),
+            BaseInterval::new(40, 50),
+            BaseInterval::new(75, 85),
         ];
         let iter_a = intervals_a.into_iter();
         let iter_b = intervals_b.into_iter();
@@ -333,9 +333,9 @@ mod testing {
     ///     i-----j        i--j
     /// ===================================
     fn intersections_query_fraction() {
-        let intervals_a = vec![Interval::new(100, 300), Interval::new(400, 600)];
-        let intervals_b = vec![Interval::new(100, 200), Interval::new(400, 450)];
-        let expected = vec![Interval::new(100, 200)];
+        let intervals_a = vec![BaseInterval::new(100, 300), BaseInterval::new(400, 600)];
+        let intervals_b = vec![BaseInterval::new(100, 200), BaseInterval::new(400, 450)];
+        let expected = vec![BaseInterval::new(100, 200)];
         let frac = 0.5;
         let method = QueryMethod::CompareByQueryFraction(frac);
         let iter_a = intervals_a.into_iter();
@@ -351,9 +351,9 @@ mod testing {
     ///     i-----j        i--j
     /// ===================================
     fn intersections_target_fraction() {
-        let intervals_a = vec![Interval::new(100, 300), Interval::new(400, 600)];
-        let intervals_b = vec![Interval::new(100, 200), Interval::new(400, 450)];
-        let expected = vec![Interval::new(100, 200), Interval::new(400, 450)];
+        let intervals_a = vec![BaseInterval::new(100, 300), BaseInterval::new(400, 600)];
+        let intervals_b = vec![BaseInterval::new(100, 200), BaseInterval::new(400, 450)];
+        let expected = vec![BaseInterval::new(100, 200), BaseInterval::new(400, 450)];
         let frac = 0.5;
         let method = QueryMethod::CompareByTargetFraction(frac);
         let iter_a = intervals_a.into_iter();
