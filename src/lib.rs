@@ -84,17 +84,17 @@
 //!
 //! ### Genomic Interval
 //!
-//! Here is an example of a [`GenomicInterval`](types::GenomicInterval).
+//! Here is an example of a [`Bed3`](types::Bed3).
 //!
 //! This is the bread and butter of genomic arithmetic and has three
 //! coordinates: `chr`, `start`, and `end`.
 //!
 //! ```
-//! use bedrs::{Overlap, GenomicInterval};
+//! use bedrs::{Overlap, Bed3};
 //!
-//! let a = GenomicInterval::new(1, 10, 20);
-//! let b = GenomicInterval::new(1, 15, 25);
-//! let c = GenomicInterval::new(2, 15, 25);
+//! let a = Bed3::new(1, 10, 20);
+//! let b = Bed3::new(1, 15, 25);
+//! let c = Bed3::new(2, 15, 25);
 //!
 //! assert!(a.overlaps(&b));
 //! assert!(!a.overlaps(&c));
@@ -104,7 +104,7 @@
 //! ## Interval Operations
 //!
 //! The following operations with be shown with the base [Interval], but
-//! the same operations can be done with a [`GenomicInterval`] or any other
+//! the same operations can be done with a [`Bed3`] or any other
 //! custom type which implements the [Coordinates] trait.
 //!
 //! ### Overlap
@@ -250,7 +250,6 @@ pub mod types;
 
 pub use traits::{Coordinates, Distance, Intersect, Overlap, Subtract};
 pub use types::{
-    Bed12, Bed3, Bed4, Bed6, GenomicInterval, IntersectIter, Interval, IntervalContainer,
-    IntervalIterOwned, IntervalIterRef, MergeIter, MetaInterval, NamedInterval, Strand,
-    StrandedGenomicInterval,
+    Bed12, Bed3, Bed4, Bed6, IntersectIter, Interval, IntervalContainer, IntervalIterOwned,
+    IntervalIterRef, MergeIter, MetaInterval, Strand, StrandedBed3,
 };

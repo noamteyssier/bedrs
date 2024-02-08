@@ -43,19 +43,19 @@ where
     /// ## On genomic coordinates
     ///
     /// ```
-    /// use bedrs::{GenomicInterval, IntervalContainer};
+    /// use bedrs::{Bed3, IntervalContainer};
     ///
     /// let records = vec![
-    ///     GenomicInterval::new(1, 10, 20),
-    ///     GenomicInterval::new(2, 10, 20),
-    ///     GenomicInterval::new(3, 10, 20), // <- min
-    ///     GenomicInterval::new(3, 20, 20),
-    ///     GenomicInterval::new(3, 30, 20),
-    ///     GenomicInterval::new(4, 10, 20),
+    ///     Bed3::new(1, 10, 20),
+    ///     Bed3::new(2, 10, 20),
+    ///     Bed3::new(3, 10, 20), // <- min
+    ///     Bed3::new(3, 20, 20),
+    ///     Bed3::new(3, 30, 20),
+    ///     Bed3::new(4, 10, 20),
     /// ];
     /// let mut set = IntervalContainer::new(records);
     /// set.sort();
-    /// let query = GenomicInterval::new(3, 10, 20);
+    /// let query = Bed3::new(3, 10, 20);
     /// let bound = set.lower_bound(&query);
     /// assert_eq!(bound, Ok(2));
     /// ```
@@ -103,18 +103,18 @@ where
     /// ## On genomic coordinates
     ///
     /// ```
-    /// use bedrs::{GenomicInterval, IntervalContainer};
+    /// use bedrs::{Bed3, IntervalContainer};
     ///
     /// let records = vec![
-    ///     GenomicInterval::new(1, 10, 20),
-    ///     GenomicInterval::new(2, 10, 20),
-    ///     GenomicInterval::new(3, 10, 20), // <- min
-    ///     GenomicInterval::new(3, 20, 20),
-    ///     GenomicInterval::new(3, 30, 20),
-    ///     GenomicInterval::new(4, 10, 20),
+    ///     Bed3::new(1, 10, 20),
+    ///     Bed3::new(2, 10, 20),
+    ///     Bed3::new(3, 10, 20), // <- min
+    ///     Bed3::new(3, 20, 20),
+    ///     Bed3::new(3, 30, 20),
+    ///     Bed3::new(4, 10, 20),
     /// ];
     /// let set = IntervalContainer::new(records);
-    /// let query = GenomicInterval::new(3, 10, 20);
+    /// let query = Bed3::new(3, 10, 20);
     /// let bound = set.lower_bound_unchecked(&query);
     /// assert_eq!(bound, 2);
     /// ```
@@ -460,8 +460,8 @@ where
 #[cfg(test)]
 mod testing {
     use crate::{
-        traits::errors::SetError, GenomicInterval, Interval, IntervalContainer, Strand,
-        StrandedGenomicInterval,
+        traits::errors::SetError, Bed3, Interval, IntervalContainer, Strand,
+        StrandedBed3,
     };
 
     #[test]
@@ -494,10 +494,10 @@ mod testing {
     #[test]
     fn bsearch_unsorted_stranded_upstream() {
         let records = (0..500)
-            .map(|x| StrandedGenomicInterval::new(1, x, x + 50, Strand::Forward))
+            .map(|x| StrandedBed3::new(1, x, x + 50, Strand::Forward))
             .collect();
         let set = IntervalContainer::new(records);
-        let query = StrandedGenomicInterval::new(1, 10, 20, Strand::Forward);
+        let query = StrandedBed3::new(1, 10, 20, Strand::Forward);
         let bound = set.stranded_upstream_bound(&query);
         assert!(bound.is_err());
     }
@@ -505,10 +505,10 @@ mod testing {
     #[test]
     fn bsearch_unsorted_stranded_downstream() {
         let records = (0..500)
-            .map(|x| StrandedGenomicInterval::new(1, x, x + 50, Strand::Forward))
+            .map(|x| StrandedBed3::new(1, x, x + 50, Strand::Forward))
             .collect();
         let set = IntervalContainer::new(records);
-        let query = StrandedGenomicInterval::new(1, 10, 20, Strand::Forward);
+        let query = StrandedBed3::new(1, 10, 20, Strand::Forward);
         let bound = set.stranded_downstream_bound(&query);
         assert!(bound.is_err());
     }
@@ -544,7 +544,7 @@ mod testing {
     fn bsearch_empty_chr_stranded_upstream() {
         let records: Vec<Interval<_>> = Vec::new();
         let set = IntervalContainer::new(records);
-        let query = StrandedGenomicInterval::new(1, 10, 20, Strand::Forward);
+        let query = StrandedBed3::new(1, 10, 20, Strand::Forward);
         let bound = set.stranded_upstream_bound(&query);
         assert!(bound.is_err());
     }
@@ -553,7 +553,7 @@ mod testing {
     fn bsearch_empty_chr_stranded_downstream() {
         let records: Vec<Interval<_>> = Vec::new();
         let set = IntervalContainer::new(records);
-        let query = StrandedGenomicInterval::new(1, 10, 20, Strand::Forward);
+        let query = StrandedBed3::new(1, 10, 20, Strand::Forward);
         let bound = set.stranded_downstream_bound(&query);
         assert!(bound.is_err());
     }
@@ -601,16 +601,16 @@ mod testing {
     #[test]
     fn bsearch_genomic_low() {
         let records = vec![
-            GenomicInterval::new(1, 10, 20),
-            GenomicInterval::new(2, 10, 20),
-            GenomicInterval::new(3, 10, 20), // <- min
-            GenomicInterval::new(3, 20, 20),
-            GenomicInterval::new(3, 30, 20),
-            GenomicInterval::new(4, 10, 20),
+            Bed3::new(1, 10, 20),
+            Bed3::new(2, 10, 20),
+            Bed3::new(3, 10, 20), // <- min
+            Bed3::new(3, 20, 20),
+            Bed3::new(3, 30, 20),
+            Bed3::new(4, 10, 20),
         ];
         let mut set = IntervalContainer::new(records);
         set.sort();
-        let query = GenomicInterval::new(3, 10, 20);
+        let query = Bed3::new(3, 10, 20);
         let bound = set.lower_bound(&query);
         assert_eq!(bound, Ok(2));
     }
@@ -618,16 +618,16 @@ mod testing {
     #[test]
     fn bsearch_genomic_high() {
         let records = vec![
-            GenomicInterval::new(1, 10, 20),
-            GenomicInterval::new(2, 10, 20),
-            GenomicInterval::new(3, 10, 20),
-            GenomicInterval::new(3, 20, 20), // <- min
-            GenomicInterval::new(3, 30, 40),
-            GenomicInterval::new(4, 10, 20),
+            Bed3::new(1, 10, 20),
+            Bed3::new(2, 10, 20),
+            Bed3::new(3, 10, 20),
+            Bed3::new(3, 20, 20), // <- min
+            Bed3::new(3, 30, 40),
+            Bed3::new(4, 10, 20),
         ];
         let mut set = IntervalContainer::new(records);
         set.sort();
-        let query = GenomicInterval::new(3, 25, 20);
+        let query = Bed3::new(3, 25, 20);
         let bound = set.lower_bound(&query);
         assert_eq!(bound, Ok(3));
     }
@@ -691,13 +691,13 @@ mod testing {
 
     #[test]
     fn bsearch_zero_example() {
-        let query = GenomicInterval::new(2, 226, 376);
+        let query = Bed3::new(2, 226, 376);
         let intervals = vec![
-            GenomicInterval::new(1, 0, 300),
-            GenomicInterval::new(2, 0, 300), // <- min
-            GenomicInterval::new(2, 16, 316),
-            GenomicInterval::new(2, 53, 353),
-            GenomicInterval::new(2, 204, 504),
+            Bed3::new(1, 0, 300),
+            Bed3::new(2, 0, 300), // <- min
+            Bed3::new(2, 16, 316),
+            Bed3::new(2, 53, 353),
+            Bed3::new(2, 204, 504),
         ];
         let set = IntervalContainer::new(intervals);
         let bound = set.lower_bound_unchecked(&query);
@@ -728,12 +728,12 @@ mod testing {
     #[test]
     fn bsearch_chr_a() {
         let intervals = vec![
-            GenomicInterval::new(1, 0, 300),
-            GenomicInterval::new(2, 0, 300), // <- min
-            GenomicInterval::new(2, 16, 316),
-            GenomicInterval::new(3, 53, 353),
+            Bed3::new(1, 0, 300),
+            Bed3::new(2, 0, 300), // <- min
+            Bed3::new(2, 16, 316),
+            Bed3::new(3, 53, 353),
         ];
-        let query = GenomicInterval::new(2, 100, 300);
+        let query = Bed3::new(2, 100, 300);
         let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.chr_bound(&query).unwrap();
         assert_eq!(bound, Some(1));
@@ -742,12 +742,12 @@ mod testing {
     #[test]
     fn bsearch_chr_b() {
         let intervals = vec![
-            GenomicInterval::new(1, 0, 300), // <- min
-            GenomicInterval::new(2, 0, 300),
-            GenomicInterval::new(3, 16, 316),
-            GenomicInterval::new(4, 53, 353),
+            Bed3::new(1, 0, 300), // <- min
+            Bed3::new(2, 0, 300),
+            Bed3::new(3, 16, 316),
+            Bed3::new(4, 53, 353),
         ];
-        let query = GenomicInterval::new(1, 100, 300);
+        let query = Bed3::new(1, 100, 300);
         let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.chr_bound(&query).unwrap();
         assert_eq!(bound, Some(0));
@@ -756,12 +756,12 @@ mod testing {
     #[test]
     fn bsearch_chr_c() {
         let intervals = vec![
-            GenomicInterval::new(1, 0, 300),
-            GenomicInterval::new(2, 0, 300),
-            GenomicInterval::new(2, 16, 316),
-            GenomicInterval::new(3, 53, 353), // <- min
+            Bed3::new(1, 0, 300),
+            Bed3::new(2, 0, 300),
+            Bed3::new(2, 16, 316),
+            Bed3::new(3, 53, 353), // <- min
         ];
-        let query = GenomicInterval::new(3, 100, 300);
+        let query = Bed3::new(3, 100, 300);
         let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.chr_bound(&query).unwrap();
         assert_eq!(bound, Some(3));
@@ -771,12 +771,12 @@ mod testing {
     fn bsearch_chr_d() {
         // no minimum in this set
         let intervals = vec![
-            GenomicInterval::new(1, 0, 300),
-            GenomicInterval::new(2, 0, 300),
-            GenomicInterval::new(2, 16, 316),
-            GenomicInterval::new(3, 53, 353),
+            Bed3::new(1, 0, 300),
+            Bed3::new(2, 0, 300),
+            Bed3::new(2, 16, 316),
+            Bed3::new(3, 53, 353),
         ];
-        let query = GenomicInterval::new(4, 100, 300);
+        let query = Bed3::new(4, 100, 300);
         let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.chr_bound(&query).unwrap();
         assert_eq!(bound, None);
@@ -786,12 +786,12 @@ mod testing {
     fn bsearch_chr_e() {
         // no minimum in this set
         let intervals = vec![
-            GenomicInterval::new(2, 0, 300),
-            GenomicInterval::new(3, 0, 300),
-            GenomicInterval::new(4, 16, 316),
-            GenomicInterval::new(5, 53, 353),
+            Bed3::new(2, 0, 300),
+            Bed3::new(3, 0, 300),
+            Bed3::new(4, 16, 316),
+            Bed3::new(5, 53, 353),
         ];
-        let query = GenomicInterval::new(1, 100, 300);
+        let query = Bed3::new(1, 100, 300);
         let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.chr_bound(&query).unwrap();
         assert_eq!(bound, None);
@@ -800,12 +800,12 @@ mod testing {
     #[test]
     fn bsearch_chr_upstream_a() {
         let intervals = vec![
-            GenomicInterval::new(1, 0, 300),
-            GenomicInterval::new(2, 0, 300),
-            GenomicInterval::new(2, 16, 316), // <- closest
-            GenomicInterval::new(3, 53, 353),
+            Bed3::new(1, 0, 300),
+            Bed3::new(2, 0, 300),
+            Bed3::new(2, 16, 316), // <- closest
+            Bed3::new(3, 53, 353),
         ];
-        let query = GenomicInterval::new(2, 100, 300);
+        let query = Bed3::new(2, 100, 300);
         let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.chr_bound_upstream(&query).unwrap();
         assert_eq!(bound, Some(2));
@@ -814,12 +814,12 @@ mod testing {
     #[test]
     fn bsearch_chr_upstream_b() {
         let intervals = vec![
-            GenomicInterval::new(1, 0, 300),
-            GenomicInterval::new(2, 0, 300),
-            GenomicInterval::new(2, 16, 316), // <- closest
-            GenomicInterval::new(3, 53, 353),
+            Bed3::new(1, 0, 300),
+            Bed3::new(2, 0, 300),
+            Bed3::new(2, 16, 316), // <- closest
+            Bed3::new(3, 53, 353),
         ];
-        let query = GenomicInterval::new(2, 18, 300);
+        let query = Bed3::new(2, 18, 300);
         let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.chr_bound_upstream(&query).unwrap();
         assert_eq!(bound, Some(2));
@@ -828,12 +828,12 @@ mod testing {
     #[test]
     fn bsearch_chr_upstream_c() {
         let intervals = vec![
-            GenomicInterval::new(1, 0, 300),
-            GenomicInterval::new(2, 0, 300),
-            GenomicInterval::new(2, 16, 316), // <- closest
-            GenomicInterval::new(3, 53, 353),
+            Bed3::new(1, 0, 300),
+            Bed3::new(2, 0, 300),
+            Bed3::new(2, 16, 316), // <- closest
+            Bed3::new(3, 53, 353),
         ];
-        let query = GenomicInterval::new(2, 53, 300);
+        let query = Bed3::new(2, 53, 300);
         let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.chr_bound_upstream(&query).unwrap();
         assert_eq!(bound, Some(2));
@@ -842,12 +842,12 @@ mod testing {
     #[test]
     fn bsearch_chr_upstream_d() {
         let intervals = vec![
-            GenomicInterval::new(1, 0, 300),
-            GenomicInterval::new(2, 0, 300),
-            GenomicInterval::new(2, 16, 316),
-            GenomicInterval::new(3, 53, 353), // <- min
+            Bed3::new(1, 0, 300),
+            Bed3::new(2, 0, 300),
+            Bed3::new(2, 16, 316),
+            Bed3::new(3, 53, 353), // <- min
         ];
-        let query = GenomicInterval::new(3, 54, 300);
+        let query = Bed3::new(3, 54, 300);
         let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.chr_bound_upstream(&query).unwrap();
         assert_eq!(bound, Some(3));
@@ -856,12 +856,12 @@ mod testing {
     #[test]
     fn bsearch_chr_upstream_e() {
         let intervals = vec![
-            GenomicInterval::new(1, 0, 300),
-            GenomicInterval::new(2, 0, 300),
-            GenomicInterval::new(2, 16, 316),
-            GenomicInterval::new(3, 53, 353),
+            Bed3::new(1, 0, 300),
+            Bed3::new(2, 0, 300),
+            Bed3::new(2, 16, 316),
+            Bed3::new(3, 53, 353),
         ]; // no min
-        let query = GenomicInterval::new(3, 50, 52);
+        let query = Bed3::new(3, 50, 52);
         let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.chr_bound_upstream(&query).unwrap();
         assert_eq!(bound, None);
@@ -870,12 +870,12 @@ mod testing {
     #[test]
     fn bsearch_chr_upstream_f() {
         let intervals = vec![
-            GenomicInterval::new(2, 0, 300),
-            GenomicInterval::new(3, 0, 300),
-            GenomicInterval::new(3, 16, 316),
-            GenomicInterval::new(4, 53, 353),
+            Bed3::new(2, 0, 300),
+            Bed3::new(3, 0, 300),
+            Bed3::new(3, 16, 316),
+            Bed3::new(4, 53, 353),
         ]; // no min
-        let query = GenomicInterval::new(1, 50, 52);
+        let query = Bed3::new(1, 50, 52);
         let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.chr_bound_upstream(&query).unwrap();
         assert_eq!(bound, None);
@@ -884,11 +884,11 @@ mod testing {
     #[test]
     fn bsearch_chr_upstream_g() {
         let intervals = vec![
-            GenomicInterval::new(1, 10, 20), // <- min
-            GenomicInterval::new(1, 30, 40),
-            GenomicInterval::new(1, 50, 60),
+            Bed3::new(1, 10, 20), // <- min
+            Bed3::new(1, 30, 40),
+            Bed3::new(1, 50, 60),
         ];
-        let query = GenomicInterval::new(1, 22, 32);
+        let query = Bed3::new(1, 22, 32);
         let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.chr_bound_upstream(&query).unwrap();
         assert_eq!(bound, Some(0));
@@ -898,11 +898,11 @@ mod testing {
     fn bsearch_chr_upstream_h() {
         let intervals = vec![
             // no min
-            GenomicInterval::new(1, 10, 20),
-            GenomicInterval::new(1, 30, 40),
-            GenomicInterval::new(1, 50, 60),
+            Bed3::new(1, 10, 20),
+            Bed3::new(1, 30, 40),
+            Bed3::new(1, 50, 60),
         ];
-        let query = GenomicInterval::new(1, 8, 32);
+        let query = Bed3::new(1, 8, 32);
         let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.chr_bound_upstream(&query).unwrap();
         assert_eq!(bound, None);
@@ -911,14 +911,14 @@ mod testing {
     #[test]
     fn bsearch_chr_upstream_a_stranded() {
         let intervals = vec![
-            StrandedGenomicInterval::new(1, 0, 300, Strand::Forward),
-            StrandedGenomicInterval::new(2, 0, 300, Strand::Forward),
-            StrandedGenomicInterval::new(2, 16, 316, Strand::Forward), // <- closest
-            StrandedGenomicInterval::new(2, 16, 316, Strand::Reverse), // <- wrong strand
-            StrandedGenomicInterval::new(2, 16, 316, Strand::Unknown), // <- wrong strand
-            StrandedGenomicInterval::new(3, 53, 353, Strand::Forward),
+            StrandedBed3::new(1, 0, 300, Strand::Forward),
+            StrandedBed3::new(2, 0, 300, Strand::Forward),
+            StrandedBed3::new(2, 16, 316, Strand::Forward), // <- closest
+            StrandedBed3::new(2, 16, 316, Strand::Reverse), // <- wrong strand
+            StrandedBed3::new(2, 16, 316, Strand::Unknown), // <- wrong strand
+            StrandedBed3::new(3, 53, 353, Strand::Forward),
         ];
-        let query = StrandedGenomicInterval::new(2, 100, 300, Strand::Forward);
+        let query = StrandedBed3::new(2, 100, 300, Strand::Forward);
         let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.stranded_upstream_bound(&query).unwrap();
         assert_eq!(bound, Some(2));
@@ -927,12 +927,12 @@ mod testing {
     #[test]
     fn bsearch_chr_upstream_b_stranded() {
         let intervals = vec![
-            StrandedGenomicInterval::new(1, 0, 300, Strand::Forward),
-            StrandedGenomicInterval::new(2, 0, 300, Strand::Forward), // <- closest
-            StrandedGenomicInterval::new(2, 16, 316, Strand::Reverse), // <- wrong strand
-            StrandedGenomicInterval::new(3, 53, 353, Strand::Forward),
+            StrandedBed3::new(1, 0, 300, Strand::Forward),
+            StrandedBed3::new(2, 0, 300, Strand::Forward), // <- closest
+            StrandedBed3::new(2, 16, 316, Strand::Reverse), // <- wrong strand
+            StrandedBed3::new(3, 53, 353, Strand::Forward),
         ];
-        let query = StrandedGenomicInterval::new(2, 100, 300, Strand::Forward);
+        let query = StrandedBed3::new(2, 100, 300, Strand::Forward);
         let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.stranded_upstream_bound(&query).unwrap();
         assert_eq!(bound, Some(1));
@@ -941,11 +941,11 @@ mod testing {
     #[test]
     fn bsearch_chr_upstream_c_stranded() {
         let intervals = vec![
-            StrandedGenomicInterval::new(1, 0, 300, Strand::Forward),
-            StrandedGenomicInterval::new(2, 16, 316, Strand::Reverse), // <- wrong strand
-            StrandedGenomicInterval::new(3, 53, 353, Strand::Forward),
+            StrandedBed3::new(1, 0, 300, Strand::Forward),
+            StrandedBed3::new(2, 16, 316, Strand::Reverse), // <- wrong strand
+            StrandedBed3::new(3, 53, 353, Strand::Forward),
         ];
-        let query = StrandedGenomicInterval::new(2, 100, 300, Strand::Forward);
+        let query = StrandedBed3::new(2, 100, 300, Strand::Forward);
         let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.stranded_upstream_bound(&query).unwrap();
         assert_eq!(bound, None);
@@ -954,12 +954,12 @@ mod testing {
     #[test]
     fn bsearch_chr_upstream_d_stranded() {
         let intervals = vec![
-            StrandedGenomicInterval::new(1, 0, 300, Strand::Forward),
-            StrandedGenomicInterval::new(2, 0, 300, Strand::Reverse), // <- wrong strand
-            StrandedGenomicInterval::new(2, 16, 316, Strand::Forward), // <- min
-            StrandedGenomicInterval::new(3, 53, 353, Strand::Forward),
+            StrandedBed3::new(1, 0, 300, Strand::Forward),
+            StrandedBed3::new(2, 0, 300, Strand::Reverse), // <- wrong strand
+            StrandedBed3::new(2, 16, 316, Strand::Forward), // <- min
+            StrandedBed3::new(3, 53, 353, Strand::Forward),
         ];
-        let query = StrandedGenomicInterval::new(2, 100, 300, Strand::Forward);
+        let query = StrandedBed3::new(2, 100, 300, Strand::Forward);
         let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.stranded_upstream_bound(&query).unwrap();
         assert_eq!(bound, Some(2));
@@ -968,12 +968,12 @@ mod testing {
     #[test]
     fn bsearch_chr_downstream_a() {
         let intervals = vec![
-            GenomicInterval::new(1, 0, 300),
-            GenomicInterval::new(2, 0, 300),
-            GenomicInterval::new(2, 16, 316), // <- min
-            GenomicInterval::new(3, 53, 353),
+            Bed3::new(1, 0, 300),
+            Bed3::new(2, 0, 300),
+            Bed3::new(2, 16, 316), // <- min
+            Bed3::new(3, 53, 353),
         ];
-        let query = GenomicInterval::new(2, 10, 300);
+        let query = Bed3::new(2, 10, 300);
         let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.chr_bound_downstream(&query).unwrap();
         assert_eq!(bound, Some(2));
@@ -982,12 +982,12 @@ mod testing {
     #[test]
     fn bsearch_chr_downstream_c() {
         let intervals = vec![
-            GenomicInterval::new(1, 0, 300),
-            GenomicInterval::new(2, 0, 300),
-            GenomicInterval::new(2, 16, 316),
-            GenomicInterval::new(3, 53, 353), // <- min
+            Bed3::new(1, 0, 300),
+            Bed3::new(2, 0, 300),
+            Bed3::new(2, 16, 316),
+            Bed3::new(3, 53, 353), // <- min
         ];
-        let query = GenomicInterval::new(3, 10, 300);
+        let query = Bed3::new(3, 10, 300);
         let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.chr_bound_downstream(&query).unwrap();
         assert_eq!(bound, Some(3));
@@ -996,12 +996,12 @@ mod testing {
     #[test]
     fn bsearch_chr_downstream_d() {
         let intervals = vec![
-            GenomicInterval::new(1, 0, 300),
-            GenomicInterval::new(2, 0, 300),
-            GenomicInterval::new(2, 16, 316),
-            GenomicInterval::new(3, 53, 353),
+            Bed3::new(1, 0, 300),
+            Bed3::new(2, 0, 300),
+            Bed3::new(2, 16, 316),
+            Bed3::new(3, 53, 353),
         ]; // no min
-        let query = GenomicInterval::new(3, 54, 300);
+        let query = Bed3::new(3, 54, 300);
         let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.chr_bound_downstream(&query).unwrap();
         assert_eq!(bound, None);
@@ -1010,12 +1010,12 @@ mod testing {
     #[test]
     fn bsearch_chr_downstream_e() {
         let intervals = vec![
-            GenomicInterval::new(2, 0, 300),
-            GenomicInterval::new(3, 0, 300),
-            GenomicInterval::new(3, 16, 316),
-            GenomicInterval::new(4, 53, 353),
+            Bed3::new(2, 0, 300),
+            Bed3::new(3, 0, 300),
+            Bed3::new(3, 16, 316),
+            Bed3::new(4, 53, 353),
         ]; // no min
-        let query = GenomicInterval::new(1, 54, 300);
+        let query = Bed3::new(1, 54, 300);
         let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.chr_bound_downstream(&query).unwrap();
         assert_eq!(bound, None);
@@ -1024,11 +1024,11 @@ mod testing {
     #[test]
     fn bsearch_chr_downstream_f() {
         let intervals = vec![
-            GenomicInterval::new(1, 70, 220), // <- min
-            GenomicInterval::new(1, 142, 292),
-            GenomicInterval::new(1, 154, 304),
+            Bed3::new(1, 70, 220), // <- min
+            Bed3::new(1, 142, 292),
+            Bed3::new(1, 154, 304),
         ];
-        let query = GenomicInterval::new(1, 21, 71);
+        let query = Bed3::new(1, 21, 71);
         let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.chr_bound_downstream(&query).unwrap();
         assert_eq!(bound, Some(0));
@@ -1043,11 +1043,11 @@ mod testing {
             .iter()
             .zip(starts.iter())
             .zip(ends.iter())
-            .map(|((&chr, &start), &end)| GenomicInterval::new(chr, start, end))
+            .map(|((&chr, &start), &end)| Bed3::new(chr, start, end))
             .collect::<Vec<_>>();
         let set = IntervalContainer::from_unsorted(records);
         // set.sort();
-        let query = GenomicInterval::new(0, 12, 15);
+        let query = Bed3::new(0, 12, 15);
         let bound = set.chr_bound_downstream(&query).unwrap().unwrap();
         assert_eq!(bound, 4);
     }
@@ -1055,13 +1055,13 @@ mod testing {
     #[test]
     fn bsearch_stranded_downstream_a() {
         let intervals = vec![
-            StrandedGenomicInterval::new(1, 0, 300, Strand::Forward),
-            StrandedGenomicInterval::new(2, 0, 300, Strand::Forward),
-            StrandedGenomicInterval::new(2, 16, 316, Strand::Forward), // <- min
-            StrandedGenomicInterval::new(2, 16, 316, Strand::Reverse), // <- wrong-strand
-            StrandedGenomicInterval::new(3, 53, 353, Strand::Forward),
+            StrandedBed3::new(1, 0, 300, Strand::Forward),
+            StrandedBed3::new(2, 0, 300, Strand::Forward),
+            StrandedBed3::new(2, 16, 316, Strand::Forward), // <- min
+            StrandedBed3::new(2, 16, 316, Strand::Reverse), // <- wrong-strand
+            StrandedBed3::new(3, 53, 353, Strand::Forward),
         ];
-        let query = StrandedGenomicInterval::new(2, 10, 300, Strand::Forward);
+        let query = StrandedBed3::new(2, 10, 300, Strand::Forward);
         let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.stranded_downstream_bound(&query).unwrap();
         assert_eq!(bound, Some(2));
@@ -1070,13 +1070,13 @@ mod testing {
     #[test]
     fn bsearch_stranded_downstream_b() {
         let intervals = vec![
-            StrandedGenomicInterval::new(1, 0, 300, Strand::Forward),
-            StrandedGenomicInterval::new(2, 0, 300, Strand::Forward),
-            StrandedGenomicInterval::new(2, 16, 316, Strand::Reverse), // <- wrong-strand
-            StrandedGenomicInterval::new(2, 116, 316, Strand::Forward), // <- min
-            StrandedGenomicInterval::new(3, 53, 353, Strand::Forward),
+            StrandedBed3::new(1, 0, 300, Strand::Forward),
+            StrandedBed3::new(2, 0, 300, Strand::Forward),
+            StrandedBed3::new(2, 16, 316, Strand::Reverse), // <- wrong-strand
+            StrandedBed3::new(2, 116, 316, Strand::Forward), // <- min
+            StrandedBed3::new(3, 53, 353, Strand::Forward),
         ];
-        let query = StrandedGenomicInterval::new(2, 10, 300, Strand::Forward);
+        let query = StrandedBed3::new(2, 10, 300, Strand::Forward);
         let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.stranded_downstream_bound(&query).unwrap();
         assert_eq!(bound, Some(3));
@@ -1085,14 +1085,14 @@ mod testing {
     #[test]
     fn bsearch_stranded_downstream_c() {
         let intervals = vec![
-            StrandedGenomicInterval::new(1, 0, 300, Strand::Forward),
-            StrandedGenomicInterval::new(2, 0, 300, Strand::Forward),
-            StrandedGenomicInterval::new(2, 16, 316, Strand::Reverse), // <- wrong-strand
-            StrandedGenomicInterval::new(2, 16, 316, Strand::Unknown), // <- wrong-strand
-            StrandedGenomicInterval::new(2, 116, 316, Strand::Forward), // <- min
-            StrandedGenomicInterval::new(3, 53, 353, Strand::Forward),
+            StrandedBed3::new(1, 0, 300, Strand::Forward),
+            StrandedBed3::new(2, 0, 300, Strand::Forward),
+            StrandedBed3::new(2, 16, 316, Strand::Reverse), // <- wrong-strand
+            StrandedBed3::new(2, 16, 316, Strand::Unknown), // <- wrong-strand
+            StrandedBed3::new(2, 116, 316, Strand::Forward), // <- min
+            StrandedBed3::new(3, 53, 353, Strand::Forward),
         ];
-        let query = StrandedGenomicInterval::new(2, 10, 300, Strand::Forward);
+        let query = StrandedBed3::new(2, 10, 300, Strand::Forward);
         let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.stranded_downstream_bound(&query).unwrap();
         assert_eq!(bound, Some(4));
@@ -1101,14 +1101,14 @@ mod testing {
     #[test]
     fn bsearch_stranded_downstream_d() {
         let intervals = vec![
-            StrandedGenomicInterval::new(1, 0, 300, Strand::Forward),
-            StrandedGenomicInterval::new(2, 0, 300, Strand::Forward),
-            StrandedGenomicInterval::new(2, 16, 316, Strand::Reverse), // <- wrong-strand
-            StrandedGenomicInterval::new(2, 16, 316, Strand::Unknown), // <- wrong-strand
-            StrandedGenomicInterval::new(2, 116, 316, Strand::Reverse), // <- wrong-strand
-            StrandedGenomicInterval::new(3, 53, 353, Strand::Forward),
+            StrandedBed3::new(1, 0, 300, Strand::Forward),
+            StrandedBed3::new(2, 0, 300, Strand::Forward),
+            StrandedBed3::new(2, 16, 316, Strand::Reverse), // <- wrong-strand
+            StrandedBed3::new(2, 16, 316, Strand::Unknown), // <- wrong-strand
+            StrandedBed3::new(2, 116, 316, Strand::Reverse), // <- wrong-strand
+            StrandedBed3::new(3, 53, 353, Strand::Forward),
         ];
-        let query = StrandedGenomicInterval::new(2, 10, 300, Strand::Forward);
+        let query = StrandedBed3::new(2, 10, 300, Strand::Forward);
         let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.stranded_downstream_bound(&query).unwrap();
         assert_eq!(bound, None);
@@ -1117,13 +1117,13 @@ mod testing {
     #[test]
     fn bsearch_stranded_downstream_e() {
         let intervals = vec![
-            StrandedGenomicInterval::new(2, 0, 300, Strand::Forward), // <- wrong-chr
-            StrandedGenomicInterval::new(2, 16, 316, Strand::Reverse), // <- wrong-strand
-            StrandedGenomicInterval::new(2, 16, 316, Strand::Unknown), // <- wrong-strand
-            StrandedGenomicInterval::new(2, 116, 316, Strand::Reverse), // <- wrong-strand
-            StrandedGenomicInterval::new(3, 53, 353, Strand::Forward),
+            StrandedBed3::new(2, 0, 300, Strand::Forward), // <- wrong-chr
+            StrandedBed3::new(2, 16, 316, Strand::Reverse), // <- wrong-strand
+            StrandedBed3::new(2, 16, 316, Strand::Unknown), // <- wrong-strand
+            StrandedBed3::new(2, 116, 316, Strand::Reverse), // <- wrong-strand
+            StrandedBed3::new(3, 53, 353, Strand::Forward),
         ];
-        let query = StrandedGenomicInterval::new(1, 10, 300, Strand::Forward);
+        let query = StrandedBed3::new(1, 10, 300, Strand::Forward);
         let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.stranded_downstream_bound(&query).unwrap();
         assert_eq!(bound, None);

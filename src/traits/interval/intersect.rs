@@ -43,11 +43,11 @@ where
     /// and are on the same strand.
     ///
     /// ```
-    /// use bedrs::{Coordinates, Intersect, StrandedGenomicInterval, Strand};
+    /// use bedrs::{Coordinates, Intersect, StrandedBed3, Strand};
     ///
-    /// let a = StrandedGenomicInterval::new(1, 10, 20, Strand::Forward);
-    /// let b = StrandedGenomicInterval::new(1, 15, 25, Strand::Forward);
-    /// let c = StrandedGenomicInterval::new(1, 15, 25, Strand::Reverse);
+    /// let a = StrandedBed3::new(1, 10, 20, Strand::Forward);
+    /// let b = StrandedBed3::new(1, 15, 25, Strand::Forward);
+    /// let c = StrandedBed3::new(1, 15, 25, Strand::Reverse);
     ///
     /// let ix = a.stranded_intersect(&b).unwrap();
     /// assert_eq!(ix.start(), 15);
@@ -70,7 +70,7 @@ where
 #[allow(clippy::many_single_char_names)]
 mod testing {
     use super::Intersect;
-    use crate::{Coordinates, GenomicInterval, Interval, Strand, StrandedGenomicInterval};
+    use crate::{Coordinates, Bed3, Interval, Strand, StrandedBed3};
 
     #[test]
     ///       x-------y
@@ -87,9 +87,9 @@ mod testing {
 
     #[test]
     fn intersection_case_a_genomic() {
-        let a = GenomicInterval::new(1, 20, 30);
-        let b = GenomicInterval::new(1, 15, 25);
-        let c = GenomicInterval::new(2, 15, 25);
+        let a = Bed3::new(1, 20, 30);
+        let b = Bed3::new(1, 15, 25);
+        let c = Bed3::new(2, 15, 25);
         let ix = a.intersect(&b).unwrap();
         assert_eq!(ix.start(), 20);
         assert_eq!(ix.end(), 25);
@@ -98,11 +98,11 @@ mod testing {
 
     #[test]
     fn intersection_case_a_stranded() {
-        let a = StrandedGenomicInterval::new(1, 20, 30, Strand::Forward);
-        let b = StrandedGenomicInterval::new(1, 15, 25, Strand::Forward);
-        let c = StrandedGenomicInterval::new(1, 15, 25, Strand::Reverse);
-        let d = StrandedGenomicInterval::new(2, 15, 25, Strand::Forward);
-        let e = StrandedGenomicInterval::new(2, 15, 25, Strand::Reverse);
+        let a = StrandedBed3::new(1, 20, 30, Strand::Forward);
+        let b = StrandedBed3::new(1, 15, 25, Strand::Forward);
+        let c = StrandedBed3::new(1, 15, 25, Strand::Reverse);
+        let d = StrandedBed3::new(2, 15, 25, Strand::Forward);
+        let e = StrandedBed3::new(2, 15, 25, Strand::Reverse);
         let ix = a.stranded_intersect(&b).unwrap();
         assert_eq!(ix.start(), 20);
         assert_eq!(ix.end(), 25);
@@ -127,9 +127,9 @@ mod testing {
 
     #[test]
     fn intersection_case_b_genomic() {
-        let a = GenomicInterval::new(1, 20, 30);
-        let b = GenomicInterval::new(1, 25, 35);
-        let c = GenomicInterval::new(2, 25, 35);
+        let a = Bed3::new(1, 20, 30);
+        let b = Bed3::new(1, 25, 35);
+        let c = Bed3::new(2, 25, 35);
         let ix = a.intersect(&b).unwrap();
         assert_eq!(ix.start(), 25);
         assert_eq!(ix.end(), 30);
@@ -138,11 +138,11 @@ mod testing {
 
     #[test]
     fn intersection_case_b_stranded() {
-        let a = StrandedGenomicInterval::new(1, 20, 30, Strand::Forward);
-        let b = StrandedGenomicInterval::new(1, 25, 35, Strand::Forward);
-        let c = StrandedGenomicInterval::new(1, 25, 35, Strand::Reverse);
-        let d = StrandedGenomicInterval::new(2, 25, 35, Strand::Forward);
-        let e = StrandedGenomicInterval::new(2, 25, 35, Strand::Reverse);
+        let a = StrandedBed3::new(1, 20, 30, Strand::Forward);
+        let b = StrandedBed3::new(1, 25, 35, Strand::Forward);
+        let c = StrandedBed3::new(1, 25, 35, Strand::Reverse);
+        let d = StrandedBed3::new(2, 25, 35, Strand::Forward);
+        let e = StrandedBed3::new(2, 25, 35, Strand::Reverse);
         let ix = a.stranded_intersect(&b).unwrap();
         assert_eq!(ix.start(), 25);
         assert_eq!(ix.end(), 30);
@@ -167,9 +167,9 @@ mod testing {
 
     #[test]
     fn intersection_case_c_genomic() {
-        let a = GenomicInterval::new(1, 20, 40);
-        let b = GenomicInterval::new(1, 25, 35);
-        let c = GenomicInterval::new(2, 25, 35);
+        let a = Bed3::new(1, 20, 40);
+        let b = Bed3::new(1, 25, 35);
+        let c = Bed3::new(2, 25, 35);
         let ix = a.intersect(&b).unwrap();
         assert_eq!(ix.start(), 25);
         assert_eq!(ix.end(), 35);
@@ -178,11 +178,11 @@ mod testing {
 
     #[test]
     fn intersection_case_c_stranded() {
-        let a = StrandedGenomicInterval::new(1, 20, 40, Strand::Forward);
-        let b = StrandedGenomicInterval::new(1, 25, 35, Strand::Forward);
-        let c = StrandedGenomicInterval::new(1, 25, 35, Strand::Reverse);
-        let d = StrandedGenomicInterval::new(2, 25, 35, Strand::Forward);
-        let e = StrandedGenomicInterval::new(2, 25, 35, Strand::Reverse);
+        let a = StrandedBed3::new(1, 20, 40, Strand::Forward);
+        let b = StrandedBed3::new(1, 25, 35, Strand::Forward);
+        let c = StrandedBed3::new(1, 25, 35, Strand::Reverse);
+        let d = StrandedBed3::new(2, 25, 35, Strand::Forward);
+        let e = StrandedBed3::new(2, 25, 35, Strand::Reverse);
         let ix = a.stranded_intersect(&b).unwrap();
         assert_eq!(ix.start(), 25);
         assert_eq!(ix.end(), 35);
@@ -207,9 +207,9 @@ mod testing {
 
     #[test]
     fn intersection_case_d_genomic() {
-        let a = GenomicInterval::new(1, 25, 35);
-        let b = GenomicInterval::new(1, 20, 40);
-        let c = GenomicInterval::new(2, 20, 40);
+        let a = Bed3::new(1, 25, 35);
+        let b = Bed3::new(1, 20, 40);
+        let c = Bed3::new(2, 20, 40);
         let ix = a.intersect(&b).unwrap();
         assert_eq!(ix.start(), 25);
         assert_eq!(ix.end(), 35);
@@ -218,11 +218,11 @@ mod testing {
 
     #[test]
     fn intersection_case_d_stranded() {
-        let a = StrandedGenomicInterval::new(1, 25, 35, Strand::Forward);
-        let b = StrandedGenomicInterval::new(1, 20, 40, Strand::Forward);
-        let c = StrandedGenomicInterval::new(1, 20, 40, Strand::Reverse);
-        let d = StrandedGenomicInterval::new(2, 20, 40, Strand::Forward);
-        let e = StrandedGenomicInterval::new(2, 20, 40, Strand::Reverse);
+        let a = StrandedBed3::new(1, 25, 35, Strand::Forward);
+        let b = StrandedBed3::new(1, 20, 40, Strand::Forward);
+        let c = StrandedBed3::new(1, 20, 40, Strand::Reverse);
+        let d = StrandedBed3::new(2, 20, 40, Strand::Forward);
+        let e = StrandedBed3::new(2, 20, 40, Strand::Reverse);
         let ix = a.stranded_intersect(&b).unwrap();
         assert_eq!(ix.start(), 25);
         assert_eq!(ix.end(), 35);
@@ -247,9 +247,9 @@ mod testing {
 
     #[test]
     fn intersection_case_e_genomic() {
-        let a = GenomicInterval::new(1, 20, 40);
-        let b = GenomicInterval::new(1, 20, 40);
-        let c = GenomicInterval::new(2, 20, 40);
+        let a = Bed3::new(1, 20, 40);
+        let b = Bed3::new(1, 20, 40);
+        let c = Bed3::new(2, 20, 40);
         let ix = a.intersect(&b).unwrap();
         assert_eq!(ix.start(), 20);
         assert_eq!(ix.end(), 40);
@@ -258,11 +258,11 @@ mod testing {
 
     #[test]
     fn intersection_case_e_stranded() {
-        let a = StrandedGenomicInterval::new(1, 20, 40, Strand::Forward);
-        let b = StrandedGenomicInterval::new(1, 20, 40, Strand::Forward);
-        let c = StrandedGenomicInterval::new(1, 20, 40, Strand::Reverse);
-        let d = StrandedGenomicInterval::new(2, 20, 40, Strand::Forward);
-        let e = StrandedGenomicInterval::new(2, 20, 40, Strand::Reverse);
+        let a = StrandedBed3::new(1, 20, 40, Strand::Forward);
+        let b = StrandedBed3::new(1, 20, 40, Strand::Forward);
+        let c = StrandedBed3::new(1, 20, 40, Strand::Reverse);
+        let d = StrandedBed3::new(2, 20, 40, Strand::Forward);
+        let e = StrandedBed3::new(2, 20, 40, Strand::Reverse);
         let ix = a.stranded_intersect(&b).unwrap();
         assert_eq!(ix.start(), 20);
         assert_eq!(ix.end(), 40);
@@ -286,20 +286,20 @@ mod testing {
 
     #[test]
     fn intersection_case_none_genomic() {
-        let a = GenomicInterval::new(1, 10, 15);
-        let b = GenomicInterval::new(1, 20, 25);
-        let c = GenomicInterval::new(2, 20, 25);
+        let a = Bed3::new(1, 10, 15);
+        let b = Bed3::new(1, 20, 25);
+        let c = Bed3::new(2, 20, 25);
         assert!(a.intersect(&b).is_none());
         assert!(a.intersect(&c).is_none());
     }
 
     #[test]
     fn intersection_case_none_stranded() {
-        let a = StrandedGenomicInterval::new(1, 10, 15, Strand::Forward);
-        let b = StrandedGenomicInterval::new(1, 20, 25, Strand::Forward);
-        let c = StrandedGenomicInterval::new(1, 20, 25, Strand::Reverse);
-        let d = StrandedGenomicInterval::new(2, 20, 25, Strand::Forward);
-        let e = StrandedGenomicInterval::new(2, 20, 25, Strand::Reverse);
+        let a = StrandedBed3::new(1, 10, 15, Strand::Forward);
+        let b = StrandedBed3::new(1, 20, 25, Strand::Forward);
+        let c = StrandedBed3::new(1, 20, 25, Strand::Reverse);
+        let d = StrandedBed3::new(2, 20, 25, Strand::Forward);
+        let e = StrandedBed3::new(2, 20, 25, Strand::Reverse);
         assert!(a.stranded_intersect(&b).is_none());
         assert!(a.stranded_intersect(&c).is_none());
         assert!(a.stranded_intersect(&d).is_none());

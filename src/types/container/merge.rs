@@ -63,7 +63,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::{traits::Coordinates, GenomicInterval, Interval, IntervalContainer};
+    use crate::{traits::Coordinates, Bed3, Interval, IntervalContainer};
 
     #[test]
     fn test_merging_one_cluster() {
@@ -127,9 +127,9 @@ mod testing {
     #[test]
     fn test_merging_one_cluster_genomic() {
         let records = vec![
-            GenomicInterval::new(1, 10, 30),
-            GenomicInterval::new(1, 15, 20),
-            GenomicInterval::new(1, 25, 30),
+            Bed3::new(1, 10, 30),
+            Bed3::new(1, 15, 20),
+            Bed3::new(1, 25, 30),
         ];
         let set = IntervalContainer::from_unsorted(records);
         let merge_set = set.merge().unwrap();
@@ -148,9 +148,9 @@ mod testing {
     #[test]
     fn test_merging_two_cluster_genomic() {
         let records = vec![
-            GenomicInterval::new(1, 10, 30),
-            GenomicInterval::new(1, 15, 20),
-            GenomicInterval::new(2, 25, 30),
+            Bed3::new(1, 10, 30),
+            Bed3::new(1, 15, 20),
+            Bed3::new(2, 25, 30),
         ];
         let set = IntervalContainer::from_unsorted(records);
         let merge_set = set.merge().unwrap();

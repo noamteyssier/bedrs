@@ -145,16 +145,16 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::{Coordinates, GenomicInterval, Interval, IntervalContainer};
+    use crate::{Bed3, Coordinates, Interval, IntervalContainer};
 
     #[test]
     fn closest_unsorted() {
         let intervals = vec![
-            GenomicInterval::new(1, 10, 20),
-            GenomicInterval::new(1, 30, 40),
-            GenomicInterval::new(1, 50, 60),
+            Bed3::new(1, 10, 20),
+            Bed3::new(1, 30, 40),
+            Bed3::new(1, 50, 60),
         ];
-        let query = GenomicInterval::new(1, 22, 23);
+        let query = Bed3::new(1, 22, 23);
         let set = IntervalContainer::new(intervals);
         assert!(set.closest(&query).is_err());
         assert!(set.closest_upstream(&query).is_err());
@@ -163,8 +163,8 @@ mod testing {
 
     #[test]
     fn closest_empty() {
-        let intervals: Vec<GenomicInterval<_>> = vec![];
-        let query = GenomicInterval::new(1, 22, 23);
+        let intervals: Vec<Bed3<_, _>> = vec![];
+        let query = Bed3::new(1, 22, 23);
         let set = IntervalContainer::from_unsorted(intervals);
         assert!(set.closest(&query).is_err());
         assert!(set.closest_upstream(&query).is_err());
@@ -178,14 +178,14 @@ mod testing {
     ///    x-----y
     fn closest_a() {
         let intervals = vec![
-            GenomicInterval::new(1, 10, 20),
-            GenomicInterval::new(1, 30, 40),
-            GenomicInterval::new(1, 50, 60),
+            Bed3::new(1, 10, 20),
+            Bed3::new(1, 30, 40),
+            Bed3::new(1, 50, 60),
         ];
-        let query = GenomicInterval::new(1, 22, 23);
+        let query = Bed3::new(1, 22, 23);
         let set = IntervalContainer::from_unsorted(intervals);
         let closest = set.closest(&query).unwrap().unwrap();
-        assert!(closest.eq(&GenomicInterval::new(1, 10, 20)));
+        assert!(closest.eq(&Bed3::new(1, 10, 20)));
     }
 
     #[test]
@@ -195,14 +195,14 @@ mod testing {
     ///                 x-----y
     fn closest_b() {
         let intervals = vec![
-            GenomicInterval::new(1, 10, 20),
-            GenomicInterval::new(1, 30, 40),
-            GenomicInterval::new(1, 50, 60),
+            Bed3::new(1, 10, 20),
+            Bed3::new(1, 30, 40),
+            Bed3::new(1, 50, 60),
         ];
-        let query = GenomicInterval::new(1, 22, 32);
+        let query = Bed3::new(1, 22, 32);
         let set = IntervalContainer::from_unsorted(intervals);
         let closest = set.closest(&query).unwrap().unwrap();
-        assert!(closest.eq(&GenomicInterval::new(1, 30, 40)));
+        assert!(closest.eq(&Bed3::new(1, 30, 40)));
     }
 
     #[test]
@@ -212,14 +212,14 @@ mod testing {
     ///                 x-----y
     fn closest_c() {
         let intervals = vec![
-            GenomicInterval::new(1, 10, 20),
-            GenomicInterval::new(1, 30, 40),
-            GenomicInterval::new(1, 50, 60),
+            Bed3::new(1, 10, 20),
+            Bed3::new(1, 30, 40),
+            Bed3::new(1, 50, 60),
         ];
-        let query = GenomicInterval::new(1, 22, 30);
+        let query = Bed3::new(1, 22, 30);
         let set = IntervalContainer::from_unsorted(intervals);
         let closest = set.closest(&query).unwrap().unwrap();
-        assert!(closest.eq(&GenomicInterval::new(1, 30, 40)));
+        assert!(closest.eq(&Bed3::new(1, 30, 40)));
     }
 
     #[test]
@@ -229,14 +229,14 @@ mod testing {
     ///                                      x-------y
     fn closest_d() {
         let intervals = vec![
-            GenomicInterval::new(1, 10, 20),
-            GenomicInterval::new(2, 30, 40),
-            GenomicInterval::new(2, 50, 60),
+            Bed3::new(1, 10, 20),
+            Bed3::new(2, 30, 40),
+            Bed3::new(2, 50, 60),
         ];
-        let query = GenomicInterval::new(2, 46, 47);
+        let query = Bed3::new(2, 46, 47);
         let set = IntervalContainer::from_unsorted(intervals);
         let closest = set.closest(&query).unwrap().unwrap();
-        assert!(closest.eq(&GenomicInterval::new(2, 50, 60)));
+        assert!(closest.eq(&Bed3::new(2, 50, 60)));
     }
 
     #[test]
@@ -245,11 +245,8 @@ mod testing {
     /// ========================================
     /// None
     fn closest_e() {
-        let intervals = vec![
-            GenomicInterval::new(1, 10, 20),
-            GenomicInterval::new(1, 30, 40),
-        ];
-        let query = GenomicInterval::new(2, 46, 47);
+        let intervals = vec![Bed3::new(1, 10, 20), Bed3::new(1, 30, 40)];
+        let query = Bed3::new(2, 46, 47);
         let set = IntervalContainer::from_unsorted(intervals);
         let closest = set.closest(&query).unwrap();
         assert!(closest.is_none());
@@ -261,14 +258,11 @@ mod testing {
     /// ========================================
     ///       x-----y
     fn closest_f() {
-        let intervals = vec![
-            GenomicInterval::new(1, 10, 20),
-            GenomicInterval::new(1, 30, 40),
-        ];
-        let query = GenomicInterval::new(1, 24, 26);
+        let intervals = vec![Bed3::new(1, 10, 20), Bed3::new(1, 30, 40)];
+        let query = Bed3::new(1, 24, 26);
         let set = IntervalContainer::from_unsorted(intervals);
         let closest = set.closest(&query).unwrap().unwrap();
-        assert!(closest.eq(&GenomicInterval::new(1, 10, 20)));
+        assert!(closest.eq(&Bed3::new(1, 10, 20)));
     }
 
     #[test]
@@ -278,14 +272,14 @@ mod testing {
     ///    x-----y
     fn closest_upstream_a() {
         let intervals = vec![
-            GenomicInterval::new(1, 10, 20),
-            GenomicInterval::new(1, 30, 40),
-            GenomicInterval::new(1, 50, 60),
+            Bed3::new(1, 10, 20),
+            Bed3::new(1, 30, 40),
+            Bed3::new(1, 50, 60),
         ];
-        let query = GenomicInterval::new(1, 22, 32);
+        let query = Bed3::new(1, 22, 32);
         let set = IntervalContainer::from_unsorted(intervals);
         let closest = set.closest_upstream(&query).unwrap().unwrap();
-        assert!(closest.eq(&GenomicInterval::new(1, 10, 20)));
+        assert!(closest.eq(&Bed3::new(1, 10, 20)));
     }
 
     #[test]
@@ -295,14 +289,14 @@ mod testing {
     ///                    x-----y
     fn closest_upstream_b() {
         let intervals = vec![
-            GenomicInterval::new(1, 10, 20),
-            GenomicInterval::new(2, 30, 40),
-            GenomicInterval::new(2, 50, 60),
+            Bed3::new(1, 10, 20),
+            Bed3::new(2, 30, 40),
+            Bed3::new(2, 50, 60),
         ];
-        let query = GenomicInterval::new(2, 32, 55);
+        let query = Bed3::new(2, 32, 55);
         let set = IntervalContainer::from_unsorted(intervals);
         let closest = set.closest_upstream(&query).unwrap().unwrap();
-        assert!(closest.eq(&GenomicInterval::new(2, 30, 40)));
+        assert!(closest.eq(&Bed3::new(2, 30, 40)));
     }
 
     #[test]
@@ -312,15 +306,15 @@ mod testing {
     ///                          x-----y
     fn closest_upstream_c() {
         let intervals = vec![
-            GenomicInterval::new(1, 10, 20),
-            GenomicInterval::new(2, 10, 20),
-            GenomicInterval::new(2, 30, 40),
-            GenomicInterval::new(2, 50, 60),
+            Bed3::new(1, 10, 20),
+            Bed3::new(2, 10, 20),
+            Bed3::new(2, 30, 40),
+            Bed3::new(2, 50, 60),
         ];
-        let query = GenomicInterval::new(2, 32, 55);
+        let query = Bed3::new(2, 32, 55);
         let set = IntervalContainer::from_unsorted(intervals);
         let closest = set.closest_upstream(&query).unwrap().unwrap();
-        assert!(closest.eq(&GenomicInterval::new(2, 30, 40)));
+        assert!(closest.eq(&Bed3::new(2, 30, 40)));
     }
 
     #[test]
@@ -330,14 +324,14 @@ mod testing {
     ///                 x-----y
     fn closest_downstream_a() {
         let intervals = vec![
-            GenomicInterval::new(1, 10, 20),
-            GenomicInterval::new(1, 30, 40),
-            GenomicInterval::new(1, 50, 60),
+            Bed3::new(1, 10, 20),
+            Bed3::new(1, 30, 40),
+            Bed3::new(1, 50, 60),
         ];
-        let query = GenomicInterval::new(1, 22, 32);
+        let query = Bed3::new(1, 22, 32);
         let set = IntervalContainer::from_unsorted(intervals);
         let closest = set.closest_downstream(&query).unwrap().unwrap();
-        assert!(closest.eq(&GenomicInterval::new(1, 30, 40)));
+        assert!(closest.eq(&Bed3::new(1, 30, 40)));
     }
 
     #[test]
@@ -347,14 +341,14 @@ mod testing {
     ///                              x-------y
     fn closest_downstream_b() {
         let intervals = vec![
-            GenomicInterval::new(1, 10, 20),
-            GenomicInterval::new(2, 30, 40),
-            GenomicInterval::new(2, 50, 60),
+            Bed3::new(1, 10, 20),
+            Bed3::new(2, 30, 40),
+            Bed3::new(2, 50, 60),
         ];
-        let query = GenomicInterval::new(2, 32, 55);
+        let query = Bed3::new(2, 32, 55);
         let set = IntervalContainer::from_unsorted(intervals);
         let closest = set.closest_downstream(&query).unwrap().unwrap();
-        assert!(closest.eq(&GenomicInterval::new(2, 50, 60)));
+        assert!(closest.eq(&Bed3::new(2, 50, 60)));
     }
 
     #[test]
@@ -364,28 +358,28 @@ mod testing {
     ///                              x-------y
     fn closest_downstream_c() {
         let intervals = vec![
-            GenomicInterval::new(1, 10, 20),
-            GenomicInterval::new(2, 30, 40),
-            GenomicInterval::new(2, 50, 60),
-            GenomicInterval::new(2, 70, 80),
+            Bed3::new(1, 10, 20),
+            Bed3::new(2, 30, 40),
+            Bed3::new(2, 50, 60),
+            Bed3::new(2, 70, 80),
         ];
-        let query = GenomicInterval::new(2, 32, 55);
+        let query = Bed3::new(2, 32, 55);
         let set = IntervalContainer::from_unsorted(intervals);
         let closest = set.closest_downstream(&query).unwrap().unwrap();
-        assert!(closest.eq(&GenomicInterval::new(2, 50, 60)));
+        assert!(closest.eq(&Bed3::new(2, 50, 60)));
     }
 
     #[test]
     fn closest_downstream_d() {
         let intervals = vec![
-            GenomicInterval::new(1, 70, 220), // <- min
-            GenomicInterval::new(1, 142, 292),
-            GenomicInterval::new(1, 154, 304),
+            Bed3::new(1, 70, 220), // <- min
+            Bed3::new(1, 142, 292),
+            Bed3::new(1, 154, 304),
         ];
-        let query = GenomicInterval::new(1, 21, 71);
+        let query = Bed3::new(1, 21, 71);
         let set = IntervalContainer::from_unsorted(intervals);
         let closest = set.closest_downstream(&query).unwrap().unwrap();
-        assert!(closest.eq(&GenomicInterval::new(1, 70, 220)));
+        assert!(closest.eq(&Bed3::new(1, 70, 220)));
     }
 
     #[test]
@@ -410,12 +404,12 @@ mod testing {
             .iter()
             .zip(starts.iter())
             .zip(ends.iter())
-            .map(|((c, s), e)| GenomicInterval::new(*c, *s, *e))
+            .map(|((c, s), e)| Bed3::new(*c, *s, *e))
             .collect::<Vec<_>>();
         let intervals = IntervalContainer::from_unsorted(records);
-        let query = GenomicInterval::new(1, 12, 15);
+        let query = Bed3::new(1, 12, 15);
         let closest = intervals.closest_downstream(&query).unwrap().unwrap();
-        assert!(closest.eq(&GenomicInterval::new(1, 13, 23)));
+        assert!(closest.eq(&Bed3::new(1, 13, 23)));
     }
 
     #[test]
@@ -427,11 +421,11 @@ mod testing {
             .iter()
             .zip(starts.iter())
             .zip(ends.iter())
-            .map(|((c, s), e)| GenomicInterval::new(*c, *s, *e))
+            .map(|((c, s), e)| Bed3::new(*c, *s, *e))
             .collect::<Vec<_>>();
         let intervals = IntervalContainer::from_unsorted(records);
-        let query = GenomicInterval::new(0, 12, 15);
+        let query = Bed3::new(0, 12, 15);
         let closest = intervals.closest_downstream(&query).unwrap().unwrap();
-        assert!(closest.eq(&GenomicInterval::new(0, 12, 22)));
+        assert!(closest.eq(&Bed3::new(0, 12, 22)));
     }
 }

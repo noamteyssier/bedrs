@@ -1,4 +1,4 @@
-use bedrs::types::{GenomicInterval, Interval, IntervalContainer};
+use bedrs::types::{Bed3, Interval, IntervalContainer};
 use criterion::Criterion;
 
 pub fn merge_base(c: &mut Criterion) {
@@ -14,7 +14,7 @@ pub fn merge_base(c: &mut Criterion) {
 pub fn merge_genomic(c: &mut Criterion) {
     let records = (0..100)
         .map(|x| (x, x + 50, x % 5))
-        .map(|(x, y, z)| GenomicInterval::new(z, x, y))
+        .map(|(x, y, z)| Bed3::new(z, x, y))
         .collect();
     let mut set = IntervalContainer::new(records);
     set.sort();
@@ -36,7 +36,7 @@ pub fn merge_unchecked_base(c: &mut Criterion) {
 pub fn merge_unchecked_genomic(c: &mut Criterion) {
     let records = (0..100)
         .map(|x| (x, x + 50, x % 5))
-        .map(|(x, y, z)| GenomicInterval::new(z, x, y))
+        .map(|(x, y, z)| Bed3::new(z, x, y))
         .collect();
     let mut set = IntervalContainer::new(records);
     set.sort();

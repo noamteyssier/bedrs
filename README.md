@@ -116,16 +116,16 @@ This is the bread and butter of genomic arithmetic.
 It is a 3-attribute struct of `[chr, start, stop]`.
 
 ```rust
-use bedrs::{Overlap, GenomicInterval};
+use bedrs::{Overlap, Bed3};
 
 // Initializing two intervals on the same Chr
-let a = GenomicInterval::new(1, 10, 20);
-let b = GenomicInterval::new(1, 15, 25);
+let a = Bed3::new(1, 10, 20);
+let b = Bed3::new(1, 15, 25);
 assert!(a.overlaps(&b));
 
 // Initializing two intervals on different Chr
-let a = GenomicInterval::new(1, 10, 20);
-let b = GenomicInterval::new(2, 15, 25);
+let a = Bed3::new(1, 10, 20);
+let b = Bed3::new(2, 15, 25);
 assert!(!a.overlaps(&b));
 ```
 
@@ -135,12 +135,12 @@ This is another version of the genomic interval which includes strand informatio
 It is a 4-attribute struct of `[chr, start, stop, strand]`
 
 ```rust
-use bedrs::{Overlap, Strand, StrandedGenomicInterval};
+use bedrs::{Overlap, Strand, StrandedBed3};
 
 // Initializing three intervals on the same Chr with strands
-let a = StrandedGenomicInterval::new(1, 10, 20, Strand::Forward);
-let b = StrandedGenomicInterval::new(1, 15, 25, Strand::Forward);
-let c = StrandedGenomicInterval::new(1, 15, 25, Strand::Reverse);
+let a = StrandedBed3::new(1, 10, 20, Strand::Forward);
+let b = StrandedBed3::new(1, 15, 25, Strand::Forward);
+let c = StrandedBed3::new(1, 15, 25, Strand::Reverse);
 
 // All intervals overlap
 assert!(a.overlaps(&b));

@@ -165,7 +165,7 @@ mod testing {
     use crate::{
         traits::{ChromBounds, IntervalBounds, ValueBounds},
         types::QueryMethod,
-        GenomicInterval, Interval,
+        Bed3, Interval,
     };
 
     fn validate_records<I, C, T>(obs: &[I], exp: &[I])
@@ -370,18 +370,18 @@ mod testing {
     ///        i---j        i-j
     fn intersections_genomic_a() {
         let intervals_a = vec![
-            GenomicInterval::new(1, 100, 300),
-            GenomicInterval::new(1, 400, 475),
-            GenomicInterval::new(1, 500, 550),
+            Bed3::new(1, 100, 300),
+            Bed3::new(1, 400, 475),
+            Bed3::new(1, 500, 550),
         ];
         let intervals_b = vec![
-            GenomicInterval::new(1, 120, 160),
-            GenomicInterval::new(1, 460, 470),
-            GenomicInterval::new(1, 490, 500),
+            Bed3::new(1, 120, 160),
+            Bed3::new(1, 460, 470),
+            Bed3::new(1, 490, 500),
         ];
         let expected = vec![
-            GenomicInterval::new(1, 120, 160),
-            GenomicInterval::new(1, 460, 470),
+            Bed3::new(1, 120, 160),
+            Bed3::new(1, 460, 470),
         ];
 
         let iter_a = intervals_a.into_iter();
@@ -398,16 +398,16 @@ mod testing {
     ///        i---j    
     fn intersections_genomic_b() {
         let intervals_a = vec![
-            GenomicInterval::new(1, 100, 300),
-            GenomicInterval::new(2, 400, 475),
-            GenomicInterval::new(2, 500, 550),
+            Bed3::new(1, 100, 300),
+            Bed3::new(2, 400, 475),
+            Bed3::new(2, 500, 550),
         ];
         let intervals_b = vec![
-            GenomicInterval::new(1, 120, 160),
-            GenomicInterval::new(1, 460, 470),
-            GenomicInterval::new(1, 490, 500),
+            Bed3::new(1, 120, 160),
+            Bed3::new(1, 460, 470),
+            Bed3::new(1, 490, 500),
         ];
-        let expected = vec![GenomicInterval::new(1, 120, 160)];
+        let expected = vec![Bed3::new(1, 120, 160)];
 
         let iter_a = intervals_a.into_iter();
         let iter_b = intervals_b.into_iter();
@@ -423,17 +423,17 @@ mod testing {
     ///                           i-j       i-j
     fn intersections_genomic_c() {
         let intervals_a = vec![
-            GenomicInterval::new(2, 400, 475),
-            GenomicInterval::new(2, 500, 550),
+            Bed3::new(2, 400, 475),
+            Bed3::new(2, 500, 550),
         ];
         let intervals_b = vec![
-            GenomicInterval::new(1, 120, 160),
-            GenomicInterval::new(2, 460, 470),
-            GenomicInterval::new(2, 510, 520),
+            Bed3::new(1, 120, 160),
+            Bed3::new(2, 460, 470),
+            Bed3::new(2, 510, 520),
         ];
         let expected = vec![
-            GenomicInterval::new(2, 460, 470),
-            GenomicInterval::new(2, 510, 520),
+            Bed3::new(2, 460, 470),
+            Bed3::new(2, 510, 520),
         ];
 
         let iter_a = intervals_a.into_iter();
@@ -450,17 +450,17 @@ mod testing {
     ///                           i-j       i-j
     fn intersections_genomic_d() {
         let intervals_a = vec![
-            GenomicInterval::new(1, 120, 160),
-            GenomicInterval::new(2, 400, 475),
-            GenomicInterval::new(2, 500, 550),
+            Bed3::new(1, 120, 160),
+            Bed3::new(2, 400, 475),
+            Bed3::new(2, 500, 550),
         ];
         let intervals_b = vec![
-            GenomicInterval::new(2, 460, 470),
-            GenomicInterval::new(2, 510, 520),
+            Bed3::new(2, 460, 470),
+            Bed3::new(2, 510, 520),
         ];
         let expected = vec![
-            GenomicInterval::new(2, 460, 470),
-            GenomicInterval::new(2, 510, 520),
+            Bed3::new(2, 460, 470),
+            Bed3::new(2, 510, 520),
         ];
 
         let iter_a = intervals_a.into_iter();

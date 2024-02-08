@@ -67,7 +67,7 @@ where
 mod testing {
     use crate::{
         traits::{ChromBounds, IntervalBounds, ValueBounds},
-        GenomicInterval, Interval, IntervalContainer,
+        Bed3, Interval, IntervalContainer,
     };
 
     fn validate_records<I, C, T>(obs: &[I], exp: &[I])
@@ -141,11 +141,11 @@ mod testing {
     /// |1|                 y----i
     fn complement_c() {
         let intervals = vec![
-            GenomicInterval::new(1, 10, 20),
-            GenomicInterval::new(1, 30, 40),
-            GenomicInterval::new(2, 50, 60),
+            Bed3::new(1, 10, 20),
+            Bed3::new(1, 30, 40),
+            Bed3::new(2, 50, 60),
         ];
-        let expected = vec![GenomicInterval::new(1, 20, 30)];
+        let expected = vec![Bed3::new(1, 20, 30)];
         let set = IntervalContainer::from_unsorted(intervals);
         let comp_iter = set.complement().unwrap();
         let complements: Vec<_> = comp_iter.collect();
@@ -158,14 +158,14 @@ mod testing {
     /// |1|                 y----i          |2|      l--m
     fn complement_d() {
         let intervals = vec![
-            GenomicInterval::new(1, 10, 20),
-            GenomicInterval::new(1, 30, 40),
-            GenomicInterval::new(2, 10, 20),
-            GenomicInterval::new(2, 30, 40),
+            Bed3::new(1, 10, 20),
+            Bed3::new(1, 30, 40),
+            Bed3::new(2, 10, 20),
+            Bed3::new(2, 30, 40),
         ];
         let expected = vec![
-            GenomicInterval::new(1, 20, 30),
-            GenomicInterval::new(2, 20, 30),
+            Bed3::new(1, 20, 30),
+            Bed3::new(2, 20, 30),
         ];
         let set = IntervalContainer::from_unsorted(intervals);
         let comp_iter = set.complement().unwrap();

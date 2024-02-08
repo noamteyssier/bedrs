@@ -60,8 +60,8 @@ use crate::{
 /// assert_eq!(a.distance(&b), Some(0));
 ///
 /// // Different Chromosomes
-/// let a = GenomicInterval::new(1, 10, 20);
-/// let b = GenomicInterval::new(2, 10, 20);
+/// let a = Bed3::new(1, 10, 20);
+/// let b = Bed3::new(2, 10, 20);
 /// assert_eq!(a.distance(&b), None);
 /// ```
 pub trait Distance<C, T>: Coordinates<C, T> + Overlap<C, T>
@@ -97,7 +97,7 @@ where
 #[cfg(test)]
 #[allow(clippy::doc_markdown)]
 mod testing {
-    use crate::{traits::interval::Distance, GenomicInterval, Interval};
+    use crate::{traits::interval::Distance, Bed3, Interval};
 
     #[test]
     ///    x-----y
@@ -149,8 +149,8 @@ mod testing {
     /// ===================
     /// distance = 1
     fn distance_e() {
-        let a = GenomicInterval::new(1, 21, 30);
-        let b = GenomicInterval::new(1, 10, 20);
+        let a = Bed3::new(1, 21, 30);
+        let b = Bed3::new(1, 10, 20);
         assert_eq!(a.distance(&b), Some(1));
     }
 
@@ -160,8 +160,8 @@ mod testing {
     /// ===================
     /// distance = None
     fn distance_f() {
-        let a = GenomicInterval::new(2, 21, 30);
-        let b = GenomicInterval::new(1, 10, 20);
+        let a = Bed3::new(2, 21, 30);
+        let b = Bed3::new(1, 10, 20);
         assert_eq!(a.distance(&b), None);
     }
 
@@ -171,8 +171,8 @@ mod testing {
     /// ===================
     /// distance = None
     fn distance_g() {
-        let a = GenomicInterval::new(1, 10, 20);
-        let b = GenomicInterval::new(2, 21, 30);
+        let a = Bed3::new(1, 10, 20);
+        let b = Bed3::new(2, 21, 30);
         assert_eq!(a.distance(&b), None);
     }
 
@@ -182,8 +182,8 @@ mod testing {
     /// ===================
     /// distance = None
     fn distance_h() {
-        let a = GenomicInterval::new(2, 10, 20);
-        let b = GenomicInterval::new(1, 21, 30);
+        let a = Bed3::new(2, 10, 20);
+        let b = Bed3::new(1, 21, 30);
         assert_eq!(a.distance(&b), None);
     }
 
@@ -193,8 +193,8 @@ mod testing {
     /// ===================
     /// distance = None
     fn distance_i() {
-        let a = GenomicInterval::new(2, 21, 30);
-        let b = GenomicInterval::new(1, 10, 20);
+        let a = Bed3::new(2, 21, 30);
+        let b = Bed3::new(1, 10, 20);
         assert_eq!(a.distance(&b), None);
     }
 
@@ -248,8 +248,8 @@ mod testing {
     /// ===================
     /// directed_distance = None
     fn directed_distance_e() {
-        let a = GenomicInterval::new(2, 21, 30);
-        let b = GenomicInterval::new(1, 10, 20);
+        let a = Bed3::new(2, 21, 30);
+        let b = Bed3::new(1, 10, 20);
         assert_eq!(a.directed_distance(&b), None);
     }
 
@@ -259,8 +259,8 @@ mod testing {
     /// ===================
     /// directed_distance = None
     fn directed_distance_f() {
-        let a = GenomicInterval::new(1, 10, 20);
-        let b = GenomicInterval::new(2, 21, 30);
+        let a = Bed3::new(1, 10, 20);
+        let b = Bed3::new(2, 21, 30);
         assert_eq!(a.directed_distance(&b), None);
     }
 
@@ -270,8 +270,8 @@ mod testing {
     /// ===================
     /// directed_distance = None
     fn directed_distance_g() {
-        let a = GenomicInterval::new(2, 10, 20);
-        let b = GenomicInterval::new(1, 21, 30);
+        let a = Bed3::new(2, 10, 20);
+        let b = Bed3::new(1, 21, 30);
         assert_eq!(a.directed_distance(&b), None);
     }
 
@@ -281,8 +281,8 @@ mod testing {
     /// ===================
     /// directed_distance = None
     fn directed_distance_h() {
-        let a = GenomicInterval::new(2, 21, 30);
-        let b = GenomicInterval::new(1, 10, 20);
+        let a = Bed3::new(2, 21, 30);
+        let b = Bed3::new(1, 10, 20);
         assert_eq!(a.directed_distance(&b), None);
     }
 }

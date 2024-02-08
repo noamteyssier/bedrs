@@ -18,11 +18,11 @@ where
     /// # Example
     ///
     /// ```
-    /// use bedrs::{GenomicInterval, Overlap};
+    /// use bedrs::{Bed3, Overlap};
     ///
-    /// let interval1 = GenomicInterval::new(1, 100, 200);
-    /// let interval2 = GenomicInterval::new(1, 150, 250);
-    /// let interval3 = GenomicInterval::new(2, 100, 200);
+    /// let interval1 = Bed3::new(1, 100, 200);
+    /// let interval2 = Bed3::new(1, 150, 250);
+    /// let interval3 = Bed3::new(2, 100, 200);
     ///
     /// assert!(interval1.bounded_chr(&interval2));
     /// assert!(!interval1.bounded_chr(&interval3));
@@ -175,12 +175,12 @@ where
     /// # Example
     ///
     /// ```
-    /// use bedrs::{GenomicInterval, Overlap};
+    /// use bedrs::{Bed3, Overlap};
     ///
-    /// let interval1 = GenomicInterval::new(1, 100, 200);
-    /// let interval2 = GenomicInterval::new(1, 150, 250);
-    /// let interval3 = GenomicInterval::new(1, 50, 150);
-    /// let interval4 = GenomicInterval::new(2, 150, 250);
+    /// let interval1 = Bed3::new(1, 100, 200);
+    /// let interval2 = Bed3::new(1, 150, 250);
+    /// let interval3 = Bed3::new(1, 50, 150);
+    /// let interval4 = Bed3::new(2, 150, 250);
     ///
     /// assert!(interval1.overlaps(&interval2));
     /// assert!(interval1.overlaps(&interval3));
@@ -233,12 +233,12 @@ where
     /// # Example
     ///
     /// ```
-    /// use bedrs::{GenomicInterval, Overlap};
+    /// use bedrs::{Bed3, Overlap};
     ///
-    /// let interval1 = GenomicInterval::new(1, 100, 200);
-    /// let interval2 = GenomicInterval::new(1, 150, 250);
-    /// let interval3 = GenomicInterval::new(1, 149, 250);
-    /// let interval4 = GenomicInterval::new(1, 151, 250);
+    /// let interval1 = Bed3::new(1, 100, 200);
+    /// let interval2 = Bed3::new(1, 150, 250);
+    /// let interval3 = Bed3::new(1, 149, 250);
+    /// let interval4 = Bed3::new(1, 151, 250);
     ///
     /// assert!(interval1.overlaps_by(&interval2, 50));
     /// assert!(interval1.overlaps_by(&interval3, 50));
@@ -274,12 +274,12 @@ where
     /// # Example
     ///
     /// ```
-    /// use bedrs::{GenomicInterval, Overlap};
+    /// use bedrs::{Bed3, Overlap};
     ///
-    /// let interval1 = GenomicInterval::new(1, 100, 200);
-    /// let interval2 = GenomicInterval::new(1, 150, 250);
-    /// let interval3 = GenomicInterval::new(1, 149, 250);
-    /// let interval4 = GenomicInterval::new(1, 151, 250);
+    /// let interval1 = Bed3::new(1, 100, 200);
+    /// let interval2 = Bed3::new(1, 150, 250);
+    /// let interval3 = Bed3::new(1, 149, 250);
+    /// let interval4 = Bed3::new(1, 151, 250);
     ///
     /// assert!(interval1.overlaps_by_exactly(&interval2, 50));
     /// assert!(!interval1.overlaps_by_exactly(&interval3, 50));
@@ -325,12 +325,12 @@ where
     /// # Example
     ///
     /// ```
-    /// use bedrs::{GenomicInterval, Overlap};
+    /// use bedrs::{Bed3, Overlap};
     ///
-    /// let interval1 = GenomicInterval::new(1, 100, 200);
-    /// let interval2 = GenomicInterval::new(1, 150, 250);
-    /// let interval3 = GenomicInterval::new(1, 149, 250);
-    /// let interval4 = GenomicInterval::new(1, 151, 250);
+    /// let interval1 = Bed3::new(1, 100, 200);
+    /// let interval2 = Bed3::new(1, 150, 250);
+    /// let interval3 = Bed3::new(1, 149, 250);
+    /// let interval4 = Bed3::new(1, 151, 250);
     ///
     /// assert_eq!(interval1.overlap_size(&interval2), Some(50));
     /// assert_eq!(interval1.overlap_size(&interval3), Some(51));
@@ -386,11 +386,11 @@ where
     ///
     /// # Example
     /// ```
-    /// use bedrs::{StrandedGenomicInterval, Strand, Coordinates, Overlap};
+    /// use bedrs::{StrandedBed3, Strand, Coordinates, Overlap};
     ///
-    /// let a = StrandedGenomicInterval::new(1, 100, 200, Strand::Forward);
-    /// let b = StrandedGenomicInterval::new(1, 150, 250, Strand::Forward);
-    /// let c = StrandedGenomicInterval::new(1, 150, 250, Strand::Reverse);
+    /// let a = StrandedBed3::new(1, 100, 200, Strand::Forward);
+    /// let b = StrandedBed3::new(1, 150, 250, Strand::Forward);
+    /// let c = StrandedBed3::new(1, 150, 250, Strand::Reverse);
     ///
     /// assert_eq!(a.stranded_overlap_size(&b), Some(50));
     /// assert_eq!(a.stranded_overlap_size(&c), None);
@@ -414,11 +414,11 @@ where
     /// # Example
     ///
     /// ```
-    /// use bedrs::{GenomicInterval, Overlap};
+    /// use bedrs::{Bed3, Overlap};
     ///
-    /// let interval1 = GenomicInterval::new(1, 100, 200);
-    /// let interval2 = GenomicInterval::new(1, 150, 160);
-    /// let interval3 = GenomicInterval::new(2, 150, 160);
+    /// let interval1 = Bed3::new(1, 100, 200);
+    /// let interval2 = Bed3::new(1, 150, 160);
+    /// let interval3 = Bed3::new(2, 150, 160);
     ///
     /// assert!(interval1.contains(&interval2));
     /// assert!(!interval1.contains(&interval3));
@@ -438,11 +438,11 @@ where
     /// # Example
     ///
     /// ```
-    /// use bedrs::{StrandedGenomicInterval, Strand, Coordinates, Overlap};
+    /// use bedrs::{StrandedBed3, Strand, Coordinates, Overlap};
     ///
-    /// let interval1 = StrandedGenomicInterval::new(1, 100, 200, Strand::Forward);
-    /// let interval2 = StrandedGenomicInterval::new(1, 150, 160, Strand::Forward);
-    /// let interval3 = StrandedGenomicInterval::new(1, 150, 160, Strand::Reverse);
+    /// let interval1 = StrandedBed3::new(1, 100, 200, Strand::Forward);
+    /// let interval2 = StrandedBed3::new(1, 150, 160, Strand::Forward);
+    /// let interval3 = StrandedBed3::new(1, 150, 160, Strand::Reverse);
     ///
     /// assert!(interval1.stranded_contains(&interval2));
     /// assert!(!interval1.stranded_contains(&interval3));
@@ -462,11 +462,11 @@ where
     /// # Example
     ///
     /// ```
-    /// use bedrs::{GenomicInterval, Overlap};
+    /// use bedrs::{Bed3, Overlap};
     ///
-    /// let interval1 = GenomicInterval::new(1, 150, 16);
-    /// let interval2 = GenomicInterval::new(1, 100, 200);
-    /// let interval3 = GenomicInterval::new(2, 100, 200);
+    /// let interval1 = Bed3::new(1, 150, 16);
+    /// let interval2 = Bed3::new(1, 100, 200);
+    /// let interval3 = Bed3::new(2, 100, 200);
     ///
     /// assert!(interval1.contained_by(&interval2));
     /// assert!(!interval1.contained_by(&interval3));
@@ -490,11 +490,11 @@ where
     /// # Example
     ///
     /// ```
-    /// use bedrs::{StrandedGenomicInterval, Strand, Coordinates, Overlap};
+    /// use bedrs::{StrandedBed3, Strand, Coordinates, Overlap};
     ///
-    /// let interval1 = StrandedGenomicInterval::new(1, 150, 160, Strand::Forward);
-    /// let interval2 = StrandedGenomicInterval::new(1, 100, 200, Strand::Forward);
-    /// let interval3 = StrandedGenomicInterval::new(1, 100, 200, Strand::Reverse);
+    /// let interval1 = StrandedBed3::new(1, 150, 160, Strand::Forward);
+    /// let interval2 = StrandedBed3::new(1, 100, 200, Strand::Forward);
+    /// let interval3 = StrandedBed3::new(1, 100, 200, Strand::Reverse);
     ///
     /// assert!(interval1.stranded_contained_by(&interval2));
     /// assert!(!interval1.stranded_contained_by(&interval3));
@@ -519,11 +519,11 @@ where
     /// # Example
     ///
     /// ```
-    /// use bedrs::{GenomicInterval, Overlap};
+    /// use bedrs::{Bed3, Overlap};
     ///
-    /// let interval1 = GenomicInterval::new(1, 100, 200);
-    /// let interval2 = GenomicInterval::new(1, 200, 300);
-    /// let interval3 = GenomicInterval::new(2, 200, 300);
+    /// let interval1 = Bed3::new(1, 100, 200);
+    /// let interval2 = Bed3::new(1, 200, 300);
+    /// let interval3 = Bed3::new(2, 200, 300);
     ///
     /// assert!(interval1.borders(&interval2));
     /// assert!(!interval1.borders(&interval3));
@@ -547,11 +547,11 @@ where
     /// # Example
     ///
     /// ```
-    /// use bedrs::{StrandedGenomicInterval, Strand, Coordinates, Overlap};
+    /// use bedrs::{StrandedBed3, Strand, Coordinates, Overlap};
     ///
-    /// let interval1 = StrandedGenomicInterval::new(1, 100, 200, Strand::Forward);
-    /// let interval2 = StrandedGenomicInterval::new(1, 200, 300, Strand::Forward);
-    /// let interval3 = StrandedGenomicInterval::new(1, 200, 300, Strand::Reverse);
+    /// let interval1 = StrandedBed3::new(1, 100, 200, Strand::Forward);
+    /// let interval2 = StrandedBed3::new(1, 200, 300, Strand::Forward);
+    /// let interval3 = StrandedBed3::new(1, 200, 300, Strand::Reverse);
     ///
     /// assert!(interval1.stranded_borders(&interval2));
     /// assert!(!interval1.stranded_borders(&interval3));
@@ -566,8 +566,8 @@ where
 mod testing {
     use super::Overlap;
     use crate::{
-        types::{record::GenomicInterval, Interval},
-        Coordinates, Strand, StrandedGenomicInterval,
+        types::{record::Bed3, Interval},
+        Coordinates, Strand, StrandedBed3,
     };
 
     #[test]
@@ -610,36 +610,36 @@ mod testing {
 
     #[test]
     fn test_genomic_overlap_self() {
-        let a = GenomicInterval::new(1, 10, 20);
+        let a = Bed3::new(1, 10, 20);
         assert!(a.overlaps(&a));
     }
 
     #[test]
     fn test_genomic_overlap_reciprocity() {
-        let a = GenomicInterval::new(1, 10, 20);
-        let b = GenomicInterval::new(1, 15, 25);
+        let a = Bed3::new(1, 10, 20);
+        let b = Bed3::new(1, 15, 25);
         assert!(a.overlaps(&b));
 
-        let a = GenomicInterval::new(1, 15, 25);
-        let b = GenomicInterval::new(1, 10, 20);
+        let a = Bed3::new(1, 15, 25);
+        let b = Bed3::new(1, 10, 20);
         assert!(a.overlaps(&b));
     }
 
     #[test]
     fn test_genomic_overlap_negative_reciprocity() {
-        let a = GenomicInterval::new(1, 10, 20);
-        let b = GenomicInterval::new(1, 25, 35);
+        let a = Bed3::new(1, 10, 20);
+        let b = Bed3::new(1, 25, 35);
         assert!(!a.overlaps(&b));
 
-        let a = GenomicInterval::new(1, 25, 35);
-        let b = GenomicInterval::new(1, 10, 20);
+        let a = Bed3::new(1, 25, 35);
+        let b = Bed3::new(1, 10, 20);
         assert!(!a.overlaps(&b));
     }
 
     #[test]
     fn test_genomic_overlap_wrong_chr() {
-        let a = GenomicInterval::new(1, 10, 20);
-        let b = GenomicInterval::new(2, 10, 20);
+        let a = Bed3::new(1, 10, 20);
+        let b = Bed3::new(2, 10, 20);
         assert!(!a.overlaps(&b));
     }
 
@@ -667,11 +667,11 @@ mod testing {
 
     #[test]
     fn test_genomic_contained() {
-        let a = GenomicInterval::new(1, 10, 30);
-        let b = GenomicInterval::new(1, 15, 25);
-        let c = GenomicInterval::new(1, 10, 30);
-        let d = GenomicInterval::new(1, 9, 31);
-        let e = GenomicInterval::new(2, 15, 25);
+        let a = Bed3::new(1, 10, 30);
+        let b = Bed3::new(1, 15, 25);
+        let c = Bed3::new(1, 10, 30);
+        let d = Bed3::new(1, 9, 31);
+        let e = Bed3::new(2, 15, 25);
         assert!(a.contains(&b));
         assert!(b.contained_by(&a));
         assert!(a.contains(&c));
@@ -699,9 +699,9 @@ mod testing {
 
     #[test]
     fn genomic_borders() {
-        let a = GenomicInterval::new(1, 10, 20);
-        let b = GenomicInterval::new(1, 20, 30);
-        let c = GenomicInterval::new(2, 20, 30);
+        let a = Bed3::new(1, 10, 20);
+        let b = Bed3::new(1, 20, 30);
+        let c = Bed3::new(2, 20, 30);
         assert!(a.borders(&b));
         assert!(b.borders(&a));
         assert!(!a.borders(&c));
@@ -836,9 +836,9 @@ mod testing {
 
     #[test]
     fn overlap_stranded() {
-        let a = StrandedGenomicInterval::new(1, 10, 20, Strand::Forward);
-        let b = StrandedGenomicInterval::new(1, 15, 25, Strand::Forward);
-        let c = StrandedGenomicInterval::new(1, 15, 25, Strand::Reverse);
+        let a = StrandedBed3::new(1, 10, 20, Strand::Forward);
+        let b = StrandedBed3::new(1, 15, 25, Strand::Forward);
+        let c = StrandedBed3::new(1, 15, 25, Strand::Reverse);
         assert!(a.stranded_overlaps(&b));
         assert!(b.stranded_overlaps(&a));
         assert!(!a.stranded_overlaps(&c));
@@ -847,9 +847,9 @@ mod testing {
 
     #[test]
     fn overlap_stranded_borders() {
-        let a = StrandedGenomicInterval::new(1, 10, 20, Strand::Forward);
-        let b = StrandedGenomicInterval::new(1, 20, 30, Strand::Forward);
-        let c = StrandedGenomicInterval::new(1, 20, 30, Strand::Reverse);
+        let a = StrandedBed3::new(1, 10, 20, Strand::Forward);
+        let b = StrandedBed3::new(1, 20, 30, Strand::Forward);
+        let c = StrandedBed3::new(1, 20, 30, Strand::Reverse);
         assert!(a.stranded_borders(&b));
         assert!(b.stranded_borders(&a));
         assert!(!a.stranded_borders(&c));
@@ -858,9 +858,9 @@ mod testing {
 
     #[test]
     fn overlap_stranded_contains() {
-        let a = StrandedGenomicInterval::new(1, 10, 20, Strand::Forward);
-        let b = StrandedGenomicInterval::new(1, 15, 17, Strand::Forward);
-        let c = StrandedGenomicInterval::new(1, 15, 17, Strand::Reverse);
+        let a = StrandedBed3::new(1, 10, 20, Strand::Forward);
+        let b = StrandedBed3::new(1, 15, 17, Strand::Forward);
+        let c = StrandedBed3::new(1, 15, 17, Strand::Reverse);
         assert!(a.stranded_contains(&b));
         assert!(!b.stranded_contains(&a));
         assert!(!a.stranded_contains(&c));
@@ -869,9 +869,9 @@ mod testing {
 
     #[test]
     fn overlap_stranded_contained_by() {
-        let a = StrandedGenomicInterval::new(1, 15, 17, Strand::Forward);
-        let b = StrandedGenomicInterval::new(1, 10, 20, Strand::Forward);
-        let c = StrandedGenomicInterval::new(1, 10, 20, Strand::Reverse);
+        let a = StrandedBed3::new(1, 15, 17, Strand::Forward);
+        let b = StrandedBed3::new(1, 10, 20, Strand::Forward);
+        let c = StrandedBed3::new(1, 10, 20, Strand::Reverse);
         assert!(a.stranded_contained_by(&b));
         assert!(!b.stranded_contained_by(&a));
         assert!(!a.stranded_contained_by(&c));
@@ -880,9 +880,9 @@ mod testing {
 
     #[test]
     fn overlap_stranded_overlap_size() {
-        let a = StrandedGenomicInterval::new(1, 10, 20, Strand::Forward);
-        let b = StrandedGenomicInterval::new(1, 15, 25, Strand::Forward);
-        let c = StrandedGenomicInterval::new(1, 15, 25, Strand::Reverse);
+        let a = StrandedBed3::new(1, 10, 20, Strand::Forward);
+        let b = StrandedBed3::new(1, 15, 25, Strand::Forward);
+        let c = StrandedBed3::new(1, 15, 25, Strand::Reverse);
         assert_eq!(a.stranded_overlap_size(&b), Some(5));
         assert_eq!(b.stranded_overlap_size(&a), Some(5));
         assert_eq!(a.stranded_overlap_size(&c), None);
@@ -891,9 +891,9 @@ mod testing {
 
     #[test]
     fn stranded_overlaps_by_exactly() {
-        let a = StrandedGenomicInterval::new(1, 10, 20, Strand::Forward);
-        let b = StrandedGenomicInterval::new(1, 15, 25, Strand::Forward);
-        let c = StrandedGenomicInterval::new(1, 15, 25, Strand::Reverse);
+        let a = StrandedBed3::new(1, 10, 20, Strand::Forward);
+        let b = StrandedBed3::new(1, 15, 25, Strand::Forward);
+        let c = StrandedBed3::new(1, 15, 25, Strand::Reverse);
         assert!(a.stranded_overlaps_by_exactly(&b, 5));
         assert!(b.stranded_overlaps_by_exactly(&a, 5));
         assert!(!a.stranded_overlaps_by_exactly(&c, 5));
@@ -902,9 +902,9 @@ mod testing {
 
     #[test]
     fn stranded_overlaps_by() {
-        let a = StrandedGenomicInterval::new(1, 10, 20, Strand::Forward);
-        let b = StrandedGenomicInterval::new(1, 15, 25, Strand::Forward);
-        let c = StrandedGenomicInterval::new(1, 15, 25, Strand::Reverse);
+        let a = StrandedBed3::new(1, 10, 20, Strand::Forward);
+        let b = StrandedBed3::new(1, 15, 25, Strand::Forward);
+        let c = StrandedBed3::new(1, 15, 25, Strand::Reverse);
         assert!(a.stranded_overlaps_by(&b, 5));
         assert!(b.stranded_overlaps_by(&a, 5));
         assert!(!a.stranded_overlaps_by(&c, 5));
