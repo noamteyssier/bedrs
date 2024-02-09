@@ -1,9 +1,9 @@
 #[cfg(feature = "serde")]
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize};
 use std::{fmt::Display, str::FromStr};
 
 #[derive(Debug, PartialEq, Clone, Copy, Default)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize))]
 pub enum Score {
     Score(f64),
     #[cfg_attr(feature = "serde", serde(rename = "."))]
@@ -59,5 +59,14 @@ impl From<Option<f64>> for Score {
             Some(val) => Score::Score(val),
             None => Score::Empty,
         }
+    }
+}
+#[cfg(feature = "serde")]
+impl<'de> Deserialize<'de> for Score {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        Option::deserialize(deserializer).map(Into::into)
     }
 }
