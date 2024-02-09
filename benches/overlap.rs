@@ -1,6 +1,6 @@
 use bedrs::{
     traits::Overlap,
-    types::{Bed3, BaseInterval},
+    types::{BaseInterval, Bed3},
 };
 use criterion::Criterion;
 
