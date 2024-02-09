@@ -77,7 +77,7 @@ mod testing {
     use super::ComplementIter;
     use crate::{
         traits::{ChromBounds, IntervalBounds, ValueBounds},
-        Bed3, BaseInterval,
+        BaseInterval, Bed3,
     };
 
     fn validate_records<I, C, T>(obs: &[I], exp: &[I])
@@ -150,10 +150,7 @@ mod testing {
             Bed3::new(2, 10, 20),
             Bed3::new(2, 30, 40),
         ];
-        let expected = vec![
-            Bed3::new(1, 20, 30),
-            Bed3::new(2, 20, 30),
-        ];
+        let expected = vec![Bed3::new(1, 20, 30), Bed3::new(2, 20, 30)];
         let iter = intervals.into_iter();
         let comp_iter = ComplementIter::new(iter);
         let complements: Vec<_> = comp_iter.collect();

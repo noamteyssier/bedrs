@@ -90,8 +90,8 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::{Bed3, Coordinates, BaseInterval};
     use super::*;
+    use crate::{BaseInterval, Bed3, Coordinates};
 
     #[test]
     fn merge_iter_base() {

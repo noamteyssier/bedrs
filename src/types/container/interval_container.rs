@@ -124,6 +124,7 @@ where
         iv.update_end(&last.end());
         Ok(iv)
     }
+    #[allow(clippy::iter_without_into_iter)]
     pub fn iter(&self) -> IntervalIterRef<I, C, T> {
         IntervalIterRef::new(self.records())
     }
@@ -250,7 +251,7 @@ where
 mod testing {
 
     use super::*;
-    use crate::{Bed3, Coordinates, BaseInterval, Strand, StrandedBed3};
+    use crate::{BaseInterval, Bed3, Coordinates, Strand, StrandedBed3};
     #[cfg(feature = "serde")]
     use bincode::{deserialize, serialize};
 

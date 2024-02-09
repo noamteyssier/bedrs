@@ -1,5 +1,6 @@
 use crate::{
     traits::{ChromBounds, MetaBounds, ValueBounds},
+    types::Score,
     Bed12, Bed3, Bed4, Coordinates, Strand,
 };
 use num_traits::zero;
@@ -30,21 +31,20 @@ use serde::{Deserialize, Serialize};
 /// ```
 #[derive(Debug, Clone, Copy)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct Bed6<C, T, N, S> {
+pub struct Bed6<C, T, N> {
     chr: C,
     start: T,
     end: T,
     name: N,
-    score: S,
+    score: Score,
     strand: Strand,
 }
 
-impl<C, T, N, S> Coordinates<C, T> for Bed6<C, T, N, S>
+impl<C, T, N> Coordinates<C, T> for Bed6<C, T, N>
 where
     C: ChromBounds,
     T: ValueBounds,
     N: MetaBounds,
-    S: MetaBounds,
 {
     fn empty() -> Self {
         Self {
@@ -52,7 +52,7 @@ where
             start: zero::<T>(),
             end: zero::<T>(),
             name: N::default(),
-            score: S::default(),
+            score: Score::default(),
             strand: Strand::Unknown,
         }
     }
@@ -86,17 +86,16 @@ where
             start: other.start(),
             end: other.end(),
             name: N::default(),
-            score: S::default(),
+            score: Score::default(),
             strand: other.strand().unwrap_or_default(),
         }
     }
 }
-impl<'a, C, T, N, S> Coordinates<C, T> for &'a Bed6<C, T, N, S>
+impl<'a, C, T, N> Coordinates<C, T> for &'a Bed6<C, T, N>
 where
     C: ChromBounds,
     T: ValueBounds,
     N: MetaBounds,
-    S: MetaBounds,
 {
     fn empty() -> Self {
         unreachable!("Cannot create an immutable empty reference")
@@ -134,12 +133,11 @@ where
         unimplemented!("Cannot create a new reference from a reference")
     }
 }
-impl<'a, C, T, N, S> Coordinates<C, T> for &'a mut Bed6<C, T, N, S>
+impl<'a, C, T, N> Coordinates<C, T> for &'a mut Bed6<C, T, N>
 where
     C: ChromBounds,
     T: ValueBounds,
     N: MetaBounds,
-    S: MetaBounds,
 {
     fn empty() -> Self {
         unreachable!("Cannot create an immutable empty reference")
@@ -174,14 +172,13 @@ where
     }
 }
 
-impl<C, T, N, S> Bed6<C, T, N, S>
+impl<C, T, N> Bed6<C, T, N>
 where
     C: ChromBounds,
     T: ValueBounds,
     N: MetaBounds,
-    S: MetaBounds,
 {
-    pub fn new(chr: C, start: T, end: T, name: N, score: S, strand: Strand) -> Self {
+    pub fn new(chr: C, start: T, end: T, name: N, score: Score, strand: Strand) -> Self {
         Self {
             chr,
             start,
@@ -196,56 +193,53 @@ where
         &self.name
     }
 
-    pub fn score(&self) -> &S {
-        &self.score
+    pub fn score(&self) -> Score {
+        self.score
     }
 
     pub fn update_name(&mut self, val: &N) {
         self.name = val.clone();
     }
 
-    pub fn update_score(&mut self, val: &S) {
-        self.score = val.clone();
+    pub fn update_score(&mut self, val: Score) {
+        self.score = val;
     }
 }
 
-impl<C, T, N, S> From<Bed6<C, T, N, S>> for Bed3<C, T>
+impl<C, T, N> From<Bed6<C, T, N>> for Bed3<C, T>
 where
     C: ChromBounds,
     T: ValueBounds,
     N: MetaBounds,
-    S: MetaBounds,
 {
-    fn from(bed: Bed6<C, T, N, S>) -> Self {
+    fn from(bed: Bed6<C, T, N>) -> Self {
         Self::new(bed.chr, bed.start, bed.end)
     }
 }
 
-impl<C, T, N, S> From<Bed6<C, T, N, S>> for Bed4<C, T, N>
+impl<C, T, N> From<Bed6<C, T, N>> for Bed4<C, T, N>
 where
     C: ChromBounds,
     T: ValueBounds,
     N: MetaBounds,
-    S: MetaBounds,
 {
-    fn from(bed: Bed6<C, T, N, S>) -> Self {
+    fn from(bed: Bed6<C, T, N>) -> Self {
         Self::new(bed.chr, bed.start, bed.end, bed.name)
     }
 }
 
-impl<C, T, N, S, Ts, Te, R, Si, St> From<Bed6<C, T, N, S>> for Bed12<C, T, N, S, Ts, Te, R, Si, St>
+impl<C, T, N, Ts, Te, R, Si, St> From<Bed6<C, T, N>> for Bed12<C, T, N, Ts, Te, R, Si, St>
 where
     C: ChromBounds,
     T: ValueBounds,
     N: MetaBounds,
-    S: MetaBounds,
     Ts: ValueBounds,
     Te: ValueBounds,
     R: MetaBounds,
     Si: MetaBounds,
     St: MetaBounds,
 {
-    fn from(bed: Bed6<C, T, N, S>) -> Self {
+    fn from(bed: Bed6<C, T, N>) -> Self {
         Self::new(
             bed.chr,
             bed.start,
@@ -272,53 +266,53 @@ mod testing {
 
     #[test]
     fn test_init_chrom_numeric() {
-        let a = Bed6::new(1, 10, 20, 0, 0, Strand::Unknown);
+        let a = Bed6::new(1, 10, 20, 0, Score::Empty, Strand::Unknown);
         assert_eq!(a.chr(), &1);
         assert_eq!(a.start(), 10);
         assert_eq!(a.end(), 20);
         assert_eq!(a.name(), &0);
-        assert_eq!(a.score(), &0);
+        assert_eq!(a.score(), Score::Empty);
         assert_eq!(a.strand().unwrap(), Strand::Unknown);
     }
 
     #[test]
     fn test_init_chrom_string() {
-        let a = Bed6::new("chr1".to_string(), 10, 20, 0, 0, Strand::Unknown);
+        let a = Bed6::new("chr1".to_string(), 10, 20, 0, Score::Empty, Strand::Unknown);
         assert_eq!(a.chr(), &"chr1".to_string());
         assert_eq!(a.start(), 10);
         assert_eq!(a.end(), 20);
         assert_eq!(a.name(), &0);
-        assert_eq!(a.score(), &0);
+        assert_eq!(a.score(), Score::Empty);
         assert_eq!(a.strand().unwrap(), Strand::Unknown);
     }
 
     #[test]
     fn test_init_name_numeric() {
-        let a = Bed6::new(1, 10, 20, 0, 0, Strand::Unknown);
+        let a = Bed6::new(1, 10, 20, 0, Score::Empty, Strand::Unknown);
         assert_eq!(a.name(), &0);
     }
 
     #[test]
     fn test_init_name_string() {
-        let a = Bed6::new(1, 10, 20, "name".to_string(), 0, Strand::Unknown);
+        let a = Bed6::new(1, 10, 20, "name".to_string(), Score::Empty, Strand::Unknown);
         assert_eq!(a.name(), &"name".to_string());
     }
 
     #[test]
     fn test_init_score_discrete() {
-        let a = Bed6::new(1, 10, 20, "name".to_string(), 11, Strand::Unknown);
-        assert_eq!(a.score(), &11);
+        let a = Bed6::new(1, 10, 20, "name".to_string(), 11.into(), Strand::Unknown);
+        assert_eq!(a.score(), 11.into());
     }
 
     #[test]
     fn test_init_score_continuous() {
-        let a = Bed6::new(1, 10, 20, "name".to_string(), 11.1, Strand::Unknown);
-        assert_eq!(a.score(), &11.1);
+        let a = Bed6::new(1, 10, 20, "name".to_string(), 11.1.into(), Strand::Unknown);
+        assert_eq!(a.score(), 11.1.into());
     }
 
     #[test]
     fn convert_to_bed3() {
-        let a = Bed6::new(1, 10, 20, "name".to_string(), 11.1, Strand::Forward);
+        let a = Bed6::new(1, 10, 20, "name".to_string(), 11.1.into(), Strand::Forward);
         let b: Bed3<i32, i32> = a.into();
         assert_eq!(b.chr(), &1);
         assert_eq!(b.start(), 10);
@@ -327,7 +321,7 @@ mod testing {
 
     #[test]
     fn convert_to_bed4() {
-        let a = Bed6::new(1, 10, 20, "name".to_string(), 11.1, Strand::Forward);
+        let a = Bed6::new(1, 10, 20, "name".to_string(), 11.1.into(), Strand::Forward);
         let b: Bed4<i32, i32, String> = a.into();
         assert_eq!(b.chr(), &1);
         assert_eq!(b.start(), 10);
@@ -337,13 +331,13 @@ mod testing {
 
     #[test]
     fn convert_to_bed12() {
-        let a = Bed6::new(1, 10, 20, "name".to_string(), 11.1, Strand::Forward);
-        let b: Bed12<i32, i32, String, f32, i32, i32, f32, i32, i32> = a.into();
+        let a = Bed6::new(1, 10, 20, "name".to_string(), 11.1.into(), Strand::Forward);
+        let b: Bed12<i32, i32, String, i32, i32, f32, i32, i32> = a.into();
         assert_eq!(b.chr(), &1);
         assert_eq!(b.start(), 10);
         assert_eq!(b.end(), 20);
         assert_eq!(b.name(), "name");
-        assert_eq!(b.score(), &11.1);
+        assert_eq!(b.score(), 11.1.into());
         assert_eq!(b.strand().unwrap(), Strand::Forward);
         assert_eq!(b.thick_start(), 0);
         assert_eq!(b.thick_end(), 0);
@@ -356,24 +350,24 @@ mod testing {
     #[test]
     fn from_bed3() {
         let a = Bed3::new(1, 10, 20);
-        let b: Bed6<i32, i32, String, f32> = a.into();
+        let b: Bed6<i32, i32, String> = a.into();
         assert_eq!(b.chr(), &1);
         assert_eq!(b.start(), 10);
         assert_eq!(b.end(), 20);
         assert_eq!(b.name(), "");
-        assert_eq!(b.score(), &0.0);
+        assert_eq!(b.score(), Score::Empty);
         assert_eq!(b.strand().unwrap(), Strand::Unknown);
     }
 
     #[test]
     fn from_bed4() {
         let a = Bed4::new(1, 10, 20, "name".to_string());
-        let b: Bed6<i32, i32, String, f32> = a.into();
+        let b: Bed6<i32, i32, String> = a.into();
         assert_eq!(b.chr(), &1);
         assert_eq!(b.start(), 10);
         assert_eq!(b.end(), 20);
         assert_eq!(b.name(), "name");
-        assert_eq!(b.score(), &0.0);
+        assert_eq!(b.score(), Score::Empty);
         assert_eq!(b.strand().unwrap(), Strand::Unknown);
     }
 
@@ -384,7 +378,7 @@ mod testing {
             10,
             20,
             "name".to_string(),
-            11.1,
+            11.1.into(),
             Strand::Forward,
             0,
             0,
@@ -393,20 +387,20 @@ mod testing {
             0,
             0,
         );
-        let b: Bed6<i32, i32, String, f32> = a.into();
+        let b: Bed6<i32, i32, String> = a.into();
         assert_eq!(b.chr(), &1);
         assert_eq!(b.start(), 10);
         assert_eq!(b.end(), 20);
         assert_eq!(b.name(), "name");
-        assert_eq!(b.score(), &11.1);
+        assert_eq!(b.score(), 11.1.into());
         assert_eq!(b.strand().unwrap(), Strand::Forward);
     }
 
     #[test]
     fn merge_bed6() {
         let set = IntervalContainer::from_sorted_unchecked(vec![
-            Bed6::new(1, 10, 20, "name".to_string(), 0, Strand::Forward),
-            Bed6::new(1, 15, 25, "name".to_string(), 0, Strand::Forward),
+            Bed6::new(1, 10, 20, "name".to_string(), 0.into(), Strand::Forward),
+            Bed6::new(1, 15, 25, "name".to_string(), 0.into(), Strand::Forward),
         ]);
         let merged = set.merge_unchecked();
         assert_eq!(merged.len(), 1);

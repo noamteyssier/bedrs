@@ -70,7 +70,7 @@ where
 #[allow(clippy::many_single_char_names)]
 mod testing {
     use super::Intersect;
-    use crate::{Coordinates, Bed3, BaseInterval, Strand, StrandedBed3};
+    use crate::{BaseInterval, Bed3, Coordinates, Strand, StrandedBed3};
 
     #[test]
     ///       x-------y

@@ -251,5 +251,5 @@ pub mod types;
 pub use traits::{Coordinates, Distance, Intersect, Overlap, Subtract};
 pub use types::{
     BaseInterval, Bed12, Bed3, Bed4, Bed6, IntersectIter, IntervalContainer, IntervalIterOwned,
-    IntervalIterRef, MergeIter, MetaInterval, Strand, StrandedBed3,
+    IntervalIterRef, MergeIter, MetaInterval, Score, Strand, StrandedBed3,
 };

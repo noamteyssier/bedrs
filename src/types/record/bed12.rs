@@ -1,5 +1,6 @@
 use crate::{
     traits::{ChromBounds, MetaBounds, ValueBounds},
+    types::Score,
     Bed3, Bed4, Bed6, Coordinates, Strand,
 };
 use num_traits::zero;
@@ -36,12 +37,12 @@ use serde::{Deserialize, Serialize};
 /// ```
 #[derive(Debug, Clone, Copy)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct Bed12<C, T, N, S, Ts, Te, R, Si, St> {
+pub struct Bed12<C, T, N, Ts, Te, R, Si, St> {
     chr: C,
     start: T,
     end: T,
     name: N,
-    score: S,
+    score: Score,
     strand: Strand,
     thick_start: Ts,
     thick_end: Te,
@@ -51,12 +52,11 @@ pub struct Bed12<C, T, N, S, Ts, Te, R, Si, St> {
     block_starts: St,
 }
 
-impl<C, T, N, S, Ts, Te, R, Si, St> Coordinates<C, T> for Bed12<C, T, N, S, Ts, Te, R, Si, St>
+impl<C, T, N, Ts, Te, R, Si, St> Coordinates<C, T> for Bed12<C, T, N, Ts, Te, R, Si, St>
 where
     C: ChromBounds,
     T: ValueBounds,
     N: MetaBounds,
-    S: MetaBounds,
     Ts: ValueBounds,
     Te: ValueBounds,
     R: MetaBounds,
@@ -69,8 +69,8 @@ where
             start: zero::<T>(),
             end: zero::<T>(),
             name: N::default(),
-            score: S::default(),
-            strand: Strand::Unknown,
+            score: Score::default(),
+            strand: Strand::default(),
             thick_start: zero::<Ts>(),
             thick_end: zero::<Te>(),
             item_rgb: R::default(),
@@ -109,7 +109,7 @@ where
             start: other.start(),
             end: other.end(),
             name: N::default(),
-            score: S::default(),
+            score: Score::default(),
             strand: other.strand().unwrap_or_default(),
             thick_start: zero::<Ts>(),
             thick_end: zero::<Te>(),
@@ -120,13 +120,11 @@ where
         }
     }
 }
-impl<'a, C, T, N, S, Ts, Te, R, Si, St> Coordinates<C, T>
-    for &'a Bed12<C, T, N, S, Ts, Te, R, Si, St>
+impl<'a, C, T, N, Ts, Te, R, Si, St> Coordinates<C, T> for &'a Bed12<C, T, N, Ts, Te, R, Si, St>
 where
     C: ChromBounds,
     T: ValueBounds,
     N: MetaBounds,
-    S: MetaBounds,
     Ts: ValueBounds,
     Te: ValueBounds,
     R: MetaBounds,
@@ -169,13 +167,11 @@ where
         unimplemented!("Cannot create a new reference from a reference")
     }
 }
-impl<'a, C, T, N, S, Ts, Te, R, Si, St> Coordinates<C, T>
-    for &'a mut Bed12<C, T, N, S, Ts, Te, R, Si, St>
+impl<'a, C, T, N, Ts, Te, R, Si, St> Coordinates<C, T> for &'a mut Bed12<C, T, N, Ts, Te, R, Si, St>
 where
     C: ChromBounds,
     T: ValueBounds,
     N: MetaBounds,
-    S: MetaBounds,
     Ts: ValueBounds,
     Te: ValueBounds,
     R: MetaBounds,
@@ -215,12 +211,11 @@ where
     }
 }
 
-impl<C, T, N, S, Ts, Te, R, Si, St> Bed12<C, T, N, S, Ts, Te, R, Si, St>
+impl<C, T, N, Ts, Te, R, Si, St> Bed12<C, T, N, Ts, Te, R, Si, St>
 where
     C: ChromBounds,
     T: ValueBounds,
     N: MetaBounds,
-    S: MetaBounds,
     Ts: ValueBounds,
     Te: ValueBounds,
     R: MetaBounds,
@@ -233,7 +228,7 @@ where
         start: T,
         end: T,
         name: N,
-        score: S,
+        score: Score,
         strand: Strand,
         thick_start: Ts,
         thick_end: Te,
@@ -262,8 +257,8 @@ where
         &self.name
     }
 
-    pub fn score(&self) -> &S {
-        &self.score
+    pub fn score(&self) -> Score {
+        self.score
     }
 
     pub fn thick_start(&self) -> Ts {
@@ -294,8 +289,8 @@ where
         self.name = val.clone();
     }
 
-    pub fn update_score(&mut self, val: &S) {
-        self.score = val.clone();
+    pub fn update_score(&mut self, val: Score) {
+        self.score = val;
     }
 
     pub fn update_thick_start(&mut self, val: &Ts) {
@@ -323,53 +318,50 @@ where
     }
 }
 
-impl<C, T, N, S, Ts, Te, R, Si, St> From<Bed12<C, T, N, S, Ts, Te, R, Si, St>> for Bed3<C, T>
+impl<C, T, N, Ts, Te, R, Si, St> From<Bed12<C, T, N, Ts, Te, R, Si, St>> for Bed3<C, T>
 where
     C: ChromBounds,
     T: ValueBounds,
     N: MetaBounds,
-    S: MetaBounds,
     Ts: ValueBounds,
     Te: ValueBounds,
     R: MetaBounds,
     Si: MetaBounds,
     St: MetaBounds,
 {
-    fn from(bed: Bed12<C, T, N, S, Ts, Te, R, Si, St>) -> Self {
+    fn from(bed: Bed12<C, T, N, Ts, Te, R, Si, St>) -> Self {
         Bed3::new(bed.chr, bed.start, bed.end)
     }
 }
 
-impl<C, T, N, S, Ts, Te, R, Si, St> From<Bed12<C, T, N, S, Ts, Te, R, Si, St>> for Bed4<C, T, N>
+impl<C, T, N, Ts, Te, R, Si, St> From<Bed12<C, T, N, Ts, Te, R, Si, St>> for Bed4<C, T, N>
 where
     C: ChromBounds,
     T: ValueBounds,
     N: MetaBounds,
-    S: MetaBounds,
     Ts: ValueBounds,
     Te: ValueBounds,
     R: MetaBounds,
     Si: MetaBounds,
     St: MetaBounds,
 {
-    fn from(bed: Bed12<C, T, N, S, Ts, Te, R, Si, St>) -> Self {
+    fn from(bed: Bed12<C, T, N, Ts, Te, R, Si, St>) -> Self {
         Bed4::new(bed.chr, bed.start, bed.end, bed.name)
     }
 }
 
-impl<C, T, N, S, Ts, Te, R, Si, St> From<Bed12<C, T, N, S, Ts, Te, R, Si, St>> for Bed6<C, T, N, S>
+impl<C, T, N, Ts, Te, R, Si, St> From<Bed12<C, T, N, Ts, Te, R, Si, St>> for Bed6<C, T, N>
 where
     C: ChromBounds,
     T: ValueBounds,
     N: MetaBounds,
-    S: MetaBounds,
     Ts: ValueBounds,
     Te: ValueBounds,
     R: MetaBounds,
     Si: MetaBounds,
     St: MetaBounds,
 {
-    fn from(bed: Bed12<C, T, N, S, Ts, Te, R, Si, St>) -> Self {
+    fn from(bed: Bed12<C, T, N, Ts, Te, R, Si, St>) -> Self {
         Bed6::new(bed.chr, bed.start, bed.end, bed.name, bed.score, bed.strand)
     }
 }
@@ -386,7 +378,7 @@ mod testing {
             10,
             20,
             "name".to_string(),
-            1,
+            1.into(),
             Strand::Forward,
             1,
             2,
@@ -399,7 +391,7 @@ mod testing {
         assert_eq!(a.start(), 10);
         assert_eq!(a.end(), 20);
         assert_eq!(a.name(), "name");
-        assert_eq!(a.score(), &1);
+        assert_eq!(a.score(), 1.into());
         assert_eq!(a.strand().unwrap(), Strand::Forward);
         assert_eq!(a.thick_start(), 1);
         assert_eq!(a.thick_end(), 2);
@@ -416,7 +408,7 @@ mod testing {
             10,
             20,
             "name".to_string(),
-            1,
+            1.into(),
             Strand::Forward,
             1,
             2,
@@ -429,7 +421,7 @@ mod testing {
         assert_eq!(a.start(), 10);
         assert_eq!(a.end(), 20);
         assert_eq!(a.name(), "name");
-        assert_eq!(a.score(), &1);
+        assert_eq!(a.score(), 1.into());
         assert_eq!(a.strand().unwrap(), Strand::Forward);
         assert_eq!(a.thick_start(), 1);
         assert_eq!(a.thick_end(), 2);
@@ -446,7 +438,7 @@ mod testing {
             10,
             20,
             "name".to_string(),
-            1,
+            1.into(),
             Strand::Forward,
             1,
             2,
@@ -459,7 +451,7 @@ mod testing {
         assert_eq!(a.start(), 10);
         assert_eq!(a.end(), 20);
         assert_eq!(a.name(), "name");
-        assert_eq!(a.score(), &1);
+        assert_eq!(a.score(), 1.into());
         assert_eq!(a.strand().unwrap(), Strand::Forward);
         assert_eq!(a.thick_start(), 1);
         assert_eq!(a.thick_end(), 2);
@@ -476,7 +468,7 @@ mod testing {
             10,
             20,
             1,
-            1,
+            1.into(),
             Strand::Forward,
             1,
             2,
@@ -489,7 +481,7 @@ mod testing {
         assert_eq!(a.start(), 10);
         assert_eq!(a.end(), 20);
         assert_eq!(a.name(), &1);
-        assert_eq!(a.score(), &1);
+        assert_eq!(a.score(), 1.into());
         assert_eq!(a.strand().unwrap(), Strand::Forward);
         assert_eq!(a.thick_start(), 1);
         assert_eq!(a.thick_end(), 2);
@@ -506,7 +498,7 @@ mod testing {
             10,
             20,
             "name".to_string(),
-            1,
+            1.into(),
             Strand::Forward,
             1,
             2,
@@ -519,7 +511,7 @@ mod testing {
         assert_eq!(a.start(), 10);
         assert_eq!(a.end(), 20);
         assert_eq!(a.name(), "name");
-        assert_eq!(a.score(), &1);
+        assert_eq!(a.score(), 1.into());
         assert_eq!(a.strand().unwrap(), Strand::Forward);
         assert_eq!(a.thick_start(), 1);
         assert_eq!(a.thick_end(), 2);
@@ -536,7 +528,7 @@ mod testing {
             10,
             20,
             "name".to_string(),
-            1.1,
+            1.1.into(),
             Strand::Forward,
             1,
             2,
@@ -549,7 +541,7 @@ mod testing {
         assert_eq!(a.start(), 10);
         assert_eq!(a.end(), 20);
         assert_eq!(a.name(), "name");
-        assert_eq!(a.score(), &1.1);
+        assert_eq!(a.score(), 1.1.into());
         assert_eq!(a.strand().unwrap(), Strand::Forward);
         assert_eq!(a.thick_start(), 1);
         assert_eq!(a.thick_end(), 2);
@@ -566,7 +558,7 @@ mod testing {
             10,
             20,
             "name".to_string(),
-            1.1,
+            1.1.into(),
             Strand::Forward,
             1,
             2,
@@ -588,7 +580,7 @@ mod testing {
             10,
             20,
             "name".to_string(),
-            1.1,
+            1.1.into(),
             Strand::Forward,
             1,
             2,
@@ -611,7 +603,7 @@ mod testing {
             10,
             20,
             "name".to_string(),
-            1.1,
+            1.1.into(),
             Strand::Forward,
             1,
             2,
@@ -620,24 +612,24 @@ mod testing {
             vec![1],
             vec![1],
         );
-        let b: Bed6<String, i32, String, f32> = a.into();
+        let b: Bed6<String, i32, String> = a.into();
         assert_eq!(b.chr(), "chr1");
         assert_eq!(b.start(), 10);
         assert_eq!(b.end(), 20);
         assert_eq!(b.name(), "name");
-        assert_eq!(b.score(), &1.1);
+        assert_eq!(b.score(), 1.1.into());
         assert_eq!(b.strand().unwrap(), Strand::Forward);
     }
 
     #[test]
     fn from_bed3() {
         let a = Bed3::new("chr1".to_string(), 10, 20);
-        let b: Bed12<String, i32, String, f32, i32, i32, String, Vec<i32>, Vec<i32>> = a.into();
+        let b: Bed12<String, i32, String, i32, i32, String, Vec<i32>, Vec<i32>> = a.into();
         assert_eq!(b.chr(), "chr1");
         assert_eq!(b.start(), 10);
         assert_eq!(b.end(), 20);
         assert_eq!(b.name(), "");
-        assert_eq!(b.score(), &0.0);
+        assert_eq!(b.score(), Score::Empty);
         assert_eq!(b.strand().unwrap(), Strand::Unknown);
         assert_eq!(b.thick_start(), 0);
         assert_eq!(b.thick_end(), 0);
@@ -650,12 +642,12 @@ mod testing {
     #[test]
     fn from_bed4() {
         let a = Bed4::new("chr1".to_string(), 10, 20, "name".to_string());
-        let b: Bed12<String, i32, String, f32, i32, i32, String, Vec<i32>, Vec<i32>> = a.into();
+        let b: Bed12<String, i32, String, i32, i32, String, Vec<i32>, Vec<i32>> = a.into();
         assert_eq!(b.chr(), "chr1");
         assert_eq!(b.start(), 10);
         assert_eq!(b.end(), 20);
         assert_eq!(b.name(), "name");
-        assert_eq!(b.score(), &0.0);
+        assert_eq!(b.score(), Score::Empty);
         assert_eq!(b.strand().unwrap(), Strand::Unknown);
         assert_eq!(b.thick_start(), 0);
         assert_eq!(b.thick_end(), 0);
@@ -672,15 +664,15 @@ mod testing {
             10,
             20,
             "name".to_string(),
-            1.1,
+            1.1.into(),
             Strand::Forward,
         );
-        let b: Bed12<String, i32, String, f32, i32, i32, String, Vec<i32>, Vec<i32>> = a.into();
+        let b: Bed12<String, i32, String, i32, i32, String, Vec<i32>, Vec<i32>> = a.into();
         assert_eq!(b.chr(), "chr1");
         assert_eq!(b.start(), 10);
         assert_eq!(b.end(), 20);
         assert_eq!(b.name(), "name");
-        assert_eq!(b.score(), &1.1);
+        assert_eq!(b.score(), 1.1.into());
         assert_eq!(b.strand().unwrap(), Strand::Forward);
         assert_eq!(b.thick_start(), 0);
         assert_eq!(b.thick_end(), 0);

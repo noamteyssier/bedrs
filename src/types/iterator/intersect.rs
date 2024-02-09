@@ -165,7 +165,7 @@ mod testing {
     use crate::{
         traits::{ChromBounds, IntervalBounds, ValueBounds},
         types::QueryMethod,
-        Bed3, BaseInterval,
+        BaseInterval, Bed3,
     };
 
     fn validate_records<I, C, T>(obs: &[I], exp: &[I])
@@ -379,10 +379,7 @@ mod testing {
             Bed3::new(1, 460, 470),
             Bed3::new(1, 490, 500),
         ];
-        let expected = vec![
-            Bed3::new(1, 120, 160),
-            Bed3::new(1, 460, 470),
-        ];
+        let expected = vec![Bed3::new(1, 120, 160), Bed3::new(1, 460, 470)];
 
         let iter_a = intervals_a.into_iter();
         let iter_b = intervals_b.into_iter();
@@ -422,19 +419,13 @@ mod testing {
     ///   =========================================
     ///                           i-j       i-j
     fn intersections_genomic_c() {
-        let intervals_a = vec![
-            Bed3::new(2, 400, 475),
-            Bed3::new(2, 500, 550),
-        ];
+        let intervals_a = vec![Bed3::new(2, 400, 475), Bed3::new(2, 500, 550)];
         let intervals_b = vec![
             Bed3::new(1, 120, 160),
             Bed3::new(2, 460, 470),
             Bed3::new(2, 510, 520),
         ];
-        let expected = vec![
-            Bed3::new(2, 460, 470),
-            Bed3::new(2, 510, 520),
-        ];
+        let expected = vec![Bed3::new(2, 460, 470), Bed3::new(2, 510, 520)];
 
         let iter_a = intervals_a.into_iter();
         let iter_b = intervals_b.into_iter();
@@ -454,14 +445,8 @@ mod testing {
             Bed3::new(2, 400, 475),
             Bed3::new(2, 500, 550),
         ];
-        let intervals_b = vec![
-            Bed3::new(2, 460, 470),
-            Bed3::new(2, 510, 520),
-        ];
-        let expected = vec![
-            Bed3::new(2, 460, 470),
-            Bed3::new(2, 510, 520),
-        ];
+        let intervals_b = vec![Bed3::new(2, 460, 470), Bed3::new(2, 510, 520)];
+        let expected = vec![Bed3::new(2, 460, 470), Bed3::new(2, 510, 520)];
 
         let iter_a = intervals_a.into_iter();
         let iter_b = intervals_b.into_iter();

@@ -221,7 +221,7 @@ where
 #[cfg(test)]
 mod testing {
     use super::Subtract;
-    use crate::{Coordinates, Bed3, BaseInterval};
+    use crate::{BaseInterval, Bed3, Coordinates};
 
     #[test]
     ///      x-------y

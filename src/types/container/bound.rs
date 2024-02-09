@@ -460,8 +460,7 @@ where
 #[cfg(test)]
 mod testing {
     use crate::{
-        traits::errors::SetError, Bed3, BaseInterval, IntervalContainer, Strand,
-        StrandedBed3,
+        traits::errors::SetError, BaseInterval, Bed3, IntervalContainer, Strand, StrandedBed3,
     };
 
     #[test]

@@ -67,7 +67,7 @@ where
 mod testing {
     use crate::{
         traits::{ChromBounds, IntervalBounds, ValueBounds},
-        Bed3, BaseInterval, IntervalContainer,
+        BaseInterval, Bed3, IntervalContainer,
     };
 
     fn validate_records<I, C, T>(obs: &[I], exp: &[I])
@@ -163,10 +163,7 @@ mod testing {
             Bed3::new(2, 10, 20),
             Bed3::new(2, 30, 40),
         ];
-        let expected = vec![
-            Bed3::new(1, 20, 30),
-            Bed3::new(2, 20, 30),
-        ];
+        let expected = vec![Bed3::new(1, 20, 30), Bed3::new(2, 20, 30)];
         let set = IntervalContainer::from_unsorted(intervals);
         let comp_iter = set.complement().unwrap();
         let complements: Vec<_> = comp_iter.collect();

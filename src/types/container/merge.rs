@@ -63,7 +63,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::{traits::Coordinates, Bed3, BaseInterval, IntervalContainer};
+    use crate::{traits::Coordinates, BaseInterval, Bed3, IntervalContainer};
 
     #[test]
     fn test_merging_one_cluster() {

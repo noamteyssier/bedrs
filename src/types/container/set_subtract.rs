@@ -121,7 +121,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::{Coordinates, BaseInterval, IntervalContainer};
+    use crate::{BaseInterval, Coordinates, IntervalContainer};
 
     #[test]
     fn set_subtract_unsorted() {
