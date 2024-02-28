@@ -3,7 +3,7 @@ pub mod enums;
 pub mod iterator;
 pub mod record;
 pub use container::IntervalContainer;
-pub use enums::{QueryMethod, Score, Strand};
+pub use enums::{Frame, QueryMethod, Score, Strand};
 pub use iterator::{
     FindIter, FindIterOwned, FindIterSorted, FindIterSortedOwned, IntersectIter, IntervalIterOwned,
     IntervalIterRef, MergeIter, SubtractFromIter, SubtractIter,
