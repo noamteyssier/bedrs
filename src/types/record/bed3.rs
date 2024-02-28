@@ -247,7 +247,7 @@ mod testing {
         assert_eq!(b.start(), 20);
         assert_eq!(b.end(), 30);
         assert_eq!(b.name(), &0);
-        assert_eq!(b.score(), Score::Empty);
+        assert_eq!(b.score(), Score(None));
         assert_eq!(b.strand().unwrap(), Strand::Unknown);
     }
 
@@ -259,7 +259,7 @@ mod testing {
         assert_eq!(b.start(), 20);
         assert_eq!(b.end(), 30);
         assert_eq!(b.name(), &0);
-        assert_eq!(b.score(), Score::Empty);
+        assert_eq!(b.score(), Score(None));
         assert_eq!(b.strand().unwrap(), Strand::Unknown);
         assert_eq!(b.thick_start(), 0);
         assert_eq!(b.thick_end(), 0);
@@ -307,5 +307,37 @@ mod testing {
         assert_eq!(*b.chr(), "chr1");
         assert_eq!(b.start(), 20);
         assert_eq!(b.end(), 30);
+    }
+}
+
+#[cfg(feature = "serde")]
+#[cfg(test)]
+mod serde_testing {
+    use super::*;
+    use anyhow::Result;
+    use csv::WriterBuilder;
+
+    #[test]
+    fn test_csv_serialization() -> Result<()> {
+        let a = Bed3::new("chr1", 20, 30);
+        let mut wtr = WriterBuilder::new().has_headers(false).from_writer(vec![]);
+        wtr.serialize(a)?;
+        let result = String::from_utf8(wtr.into_inner()?)?;
+        assert_eq!(result, "chr1,20,30\n");
+        Ok(())
+    }
+
+    #[test]
+    fn test_csv_deserialization() -> Result<()> {
+        let a = "chr1,20,30\n";
+        let mut rdr = csv::ReaderBuilder::new()
+            .has_headers(false)
+            .from_reader(a.as_bytes());
+        let mut iter = rdr.deserialize();
+        let r1: Bed3<String, i32> = iter.next().unwrap()?;
+        assert_eq!(*r1.chr(), "chr1");
+        assert_eq!(r1.start(), 20);
+        assert_eq!(r1.end(), 30);
+        Ok(())
     }
 }

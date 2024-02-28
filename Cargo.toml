@@ -1,6 +1,6 @@
 [package]
 name = "bedrs"
-version = "0.2.12"
+version = "0.2.13"
 edition = "2021"
 license = "MIT"
 description = "Genomic interval library in rust"
@@ -28,6 +28,7 @@ rayon = ["dep:rayon"]
 criterion = "0.5.1"
 bincode = "1.3.3"
 tinystr = "0.7.1"
+csv = "1.3.0"
 
 [[bench]]
 name = "benchmark"

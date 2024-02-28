@@ -629,14 +629,14 @@ mod testing {
         assert_eq!(b.start(), 10);
         assert_eq!(b.end(), 20);
         assert_eq!(b.name(), "");
-        assert_eq!(b.score(), Score::Empty);
+        assert_eq!(b.score(), Score(None));
         assert_eq!(b.strand().unwrap(), Strand::Unknown);
         assert_eq!(b.thick_start(), 0);
         assert_eq!(b.thick_end(), 0);
         assert_eq!(b.item_rgb(), "");
         assert_eq!(b.block_count(), 0);
-        assert_eq!(b.block_sizes(), &vec![]);
-        assert_eq!(b.block_starts(), &vec![]);
+        assert_eq!(b.block_sizes(), &Vec::<i32>::new());
+        assert_eq!(b.block_starts(), &Vec::<i32>::new());
     }
 
     #[test]
@@ -647,14 +647,14 @@ mod testing {
         assert_eq!(b.start(), 10);
         assert_eq!(b.end(), 20);
         assert_eq!(b.name(), "name");
-        assert_eq!(b.score(), Score::Empty);
+        assert_eq!(b.score(), Score(None));
         assert_eq!(b.strand().unwrap(), Strand::Unknown);
         assert_eq!(b.thick_start(), 0);
         assert_eq!(b.thick_end(), 0);
         assert_eq!(b.item_rgb(), "");
         assert_eq!(b.block_count(), 0);
-        assert_eq!(b.block_sizes(), &vec![]);
-        assert_eq!(b.block_starts(), &vec![]);
+        assert_eq!(b.block_sizes(), &Vec::<i32>::new());
+        assert_eq!(b.block_starts(), &Vec::<i32>::new());
     }
 
     #[test]
@@ -678,7 +678,66 @@ mod testing {
         assert_eq!(b.thick_end(), 0);
         assert_eq!(b.item_rgb(), "");
         assert_eq!(b.block_count(), 0);
-        assert_eq!(b.block_sizes(), &vec![]);
-        assert_eq!(b.block_starts(), &vec![]);
+        assert_eq!(b.block_sizes(), &Vec::<i32>::new());
+        assert_eq!(b.block_starts(), &Vec::<i32>::new());
+    }
+}
+
+#[cfg(feature = "serde")]
+#[cfg(test)]
+mod serde_testing {
+    use super::*;
+    use anyhow::Result;
+    use csv::WriterBuilder;
+
+    #[test]
+    fn test_csv_serialization() -> Result<()> {
+        let a = Bed12::new(
+            "chr1".to_string(),
+            20,
+            30,
+            "metadata".to_string(),
+            1.1.into(),
+            Strand::Forward,
+            20,
+            30,
+            "0,0,0".to_string(),
+            1,
+            vec![10],
+            vec![20],
+        );
+        let mut wtr = WriterBuilder::new().has_headers(false).from_writer(vec![]);
+        wtr.serialize(a)?;
+        let result = String::from_utf8(wtr.into_inner()?)?;
+        assert_eq!(
+            result,
+            "chr1,20,30,metadata,1.1,+,20,30,\"0,0,0\",1,10,20\n"
+        );
+        Ok(())
+    }
+
+    #[test]
+    fn test_csv_deserialization() -> Result<()> {
+        let a = "chr1\t20\t30\tmetadata\t1.1\t+\t20\t30\tcolor\t1\t2,2\t2,2\n";
+        let mut rdr = csv::ReaderBuilder::new()
+            .has_headers(false)
+            .delimiter(b'\t')
+            .from_reader(a.as_bytes());
+        let mut iter = rdr.deserialize();
+        let b: Bed12<String, i32, String, i32, i32, String, String, String> =
+            iter.next().unwrap()?;
+        assert_eq!(b.chr(), "chr1");
+        assert_eq!(b.start(), 20);
+        assert_eq!(b.end(), 30);
+        assert_eq!(b.name(), "metadata");
+        assert_eq!(b.score(), 1.1.into());
+        assert_eq!(b.strand().unwrap(), Strand::Forward);
+        assert_eq!(b.thick_start(), 20);
+        assert_eq!(b.thick_end(), 30);
+        assert_eq!(b.item_rgb(), "color");
+        assert_eq!(b.block_count(), 1);
+        assert_eq!(b.block_sizes(), &"2,2");
+        assert_eq!(b.block_starts(), &"2,2");
+        Ok(())
     }
 }

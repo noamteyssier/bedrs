@@ -266,35 +266,35 @@ mod testing {
 
     #[test]
     fn test_init_chrom_numeric() {
-        let a = Bed6::new(1, 10, 20, 0, Score::Empty, Strand::Unknown);
+        let a = Bed6::new(1, 10, 20, 0, Score(None), Strand::Unknown);
         assert_eq!(a.chr(), &1);
         assert_eq!(a.start(), 10);
         assert_eq!(a.end(), 20);
         assert_eq!(a.name(), &0);
-        assert_eq!(a.score(), Score::Empty);
+        assert_eq!(a.score(), Score(None));
         assert_eq!(a.strand().unwrap(), Strand::Unknown);
     }
 
     #[test]
     fn test_init_chrom_string() {
-        let a = Bed6::new("chr1".to_string(), 10, 20, 0, Score::Empty, Strand::Unknown);
+        let a = Bed6::new("chr1".to_string(), 10, 20, 0, Score(None), Strand::Unknown);
         assert_eq!(a.chr(), &"chr1".to_string());
         assert_eq!(a.start(), 10);
         assert_eq!(a.end(), 20);
         assert_eq!(a.name(), &0);
-        assert_eq!(a.score(), Score::Empty);
+        assert_eq!(a.score(), Score(None));
         assert_eq!(a.strand().unwrap(), Strand::Unknown);
     }
 
     #[test]
     fn test_init_name_numeric() {
-        let a = Bed6::new(1, 10, 20, 0, Score::Empty, Strand::Unknown);
+        let a = Bed6::new(1, 10, 20, 0, Score(None), Strand::Unknown);
         assert_eq!(a.name(), &0);
     }
 
     #[test]
     fn test_init_name_string() {
-        let a = Bed6::new(1, 10, 20, "name".to_string(), Score::Empty, Strand::Unknown);
+        let a = Bed6::new(1, 10, 20, "name".to_string(), Score(None), Strand::Unknown);
         assert_eq!(a.name(), &"name".to_string());
     }
 
@@ -355,7 +355,7 @@ mod testing {
         assert_eq!(b.start(), 10);
         assert_eq!(b.end(), 20);
         assert_eq!(b.name(), "");
-        assert_eq!(b.score(), Score::Empty);
+        assert_eq!(b.score(), Score(None));
         assert_eq!(b.strand().unwrap(), Strand::Unknown);
     }
 
@@ -367,7 +367,7 @@ mod testing {
         assert_eq!(b.start(), 10);
         assert_eq!(b.end(), 20);
         assert_eq!(b.name(), "name");
-        assert_eq!(b.score(), Score::Empty);
+        assert_eq!(b.score(), Score(None));
         assert_eq!(b.strand().unwrap(), Strand::Unknown);
     }
 
@@ -408,5 +408,40 @@ mod testing {
         assert_eq!(merged.records()[0].end(), 25);
         assert_eq!(merged.records()[0].name(), "");
         assert_eq!(merged.records()[0].strand().unwrap(), Strand::Forward);
+    }
+}
+
+#[cfg(feature = "serde")]
+#[cfg(test)]
+mod serde_testing {
+    use super::*;
+    use anyhow::Result;
+    use csv::WriterBuilder;
+
+    #[test]
+    fn test_csv_serialization() -> Result<()> {
+        let a = Bed6::new(1, 20, 30, "metadata", 0.into(), Strand::Forward);
+        let mut wtr = WriterBuilder::new().has_headers(false).from_writer(vec![]);
+        wtr.serialize(a)?;
+        let result = String::from_utf8(wtr.into_inner()?)?;
+        assert_eq!(result, "1,20,30,metadata,0,+\n");
+        Ok(())
+    }
+
+    #[test]
+    fn test_csv_deserialization() -> Result<()> {
+        let a = "1,20,30,metadata,0,+\n";
+        let mut rdr = csv::ReaderBuilder::new()
+            .has_headers(false)
+            .from_reader(a.as_bytes());
+        let mut iter = rdr.deserialize();
+        let b: Bed6<i32, i32, String> = iter.next().unwrap()?;
+        assert_eq!(b.chr(), &1);
+        assert_eq!(b.start(), 20);
+        assert_eq!(b.end(), 30);
+        assert_eq!(b.name(), "metadata");
+        assert_eq!(b.score(), 0.into());
+        assert_eq!(b.strand().unwrap(), Strand::Forward);
+        Ok(())
     }
 }
