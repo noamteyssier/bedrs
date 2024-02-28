@@ -266,35 +266,35 @@ mod testing {
 
     #[test]
     fn test_init_chrom_numeric() {
-        let a = Bed6::new(1, 10, 20, 0, Score::Empty, Strand::Unknown);
+        let a = Bed6::new(1, 10, 20, 0, Score(None), Strand::Unknown);
         assert_eq!(a.chr(), &1);
         assert_eq!(a.start(), 10);
         assert_eq!(a.end(), 20);
         assert_eq!(a.name(), &0);
-        assert_eq!(a.score(), Score::Empty);
+        assert_eq!(a.score(), Score(None));
         assert_eq!(a.strand().unwrap(), Strand::Unknown);
     }
 
     #[test]
     fn test_init_chrom_string() {
-        let a = Bed6::new("chr1".to_string(), 10, 20, 0, Score::Empty, Strand::Unknown);
+        let a = Bed6::new("chr1".to_string(), 10, 20, 0, Score(None), Strand::Unknown);
         assert_eq!(a.chr(), &"chr1".to_string());
         assert_eq!(a.start(), 10);
         assert_eq!(a.end(), 20);
         assert_eq!(a.name(), &0);
-        assert_eq!(a.score(), Score::Empty);
+        assert_eq!(a.score(), Score(None));
         assert_eq!(a.strand().unwrap(), Strand::Unknown);
     }
 
     #[test]
     fn test_init_name_numeric() {
-        let a = Bed6::new(1, 10, 20, 0, Score::Empty, Strand::Unknown);
+        let a = Bed6::new(1, 10, 20, 0, Score(None), Strand::Unknown);
         assert_eq!(a.name(), &0);
     }
 
     #[test]
     fn test_init_name_string() {
-        let a = Bed6::new(1, 10, 20, "name".to_string(), Score::Empty, Strand::Unknown);
+        let a = Bed6::new(1, 10, 20, "name".to_string(), Score(None), Strand::Unknown);
         assert_eq!(a.name(), &"name".to_string());
     }
 
@@ -355,7 +355,7 @@ mod testing {
         assert_eq!(b.start(), 10);
         assert_eq!(b.end(), 20);
         assert_eq!(b.name(), "");
-        assert_eq!(b.score(), Score::Empty);
+        assert_eq!(b.score(), Score(None));
         assert_eq!(b.strand().unwrap(), Strand::Unknown);
     }
 
@@ -367,7 +367,7 @@ mod testing {
         assert_eq!(b.start(), 10);
         assert_eq!(b.end(), 20);
         assert_eq!(b.name(), "name");
-        assert_eq!(b.score(), Score::Empty);
+        assert_eq!(b.score(), Score(None));
         assert_eq!(b.strand().unwrap(), Strand::Unknown);
     }
 

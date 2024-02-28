@@ -31,7 +31,7 @@ use serde::{Deserialize, Serialize};
 ///     "gene",
 ///     1000,
 ///     4000,
-///     Score::Empty,
+///     Score(None),
 ///     Strand::Forward,
 ///     1,
 ///     "gene AP2S1; transcript AP2S1_201;"
@@ -310,14 +310,14 @@ mod testing {
         record.update_seqname(&2);
         record.update_source(&"Havana");
         record.update_feature(&"transcript");
-        record.update_score(Score::Empty);
+        record.update_score(Score(None));
         record.update_frame(1);
         record.update_attributes(&"");
 
         assert_eq!(record.seqname(), &2);
         assert_eq!(record.source(), &"Havana");
         assert_eq!(record.feature(), &"transcript");
-        assert_eq!(record.score(), Score::Empty);
+        assert_eq!(record.score(), Score(None));
         assert_eq!(record.frame(), 1);
         assert_eq!(record.attributes(), &"");
     }

@@ -629,7 +629,7 @@ mod testing {
         assert_eq!(b.start(), 10);
         assert_eq!(b.end(), 20);
         assert_eq!(b.name(), "");
-        assert_eq!(b.score(), Score::Empty);
+        assert_eq!(b.score(), Score(None));
         assert_eq!(b.strand().unwrap(), Strand::Unknown);
         assert_eq!(b.thick_start(), 0);
         assert_eq!(b.thick_end(), 0);
@@ -647,7 +647,7 @@ mod testing {
         assert_eq!(b.start(), 10);
         assert_eq!(b.end(), 20);
         assert_eq!(b.name(), "name");
-        assert_eq!(b.score(), Score::Empty);
+        assert_eq!(b.score(), Score(None));
         assert_eq!(b.strand().unwrap(), Strand::Unknown);
         assert_eq!(b.thick_start(), 0);
         assert_eq!(b.thick_end(), 0);
