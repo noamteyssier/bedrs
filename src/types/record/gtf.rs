@@ -1,6 +1,6 @@
 use crate::{
     traits::{ChromBounds, MetaBounds, ValueBounds},
-    types::Score,
+    types::{enums::Frame, Score},
     Coordinates, Strand,
 };
 #[cfg(feature = "serde")]
@@ -33,7 +33,7 @@ use serde::{Deserialize, Serialize};
 ///     4000,
 ///     Score(None),
 ///     Strand::Forward,
-///     1,
+///     1.into(),
 ///     "gene AP2S1; transcript AP2S1_201;"
 /// );
 /// assert_eq!(record.chr(), &"scaffold_1");
@@ -56,7 +56,7 @@ where
     end: T,
     score: Score,
     strand: Strand,
-    frame: T,
+    frame: Frame,
     attributes: N,
 }
 impl<C, T, N> Coordinates<C, T> for Gtf<C, T, N>
@@ -101,7 +101,7 @@ where
             end: other.end(),
             score: Score::default(),
             strand: other.strand().unwrap_or_default(),
-            frame: T::default(),
+            frame: Frame::default(),
             attributes: N::default(),
         }
     }
@@ -201,7 +201,7 @@ where
         end: T,
         score: Score,
         strand: Strand,
-        frame: T,
+        frame: Frame,
         attributes: N,
     ) -> Self {
         Self {
@@ -228,7 +228,7 @@ where
     pub fn score(&self) -> Score {
         self.score
     }
-    pub fn frame(&self) -> T {
+    pub fn frame(&self) -> Frame {
         self.frame
     }
     pub fn attributes(&self) -> &N {
@@ -246,7 +246,7 @@ where
     pub fn update_score(&mut self, val: Score) {
         self.score = val;
     }
-    pub fn update_frame(&mut self, val: T) {
+    pub fn update_frame(&mut self, val: Frame) {
         self.frame = val;
     }
     pub fn update_attributes(&mut self, val: &N) {
@@ -270,7 +270,7 @@ mod testing {
             30,
             11.1.into(),
             Strand::Reverse,
-            0,
+            0.into(),
             "some_attr",
         );
         assert_eq!(record.chr(), &1);
@@ -280,7 +280,7 @@ mod testing {
         assert_eq!(record.source(), &"Ensembl");
         assert_eq!(record.feature(), &"gene");
         assert_eq!(record.score(), 11.1.into());
-        assert_eq!(record.frame(), 0);
+        assert_eq!(record.frame(), 0.into());
         assert_eq!(record.attributes(), &"some_attr");
     }
 
@@ -294,7 +294,7 @@ mod testing {
             30,
             11.1.into(),
             Strand::Reverse,
-            0,
+            0.into(),
             "some_attr",
         );
         assert_eq!(record.chr(), &1);
@@ -304,21 +304,21 @@ mod testing {
         assert_eq!(record.source(), &"Ensembl");
         assert_eq!(record.feature(), &"gene");
         assert_eq!(record.score(), 11.1.into());
-        assert_eq!(record.frame(), 0);
+        assert_eq!(record.frame(), 0.into());
         assert_eq!(record.attributes(), &"some_attr");
 
         record.update_seqname(&2);
         record.update_source(&"Havana");
         record.update_feature(&"transcript");
         record.update_score(Score(None));
-        record.update_frame(1);
+        record.update_frame(1.into());
         record.update_attributes(&"");
 
         assert_eq!(record.seqname(), &2);
         assert_eq!(record.source(), &"Havana");
         assert_eq!(record.feature(), &"transcript");
         assert_eq!(record.score(), Score(None));
-        assert_eq!(record.frame(), 1);
+        assert_eq!(record.frame(), 1.into());
         assert_eq!(record.attributes(), &"");
     }
 
@@ -347,7 +347,7 @@ mod serde_testing {
             30,
             Score(None),
             Strand::Unknown,
-            0,
+            0.into(),
             "metadata",
         );
         let mut wtr = WriterBuilder::new().has_headers(false).from_writer(vec![]);
@@ -371,7 +371,7 @@ mod serde_testing {
         assert_eq!(b.start(), 20);
         assert_eq!(b.end(), 30);
         assert_eq!(b.score(), Score(None));
-        assert_eq!(b.frame(), 0);
+        assert_eq!(b.frame(), 0.into());
         assert_eq!(b.attributes(), "metadata");
         Ok(())
     }
