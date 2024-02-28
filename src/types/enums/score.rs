@@ -86,41 +86,119 @@ impl FromStr for Score {
 }
 impl From<f64> for Score {
     fn from(s: f64) -> Self {
-        Score::Score(s)
+        Score(Some(s))
     }
 }
 #[allow(clippy::cast_lossless)]
 impl From<f32> for Score {
     fn from(s: f32) -> Self {
-        Score::Score(s as f64)
+        Score(Some(s as f64))
     }
 }
 #[allow(clippy::cast_lossless)]
 impl From<i32> for Score {
     fn from(s: i32) -> Self {
-        Score::Score(s as f64)
+        Score(Some(s as f64))
     }
 }
 #[allow(clippy::cast_precision_loss)]
 impl From<usize> for Score {
     fn from(s: usize) -> Self {
-        Score::Score(s as f64)
+        Score(Some(s as f64))
     }
 }
 impl From<Option<f64>> for Score {
     fn from(s: Option<f64>) -> Self {
-        match s {
-            Some(val) => Score::Score(val),
-            None => Score::Empty,
-        }
+        Score(s)
     }
 }
+
+#[cfg(test)]
+mod testing {
+
+    use super::*;
+    use std::str::FromStr;
+    #[test]
+    fn test_score_display() {
+        let a = Score(Some(10.0));
+        assert_eq!(a.to_string(), "10");
+        let b = Score(None);
+        assert_eq!(b.to_string(), ".");
+        let c = Score(Some(11.1));
+        assert_eq!(c.to_string(), "11.1");
+    }
+    #[test]
+    fn test_score_from_str() {
+        let a = Score::from_str("10.0").unwrap();
+        assert_eq!(a, Score(Some(10.0)));
+        let b = Score::from_str(".").unwrap();
+        assert_eq!(b, Score(None));
+        let c = Score::from_str("10").unwrap();
+        assert_eq!(c, Score(Some(10.0)));
+    }
+    #[test]
+    fn test_score_from_f64() {
+        let a = Score::from(10.0);
+        assert_eq!(a, Score(Some(10.0)));
+    }
+    #[test]
+    fn test_score_from_f32() {
+        let a = Score::from(10.0);
+        assert_eq!(a, Score(Some(10.0)));
+    }
+    #[test]
+    fn test_score_from_i32() {
+        let a = Score::from(10);
+        assert_eq!(a, Score(Some(10.0)));
+    }
+    #[test]
+    fn test_score_from_usize() {
+        let a = Score::from(10);
+        assert_eq!(a, Score(Some(10.0)));
+    }
+    #[test]
+    fn test_score_from_option_f64() {
+        let a = Score::from(Some(10.0));
+        assert_eq!(a, Score(Some(10.0)));
+        let b = Score::from(None);
+        assert_eq!(b, Score(None));
+    }
+    #[test]
+    fn test_score_from_str_fail() {
+        let a = Score::from_str("a");
+        assert!(a.is_err());
+    }
+}
+
 #[cfg(feature = "serde")]
-impl<'de> Deserialize<'de> for Score {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        Option::deserialize(deserializer).map(Into::into)
+#[cfg(test)]
+mod serde_testing {
+    use super::*;
+    use csv::ReaderBuilder;
+
+    #[test]
+    fn test_csv_deserialization() {
+        let a = "10\n.\n11.1\n";
+        let rdr = ReaderBuilder::new()
+            .has_headers(false)
+            .from_reader(a.as_bytes());
+        let mut iter = rdr.into_deserialize();
+        let r1: Score = iter.next().unwrap().unwrap();
+        let r2: Score = iter.next().unwrap().unwrap();
+        let r3: Score = iter.next().unwrap().unwrap();
+        assert_eq!(r1, Score(Some(10.0)));
+        assert_eq!(r2, Score(None));
+        assert_eq!(r3, Score(Some(11.1)));
+    }
+
+    #[test]
+    fn test_csv_serialization() {
+        let a = vec![Score(Some(10.0)), Score(None), Score(Some(11.1))];
+        let mut wtr = csv::Writer::from_writer(vec![]);
+        for record in a {
+            wtr.serialize(record).unwrap();
+        }
+        let result = String::from_utf8(wtr.into_inner().unwrap()).unwrap();
+        assert_eq!(result, "10\n.\n11.1\n");
     }
 }
