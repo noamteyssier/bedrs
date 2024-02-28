@@ -23,6 +23,7 @@ pub struct BaseInterval<T>
 where
     T: ValueBounds,
 {
+    #[cfg_attr(feature = "serde", serde(skip))]
     chr: T,
     start: T,
     end: T,
@@ -207,5 +208,36 @@ mod testing {
         function_generic_reference(&iv);
         function_generic_reference(&mut iv);
         function_generic_reference(iv);
+    }
+}
+
+#[cfg(feature = "serde")]
+#[cfg(test)]
+mod serde_testing {
+    use super::*;
+    use anyhow::Result;
+    use csv::WriterBuilder;
+
+    #[test]
+    fn test_csv_serialization() -> Result<()> {
+        let a = BaseInterval::new(20, 30);
+        let mut wtr = WriterBuilder::new().has_headers(false).from_writer(vec![]);
+        wtr.serialize(a)?;
+        let result = String::from_utf8(wtr.into_inner()?)?;
+        assert_eq!(result, "20,30\n");
+        Ok(())
+    }
+
+    #[test]
+    fn test_csv_deserialization() -> Result<()> {
+        let a = "20,30\n";
+        let mut rdr = csv::ReaderBuilder::new()
+            .has_headers(false)
+            .from_reader(a.as_bytes());
+        let mut iter = rdr.deserialize();
+        let b: BaseInterval<i32> = iter.next().unwrap()?;
+        assert_eq!(b.start(), 20);
+        assert_eq!(b.end(), 30);
+        Ok(())
     }
 }

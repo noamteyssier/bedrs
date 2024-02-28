@@ -329,3 +329,50 @@ mod testing {
         assert_eq!(set.len(), 10);
     }
 }
+
+#[cfg(feature = "serde")]
+#[cfg(test)]
+mod serde_testing {
+    use super::*;
+    use anyhow::Result;
+    use csv::WriterBuilder;
+
+    #[test]
+    fn test_csv_serialization() -> Result<()> {
+        let a = Gtf::new(
+            "chr1",
+            "Ensembl",
+            "gene",
+            20,
+            30,
+            Score(None),
+            Strand::Unknown,
+            0,
+            "metadata",
+        );
+        let mut wtr = WriterBuilder::new().has_headers(false).from_writer(vec![]);
+        wtr.serialize(a)?;
+        let result = String::from_utf8(wtr.into_inner()?)?;
+        assert_eq!(result, "chr1,Ensembl,gene,20,30,.,.,0,metadata\n");
+        Ok(())
+    }
+
+    #[test]
+    fn test_csv_deserialization() -> Result<()> {
+        let a = "chr1,Ensembl,gene,20,30,.,.,0,metadata\n";
+        let mut rdr = csv::ReaderBuilder::new()
+            .has_headers(false)
+            .from_reader(a.as_bytes());
+        let mut iter = rdr.deserialize();
+        let b: Gtf<String, i32, String> = iter.next().unwrap()?;
+        assert_eq!(b.seqname(), "chr1");
+        assert_eq!(b.source(), "Ensembl");
+        assert_eq!(b.feature(), "gene");
+        assert_eq!(b.start(), 20);
+        assert_eq!(b.end(), 30);
+        assert_eq!(b.score(), Score(None));
+        assert_eq!(b.frame(), 0);
+        assert_eq!(b.attributes(), "metadata");
+        Ok(())
+    }
+}

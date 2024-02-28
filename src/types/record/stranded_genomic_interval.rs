@@ -322,3 +322,36 @@ mod testing {
         function_generic_reference(iv);
     }
 }
+
+#[cfg(feature = "serde")]
+#[cfg(test)]
+mod serde_testing {
+    use super::*;
+    use anyhow::Result;
+    use csv::WriterBuilder;
+
+    #[test]
+    fn test_csv_serialization() -> Result<()> {
+        let a = StrandedBed3::new(1, 20, 30, Strand::Forward);
+        let mut wtr = WriterBuilder::new().has_headers(false).from_writer(vec![]);
+        wtr.serialize(a)?;
+        let result = String::from_utf8(wtr.into_inner()?)?;
+        assert_eq!(result, "1,20,30,+\n");
+        Ok(())
+    }
+
+    #[test]
+    fn test_csv_deserialization() -> Result<()> {
+        let a = "1,20,30,+\n";
+        let mut rdr = csv::ReaderBuilder::new()
+            .has_headers(false)
+            .from_reader(a.as_bytes());
+        let mut iter = rdr.deserialize();
+        let b: StrandedBed3<i32> = iter.next().unwrap()?;
+        assert_eq!(b.chr(), &1);
+        assert_eq!(b.start(), 20);
+        assert_eq!(b.end(), 30);
+        assert_eq!(b.strand(), Some(Strand::Forward));
+        Ok(())
+    }
+}

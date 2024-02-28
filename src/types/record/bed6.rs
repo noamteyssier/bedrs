@@ -410,3 +410,38 @@ mod testing {
         assert_eq!(merged.records()[0].strand().unwrap(), Strand::Forward);
     }
 }
+
+#[cfg(feature = "serde")]
+#[cfg(test)]
+mod serde_testing {
+    use super::*;
+    use anyhow::Result;
+    use csv::WriterBuilder;
+
+    #[test]
+    fn test_csv_serialization() -> Result<()> {
+        let a = Bed6::new(1, 20, 30, "metadata", 0.into(), Strand::Forward);
+        let mut wtr = WriterBuilder::new().has_headers(false).from_writer(vec![]);
+        wtr.serialize(a)?;
+        let result = String::from_utf8(wtr.into_inner()?)?;
+        assert_eq!(result, "1,20,30,metadata,0,+\n");
+        Ok(())
+    }
+
+    #[test]
+    fn test_csv_deserialization() -> Result<()> {
+        let a = "1,20,30,metadata,0,+\n";
+        let mut rdr = csv::ReaderBuilder::new()
+            .has_headers(false)
+            .from_reader(a.as_bytes());
+        let mut iter = rdr.deserialize();
+        let b: Bed6<i32, i32, String> = iter.next().unwrap()?;
+        assert_eq!(b.chr(), &1);
+        assert_eq!(b.start(), 20);
+        assert_eq!(b.end(), 30);
+        assert_eq!(b.name(), "metadata");
+        assert_eq!(b.score(), 0.into());
+        assert_eq!(b.strand().unwrap(), Strand::Forward);
+        Ok(())
+    }
+}
