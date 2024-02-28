@@ -17,6 +17,16 @@ pub struct Score(
     )]
     pub Option<f64>,
 );
+impl Score {
+    #[must_use]
+    pub fn new(val: f64) -> Self {
+        Self(Some(val))
+    }
+    #[must_use]
+    pub fn empty() -> Self {
+        Self(None)
+    }
+}
 
 // Custom deserializer that expects a string and parses it as f64 or interprets '.' as None
 #[cfg(feature = "serde")]
