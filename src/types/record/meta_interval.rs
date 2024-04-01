@@ -199,6 +199,15 @@ mod testing {
         assert_eq!(a.chr(), &1);
         assert_eq!(a.meta(), &(100, 200, "test"));
     }
+
+    #[test]
+    fn test_bed3_conversion() {
+        let a = MetaInterval::new("chr1", 20, 30, "metadata");
+        let b: Bed3<_, _> = a.into();
+        assert_eq!(*b.chr(), "chr1");
+        assert_eq!(b.start(), 20);
+        assert_eq!(b.end(), 30);
+    }
 }
 
 #[cfg(feature = "serde")]

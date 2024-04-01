@@ -339,6 +339,25 @@ mod testing {
             IntervalContainer::from_iter(vec![Gtf::empty(); 10]);
         assert_eq!(set.len(), 10);
     }
+
+    #[test]
+    fn test_into_bed3() {
+        let record = Gtf::new(
+            1,
+            "Ensembl",
+            "gene",
+            10,
+            30,
+            11.1.into(),
+            Strand::Reverse,
+            0.into(),
+            "some_attr",
+        );
+        let bed3: Bed3<_, _> = record.into();
+        assert_eq!(bed3.chr(), &1);
+        assert_eq!(bed3.start(), 10);
+        assert_eq!(bed3.end(), 30);
+    }
 }
 
 #[cfg(feature = "serde")]
