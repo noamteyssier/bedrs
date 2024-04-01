@@ -1,7 +1,7 @@
 use crate::{
     traits::{ChromBounds, MetaBounds, ValueBounds},
     types::{enums::Frame, Score},
-    Coordinates, Strand,
+    Bed3, Coordinates, Strand,
 };
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
@@ -251,6 +251,17 @@ where
     }
     pub fn update_attributes(&mut self, val: &N) {
         self.attributes = val.clone();
+    }
+}
+
+impl<C, T, N> From<Gtf<C, T, N>> for Bed3<C, T>
+where
+    C: ChromBounds,
+    T: ValueBounds,
+    N: MetaBounds,
+{
+    fn from(record: Gtf<C, T, N>) -> Self {
+        Self::new(record.seqname, record.start, record.end)
     }
 }
 

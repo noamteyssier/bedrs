@@ -1,6 +1,6 @@
 use crate::{
     traits::{ChromBounds, MetaBounds, ValueBounds},
-    Coordinates, Strand,
+    Bed3, Coordinates, Strand,
 };
 use num_traits::zero;
 #[cfg(feature = "serde")]
@@ -164,6 +164,17 @@ where
     }
     pub fn update_meta(&mut self, val: &M) {
         self.meta = val.clone();
+    }
+}
+
+impl<C, T, M> From<MetaInterval<C, T, M>> for Bed3<C, T>
+where
+    C: ChromBounds,
+    T: ValueBounds,
+    M: MetaBounds,
+{
+    fn from(bed: MetaInterval<C, T, M>) -> Self {
+        Self::new(bed.chr, bed.start, bed.end)
     }
 }
 
