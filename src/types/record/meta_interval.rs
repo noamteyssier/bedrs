@@ -1,6 +1,6 @@
 use crate::{
     traits::{ChromBounds, MetaBounds, ValueBounds},
-    Coordinates, Strand,
+    Bed3, Coordinates, Strand,
 };
 use num_traits::zero;
 #[cfg(feature = "serde")]
@@ -167,6 +167,17 @@ where
     }
 }
 
+impl<C, T, M> From<MetaInterval<C, T, M>> for Bed3<C, T>
+where
+    C: ChromBounds,
+    T: ValueBounds,
+    M: MetaBounds,
+{
+    fn from(bed: MetaInterval<C, T, M>) -> Self {
+        Self::new(bed.chr, bed.start, bed.end)
+    }
+}
+
 #[cfg(test)]
 mod testing {
     use super::*;
@@ -187,6 +198,15 @@ mod testing {
         assert_eq!(a.end(), 30);
         assert_eq!(a.chr(), &1);
         assert_eq!(a.meta(), &(100, 200, "test"));
+    }
+
+    #[test]
+    fn test_bed3_conversion() {
+        let a = MetaInterval::new("chr1", 20, 30, "metadata");
+        let b: Bed3<_, _> = a.into();
+        assert_eq!(*b.chr(), "chr1");
+        assert_eq!(b.start(), 20);
+        assert_eq!(b.end(), 30);
     }
 }
 
