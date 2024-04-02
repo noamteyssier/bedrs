@@ -1127,4 +1127,50 @@ mod testing {
         assert!(a.stranded_ends(&b));
         assert!(!a.stranded_ends(&c));
     }
+
+    #[test]
+    fn equals() {
+        let a = BaseInterval::new(10, 20);
+        let b = BaseInterval::new(10, 20);
+        let c = BaseInterval::new(10, 21);
+        assert!(a.equals(&b));
+        assert!(!a.equals(&c));
+    }
+
+    #[test]
+    fn stranded_equals() {
+        let a = StrandedBed3::new(1, 10, 20, Strand::Forward);
+        let b = StrandedBed3::new(1, 10, 20, Strand::Forward);
+        let c = StrandedBed3::new(1, 10, 20, Strand::Reverse);
+        assert!(a.stranded_equals(&b));
+        assert!(!a.stranded_equals(&c));
+    }
+
+    #[test]
+    fn during() {
+        let a = BaseInterval::new(15, 25);
+        let b = BaseInterval::new(10, 30);
+        let c = BaseInterval::new(15, 30);
+        let d = BaseInterval::new(10, 25);
+        let e = BaseInterval::new(15, 25);
+        assert!(a.during(&b));
+        assert!(!a.during(&c));
+        assert!(!a.during(&d));
+        assert!(!a.during(&e));
+    }
+
+    #[test]
+    fn stranded_during() {
+        let a = StrandedBed3::new(1, 15, 25, Strand::Forward);
+        let b = StrandedBed3::new(1, 10, 30, Strand::Forward);
+        let c = StrandedBed3::new(1, 10, 30, Strand::Reverse);
+        let d = StrandedBed3::new(1, 15, 30, Strand::Forward);
+        let e = StrandedBed3::new(1, 10, 25, Strand::Forward);
+        let f = StrandedBed3::new(1, 15, 25, Strand::Forward);
+        assert!(a.stranded_during(&b));
+        assert!(!a.stranded_during(&c));
+        assert!(!a.stranded_during(&d));
+        assert!(!a.stranded_during(&e));
+        assert!(!a.stranded_during(&f));
+    }
 }
