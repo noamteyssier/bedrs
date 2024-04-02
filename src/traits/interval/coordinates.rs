@@ -444,7 +444,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::{traits::Coordinates, BaseInterval};
+    use crate::{traits::Coordinates, BaseInterval, Bed3};
 
     // define a custom interval struct for testing
     struct CustomInterval {
@@ -528,6 +528,11 @@ mod testing {
         assert_eq!(a.start(), 10);
         assert_eq!(a.end(), 100);
         assert_eq!(*a.chr(), 0);
+
+        // for coverage
+        let mut a = CustomInterval::empty();
+        a.update_chr(&0);
+        //
     }
 
     #[test]
@@ -577,8 +582,10 @@ mod testing {
         assert_eq!(a.end(), 100);
         a.update_start(&30);
         a.update_end(&120);
+        a.update_chr(&0);
         assert_eq!(a.start(), 30);
         assert_eq!(a.end(), 120);
+        let _a = CustomIntervalMeta::empty();
     }
 
     #[test]
@@ -657,5 +664,15 @@ mod testing {
         a.extend(&val, Some(22));
         assert_eq!(a.start(), 5);
         assert_eq!(a.end(), 22);
+    }
+
+    #[test]
+    fn test_update_from() {
+        let mut a = Bed3::new(1, 10, 20);
+        let b = Bed3::new(2, 30, 50);
+        a.update_endpoints_from(&b);
+        assert_eq!(a.chr(), &1);
+        assert_eq!(a.start(), 30);
+        assert_eq!(a.end(), 50);
     }
 }
