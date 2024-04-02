@@ -427,6 +427,165 @@ where
         self.bounded_chr(other) && self.interval_contains(other)
     }
 
+    /// Returns true if the current interval starts the other -
+    /// considers both the interval overlap and the chromosome.
+    ///
+    /// ```text
+    /// (Self)    |--------|
+    /// (Other)   |-----------------|
+    /// ```
+    /// # Example
+    /// ```
+    /// use bedrs::{Bed3, Overlap};
+    /// let interval1 = Bed3::new(1, 100, 200);
+    /// let interval2 = Bed3::new(1, 100, 400);
+    /// let interval3 = Bed3::new(2, 100, 400);
+    /// assert!(interval1.starts(&interval2));
+    /// assert!(!interval1.starts(&interval3));
+    /// ```
+    fn starts<I: Coordinates<C, T>>(&self, other: &I) -> bool {
+        self.bounded_chr(other) && self.start() == other.start() && self.end() < other.end()
+    }
+
+    /// Returns true if the current interval starts the other and
+    /// both intervals are on the same strand
+    /// ```text
+    /// (Self)    |-------->
+    /// (Other)   |----------------->
+    /// ```
+    /// # Example
+    /// ```
+    /// use bedrs::{StrandedBed3, Strand, Coordinates, Overlap};
+    /// let interval1 = StrandedBed3::new(1, 100, 200, Strand::Forward);
+    /// let interval2 = StrandedBed3::new(1, 100, 400, Strand::Forward);
+    /// let interval3 = StrandedBed3::new(1, 100, 400, Strand::Reverse);
+    /// assert!(interval1.stranded_starts(&interval2));
+    /// assert!(!interval1.stranded_starts(&interval3));
+    /// ```
+    fn stranded_starts<I: Coordinates<C, T>>(&self, other: &I) -> bool {
+        self.bounded_strand(other) && self.starts(other)
+    }
+
+    /// Returns true if the current interval ends the other -
+    /// considers both the interval overlap and the chromosome.
+    ///
+    /// ```text
+    /// (Self)             |--------|
+    /// (Other)   |-----------------|
+    /// ```
+    /// # Example
+    /// ```
+    /// use bedrs::{Bed3, Overlap};
+    /// let interval1 = Bed3::new(1, 300, 400);
+    /// let interval2 = Bed3::new(1, 100, 400);
+    /// let interval3 = Bed3::new(2, 100, 400);
+    /// assert!(interval1.ends(&interval2));
+    /// assert!(!interval1.ends(&interval3));
+    /// ```
+    fn ends<I: Coordinates<C, T>>(&self, other: &I) -> bool {
+        self.bounded_chr(other) && self.start() > other.start() && self.end() == other.end()
+    }
+
+    /// Returns true if the current interval ends the other and
+    /// both intervals are on the same strand
+    /// ```text
+    /// (Self)             |-------->
+    /// (Other)   |----------------->
+    /// ```
+    /// # Example
+    /// ```
+    /// use bedrs::{StrandedBed3, Strand, Coordinates, Overlap};
+    /// let interval1 = StrandedBed3::new(1, 300, 400, Strand::Forward);
+    /// let interval2 = StrandedBed3::new(1, 100, 400, Strand::Forward);
+    /// let interval3 = StrandedBed3::new(1, 100, 400, Strand::Reverse);
+    /// assert!(interval1.stranded_ends(&interval2));
+    /// assert!(!interval1.stranded_ends(&interval3));
+    /// ```
+    fn stranded_ends<I: Coordinates<C, T>>(&self, other: &I) -> bool {
+        self.bounded_strand(other) && self.ends(other)
+    }
+
+    /// Returns true if the current interval equals the other -
+    /// considers both the interval overlap and the chromosome.
+    /// ```text
+    /// (Self)    |--------|
+    /// (Other)   |--------|
+    /// ```
+    /// # Example
+    /// ```
+    /// use bedrs::{Bed3, Overlap};
+    /// let interval1 = Bed3::new(1, 100, 200);
+    /// let interval2 = Bed3::new(1, 100, 200);
+    /// let interval3 = Bed3::new(2, 100, 200);
+    /// assert!(interval1.equals(&interval2));
+    /// assert!(!interval1.equals(&interval3));
+    /// ```
+    fn equals<I: Coordinates<C, T>>(&self, other: &I) -> bool {
+        self.bounded_chr(other) && self.start() == other.start() && self.end() == other.end()
+    }
+
+    /// Returns true if the current interval equals the other and they are on the same strand
+    /// considers both the interval overlap and the chromosome.
+    /// ```text
+    /// (Self)    |-------->
+    /// (Other)   |-------->
+    /// ```
+    /// # Example
+    /// ```
+    /// use bedrs::{StrandedBed3, Strand, Coordinates, Overlap};
+    /// let interval1 = StrandedBed3::new(1, 100, 200, Strand::Forward);
+    /// let interval2 = StrandedBed3::new(1, 100, 200, Strand::Forward);
+    /// let interval3 = StrandedBed3::new(1, 100, 200, Strand::Reverse);
+    /// assert!(interval1.stranded_equals(&interval2));
+    /// assert!(!interval1.stranded_equals(&interval3));
+    /// ```
+    fn stranded_equals<I: Coordinates<C, T>>(&self, other: &I) -> bool {
+        self.bounded_strand(other) && self.equals(other)
+    }
+
+    /// Returns true if the current interval is during the other -
+    /// considers both the interval overlap and the chromosome.
+    ///
+    /// ```text
+    /// (Self)      |----|
+    /// (Other)   |----------|
+    /// ```
+    /// # Example
+    /// ```
+    /// use bedrs::{Bed3, Overlap};
+    /// let interval1 = Bed3::new(1, 150, 160);
+    /// let interval2 = Bed3::new(1, 100, 200);
+    /// let interval3 = Bed3::new(2, 100, 200);
+    /// let interval4 = Bed3::new(2, 100, 160);
+    /// let interval5 = Bed3::new(2, 150, 160);
+    /// assert!(interval1.during(&interval2));
+    /// assert!(!interval1.during(&interval3));
+    /// assert!(!interval1.during(&interval4));
+    /// assert!(!interval1.during(&interval5));
+    /// ```
+    fn during<I: Coordinates<C, T>>(&self, other: &I) -> bool {
+        self.bounded_chr(other) && self.start() > other.start() && self.end() < other.end()
+    }
+
+    /// Returns true if the current interval is during the other and
+    /// both intervals are on the same strand -
+    /// ```text
+    /// (Self)      |---->
+    /// (Other)   |-------->
+    /// ```
+    /// # Example
+    /// ```
+    /// use bedrs::{StrandedBed3, Strand, Coordinates, Overlap};
+    /// let interval1 = StrandedBed3::new(1, 150, 160, Strand::Forward);
+    /// let interval2 = StrandedBed3::new(1, 100, 200, Strand::Forward);
+    /// let interval3 = StrandedBed3::new(1, 100, 200, Strand::Reverse);
+    /// assert!(interval1.stranded_during(&interval2));
+    /// assert!(!interval1.stranded_during(&interval3));
+    /// ```
+    fn stranded_during<I: Coordinates<C, T>>(&self, other: &I) -> bool {
+        self.bounded_strand(other) && self.during(other)
+    }
+
     /// Returns true if the current interval contains the other and
     /// both intervals are on the same strand -
     ///
@@ -909,5 +1068,109 @@ mod testing {
         assert!(b.stranded_overlaps_by(&a, 5));
         assert!(!a.stranded_overlaps_by(&c, 5));
         assert!(!c.stranded_overlaps_by(&a, 5));
+    }
+
+    #[test]
+    fn starts() {
+        let a = BaseInterval::new(10, 20);
+        let b = BaseInterval::new(10, 30);
+        let c = BaseInterval::new(10, 40);
+        assert!(a.starts(&b));
+        assert!(a.starts(&c));
+    }
+
+    #[test]
+    fn starts_genomic() {
+        let a = Bed3::new(1, 10, 20);
+        let b = Bed3::new(1, 10, 40);
+        let c = Bed3::new(2, 10, 40);
+        assert!(a.starts(&b));
+        assert!(!a.starts(&c));
+    }
+
+    #[test]
+    fn starts_genomic_stranded() {
+        let a = StrandedBed3::new(1, 10, 20, Strand::Forward);
+        let b = StrandedBed3::new(1, 10, 40, Strand::Forward);
+        let c = StrandedBed3::new(1, 10, 40, Strand::Reverse);
+        assert!(a.stranded_starts(&b));
+        assert!(!a.stranded_starts(&c));
+        assert!(a.starts(&b));
+        assert!(a.starts(&c));
+    }
+
+    #[test]
+    fn ends() {
+        let a = BaseInterval::new(30, 40);
+        let b = BaseInterval::new(10, 40);
+        let c = BaseInterval::new(10, 40);
+        assert!(a.ends(&b));
+        assert!(a.ends(&c));
+    }
+
+    #[test]
+    fn ends_genomic() {
+        let a = Bed3::new(1, 30, 40);
+        let b = Bed3::new(1, 10, 40);
+        let c = Bed3::new(2, 10, 40);
+        assert!(a.ends(&b));
+        assert!(!a.ends(&c));
+    }
+
+    #[test]
+    fn ends_genomic_stranded() {
+        let a = StrandedBed3::new(1, 30, 40, Strand::Forward);
+        let b = StrandedBed3::new(1, 10, 40, Strand::Forward);
+        let c = StrandedBed3::new(1, 10, 40, Strand::Reverse);
+        assert!(a.ends(&b));
+        assert!(a.ends(&c));
+        assert!(a.stranded_ends(&b));
+        assert!(!a.stranded_ends(&c));
+    }
+
+    #[test]
+    fn equals() {
+        let a = BaseInterval::new(10, 20);
+        let b = BaseInterval::new(10, 20);
+        let c = BaseInterval::new(10, 21);
+        assert!(a.equals(&b));
+        assert!(!a.equals(&c));
+    }
+
+    #[test]
+    fn stranded_equals() {
+        let a = StrandedBed3::new(1, 10, 20, Strand::Forward);
+        let b = StrandedBed3::new(1, 10, 20, Strand::Forward);
+        let c = StrandedBed3::new(1, 10, 20, Strand::Reverse);
+        assert!(a.stranded_equals(&b));
+        assert!(!a.stranded_equals(&c));
+    }
+
+    #[test]
+    fn during() {
+        let a = BaseInterval::new(15, 25);
+        let b = BaseInterval::new(10, 30);
+        let c = BaseInterval::new(15, 30);
+        let d = BaseInterval::new(10, 25);
+        let e = BaseInterval::new(15, 25);
+        assert!(a.during(&b));
+        assert!(!a.during(&c));
+        assert!(!a.during(&d));
+        assert!(!a.during(&e));
+    }
+
+    #[test]
+    fn stranded_during() {
+        let a = StrandedBed3::new(1, 15, 25, Strand::Forward);
+        let b = StrandedBed3::new(1, 10, 30, Strand::Forward);
+        let c = StrandedBed3::new(1, 10, 30, Strand::Reverse);
+        let d = StrandedBed3::new(1, 15, 30, Strand::Forward);
+        let e = StrandedBed3::new(1, 10, 25, Strand::Forward);
+        let f = StrandedBed3::new(1, 15, 25, Strand::Forward);
+        assert!(a.stranded_during(&b));
+        assert!(!a.stranded_during(&c));
+        assert!(!a.stranded_during(&d));
+        assert!(!a.stranded_during(&e));
+        assert!(!a.stranded_during(&f));
     }
 }
