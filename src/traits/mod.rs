@@ -7,7 +7,7 @@ pub mod interval;
 //     // Closest, Complement, Find, Internal, Merge, Sample, SetSubtract,
 // };
 pub use errors::SetError;
-pub use interval::{Coordinates, Distance, Intersect, Overlap, Subtract};
+pub use interval::{Coordinates, Distance, Intersect, Overlap, Segment, Subtract};
 
 /// Generic bounds for types to be used for [Coordinates] in the context
 /// of Chromosome coordinates
