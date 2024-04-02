@@ -1069,4 +1069,62 @@ mod testing {
         assert!(!a.stranded_overlaps_by(&c, 5));
         assert!(!c.stranded_overlaps_by(&a, 5));
     }
+
+    #[test]
+    fn starts() {
+        let a = BaseInterval::new(10, 20);
+        let b = BaseInterval::new(10, 30);
+        let c = BaseInterval::new(10, 40);
+        assert!(a.starts(&b));
+        assert!(a.starts(&c));
+    }
+
+    #[test]
+    fn starts_genomic() {
+        let a = Bed3::new(1, 10, 20);
+        let b = Bed3::new(1, 10, 40);
+        let c = Bed3::new(2, 10, 40);
+        assert!(a.starts(&b));
+        assert!(!a.starts(&c));
+    }
+
+    #[test]
+    fn starts_genomic_stranded() {
+        let a = StrandedBed3::new(1, 10, 20, Strand::Forward);
+        let b = StrandedBed3::new(1, 10, 40, Strand::Forward);
+        let c = StrandedBed3::new(1, 10, 40, Strand::Reverse);
+        assert!(a.stranded_starts(&b));
+        assert!(!a.stranded_starts(&c));
+        assert!(a.starts(&b));
+        assert!(a.starts(&c));
+    }
+
+    #[test]
+    fn ends() {
+        let a = BaseInterval::new(30, 40);
+        let b = BaseInterval::new(10, 40);
+        let c = BaseInterval::new(10, 40);
+        assert!(a.ends(&b));
+        assert!(a.ends(&c));
+    }
+
+    #[test]
+    fn ends_genomic() {
+        let a = Bed3::new(1, 30, 40);
+        let b = Bed3::new(1, 10, 40);
+        let c = Bed3::new(2, 10, 40);
+        assert!(a.ends(&b));
+        assert!(!a.ends(&c));
+    }
+
+    #[test]
+    fn ends_genomic_stranded() {
+        let a = StrandedBed3::new(1, 30, 40, Strand::Forward);
+        let b = StrandedBed3::new(1, 10, 40, Strand::Forward);
+        let c = StrandedBed3::new(1, 10, 40, Strand::Reverse);
+        assert!(a.ends(&b));
+        assert!(a.ends(&c));
+        assert!(a.stranded_ends(&b));
+        assert!(!a.stranded_ends(&c));
+    }
 }
