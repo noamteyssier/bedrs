@@ -1173,4 +1173,14 @@ mod testing {
         assert!(!a.stranded_during(&e));
         assert!(!a.stranded_during(&f));
     }
+
+    #[test]
+    fn bounded_strand_missing_info() {
+        let a = Bed3::new(1, 10, 20);
+        let b = Bed3::new(1, 15, 25);
+        let c = StrandedBed3::new(1, 15, 25, Strand::Forward);
+        assert!(a.bounded_strand(&b));
+        assert!(a.bounded_strand(&c));
+        assert!(c.bounded_strand(&a));
+    }
 }
