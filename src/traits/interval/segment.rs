@@ -119,7 +119,7 @@ where
             self.insert_center(other, segments);
             self.insert_rhs(other, segments);
         } else if self.ends(other) {
-            self.insert_lhs(other, segments);
+            self.insert_rhs(other, segments);
             self.insert_center(other, segments);
         } else {
             self.insert_external_contained(other, segments);
@@ -275,7 +275,7 @@ mod testing {
     #[test]
     fn segments_internal_ends() {
         let iv1 = Bed3::new(1, 20, 40);
-        let iv2 = Bed3::new(1, 20, 30);
+        let iv2 = Bed3::new(1, 30, 40);
         let expected = vec![Bed3::new(1, 20, 30), Bed3::new(1, 30, 40)];
         let observed = iv1.segment(&iv2);
         validate_segments(&observed, &expected);
@@ -321,7 +321,7 @@ mod testing {
     /// 2:        w----y
     #[test]
     fn segments_external_ends() {
-        let iv1 = Bed3::new(1, 20, 30);
+        let iv1 = Bed3::new(1, 30, 40);
         let iv2 = Bed3::new(1, 20, 40);
         let expected = vec![Bed3::new(1, 20, 30), Bed3::new(1, 30, 40)];
         let observed = iv1.segment(&iv2);
