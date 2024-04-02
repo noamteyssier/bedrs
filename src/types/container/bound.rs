@@ -464,100 +464,6 @@ mod testing {
     };
 
     #[test]
-    fn bsearch_unsorted_chr() {
-        let records = (0..500).map(|x| BaseInterval::new(x, x + 50)).collect();
-        let set = IntervalContainer::new(records);
-        let query = BaseInterval::new(10, 20);
-        let bound = set.lower_bound(&query);
-        assert!(bound.is_err());
-    }
-
-    #[test]
-    fn bsearch_unsorted_chr_upstream() {
-        let records = (0..500).map(|x| BaseInterval::new(x, x + 50)).collect();
-        let set = IntervalContainer::new(records);
-        let query = BaseInterval::new(10, 20);
-        let bound = set.chr_bound_upstream(&query);
-        assert!(bound.is_err());
-    }
-
-    #[test]
-    fn bsearch_unsorted_chr_downstream() {
-        let records = (0..500).map(|x| BaseInterval::new(x, x + 50)).collect();
-        let set = IntervalContainer::new(records);
-        let query = BaseInterval::new(10, 20);
-        let bound = set.chr_bound_downstream(&query);
-        assert!(bound.is_err());
-    }
-
-    #[test]
-    fn bsearch_unsorted_stranded_upstream() {
-        let records = (0..500)
-            .map(|x| StrandedBed3::new(1, x, x + 50, Strand::Forward))
-            .collect();
-        let set = IntervalContainer::new(records);
-        let query = StrandedBed3::new(1, 10, 20, Strand::Forward);
-        let bound = set.stranded_upstream_bound(&query);
-        assert!(bound.is_err());
-    }
-
-    #[test]
-    fn bsearch_unsorted_stranded_downstream() {
-        let records = (0..500)
-            .map(|x| StrandedBed3::new(1, x, x + 50, Strand::Forward))
-            .collect();
-        let set = IntervalContainer::new(records);
-        let query = StrandedBed3::new(1, 10, 20, Strand::Forward);
-        let bound = set.stranded_downstream_bound(&query);
-        assert!(bound.is_err());
-    }
-
-    #[test]
-    fn bsearch_empty_chr() {
-        let records: Vec<BaseInterval<_>> = Vec::new();
-        let set = IntervalContainer::new(records);
-        let query = BaseInterval::new(10, 20);
-        let bound = set.lower_bound(&query);
-        assert!(bound.is_err());
-    }
-
-    #[test]
-    fn bsearch_empty_chr_upstream() {
-        let records: Vec<BaseInterval<_>> = Vec::new();
-        let set = IntervalContainer::new(records);
-        let query = BaseInterval::new(10, 20);
-        let bound = set.chr_bound_upstream(&query);
-        assert!(bound.is_err());
-    }
-
-    #[test]
-    fn bsearch_empty_chr_downstream() {
-        let records: Vec<BaseInterval<_>> = Vec::new();
-        let set = IntervalContainer::new(records);
-        let query = BaseInterval::new(10, 20);
-        let bound = set.chr_bound_downstream(&query);
-        assert!(bound.is_err());
-    }
-
-    #[test]
-    fn bsearch_empty_chr_stranded_upstream() {
-        let records: Vec<BaseInterval<_>> = Vec::new();
-        let set = IntervalContainer::new(records);
-        let query = StrandedBed3::new(1, 10, 20, Strand::Forward);
-        let bound = set.stranded_upstream_bound(&query);
-        assert!(bound.is_err());
-    }
-
-    #[test]
-    fn bsearch_empty_chr_stranded_downstream() {
-        let records: Vec<BaseInterval<_>> = Vec::new();
-        let set = IntervalContainer::new(records);
-        let query = StrandedBed3::new(1, 10, 20, Strand::Forward);
-        let bound = set.stranded_downstream_bound(&query);
-        assert!(bound.is_err());
-    }
-
-    #[test]
     fn bsearch_base_low() {
         let records = (0..500).map(|x| BaseInterval::new(x, x + 50)).collect();
         let mut set = IntervalContainer::new(records);
@@ -1126,5 +1032,54 @@ mod testing {
         let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.stranded_downstream_bound(&query).unwrap();
         assert_eq!(bound, None);
+    }
+
+    #[test]
+    fn empty_set_bound() {
+        let records: Vec<BaseInterval<_>> = Vec::new();
+        let set = IntervalContainer::from_sorted_unchecked(records);
+        let query = BaseInterval::new(10, 20);
+        let bound = set.lower_bound(&query);
+        assert_eq!(bound, Err(SetError::EmptySet));
+
+        let bound = set.chr_bound(&query);
+        assert_eq!(bound, Err(SetError::EmptySet));
+
+        let bound = set.chr_bound_upstream(&query);
+        assert_eq!(bound, Err(SetError::EmptySet));
+
+        let bound = set.chr_bound_downstream(&query);
+        assert_eq!(bound, Err(SetError::EmptySet));
+
+        let bound = set.stranded_upstream_bound(&query);
+        assert_eq!(bound, Err(SetError::EmptySet));
+
+        let bound = set.stranded_downstream_bound(&query);
+        assert_eq!(bound, Err(SetError::EmptySet));
+    }
+
+    #[test]
+    fn unsorted_set_bound() {
+        let records = (0..500).map(|x| BaseInterval::new(x, x + 50)).collect();
+        let set = IntervalContainer::new(records);
+        let query = BaseInterval::new(10, 20);
+
+        let bound = set.lower_bound(&query);
+        assert_eq!(bound, Err(SetError::UnsortedSet));
+
+        let bound = set.chr_bound(&query);
+        assert_eq!(bound, Err(SetError::UnsortedSet));
+
+        let bound = set.chr_bound_upstream(&query);
+        assert_eq!(bound, Err(SetError::UnsortedSet));
+
+        let bound = set.chr_bound_downstream(&query);
+        assert_eq!(bound, Err(SetError::UnsortedSet));
+
+        let bound = set.stranded_upstream_bound(&query);
+        assert_eq!(bound, Err(SetError::UnsortedSet));
+
+        let bound = set.stranded_downstream_bound(&query);
+        assert_eq!(bound, Err(SetError::UnsortedSet));
     }
 }
