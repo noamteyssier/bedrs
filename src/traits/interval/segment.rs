@@ -24,9 +24,8 @@ where
     /// Insert the left-hand side interval segment (i.e. the left-hand subtraction) into
     /// the segments vector
     fn insert_lhs<I: Coordinates<C, T>>(&self, other: &I, segments: &mut Vec<Self>) {
-        if let Some(sub) = self.subtract(other) {
-            segments.extend(sub);
-        }
+        let sub = self.subtract(other).unwrap();
+        segments.extend(sub);
     }
 
     /// Insert the central segment into the segments vector
@@ -40,10 +39,9 @@ where
     /// Insert the right-hand side interval segment (i.e. the right-hand subtraction) into
     /// the segments vector
     fn insert_rhs<I: Coordinates<C, T>>(&self, other: &I, segments: &mut Vec<Self>) {
-        if let Some(sub) = other.subtract(self) {
-            for s in sub {
-                segments.push(self.build_other(&s));
-            }
+        let sub = other.subtract(self).unwrap();
+        for s in sub {
+            segments.push(self.build_other(&s));
         }
     }
 
@@ -169,6 +167,20 @@ mod testing {
             assert_eq!(obs.start(), exp.start());
             assert_eq!(obs.end(), exp.end());
         }
+    }
+
+    /// a:    x--------y
+    /// b:                  w--------z
+    /// ==========================
+    /// 1:    x--------y
+    /// 2:                  w--------z
+    #[test]
+    fn non_overlapping() {
+        let iv1 = Bed3::new(1, 20, 30);
+        let iv2 = Bed3::new(1, 40, 50);
+        let expected = vec![Bed3::new(1, 20, 30), Bed3::new(1, 40, 50)];
+        let observed = iv1.segment(&iv2);
+        validate_segments(&observed, &expected);
     }
 
     /// a:    x--------y
