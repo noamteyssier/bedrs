@@ -286,18 +286,7 @@ where
         // If the low index is 0, then the query is potentially less than
         // all records in the set.
         if low == 0 {
-            let target = &self.records()[0];
-
-            // If the first record in the set has the same chromosome as the
-            // query and the start of the record is less than or equal to the
-            // start of the query, then return 0.
-            if target.chr() == query.chr() && target.start() <= query.start() {
-                Some(0)
-
-            // Otherwise, the query is less than all records in the set
-            } else {
-                None
-            }
+            None
         } else {
             // otherwise the low index is the index of the first record that
             // is greater than the query. We subtract 1 to get the index of
@@ -331,19 +320,7 @@ where
         // If the low index is 0, then the query is potentially less than
         // all records in the set.
         if low == 0 {
-            let target = &self.records()[0];
-
-            // If the first record in the set has the same chromosome as the
-            // query and the start of the record is less than or equal to the
-            // start of the query, and they share a strand then return 0.
-            if target.chr() == query.chr()
-                && target.start() <= query.start()
-                && target.strand() == query.strand()
-            {
-                Some(0)
-            } else {
-                None
-            }
+            None
         } else {
             // otherwise the low index is the index of the first record that
             // is greater than the query. We subtract 1 to get the index of
@@ -1081,5 +1058,31 @@ mod testing {
 
         let bound = set.stranded_downstream_bound(&query);
         assert_eq!(bound, Err(SetError::UnsortedSet));
+    }
+
+    #[test]
+    fn upstream_bound_smaller_initial_record() {
+        let records = vec![
+            Bed3::new(1, 10, 20),
+            Bed3::new(1, 30, 40),
+            Bed3::new(1, 50, 60),
+        ];
+        let set = IntervalContainer::from_sorted_unchecked(records);
+        let query = Bed3::new(1, 5, 25);
+        let bound = set.chr_bound_upstream_unchecked(&query);
+        assert_eq!(bound, None);
+    }
+
+    #[test]
+    fn upstream_bound_stranded_smaller_initial_record() {
+        let records = vec![
+            StrandedBed3::new(1, 10, 20, Strand::Forward),
+            StrandedBed3::new(1, 30, 40, Strand::Forward),
+            StrandedBed3::new(1, 50, 60, Strand::Forward),
+        ];
+        let set = IntervalContainer::from_sorted_unchecked(records);
+        let query = StrandedBed3::new(1, 5, 25, Strand::Forward);
+        let bound = set.stranded_upstream_bound_unchecked(&query);
+        assert_eq!(bound, None);
     }
 }
