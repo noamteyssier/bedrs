@@ -8,4 +8,6 @@ pub use iterator::{
     FindIter, FindIterOwned, FindIterSorted, FindIterSortedOwned, IntersectIter, IntervalIterOwned,
     IntervalIterRef, MergeIter, SubtractFromIter, SubtractIter,
 };
-pub use record::{BaseInterval, Bed12, Bed3, Bed4, Bed6, Gtf, MetaInterval, StrandedBed3};
+pub use record::{
+    BaseInterval, Bed12, Bed3, Bed4, Bed6, BedGraph, Gtf, MetaInterval, StrandedBed3,
+};

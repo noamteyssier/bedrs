@@ -1,53 +1,52 @@
 use crate::{
     traits::{ChromBounds, MetaBounds, ValueBounds},
     types::Score,
-    Bed12, Bed3, Bed6, BedGraph, Coordinates, Strand,
+    Bed12, Bed3, Bed6, Coordinates, Strand,
 };
 use num_traits::zero;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
-/// A representation of a Bed4 Interval.
+/// A representation of a `BedGraph` Interval.
 ///
 /// Has four values
 ///     1. `chr`
 ///     2. `start`
 ///     3. `end`
-///     4. `name`
+///     4. `score`
 ///
 /// ```
-/// use bedrs::{Coordinates, Bed4, Overlap};
+/// use bedrs::{Coordinates, BedGraph, Overlap};
 ///
-/// let a = Bed4::new(1, 20, 30, 10);
+/// let a = BedGraph::new(1, 20, 30, 10.0);
 /// assert_eq!(*a.chr(), 1);
 /// assert_eq!(a.start(), 20);
 /// assert_eq!(a.end(), 30);
-/// assert_eq!(*a.name(), 10);
+/// assert_eq!(a.score(), 10.0);
 ///
-/// let b = Bed4::new(1, 20, 30, 0);
+/// let b = BedGraph::new(1, 20, 30, 0.0);
 /// assert!(a.overlaps(&b));
 /// ```
 #[derive(Debug, Clone, Copy)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct Bed4<C, T, N> {
+pub struct BedGraph<C, T> {
     chr: C,
     start: T,
     end: T,
-    name: N,
+    score: f64,
 }
 
-impl<C, T, N> Coordinates<C, T> for Bed4<C, T, N>
+impl<C, T> Coordinates<C, T> for BedGraph<C, T>
 where
     C: ChromBounds,
     T: ValueBounds,
-    N: MetaBounds,
 {
     fn empty() -> Self {
         Self {
             chr: C::default(),
             start: zero::<T>(),
             end: zero::<T>(),
-            name: N::default(),
+            score: f64::default(),
         }
     }
     fn start(&self) -> T {
@@ -73,15 +72,14 @@ where
             chr: other.chr().clone(),
             start: other.start(),
             end: other.end(),
-            name: N::default(),
+            score: f64::default(),
         }
     }
 }
-impl<'a, C, T, N> Coordinates<C, T> for &'a Bed4<C, T, N>
+impl<'a, C, T> Coordinates<C, T> for &'a BedGraph<C, T>
 where
     C: ChromBounds,
     T: ValueBounds,
-    N: MetaBounds,
 {
     fn empty() -> Self {
         unreachable!("Cannot create an immutable empty reference")
@@ -112,11 +110,10 @@ where
         unimplemented!("Cannot create a new reference from a reference")
     }
 }
-impl<'a, C, T, N> Coordinates<C, T> for &'a mut Bed4<C, T, N>
+impl<'a, C, T> Coordinates<C, T> for &'a mut BedGraph<C, T>
 where
     C: ChromBounds,
     T: ValueBounds,
-    N: MetaBounds,
 {
     fn empty() -> Self {
         unreachable!("Cannot create an immutable empty reference")
@@ -145,87 +142,74 @@ where
     }
 }
 
-impl<C, T, N> Bed4<C, T, N>
+impl<C, T> BedGraph<C, T>
 where
     C: ChromBounds,
     T: ValueBounds,
-    N: MetaBounds,
 {
-    pub fn new(chr: C, start: T, end: T, name: N) -> Self {
+    pub fn new(chr: C, start: T, end: T, score: f64) -> Self {
         Self {
             chr,
             start,
             end,
-            name,
+            score,
         }
     }
 
-    pub fn name(&self) -> &N {
-        &self.name
+    pub fn score(&self) -> f64 {
+        self.score
     }
 
-    pub fn update_name(&mut self, val: &N) {
-        self.name = val.clone();
+    pub fn update_score(&mut self, val: f64) {
+        self.score = val;
     }
 }
 
-impl<C, T, N> From<Bed4<C, T, N>> for Bed3<C, T>
+impl<C, T> From<BedGraph<C, T>> for Bed3<C, T>
 where
     C: ChromBounds,
     T: ValueBounds,
 {
-    fn from(bed: Bed4<C, T, N>) -> Self {
+    fn from(bed: BedGraph<C, T>) -> Self {
         Self::new(bed.chr, bed.start, bed.end)
     }
 }
 
-impl<C, T, N> From<Bed4<C, T, N>> for BedGraph<C, T>
+impl<C, T, N> From<BedGraph<C, T>> for Bed6<C, T, N>
 where
     C: ChromBounds,
     T: ValueBounds,
-    N: MetaBounds,
-    f64: From<N>,
+    N: MetaBounds + std::convert::From<f64>,
 {
-    fn from(bed: Bed4<C, T, N>) -> Self {
-        Self::new(bed.chr, bed.start, bed.end, bed.name.into())
-    }
-}
-
-impl<C, T, N> From<Bed4<C, T, N>> for Bed6<C, T, N>
-where
-    C: ChromBounds,
-    T: ValueBounds,
-    N: MetaBounds,
-{
-    fn from(bed: Bed4<C, T, N>) -> Self {
+    fn from(bed: BedGraph<C, T>) -> Self {
         Self::new(
             bed.chr,
             bed.start,
             bed.end,
-            bed.name,
+            bed.score.into(),
             Score::default(),
             Strand::Unknown,
         )
     }
 }
 
-impl<C, T, N, Ts, Te, R, Si, St> From<Bed4<C, T, N>> for Bed12<C, T, N, Ts, Te, R, Si, St>
+impl<C, T, N, Ts, Te, R, Si, St> From<BedGraph<C, T>> for Bed12<C, T, N, Ts, Te, R, Si, St>
 where
     C: ChromBounds,
     T: ValueBounds,
-    N: MetaBounds,
+    N: MetaBounds + From<f64>,
     Ts: ValueBounds,
     Te: ValueBounds,
     R: MetaBounds,
     Si: MetaBounds,
     St: MetaBounds,
 {
-    fn from(bed: Bed4<C, T, N>) -> Self {
+    fn from(bed: BedGraph<C, T>) -> Self {
         Self::new(
             bed.chr,
             bed.start,
             bed.end,
-            bed.name,
+            bed.score.into(),
             Score::default(),
             Strand::Unknown,
             Ts::default(),
@@ -241,34 +225,39 @@ where
 #[cfg(test)]
 mod testing {
     use super::*;
+    use crate::Bed4;
+
+    fn float_eq(a: f64, b: f64) -> bool {
+        (a - b).abs() < f64::EPSILON
+    }
 
     #[test]
     fn test_init_chrom_numeric() {
-        let b = Bed4::new(1, 10, 20, "test".to_string());
+        let b = BedGraph::new(1, 10, 20, 66.6);
         assert_eq!(b.chr(), &1);
     }
 
     #[test]
     fn test_init_chrom_string() {
-        let b = Bed4::new("chr1".to_string(), 10, 20, "test".to_string());
+        let b = BedGraph::new("chr1".to_string(), 10, 20, 66.6);
         assert_eq!(b.chr(), "chr1");
     }
 
     #[test]
-    fn test_init_name_numeric() {
-        let b = Bed4::new(1, 10, 20, 30);
-        assert_eq!(b.name(), &30);
+    fn test_init_score_numeric() {
+        let b = BedGraph::new(1, 10, 20, 30.0);
+        assert!(float_eq(b.score(), 30.));
     }
 
     #[test]
-    fn test_init_name_string() {
-        let b = Bed4::new(1, 10, 20, "test".to_string());
-        assert_eq!(b.name(), "test");
+    fn test_init_score_string() {
+        let b = BedGraph::new(1, 10, 20, 66.6);
+        assert!(float_eq(b.score(), 66.6));
     }
 
     #[test]
     fn convert_to_bed3() {
-        let b = Bed4::new(1, 10, 20, "test".to_string());
+        let b = BedGraph::new(1, 10, 20, 66.6);
         let b3: Bed3<_, _> = b.into();
         assert_eq!(b3.chr(), &1);
         assert_eq!(b3.start(), 10);
@@ -276,25 +265,35 @@ mod testing {
     }
 
     #[test]
+    fn convert_to_bed4() {
+        let b = BedGraph::new(1, 10, 20, 66.6);
+        let b4: Bed6<_, _, f64> = b.into();
+        assert_eq!(b4.chr(), &1);
+        assert_eq!(b4.start(), 10);
+        assert_eq!(b4.end(), 20);
+        assert!(float_eq(*b4.name(), 66.6));
+    }
+
+    #[test]
     fn convert_to_bed6() {
-        let b = Bed4::new(1, 10, 20, "test".to_string());
-        let b6: Bed6<i32, i32, String> = b.into();
+        let b = BedGraph::new(1, 10, 20, 66.6);
+        let b6: Bed6<i32, i32, f64> = b.into();
         assert_eq!(b6.chr(), &1);
         assert_eq!(b6.start(), 10);
         assert_eq!(b6.end(), 20);
-        assert_eq!(b6.name(), "test");
         assert_eq!(b6.score(), Score(None));
         assert_eq!(b6.strand().unwrap(), Strand::Unknown);
+        assert!(float_eq(*b6.name(), 66.6));
     }
 
     #[test]
     fn convert_to_bed12() {
-        let b = Bed4::new(1, 10, 20, "test".to_string());
-        let b12: Bed12<i32, i32, String, i32, i32, i32, i32, i32> = b.into();
+        let b = BedGraph::new(1, 10, 20, 66.6);
+        let b12: Bed12<i32, i32, f64, i32, i32, i32, i32, i32> = b.into();
         assert_eq!(b12.chr(), &1);
         assert_eq!(b12.start(), 10);
         assert_eq!(b12.end(), 20);
-        assert_eq!(b12.name(), "test");
+        assert!(float_eq(*b12.name(), 66.6));
         assert_eq!(b12.score(), Score(None));
         assert_eq!(b12.strand().unwrap(), Strand::Unknown);
         assert_eq!(b12.thick_start(), 0);
@@ -308,21 +307,31 @@ mod testing {
     #[test]
     fn from_bed3() {
         let b3 = Bed3::new(1, 10, 20);
-        let b4: Bed4<_, _, String> = b3.into();
-        assert_eq!(b4.chr(), &1);
-        assert_eq!(b4.start(), 10);
-        assert_eq!(b4.end(), 20);
-        assert_eq!(b4.name(), "");
+        let bg: BedGraph<_, _> = b3.into();
+        assert_eq!(bg.chr(), &1);
+        assert_eq!(bg.start(), 10);
+        assert_eq!(bg.end(), 20);
+        assert!(float_eq(bg.score(), 0.));
+    }
+
+    #[test]
+    fn from_bed4() {
+        let b4 = Bed4::new(1, 10, 20, 66.6);
+        let bg: BedGraph<_, _> = b4.into();
+        assert_eq!(bg.chr(), &1);
+        assert_eq!(bg.start(), 10);
+        assert_eq!(bg.end(), 20);
+        assert!(float_eq(bg.score(), 66.6));
     }
 
     #[test]
     fn from_bed6() {
-        let b6 = Bed6::new(1, 10, 20, "test".to_string(), 30.into(), Strand::Unknown);
-        let b4: Bed4<_, _, String> = b6.into();
-        assert_eq!(b4.chr(), &1);
-        assert_eq!(b4.start(), 10);
-        assert_eq!(b4.end(), 20);
-        assert_eq!(b4.name(), "test");
+        let b6 = Bed6::new(1, 10, 20, 66.6, 30.into(), Strand::Unknown);
+        let bg: BedGraph<_, _> = b6.into();
+        assert_eq!(bg.chr(), &1);
+        assert_eq!(bg.start(), 10);
+        assert_eq!(bg.end(), 20);
+        assert!(float_eq(bg.score(), 66.6));
     }
 
     #[test]
@@ -331,7 +340,7 @@ mod testing {
             1,
             10,
             20,
-            "test".to_string(),
+            66.6,
             30.into(),
             Strand::Unknown,
             40,
@@ -341,11 +350,11 @@ mod testing {
             80,
             90,
         );
-        let b4: Bed4<_, _, String> = b12.into();
-        assert_eq!(b4.chr(), &1);
-        assert_eq!(b4.start(), 10);
-        assert_eq!(b4.end(), 20);
-        assert_eq!(b4.name(), "test");
+        let bg: BedGraph<_, _> = b12.into();
+        assert_eq!(bg.chr(), &1);
+        assert_eq!(bg.start(), 10);
+        assert_eq!(bg.end(), 20);
+        assert!(float_eq(bg.score(), 66.6));
     }
 }
 
@@ -356,28 +365,34 @@ mod serde_testing {
     use anyhow::Result;
     use csv::WriterBuilder;
 
+    fn float_eq(a: f64, b: f64) -> bool {
+        (a - b).abs() < f64::EPSILON
+    }
+
     #[test]
     fn test_csv_serialization() -> Result<()> {
-        let a = Bed4::new("chr1", 20, 30, "metadata");
+        let a = BedGraph::new("chr1", 20, 30, 66.6);
         let mut wtr = WriterBuilder::new().has_headers(false).from_writer(vec![]);
         wtr.serialize(a)?;
         let result = String::from_utf8(wtr.into_inner()?)?;
-        assert_eq!(result, "chr1,20,30,metadata\n");
+        assert_eq!(result, "chr1,20,30,66.6\n");
         Ok(())
     }
 
     #[test]
+    #[allow(unknown_lints)]
+    #[allow(clippy::float_cmp)]
     fn test_csv_deserialization() -> Result<()> {
-        let a = "chr1,20,30,metadata\n";
+        let a = "chr1,20,30,66.6\n";
         let mut rdr = csv::ReaderBuilder::new()
             .has_headers(false)
             .from_reader(a.as_bytes());
         let mut iter = rdr.deserialize();
-        let b: Bed4<String, i32, String> = iter.next().unwrap()?;
+        let b: BedGraph<String, i32> = iter.next().unwrap()?;
         assert_eq!(b.chr(), "chr1");
         assert_eq!(b.start(), 20);
         assert_eq!(b.end(), 30);
-        assert_eq!(b.name(), "metadata");
+        assert!(float_eq(b.score(), 66.6));
         Ok(())
     }
 }
