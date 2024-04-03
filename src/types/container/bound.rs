@@ -256,16 +256,9 @@ where
             }
 
         // if the partition point is the length of the records, then
-        // the query is potentially greater than all records in the set.
-        // If the last record shares a chromosome with the query, then
-        // it is the earliest record that shares a chromosome with the
-        // query.
+        // the query is greater than all records in the set.
         } else if bound == self.len() {
-            if self.records()[bound - 1].chr() == query.chr() {
-                Some(bound - 1)
-            } else {
-                None
-            }
+            None
         } else {
             Some(bound)
         }
@@ -1083,6 +1076,19 @@ mod testing {
         let set = IntervalContainer::from_sorted_unchecked(records);
         let query = StrandedBed3::new(1, 5, 25, Strand::Forward);
         let bound = set.stranded_upstream_bound_unchecked(&query);
+        assert_eq!(bound, None);
+    }
+
+    #[test]
+    fn bound_query_upstream_of_all() {
+        let records = vec![
+            Bed3::new(1, 10, 20),
+            Bed3::new(1, 30, 40),
+            Bed3::new(1, 50, 60),
+        ];
+        let set = IntervalContainer::from_sorted_unchecked(records);
+        let query = Bed3::new(2, 65, 75);
+        let bound = set.chr_bound_unchecked(&query);
         assert_eq!(bound, None);
     }
 }
