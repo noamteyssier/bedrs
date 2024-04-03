@@ -10,7 +10,7 @@ where
     C: ChromBounds,
     T: ValueBounds,
 {
-    fn grow_cluster(span: &mut I, iv: &I, starts: &mut Vec<T>, ends: &mut Vec<T>) {
+    fn grow_cluster(span: &mut I, iv: &I, endpoints: &mut Vec<T>, n_iv: &mut usize) {
         // Update the span
         let new_min = span.start().min(iv.start());
         let new_max = span.end().max(iv.end());
@@ -18,14 +18,18 @@ where
         span.update_end(&new_max);
 
         // store the start and end of current interval
-        starts.push(iv.start());
-        ends.push(iv.end());
+        endpoints.push(iv.start());
+        endpoints.push(iv.end());
+        *n_iv += 1;
     }
 
-    fn process_starts(reference: &I, starts: &[T], segments: &mut Vec<I>) {
-        for idx in 0..starts.len() - 1 {
-            let a = starts[idx];
-            let b = starts[idx + 1];
+    fn process_starts(reference: &I, endpoints: &[T], num_iv: usize, segments: &mut Vec<I>) {
+        for idx in 0..num_iv - 1 {
+            let a = endpoints[idx];
+            let b = endpoints[idx + 1];
+            if a == b {
+                continue;
+            }
             let mut seg = I::from(reference);
             seg.update_start(&a);
             seg.update_end(&b);
@@ -33,19 +37,25 @@ where
         }
     }
 
-    fn process_center(reference: &I, starts: &[T], ends: &[T], segments: &mut Vec<I>) {
-        let a = &starts[starts.len() - 1];
-        let b = &ends[0];
+    fn process_center(reference: &I, endpoints: &[T], num_iv: usize, segments: &mut Vec<I>) {
+        let a = &endpoints[num_iv - 1];
+        let b = &endpoints[num_iv];
+        if a >= b {
+            return;
+        }
         let mut inner_segment = I::from(reference);
         inner_segment.update_start(a);
         inner_segment.update_end(b);
         segments.push(inner_segment);
     }
 
-    fn process_ends(reference: &I, ends: &[T], segments: &mut Vec<I>) {
-        for idx in 0..ends.len() - 1 {
-            let a = ends[idx];
-            let b = ends[idx + 1];
+    fn process_ends(reference: &I, endpoints: &[T], num_iv: usize, segments: &mut Vec<I>) {
+        for idx in 0..num_iv - 1 {
+            let a = endpoints[num_iv + idx];
+            let b = endpoints[num_iv + idx + 1];
+            if a == b {
+                continue;
+            }
             let mut seg = I::from(reference);
             seg.update_start(&a);
             seg.update_end(&b);
@@ -53,50 +63,51 @@ where
         }
     }
 
-    fn segment_cluster(reference: &I, starts: &mut [T], ends: &mut [T], segments: &mut Vec<I>) {
-        starts.sort_unstable();
-        ends.sort_unstable();
-        Self::process_starts(reference, starts, segments);
-        Self::process_center(reference, starts, ends, segments);
-        Self::process_ends(reference, ends, segments);
+    fn segment_cluster(reference: &I, endpoints: &mut [T], n_iv: usize, segments: &mut Vec<I>) {
+        endpoints.sort_unstable();
+        Self::process_starts(reference, endpoints, n_iv, segments);
+        Self::process_center(reference, endpoints, n_iv, segments);
+        Self::process_ends(reference, endpoints, n_iv, segments);
     }
 
     /// Resets the cluster with the new interval
-    fn init_cluster(span: &mut I, interval: &I, starts: &mut Vec<T>, ends: &mut Vec<T>) {
+    fn init_cluster(span: &mut I, interval: &I, endpoints: &mut Vec<T>, n_iv: &mut usize) {
         // Reset the span with the new interval
         span.update_all_from(interval);
 
         // With the new span, reset the starts and ends
-        starts.clear();
-        ends.clear();
+        endpoints.clear();
+
+        // Reset the number of intervals
+        *n_iv = 0;
 
         // store the start and end of current interval
-        Self::grow_cluster(span, interval, starts, ends);
+        Self::grow_cluster(span, interval, endpoints, n_iv);
     }
 
     #[must_use]
     pub fn segment_unchecked(&self) -> Self {
         let mut segments = Vec::with_capacity(self.len());
-        let mut starts = Vec::with_capacity(self.len());
-        let mut ends = Vec::with_capacity(self.len());
+        let mut endpoints = Vec::with_capacity(self.len());
         let mut span = I::from(&self.records()[0]);
+        let mut n_iv = 0;
 
         for interval in self.records() {
             // Case where intervals are part of the same span
             if span.overlaps(interval) || span.borders(interval) {
-                Self::grow_cluster(&mut span, interval, &mut starts, &mut ends);
+                Self::grow_cluster(&mut span, interval, &mut endpoints, &mut n_iv);
             // Case where intervals are not part of the same span
             } else {
                 // Segment the cluster
-                Self::segment_cluster(interval, &mut starts, &mut ends, &mut segments);
+                Self::segment_cluster(interval, &mut endpoints, n_iv, &mut segments);
                 // Initialize a new cluster
-                Self::init_cluster(&mut span, interval, &mut starts, &mut ends);
+                Self::init_cluster(&mut span, interval, &mut endpoints, &mut n_iv);
             }
         }
 
         // Process any remainder members
-        if !starts.is_empty() {
-            Self::segment_cluster(&span, &mut starts, &mut ends, &mut segments);
+        if !endpoints.is_empty() {
+            Self::segment_cluster(&span, &mut endpoints, n_iv, &mut segments);
         }
 
         // Create a IntervalContainer with the segmented intervals
@@ -325,6 +336,175 @@ mod testing {
             Bed3::new(0, 30, 50),
             Bed3::new(0, 50, 70),
             Bed3::new(0, 70, 500),
+        ];
+        let observed = segments.records();
+        validate_segments(observed, &expected);
+    }
+
+    /// Container:
+    /// (a)    i-----j
+    /// (a)    i-----j
+    /// (b)      k---------l
+    /// (b)      k---------l
+    /// (c)        m----------n
+    /// (c)        m----------n
+    /// ===============================
+    /// (1)    i-k
+    /// (2)      k-m
+    /// (3)        m--j
+    /// (4)           j----l
+    /// (5)                l-n
+    #[test]
+    fn segment_container_duplicate_intervals() {
+        let intervals = vec![
+            Bed3::new(0, 10, 50),
+            Bed3::new(0, 10, 50),
+            Bed3::new(0, 30, 70),
+            Bed3::new(0, 30, 70),
+            Bed3::new(0, 50, 90),
+            Bed3::new(0, 50, 90),
+            Bed3::new(0, 100, 120),
+            Bed3::new(0, 100, 120),
+        ];
+        let set = IntervalContainer::from_unsorted(intervals);
+        let segments = set.segment().unwrap();
+        let expected = vec![
+            Bed3::new(0, 10, 30),
+            Bed3::new(0, 30, 50),
+            Bed3::new(0, 50, 70),
+            Bed3::new(0, 70, 90),
+            Bed3::new(0, 100, 120),
+        ];
+        let observed = segments.records();
+        validate_segments(observed, &expected);
+    }
+
+    /// Container:
+    /// (a)    i-----j
+    /// (a)    i---------l
+    /// (b)      k---------m
+    /// (c)        n----------p
+    /// ===============================
+    /// (1)    i-k
+    /// (2)      k-n
+    /// (3)        n--j
+    /// (4)           j--l
+    /// (5)              l-m
+    /// (6)                m--p
+    #[test]
+    fn segment_container_duplicate_start_sites() {
+        let intervals = vec![
+            Bed3::new(0, 10, 50),
+            Bed3::new(0, 10, 70),
+            Bed3::new(0, 30, 90),
+            Bed3::new(0, 50, 110),
+        ];
+        let set = IntervalContainer::from_unsorted(intervals);
+        let segments = set.segment().unwrap();
+        let expected = vec![
+            Bed3::new(0, 10, 30),
+            Bed3::new(0, 30, 50),
+            Bed3::new(0, 50, 70),
+            Bed3::new(0, 70, 90),
+            Bed3::new(0, 90, 110),
+        ];
+        let observed = segments.records();
+        validate_segments(observed, &expected);
+    }
+
+    /// Container:
+    /// (a)    i-------j
+    /// (b)      k---------m
+    /// (c)        n-------m
+    /// (d)           o----------p
+    /// ===============================
+    /// (1)    i-k
+    /// (2)      k-n
+    /// (3)        n-o
+    /// (4)          oj
+    /// (5)           j---m
+    /// (6)               m-----p
+    #[test]
+    fn segment_container_duplicate_end_sites() {
+        let intervals = vec![
+            Bed3::new(0, 10, 50),
+            Bed3::new(0, 20, 60),
+            Bed3::new(0, 30, 60),
+            Bed3::new(0, 40, 110),
+        ];
+        let set = IntervalContainer::from_unsorted(intervals);
+        let segments = set.segment().unwrap();
+        let expected = vec![
+            Bed3::new(0, 10, 20),
+            Bed3::new(0, 20, 30),
+            Bed3::new(0, 30, 40),
+            Bed3::new(0, 40, 50),
+            Bed3::new(0, 50, 60),
+            Bed3::new(0, 60, 110),
+        ];
+        let observed = segments.records();
+        validate_segments(observed, &expected);
+    }
+
+    /// Container:
+    /// (a)    i---------------------------j
+    /// (b)      k---------m
+    /// (c)                     n-------o
+    /// ========================================
+    /// (1)    i-k
+    /// (2)      k---------m
+    /// (3)                m----n
+    /// (4)                     n-------o
+    /// (5)                             o--j
+    #[test]
+    fn segment_container_spanned_internal_segments() {
+        let intervals = vec![
+            Bed3::new(0, 100, 200),
+            Bed3::new(0, 110, 150),
+            Bed3::new(0, 160, 180),
+        ];
+        let set = IntervalContainer::from_unsorted(intervals);
+        let segments = set.segment().unwrap();
+        let expected = vec![
+            Bed3::new(0, 100, 110),
+            Bed3::new(0, 110, 150),
+            Bed3::new(0, 150, 160),
+            Bed3::new(0, 160, 180),
+            Bed3::new(0, 180, 200),
+        ];
+        let observed = segments.records();
+        validate_segments(observed, &expected);
+    }
+
+    /// Container:
+    /// (a)    i---------------------------j
+    /// (b)      k---------m
+    /// (c)                     n-------o
+    /// (d)                                    p--q
+    /// ==============================================
+    /// (1)    i-k
+    /// (2)      k---------m
+    /// (3)                m----n
+    /// (4)                     n-------o
+    /// (5)                             o--j
+    /// (6)                                    p--q
+    #[test]
+    fn segment_container_spanned_internal_segments_with_clusters() {
+        let intervals = vec![
+            Bed3::new(0, 100, 200),
+            Bed3::new(0, 110, 150),
+            Bed3::new(0, 160, 180),
+            Bed3::new(0, 250, 270),
+        ];
+        let set = IntervalContainer::from_unsorted(intervals);
+        let segments = set.segment().unwrap();
+        let expected = vec![
+            Bed3::new(0, 100, 110),
+            Bed3::new(0, 110, 150),
+            Bed3::new(0, 150, 160),
+            Bed3::new(0, 160, 180),
+            Bed3::new(0, 180, 200),
+            Bed3::new(0, 250, 270),
         ];
         let observed = segments.records();
         validate_segments(observed, &expected);
