@@ -1,9 +1,11 @@
+mod cluster;
 mod complement;
 mod find;
 mod intersect;
 mod interval;
 mod merge;
 mod subtract;
+pub use cluster::ClusterIter;
 pub use complement::ComplementIter;
 pub use find::{FindIter, FindIterOwned, FindIterSorted, FindIterSortedOwned};
 pub use intersect::IntersectIter;

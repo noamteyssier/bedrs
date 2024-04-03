@@ -348,12 +348,15 @@ mod testing {
     /// (b)      k---------l
     /// (c)        m----------n
     /// (c)        m----------n
+    /// (d)                      o----p
+    /// (d)                      o----p
     /// ===============================
     /// (1)    i-k
     /// (2)      k-m
     /// (3)        m--j
     /// (4)           j----l
     /// (5)                l-n
+    /// (6)                      o---p
     #[test]
     fn segment_container_duplicate_intervals() {
         let intervals = vec![
