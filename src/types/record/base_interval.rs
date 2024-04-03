@@ -17,7 +17,7 @@ use serde::{Deserialize, Serialize};
 /// let b = BaseInterval::new(25, 35);
 /// assert!(a.overlaps(&b));
 /// ```
-#[derive(Debug, Clone, Copy, Hash)]
+#[derive(Debug, Clone, Copy)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct BaseInterval<T>
 where
@@ -154,6 +154,10 @@ mod testing {
 
         assert_eq!(iv.start(), start);
         assert_eq!(iv.end(), end);
+        assert_eq!(
+            format!("{iv:?}"),
+            "BaseInterval { chr: 0, start: 10, end: 100 }"
+        );
     }
 
     #[test]
