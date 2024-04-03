@@ -372,6 +372,70 @@ mod testing {
     use super::*;
 
     #[test]
+    fn test_init() {
+        let a: Bed12<String, usize, usize, usize, usize, usize, usize, usize> = Bed12::empty();
+        let b = a.clone();
+        assert_eq!(a.chr(), b.chr());
+        assert_eq!(a.start(), b.start());
+        assert_eq!(a.end(), b.end());
+        assert_eq!(a.name(), b.name());
+        assert_eq!(a.score(), b.score());
+        assert_eq!(a.strand().unwrap(), b.strand().unwrap());
+        assert_eq!(a.thick_start(), b.thick_start());
+        assert_eq!(a.thick_end(), b.thick_end());
+        assert_eq!(a.item_rgb(), b.item_rgb());
+        assert_eq!(a.block_count(), b.block_count());
+        assert_eq!(a.block_sizes(), b.block_sizes());
+        assert_eq!(a.block_starts(), b.block_starts());
+        assert_eq!(
+            format!("{a:?}"),
+            "Bed12 { chr: \"\", start: 0, end: 0, name: 0, score: Score(None), strand: Unknown, thick_start: 0, thick_end: 0, item_rgb: 0, block_count: 0, block_sizes: 0, block_starts: 0 }"
+        );
+    }
+
+    #[test]
+    fn test_updates() {
+        let mut a = Bed12::new(
+            "chr1".to_string(),
+            10,
+            20,
+            "name".to_string(),
+            1.into(),
+            Strand::Forward,
+            1,
+            2,
+            "0,0,0".to_string(),
+            1,
+            vec![1],
+            vec![1],
+        );
+        a.update_chr(&String::from("chr2"));
+        a.update_start(&20);
+        a.update_end(&30);
+        a.update_strand(Some(Strand::Reverse));
+        a.update_name(&String::from("new_name"));
+        a.update_score(2.into());
+        a.update_thick_start(&2);
+        a.update_thick_end(&3);
+        a.update_item_rgb(&String::from("1,1,1"));
+        a.update_block_count(&2);
+        a.update_block_sizes(&vec![1, 2]);
+        a.update_block_starts(&vec![1, 2]);
+        assert_eq!(a.chr(), "chr2");
+        assert_eq!(a.start(), 20);
+        assert_eq!(a.end(), 30);
+        assert_eq!(a.name(), "new_name");
+        assert_eq!(a.score(), 2.into());
+        assert_eq!(a.strand().unwrap(), Strand::Reverse);
+        assert_eq!(a.thick_start(), 2);
+        assert_eq!(a.thick_end(), 3);
+        assert_eq!(a.item_rgb(), "1,1,1");
+        assert_eq!(a.block_count(), 2);
+        assert_eq!(a.block_sizes(), &vec![1, 2]);
+        assert_eq!(a.block_starts(), &vec![1, 2]);
+    }
+
+    #[test]
     fn test_init_chrom_string() {
         let a = Bed12::new(
             "chr1".to_string(),
