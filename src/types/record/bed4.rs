@@ -1,7 +1,7 @@
 use crate::{
     traits::{ChromBounds, MetaBounds, ValueBounds},
     types::Score,
-    Bed12, Bed3, Bed6, Coordinates, Strand,
+    Bed12, Bed3, Bed6, BedGraph, Coordinates, Strand,
 };
 use num_traits::zero;
 #[cfg(feature = "serde")]
@@ -176,6 +176,18 @@ where
 {
     fn from(bed: Bed4<C, T, N>) -> Self {
         Self::new(bed.chr, bed.start, bed.end)
+    }
+}
+
+impl<C, T, N> From<Bed4<C, T, N>> for BedGraph<C, T>
+where
+    C: ChromBounds,
+    T: ValueBounds,
+    N: MetaBounds,
+    f64: From<N>,
+{
+    fn from(bed: Bed4<C, T, N>) -> Self {
+        Self::new(bed.chr, bed.start, bed.end, bed.name.into())
     }
 }
 
