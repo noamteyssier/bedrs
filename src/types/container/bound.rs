@@ -388,7 +388,7 @@ where
         // Iterate from the low bound to the end of the set and find the first
         // record that shares a strand with the query.
         // This will short-circuit on the first record that does not share a
-        // chromosome.
+        // chromosome and return None.
         let strand_bound = self.records()[lt_bound..]
             .iter()
             .enumerate()
@@ -396,34 +396,7 @@ where
             .find(|(_, iv)| iv.bounded_strand(query))?
             .0;
 
-        let low = lt_bound + strand_bound;
-
-        // If the low index is the length of the set, then the query is
-        // greater than all records in the set.
-        if low == self.len() {
-            None
-
-        // If the low index is 0, then the query is potentially less than
-        // all records in the set.
-        } else if low == 0 {
-            // If the first record in the set has the same chromosome as the
-            // query and shares a strand, then return 0.
-            if self.records()[0].chr() == query.chr()
-                && self.records()[0].strand() == query.strand()
-            {
-                Some(0)
-
-            // Otherwise, the query is less than all records in the set.
-            } else {
-                None
-            }
-        }
-        // If the low index is not 0 or the length of the set, then the query
-        // shares a chromosome and strand with at least one record in the set.
-        // Returns the earliest index of a record with the same chromosome
-        else {
-            Some(low)
-        }
+        Some(lt_bound + strand_bound)
     }
 }
 
@@ -1089,6 +1062,58 @@ mod testing {
         let set = IntervalContainer::from_sorted_unchecked(records);
         let query = Bed3::new(2, 65, 75);
         let bound = set.chr_bound_unchecked(&query);
+        assert_eq!(bound, None);
+    }
+
+    #[test]
+    fn bound_query_stranded_downstream_of_all() {
+        let records = vec![
+            StrandedBed3::new(1, 10, 20, Strand::Forward),
+            StrandedBed3::new(1, 30, 40, Strand::Forward),
+            StrandedBed3::new(1, 50, 60, Strand::Forward),
+        ];
+        let set = IntervalContainer::from_sorted_unchecked(records);
+        let query = StrandedBed3::new(1, 65, 75, Strand::Forward);
+        let bound = set.stranded_downstream_bound_unchecked(&query);
+        assert_eq!(bound, None);
+    }
+
+    #[test]
+    fn bound_query_stranded_downstream_bound_query_upstream_of_all() {
+        let records = vec![
+            StrandedBed3::new(1, 10, 20, Strand::Forward),
+            StrandedBed3::new(1, 30, 40, Strand::Forward),
+            StrandedBed3::new(1, 50, 60, Strand::Forward),
+        ];
+        let set = IntervalContainer::from_sorted_unchecked(records);
+        let query = StrandedBed3::new(1, 5, 10, Strand::Forward);
+        let bound = set.stranded_downstream_bound_unchecked(&query);
+        assert_eq!(bound, Some(0));
+    }
+
+    #[test]
+    fn bound_query_stranded_downstream_bound_query_upstream_of_all_no_shared_strand() {
+        let records = vec![
+            StrandedBed3::new(1, 10, 20, Strand::Forward),
+            StrandedBed3::new(1, 30, 40, Strand::Forward),
+            StrandedBed3::new(1, 50, 60, Strand::Forward),
+        ];
+        let set = IntervalContainer::from_sorted_unchecked(records);
+        let query = StrandedBed3::new(1, 5, 10, Strand::Reverse);
+        let bound = set.stranded_downstream_bound_unchecked(&query);
+        assert_eq!(bound, None);
+    }
+
+    #[test]
+    fn bound_query_stranded_downstream_bound_query_upstream_of_all_no_shared_chr() {
+        let records = vec![
+            StrandedBed3::new(2, 10, 20, Strand::Forward),
+            StrandedBed3::new(2, 30, 40, Strand::Forward),
+            StrandedBed3::new(2, 50, 60, Strand::Forward),
+        ];
+        let set = IntervalContainer::from_sorted_unchecked(records);
+        let query = StrandedBed3::new(1, 5, 10, Strand::Forward);
+        let bound = set.stranded_downstream_bound_unchecked(&query);
         assert_eq!(bound, None);
     }
 }
