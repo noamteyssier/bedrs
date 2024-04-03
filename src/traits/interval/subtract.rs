@@ -183,10 +183,8 @@ where
                 }
             } else if self.gt(other) {
                 Some(vec![self.build_gt(other)])
-            } else if self.lt(other) {
-                Some(vec![self.build_lt(other)])
             } else {
-                todo!()
+                Some(vec![self.build_lt(other)])
             }
         } else {
             Some(vec![self.build_self(other)])
@@ -205,11 +203,9 @@ where
             } else if self.gt(other) {
                 let iv = self.build_gt(other);
                 Box::new(std::iter::once(iv))
-            } else if self.lt(other) {
+            } else {
                 let iv = self.build_lt(other);
                 Box::new(std::iter::once(iv))
-            } else {
-                todo!()
             }
         } else {
             let iv = self.build_self(other);
