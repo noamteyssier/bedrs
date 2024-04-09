@@ -13,7 +13,7 @@ use serde::{Deserialize, Serialize};
 /// This is an associated metadata and is not used in comparisons.
 ///
 /// ```
-/// use bedrs::{Coordinates, StrandedBed3, Overlap, Strand};
+/// use bedrs::{Coordinates, StrandedBed3, Overlap, Strand, StrandedOverlap};
 ///
 /// let a = StrandedBed3::new(1, 20, 30, Strand::Forward);
 /// assert_eq!(*a.chr(), 1);
