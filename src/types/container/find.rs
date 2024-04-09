@@ -1,10 +1,7 @@
 // use super::Container;
 use crate::{
     traits::{errors::SetError, ChromBounds, IntervalBounds, ValueBounds},
-    types::{
-        FindIter, FindIterOwned, FindIterSorted, FindIterSortedOwned, IntervalContainer,
-        QueryMethod,
-    },
+    types::{FindIterSorted, FindIterSortedOwned, IntervalContainer, Query},
 };
 use anyhow::Result;
 
@@ -15,630 +12,124 @@ where
     C: ChromBounds,
     T: ValueBounds,
 {
-    pub fn find_method<Iv>(
-        &self,
-        query: &Iv,
-        method: QueryMethod<T>,
-    ) -> Result<IntervalContainer<I, C, T>, SetError>
-    where
-        Iv: IntervalBounds<C, T>,
-    {
-        match method {
-            QueryMethod::Compare => Ok(self.find(query)),
-            QueryMethod::CompareBy(minimum) => Ok(self.find_min(query, minimum)),
-            QueryMethod::CompareExact(exact) => Ok(self.find_exact(query, exact)),
-            QueryMethod::CompareByQueryFraction(frac) => self.find_query_frac(query, frac),
-            QueryMethod::CompareByTargetFraction(frac) => self.find_target_frac(query, frac),
-            QueryMethod::CompareReciprocalFractionOr(f_query, f_target) => {
-                self.find_reciprocal_frac_either(query, f_query, f_target)
-            }
-            QueryMethod::CompareReciprocalFractionAnd(f_query, f_target) => {
-                self.find_reciprocal_frac(query, f_query, f_target)
-            }
-        }
-    }
-
-    /// Finds all intervals that overlap a query and returns
-    /// the same `Container` type with all found regions.
-    #[must_use]
-    pub fn find<Iv>(&self, query: &Iv) -> IntervalContainer<I, C, T>
-    where
-        Iv: IntervalBounds<C, T>,
-    {
-        let records = self.find_iter(query).cloned().collect::<Vec<I>>();
-        IntervalContainer::new(records)
-    }
-
-    /// Finds all intervals that overlap a query by some minimum
-    /// amount and returns the same `Container` type with all found regions.
-    #[must_use]
-    pub fn find_min<Iv>(&self, query: &Iv, minimum: T) -> IntervalContainer<I, C, T>
-    where
-        Iv: IntervalBounds<C, T>,
-    {
-        let records = self
-            .find_iter_min(query, minimum)
-            .cloned()
-            .collect::<Vec<I>>();
-        IntervalContainer::new(records)
-    }
-
-    /// Finds all intervals that overlap a query by some exact
-    /// amount and returns the same `Container` type with all found regions.
-    #[must_use]
-    pub fn find_exact<Iv>(&self, query: &Iv, exact: T) -> IntervalContainer<I, C, T>
-    where
-        Iv: IntervalBounds<C, T>,
-    {
-        let records = self
-            .find_iter_exact(query, exact)
-            .cloned()
-            .collect::<Vec<I>>();
-        IntervalContainer::new(records)
-    }
-
-    /// Finds all intervals that overlap a query by some fraction
-    /// of the query length and returns the same `Container` type with all found regions.
-    pub fn find_query_frac<Iv>(
-        &self,
-        query: &Iv,
-        frac: f64,
-    ) -> Result<IntervalContainer<I, C, T>, SetError>
-    where
-        Iv: IntervalBounds<C, T>,
-    {
-        let records = match self.find_iter_query_frac(query, frac) {
-            Ok(iter) => iter.into_iter().cloned().collect::<Vec<I>>(),
-            Err(e) => return Err(e),
-        };
-        Ok(IntervalContainer::new(records))
-    }
-
-    /// Finds all intervals that overlap a query by some fraction
-    /// of the target length and returns the same `Container` type with all found regions.
-    pub fn find_target_frac<Iv>(
-        &self,
-        query: &Iv,
-        frac: f64,
-    ) -> Result<IntervalContainer<I, C, T>, SetError>
-    where
-        Iv: IntervalBounds<C, T>,
-    {
-        let records = match self.find_iter_target_frac(query, frac) {
-            Ok(iter) => iter.into_iter().cloned().collect::<Vec<I>>(),
-            Err(e) => return Err(e),
-        };
-        Ok(IntervalContainer::new(records))
-    }
-
-    /// Finds all intervals that overlap a query by some fraction
-    /// of **both** the query and target lengths and returns the
-    /// same `Container` type with all found regions.
-    pub fn find_reciprocal_frac<Iv>(
-        &self,
-        query: &Iv,
-        f_query: f64,
-        f_target: f64,
-    ) -> Result<IntervalContainer<I, C, T>, SetError>
-    where
-        Iv: IntervalBounds<C, T>,
-    {
-        let records = match self.find_iter_reciprocal_frac(query, f_query, f_target) {
-            Ok(iter) => iter.into_iter().cloned().collect::<Vec<I>>(),
-            Err(e) => return Err(e),
-        };
-        Ok(IntervalContainer::new(records))
-    }
-
-    /// Finds all intervals that overlap a query by some fraction
-    /// of **either** the query and target lengths and returns the
-    /// same `Container` type with all found regions.
-    pub fn find_reciprocal_frac_either<Iv>(
-        &self,
-        query: &Iv,
-        f_query: f64,
-        f_target: f64,
-    ) -> Result<IntervalContainer<I, C, T>, SetError>
-    where
-        Iv: IntervalBounds<C, T>,
-    {
-        let records = match self.find_iter_reciprocal_frac_either(query, f_query, f_target) {
-            Ok(iter) => iter.into_iter().cloned().collect::<Vec<I>>(),
-            Err(e) => return Err(e),
-        };
-        Ok(IntervalContainer::new(records))
-    }
-
-    /// Creates an iterator that finds all overlapping regions
+    /// Find all intervals that overlap a query interval
+    /// and return an iterator over the intervals.
     ///
-    /// Does not assume a sorted Container
-    pub fn find_iter<'a, Iv>(&'a self, query: &'a Iv) -> FindIter<'_, C, T, I, Iv>
-    where
-        Iv: IntervalBounds<C, T>,
-    {
-        FindIter::new(self.records(), query, QueryMethod::Compare)
-    }
-
-    /// Creates an iterator that finds all overlapping regions
-    ///
-    /// Does not assume a sorted Container
-    pub fn find_iter_owned<Iv>(&self, query: Iv) -> FindIterOwned<'_, C, T, I, Iv>
-    where
-        Iv: IntervalBounds<C, T>,
-    {
-        FindIterOwned::new(self.records(), query, QueryMethod::Compare)
-    }
-
-    /// Creates an iterator that finds all overlapping regions
-    /// by some minimum overlap
-    ///
-    /// Does not assume a sorted Container
-    pub fn find_iter_min<'a, Iv>(&'a self, query: &'a Iv, minimum: T) -> FindIter<'_, C, T, I, Iv>
-    where
-        Iv: IntervalBounds<C, T>,
-    {
-        FindIter::new(self.records(), query, QueryMethod::CompareBy(minimum))
-    }
-
-    /// Creates an iterator that finds all overlapping regions
-    /// by some exact overlap
-    ///
-    /// Does not assume a sorted Container
-    pub fn find_iter_exact<'a, Iv>(&'a self, query: &'a Iv, exact: T) -> FindIter<'_, C, T, I, Iv>
-    where
-        Iv: IntervalBounds<C, T>,
-    {
-        FindIter::new(self.records(), query, QueryMethod::CompareExact(exact))
-    }
-
-    /// Creates an iterator that finds all overlapping regions
-    /// by some fraction of the query length
-    ///
-    /// Does not assume a sorted Container
-    pub fn find_iter_query_frac<'a, Iv>(
+    /// Will return an error if the set is not sorted.
+    pub fn query_iter<'a, Iv>(
         &'a self,
         query: &'a Iv,
-        frac: f64,
-    ) -> Result<FindIter<'_, C, T, I, Iv>, SetError>
-    where
-        Iv: IntervalBounds<C, T>,
-    {
-        if frac <= 0.0 || frac > 1.0 {
-            return Err(SetError::FractionUnbounded { frac });
-        }
-        Ok(FindIter::new(
-            self.records(),
-            query,
-            QueryMethod::CompareByQueryFraction(frac),
-        ))
-    }
-
-    /// Creates an iterator that finds all overlapping regions
-    /// by some fraction of the target length
-    ///
-    /// Does not assume a sorted Container
-    pub fn find_iter_target_frac<'a, Iv>(
-        &'a self,
-        query: &'a Iv,
-        frac: f64,
-    ) -> Result<FindIter<'_, C, T, I, Iv>, SetError>
-    where
-        Iv: IntervalBounds<C, T>,
-    {
-        if frac <= 0.0 || frac > 1.0 {
-            return Err(SetError::FractionUnbounded { frac });
-        }
-        Ok(FindIter::new(
-            self.records(),
-            query,
-            QueryMethod::CompareByTargetFraction(frac),
-        ))
-    }
-
-    /// Creates an iterator that finds all overlapping regions
-    /// by some fraction of **both** the query and target length
-    ///
-    /// Does not assume a sorted Container
-    pub fn find_iter_reciprocal_frac<'a, Iv>(
-        &'a self,
-        query: &'a Iv,
-        f_query: f64,
-        f_target: f64,
-    ) -> Result<FindIter<'_, C, T, I, Iv>, SetError>
-    where
-        Iv: IntervalBounds<C, T>,
-    {
-        if f_query <= 0.0 || f_query > 1.0 {
-            return Err(SetError::FractionUnbounded { frac: f_query });
-        } else if f_target <= 0.0 || f_target > 1.0 {
-            return Err(SetError::FractionUnbounded { frac: f_target });
-        }
-        Ok(FindIter::new(
-            self.records(),
-            query,
-            QueryMethod::CompareReciprocalFractionAnd(f_query, f_target),
-        ))
-    }
-
-    /// Creates an iterator that finds all overlapping regions
-    /// by some fraction of **either** the query and target length
-    ///
-    /// Does not assume a sorted Container
-    pub fn find_iter_reciprocal_frac_either<'a, Iv>(
-        &'a self,
-        query: &'a Iv,
-        f_query: f64,
-        f_target: f64,
-    ) -> Result<FindIter<'_, C, T, I, Iv>, SetError>
-    where
-        Iv: IntervalBounds<C, T>,
-    {
-        if f_query <= 0.0 || f_query > 1.0 {
-            return Err(SetError::FractionUnbounded { frac: f_query });
-        } else if f_target <= 0.0 || f_target > 1.0 {
-            return Err(SetError::FractionUnbounded { frac: f_target });
-        }
-        Ok(FindIter::new(
-            self.records(),
-            query,
-            QueryMethod::CompareReciprocalFractionOr(f_query, f_target),
-        ))
-    }
-
-    /// Creates a Result Iterator that finds all overlapping regions
-    ///
-    /// First checks to see if container is sorted
-    pub fn find_iter_sorted<'a, Iv>(
-        &'a self,
-        query: &'a Iv,
+        method: Query<T>,
     ) -> Result<FindIterSorted<'_, C, T, I, Iv>, SetError>
     where
         Iv: IntervalBounds<C, T>,
     {
         if self.is_sorted() {
-            Ok(self.find_iter_sorted_unchecked(query))
+            self.query_iter_unchecked(query, method)
         } else {
             Err(SetError::UnsortedSet)
         }
     }
 
-    /// Creates a Result Iterator that finds all overlapping regions
-    /// by some minimum overlap
+    /// Find all intervals that overlap a query interval
+    /// and return an iterator over the intervals.
     ///
-    /// First checks to see if container is sorted
-    pub fn find_iter_sorted_min<'a, Iv>(
+    /// Assumes the set is sorted.
+    pub fn query_iter_unchecked<'a, Iv>(
         &'a self,
         query: &'a Iv,
-        minimum: T,
+        method: Query<T>,
     ) -> Result<FindIterSorted<'_, C, T, I, Iv>, SetError>
     where
         Iv: IntervalBounds<C, T>,
     {
-        if self.is_sorted() {
-            Ok(self.find_iter_sorted_min_unchecked(query, minimum))
-        } else {
-            Err(SetError::UnsortedSet)
-        }
-    }
-
-    /// Creates a Result Iterator that finds all overlapping regions
-    /// by some exact overlap
-    ///
-    /// First checks to see if container is sorted
-    pub fn find_iter_sorted_exact<'a, Iv>(
-        &'a self,
-        query: &'a Iv,
-        exact: T,
-    ) -> Result<FindIterSorted<'_, C, T, I, Iv>, SetError>
-    where
-        Iv: IntervalBounds<C, T>,
-    {
-        if self.is_sorted() {
-            Ok(self.find_iter_sorted_exact_unchecked(query, exact))
-        } else {
-            Err(SetError::UnsortedSet)
-        }
-    }
-
-    /// Creates a Result Iterator that finds all overlapping regions
-    /// by some fraction of the query length
-    ///
-    /// First checks to see if container is sorted
-    pub fn find_iter_sorted_query_frac<'a, Iv>(
-        &'a self,
-        query: &'a Iv,
-        frac: f64,
-    ) -> Result<FindIterSorted<'_, C, T, I, Iv>, SetError>
-    where
-        Iv: IntervalBounds<C, T>,
-    {
-        if self.is_sorted() {
-            Ok(self.find_iter_sorted_query_frac_unchecked(query, frac)?)
-        } else {
-            Err(SetError::UnsortedSet)
-        }
-    }
-
-    /// Creates a Result Iterator that finds all overlapping regions
-    /// by some fraction of the target length
-    ///
-    /// First checks to see if container is sorted
-    pub fn find_iter_sorted_target_frac<'a, Iv>(
-        &'a self,
-        query: &'a Iv,
-        frac: f64,
-    ) -> Result<FindIterSorted<'_, C, T, I, Iv>, SetError>
-    where
-        Iv: IntervalBounds<C, T>,
-    {
-        if self.is_sorted() {
-            Ok(self.find_iter_sorted_target_frac_unchecked(query, frac)?)
-        } else {
-            Err(SetError::UnsortedSet)
-        }
-    }
-
-    /// Creates a Result Iterator that finds all overlapping regions
-    /// by some fraction of **both** the query and target length
-    ///
-    /// First checks to see if container is sorted
-    pub fn find_iter_sorted_reciprocal_frac<'a, Iv>(
-        &'a self,
-        query: &'a Iv,
-        f_query: f64,
-        f_target: f64,
-    ) -> Result<FindIterSorted<'_, C, T, I, Iv>, SetError>
-    where
-        Iv: IntervalBounds<C, T>,
-    {
-        if self.is_sorted() {
-            Ok(self.find_iter_sorted_reciprocal_frac_unchecked(query, f_query, f_target)?)
-        } else {
-            Err(SetError::UnsortedSet)
-        }
-    }
-
-    /// Creates a Result Iterator that finds all overlapping regions
-    /// by some fraction of **both** the query and target length
-    ///
-    /// First checks to see if container is sorted
-    pub fn find_iter_sorted_reciprocal_frac_either<'a, Iv>(
-        &'a self,
-        query: &'a Iv,
-        f_query: f64,
-        f_target: f64,
-    ) -> Result<FindIterSorted<'_, C, T, I, Iv>, SetError>
-    where
-        Iv: IntervalBounds<C, T>,
-    {
-        if self.is_sorted() {
-            Ok(self.find_iter_sorted_reciprocal_frac_either_unchecked(query, f_query, f_target)?)
-        } else {
-            Err(SetError::UnsortedSet)
-        }
-    }
-
-    /// Creates an Iterator that finds all overlapping regions
-    ///
-    /// Assumes a sorted Container.
-    pub fn find_iter_sorted_unchecked<'a, Iv>(
-        &'a self,
-        query: &'a Iv,
-    ) -> FindIterSorted<'_, C, T, I, Iv>
-    where
-        Iv: IntervalBounds<C, T>,
-    {
-        FindIterSorted::new(
+        method.validate()?;
+        Ok(FindIterSorted::new(
             self.records(),
             query,
             self.lower_bound_unchecked(query),
-            QueryMethod::Compare,
-        )
+            method,
+        ))
     }
-
-    /// Creates an Iterator that finds all overlapping regions
+    /// Find all intervals that overlap a query interval
+    /// and return an iterator over the intervals.
     ///
-    /// Assumes a sorted Container.
-    pub fn find_iter_sorted_owned_unchecked<Iv>(
+    /// Will return an error if the set is not sorted.
+    pub fn query_iter_owned<Iv>(
         &self,
         query: Iv,
-    ) -> FindIterSortedOwned<'_, C, T, I, Iv>
+        method: Query<T>,
+    ) -> Result<FindIterSortedOwned<'_, C, T, I, Iv>, SetError>
     where
         Iv: IntervalBounds<C, T>,
     {
-        let offset = self.lower_bound_unchecked(&query);
-        FindIterSortedOwned::new(self.records(), query, offset, QueryMethod::Compare)
-    }
-
-    /// Creates an Iterator that finds all overlapping regions
-    /// by some minimum overlap
-    ///
-    /// Assumes a sorted Container.
-    pub fn find_iter_sorted_min_unchecked<'a, Iv>(
-        &'a self,
-        query: &'a Iv,
-        minimum: T,
-    ) -> FindIterSorted<'_, C, T, I, Iv>
-    where
-        Iv: IntervalBounds<C, T>,
-    {
-        FindIterSorted::new(
-            self.records(),
-            query,
-            self.lower_bound_unchecked(query),
-            QueryMethod::CompareBy(minimum),
-        )
-    }
-
-    /// Creates an Iterator that finds all overlapping regions
-    /// by some exact overlap
-    ///
-    /// Assumes a sorted Container.
-    pub fn find_iter_sorted_exact_unchecked<'a, Iv>(
-        &'a self,
-        query: &'a Iv,
-        exact: T,
-    ) -> FindIterSorted<'_, C, T, I, Iv>
-    where
-        Iv: IntervalBounds<C, T>,
-    {
-        FindIterSorted::new(
-            self.records(),
-            query,
-            self.lower_bound_unchecked(query),
-            QueryMethod::CompareExact(exact),
-        )
-    }
-
-    /// Creates an Iterator that finds all overlapping regions
-    /// by some fraction of the query length
-    ///
-    /// Assumes a sorted Container.
-    pub fn find_iter_sorted_query_frac_unchecked<'a, Iv>(
-        &'a self,
-        query: &'a Iv,
-        frac: f64,
-    ) -> Result<FindIterSorted<'_, C, T, I, Iv>, SetError>
-    where
-        Iv: IntervalBounds<C, T>,
-    {
-        if frac <= 0.0 || frac > 1.0 {
-            return Err(SetError::FractionUnbounded { frac });
+        if self.is_sorted() {
+            self.query_iter_owned_unchecked(query, method)
+        } else {
+            Err(SetError::UnsortedSet)
         }
-        Ok(FindIterSorted::new(
+    }
+
+    /// Find all intervals that overlap a query interval
+    /// and return an iterator over the intervals.
+    ///
+    /// Assumes the set is sorted.
+    pub fn query_iter_owned_unchecked<Iv>(
+        &self,
+        query: Iv,
+        method: Query<T>,
+    ) -> Result<FindIterSortedOwned<'_, C, T, I, Iv>, SetError>
+    where
+        Iv: IntervalBounds<C, T>,
+    {
+        method.validate()?;
+        let bound = self.lower_bound_unchecked(&query);
+        Ok(FindIterSortedOwned::new(
             self.records(),
             query,
-            self.lower_bound_unchecked(query),
-            QueryMethod::CompareByQueryFraction(frac),
+            bound,
+            method,
         ))
     }
 
-    /// Creates an Iterator that finds all overlapping regions
-    /// by some fraction of the target length
+    /// Find all intervals that overlap a query interval
+    /// and return an `IntervalContainer` containing the intervals.
     ///
-    /// Assumes a sorted Container.
-    pub fn find_iter_sorted_target_frac_unchecked<'a, Iv>(
+    /// Will return an error if the set is not sorted.
+    pub fn query_unchecked<'a, Iv>(
         &'a self,
         query: &'a Iv,
-        frac: f64,
-    ) -> Result<FindIterSorted<'_, C, T, I, Iv>, SetError>
+        method: Query<T>,
+    ) -> Result<IntervalContainer<I, C, T>, SetError>
     where
         Iv: IntervalBounds<C, T>,
     {
-        if frac <= 0.0 || frac > 1.0 {
-            return Err(SetError::FractionUnbounded { frac });
-        }
-        Ok(FindIterSorted::new(
-            self.records(),
-            query,
-            self.lower_bound_unchecked(query),
-            QueryMethod::CompareByTargetFraction(frac),
-        ))
+        Ok(self.query_iter_unchecked(query, method)?.cloned().collect())
     }
 
-    /// Creates an Iterator that finds all overlapping regions
-    /// by some fraction of **both** the query and target length
+    /// Find all intervals that overlap a query interval
+    /// and return an `IntervalContainer` containing the intervals.
     ///
-    /// Assumes a sorted Container.
-    pub fn find_iter_sorted_reciprocal_frac_unchecked<'a, Iv>(
+    /// Assumes the set is sorted.
+    pub fn query<'a, Iv>(
         &'a self,
         query: &'a Iv,
-        f_query: f64,
-        f_target: f64,
-    ) -> Result<FindIterSorted<'_, C, T, I, Iv>, SetError>
+        method: Query<T>,
+    ) -> Result<IntervalContainer<I, C, T>, SetError>
     where
         Iv: IntervalBounds<C, T>,
     {
-        if f_query <= 0.0 || f_query > 1.0 {
-            return Err(SetError::FractionUnbounded { frac: f_query });
-        } else if f_target <= 0.0 || f_target > 1.0 {
-            return Err(SetError::FractionUnbounded { frac: f_target });
-        }
-        Ok(FindIterSorted::new(
-            self.records(),
-            query,
-            self.lower_bound_unchecked(query),
-            QueryMethod::CompareReciprocalFractionAnd(f_query, f_target),
-        ))
-    }
-
-    /// Creates an Iterator that finds all overlapping regions
-    /// by some fraction of **either** the query and target length
-    ///
-    /// Assumes a sorted Container.
-    pub fn find_iter_sorted_reciprocal_frac_either_unchecked<'a, Iv>(
-        &'a self,
-        query: &'a Iv,
-        f_query: f64,
-        f_target: f64,
-    ) -> Result<FindIterSorted<'_, C, T, I, Iv>, SetError>
-    where
-        Iv: IntervalBounds<C, T>,
-    {
-        if f_query <= 0.0 || f_query > 1.0 {
-            return Err(SetError::FractionUnbounded { frac: f_query });
-        } else if f_target <= 0.0 || f_target > 1.0 {
-            return Err(SetError::FractionUnbounded { frac: f_target });
-        }
-        Ok(FindIterSorted::new(
-            self.records(),
-            query,
-            self.lower_bound_unchecked(query),
-            QueryMethod::CompareReciprocalFractionOr(f_query, f_target),
-        ))
-    }
-
-    /// Creates an Iterator that finds all overlapping regions
-    /// given some method of comparison
-    pub fn find_iter_sorted_method_unchecked<'a, Iv>(
-        &'a self,
-        query: &'a Iv,
-        method: QueryMethod<T>,
-    ) -> Result<FindIterSorted<'_, C, T, I, Iv>, SetError>
-    where
-        Iv: IntervalBounds<C, T>,
-    {
-        match method {
-            QueryMethod::Compare => {
-                let iter = self.find_iter_sorted_unchecked(query);
-                Ok(iter)
-            }
-            QueryMethod::CompareBy(minimum) => {
-                let iter = self.find_iter_sorted_min_unchecked(query, minimum);
-                Ok(iter)
-            }
-            QueryMethod::CompareExact(exact) => {
-                let iter = self.find_iter_sorted_exact_unchecked(query, exact);
-                Ok(iter)
-            }
-            QueryMethod::CompareByQueryFraction(frac) => {
-                let iter = self.find_iter_sorted_query_frac_unchecked(query, frac)?;
-                Ok(iter)
-            }
-            QueryMethod::CompareByTargetFraction(frac) => {
-                let iter = self.find_iter_sorted_target_frac_unchecked(query, frac)?;
-                Ok(iter)
-            }
-            QueryMethod::CompareReciprocalFractionAnd(f_query, f_target) => {
-                let iter =
-                    self.find_iter_sorted_reciprocal_frac_unchecked(query, f_query, f_target)?;
-                Ok(iter)
-            }
-            QueryMethod::CompareReciprocalFractionOr(f_query, f_target) => {
-                let iter = self
-                    .find_iter_sorted_reciprocal_frac_either_unchecked(query, f_query, f_target)?;
-                Ok(iter)
-            }
-        }
+        self.query_iter(query, method)
+            .map(|iter| iter.cloned().collect())
     }
 }
 
 #[cfg(test)]
 #[allow(clippy::needless_range_loop)]
 mod testing {
-    // use super::Find;
     use crate::{
         traits::{ChromBounds, IntervalBounds, ValueBounds},
+        types::{Query, QueryMethod},
         BaseInterval, Bed3, Coordinates, IntervalContainer,
     };
 
@@ -680,7 +171,8 @@ mod testing {
             .map(|(s, e)| BaseInterval::new(*s, *e))
             .collect::<Vec<BaseInterval<u32>>>();
         let set = IntervalContainer::from_unsorted(records);
-        let overlaps = set.find(&query);
+        let method = Query::default();
+        let overlaps = set.query(&query, method).unwrap();
         assert_eq!(overlaps.len(), 4);
     }
 
@@ -689,7 +181,7 @@ mod testing {
         let query = BaseInterval::new(0, 100);
         let intervals = vec![BaseInterval::new(10, 20)];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
-        let overlaps = set.find(&query);
+        let overlaps = set.query(&query, Query::default()).unwrap();
         assert_eq!(overlaps.len(), 1);
     }
 
@@ -698,13 +190,13 @@ mod testing {
         let query = BaseInterval::new(0, 100);
         let intervals = vec![BaseInterval::new(10, 20)];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
-        let overlaps = set.find_iter_sorted(&query).unwrap();
+        let overlaps = set.query_iter(&query, Query::default()).unwrap();
         let counts = overlaps.count();
         assert_eq!(counts, 1);
     }
 
     #[test]
-    fn find_minimum() {
+    fn find_minimum_overlap() {
         let query = BaseInterval::new(17, 27);
         let starts = [10, 15, 20, 25];
         let ends = [40, 45, 50, 55];
@@ -714,7 +206,8 @@ mod testing {
             .map(|(s, e)| BaseInterval::new(*s, *e))
             .collect::<Vec<BaseInterval<u32>>>();
         let set = IntervalContainer::from_unsorted(records);
-        let overlaps = set.find_min(&query, 5);
+        let method = Query::new_predicate(QueryMethod::CompareBy(5));
+        let overlaps = set.query(&query, method).unwrap();
         assert_eq!(overlaps.len(), 3);
     }
 
@@ -729,7 +222,8 @@ mod testing {
             .map(|(s, e)| BaseInterval::new(*s, *e))
             .collect::<Vec<BaseInterval<u32>>>();
         let set = IntervalContainer::from_unsorted(records);
-        let overlaps = set.find_exact(&query, 7);
+        let method = Query::new_predicate(QueryMethod::CompareExact(7));
+        let overlaps = set.query(&query, method).unwrap();
         assert_eq!(overlaps.len(), 1);
     }
 
@@ -744,7 +238,7 @@ mod testing {
             .map(|(s, e)| BaseInterval::new(*s, *e))
             .collect::<Vec<BaseInterval<u32>>>();
         let set = IntervalContainer::from_unsorted(records);
-        let num_overlaps = set.find_iter(&query).count();
+        let num_overlaps = set.query_iter(&query, Query::default()).unwrap().count();
         assert_eq!(num_overlaps, 1);
     }
 
@@ -759,7 +253,7 @@ mod testing {
             .map(|(s, e)| BaseInterval::new(*s, *e))
             .collect::<Vec<BaseInterval<u32>>>();
         let set = IntervalContainer::from_unsorted(records);
-        let num_overlaps = set.find_iter_owned(query).count();
+        let num_overlaps = set.query_iter(&query, Query::default()).unwrap().count();
         assert_eq!(num_overlaps, 1);
     }
 
@@ -774,7 +268,7 @@ mod testing {
             .map(|(s, e)| BaseInterval::new(*s, *e))
             .collect::<Vec<BaseInterval<u32>>>();
         let set = IntervalContainer::from_unsorted(records);
-        let num_overlaps = set.find_iter_sorted(&query).unwrap().count();
+        let num_overlaps = set.query_iter(&query, Query::default()).unwrap().count();
         assert_eq!(num_overlaps, 1);
     }
 
@@ -789,7 +283,7 @@ mod testing {
             .map(|(s, e)| BaseInterval::new(*s, *e))
             .collect::<Vec<BaseInterval<u32>>>();
         let set = IntervalContainer::from_unsorted(records);
-        let num_overlaps = set.find_iter_sorted_owned_unchecked(query).count();
+        let num_overlaps = set.query_iter(&query, Query::default()).unwrap().count();
         assert_eq!(num_overlaps, 1);
     }
 
@@ -804,7 +298,7 @@ mod testing {
             .map(|(s, e)| BaseInterval::new(*s, *e))
             .collect::<Vec<BaseInterval<u32>>>();
         let set = IntervalContainer::from_iter(records);
-        let overlaps = set.find_iter_sorted(&query);
+        let overlaps = set.query_iter(&query, Query::default());
         assert!(overlaps.is_err());
     }
 
@@ -819,7 +313,9 @@ mod testing {
             .map(|(s, e)| BaseInterval::new(*s, *e))
             .collect::<Vec<BaseInterval<u32>>>();
         let set = IntervalContainer::from_unsorted(records);
-        let overlaps = set.find_iter_min(&query, 5);
+        let overlaps = set
+            .query_iter(&query, Query::new_predicate(QueryMethod::CompareBy(5)))
+            .unwrap();
         let num_overlaps = overlaps.count();
         assert_eq!(num_overlaps, 3);
     }
@@ -835,7 +331,9 @@ mod testing {
             .map(|(s, e)| BaseInterval::new(*s, *e))
             .collect::<Vec<BaseInterval<u32>>>();
         let set = IntervalContainer::from_unsorted(records);
-        let overlaps = set.find_iter_exact(&query, 7);
+        let overlaps = set
+            .query_iter(&query, Query::new_predicate(QueryMethod::CompareExact(7)))
+            .unwrap();
         let num_overlaps = overlaps.count();
         assert_eq!(num_overlaps, 1);
     }
@@ -851,7 +349,9 @@ mod testing {
             .map(|(s, e)| BaseInterval::new(*s, *e))
             .collect::<Vec<BaseInterval<u32>>>();
         let set = IntervalContainer::from_unsorted(records);
-        let overlaps = set.find_iter_sorted_min(&query, 5).unwrap();
+        let overlaps = set
+            .query_iter(&query, Query::new_predicate(QueryMethod::CompareBy(5)))
+            .unwrap();
         let num_overlaps = overlaps.count();
         assert_eq!(num_overlaps, 3);
     }
@@ -867,7 +367,9 @@ mod testing {
             .map(|(s, e)| BaseInterval::new(*s, *e))
             .collect::<Vec<BaseInterval<u32>>>();
         let set = IntervalContainer::from_unsorted(records);
-        let overlaps = set.find_iter_sorted_exact(&query, 7).unwrap();
+        let overlaps = set
+            .query_iter(&query, Query::new_predicate(QueryMethod::CompareExact(7)))
+            .unwrap();
         let num_overlaps = overlaps.count();
         assert_eq!(num_overlaps, 1);
     }
@@ -886,7 +388,10 @@ mod testing {
             Bed3::new(4, 25, 35),
         ];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
-        let mut overlaps = set.find_iter_sorted_min(&query, 5).unwrap().copied();
+        let mut overlaps = set
+            .query_iter(&query, Query::new_predicate(QueryMethod::CompareBy(5)))
+            .unwrap()
+            .copied();
         let first = overlaps.next().unwrap();
         let last = overlaps.last().unwrap();
         assert!(first.eq(&Bed3::new(3, 15, 25)));
@@ -907,7 +412,10 @@ mod testing {
             Bed3::new(4, 25, 35),
         ];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
-        let mut overlaps = set.find_iter_sorted_exact(&query, 7).unwrap().copied();
+        let mut overlaps = set
+            .query_iter(&query, Query::new_predicate(QueryMethod::CompareExact(7)))
+            .unwrap()
+            .copied();
         let first = overlaps.next().unwrap();
         let last = overlaps.last();
         assert!(first.eq(&Bed3::new(3, 20, 30)));
@@ -934,7 +442,12 @@ mod testing {
             BaseInterval::new(15, 25),
         ];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
-        let overlaps = set.find_query_frac(&query, frac).unwrap();
+        let overlaps = set
+            .query(
+                &query,
+                Query::new_predicate(QueryMethod::CompareByQueryFraction(frac)),
+            )
+            .unwrap();
         validate_set(&overlaps, &expected);
     }
 
@@ -959,7 +472,12 @@ mod testing {
             BaseInterval::new(17, 27),
         ];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
-        let overlaps = set.find_query_frac(&query, frac).unwrap();
+        let overlaps = set
+            .query(
+                &query,
+                Query::new_predicate(QueryMethod::CompareByQueryFraction(frac)),
+            )
+            .unwrap();
         validate_set(&overlaps, &expected);
     }
 
@@ -978,7 +496,12 @@ mod testing {
         ];
         let expected = vec![BaseInterval::new(10, 20)];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
-        let overlaps = set.find_query_frac(&query, frac).unwrap();
+        let overlaps = set
+            .query(
+                &query,
+                Query::new_predicate(QueryMethod::CompareByQueryFraction(frac)),
+            )
+            .unwrap();
         validate_set(&overlaps, &expected);
     }
 
@@ -1003,9 +526,13 @@ mod testing {
         ];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
         let overlap_iter = set
-            .find_iter_sorted_query_frac(&query, frac)
+            .query_iter(
+                &query,
+                Query::new_predicate(QueryMethod::CompareByQueryFraction(frac)),
+            )
             .unwrap()
             .copied();
+
         validate_iter(overlap_iter, &expected);
     }
 
@@ -1027,7 +554,12 @@ mod testing {
             BaseInterval::new(10, 20),
         ];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
-        let overlaps = set.find_target_frac(&query, frac).unwrap();
+        let overlaps = set
+            .query(
+                &query,
+                Query::new_predicate(QueryMethod::CompareByTargetFraction(frac)),
+            )
+            .unwrap();
         validate_set(&overlaps, &expected);
     }
 
@@ -1045,7 +577,12 @@ mod testing {
         ];
         let expected = vec![BaseInterval::new(10, 20)];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
-        let overlaps = set.find_target_frac(&query, frac).unwrap();
+        let overlaps = set
+            .query(
+                &query,
+                Query::new_predicate(QueryMethod::CompareByTargetFraction(frac)),
+            )
+            .unwrap();
         validate_set(&overlaps, &expected);
     }
 
@@ -1066,7 +603,12 @@ mod testing {
             BaseInterval::new(11, 21),
         ];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
-        let overlaps = set.find_target_frac(&query, frac).unwrap();
+        let overlaps = set
+            .query(
+                &query,
+                Query::new_predicate(QueryMethod::CompareByTargetFraction(frac)),
+            )
+            .unwrap();
         validate_set(&overlaps, &expected);
     }
 
@@ -1089,7 +631,10 @@ mod testing {
         ];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
         let overlap_iter = set
-            .find_iter_sorted_target_frac(&query, frac)
+            .query_iter(
+                &query,
+                Query::new_predicate(QueryMethod::CompareByTargetFraction(frac)),
+            )
             .unwrap()
             .copied();
         validate_iter(overlap_iter, &expected);
@@ -1113,7 +658,12 @@ mod testing {
         ];
         let expected = vec![BaseInterval::new(9, 19)];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
-        let overlaps = set.find_reciprocal_frac(&query, frac, frac).unwrap();
+        let overlaps = set
+            .query(
+                &query,
+                Query::new_predicate(QueryMethod::CompareReciprocalFractionAnd(frac, frac)),
+            )
+            .unwrap();
         validate_set(&overlaps, &expected);
     }
 
@@ -1136,7 +686,10 @@ mod testing {
         let expected = vec![BaseInterval::new(9, 19)];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
         let overlap_iter = set
-            .find_iter_sorted_reciprocal_frac(&query, frac, frac)
+            .query_iter(
+                &query,
+                Query::new_predicate(QueryMethod::CompareReciprocalFractionAnd(frac, frac)),
+            )
             .unwrap()
             .copied();
         validate_iter(overlap_iter, &expected);
@@ -1162,7 +715,12 @@ mod testing {
             BaseInterval::new(11, 21),
         ];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
-        let overlaps = set.find_reciprocal_frac(&query, f_query, f_target).unwrap();
+        let overlaps = set
+            .query(
+                &query,
+                Query::new_predicate(QueryMethod::CompareReciprocalFractionAnd(f_query, f_target)),
+            )
+            .unwrap();
         validate_set(&overlaps, &expected);
     }
 
@@ -1189,7 +747,10 @@ mod testing {
         ];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
         let overlaps = set
-            .find_reciprocal_frac_either(&query, f_query, f_target)
+            .query(
+                &query,
+                Query::new_predicate(QueryMethod::CompareReciprocalFractionOr(f_query, f_target)),
+            )
             .unwrap();
         validate_set(&overlaps, &expected);
     }
@@ -1216,7 +777,12 @@ mod testing {
             BaseInterval::new(15, 18),
         ];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
-        let overlaps = set.find_reciprocal_frac_either(&query, frac, frac).unwrap();
+        let overlaps = set
+            .query(
+                &query,
+                Query::new_predicate(QueryMethod::CompareReciprocalFractionOr(frac, frac)),
+            )
+            .unwrap();
         validate_set(&overlaps, &expected);
     }
 
@@ -1243,7 +809,10 @@ mod testing {
         ];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
         let overlap_iter = set
-            .find_iter_sorted_reciprocal_frac_either(&query, frac, frac)
+            .query_iter(
+                &query,
+                Query::new_predicate(QueryMethod::CompareReciprocalFractionOr(frac, frac)),
+            )
             .unwrap()
             .copied();
         validate_iter(overlap_iter, &expected);
@@ -1253,31 +822,39 @@ mod testing {
     fn find_query_frac_unbounded() {
         let query = BaseInterval::new(10, 20);
         let set = IntervalContainer::from_sorted(vec![BaseInterval::new(0, 10)]).unwrap();
-        assert!(set.find_query_frac(&query, 0.0).is_err());
-        assert!(set.find_query_frac(&query, 1.01).is_err());
+        let method = Query::new_predicate(QueryMethod::CompareByQueryFraction(0.0));
+        assert!(set.query(&query, method).is_err());
+        let method = Query::new_predicate(QueryMethod::CompareByQueryFraction(1.01));
+        assert!(set.query(&query, method).is_err());
     }
 
     #[test]
     fn find_target_frac_unbounded() {
         let query = BaseInterval::new(10, 20);
         let set = IntervalContainer::from_sorted(vec![BaseInterval::new(0, 10)]).unwrap();
-        assert!(set.find_target_frac(&query, 0.0).is_err());
-        assert!(set.find_target_frac(&query, 1.01).is_err());
+        let method = Query::new_predicate(QueryMethod::CompareByTargetFraction(0.0));
+        assert!(set.query(&query, method).is_err());
+        let method = Query::new_predicate(QueryMethod::CompareByTargetFraction(1.01));
+        assert!(set.query(&query, method).is_err());
     }
 
     #[test]
     fn find_reciprocal_frac_unbounded() {
         let query = BaseInterval::new(10, 20);
         let set = IntervalContainer::from_sorted(vec![BaseInterval::new(0, 10)]).unwrap();
-        assert!(set.find_reciprocal_frac(&query, 0.0, 0.0).is_err());
-        assert!(set.find_reciprocal_frac(&query, 1.01, 1.01).is_err());
+        let method = Query::new_predicate(QueryMethod::CompareReciprocalFractionAnd(0.0, 0.0));
+        assert!(set.query(&query, method).is_err());
+        let method = Query::new_predicate(QueryMethod::CompareReciprocalFractionAnd(1.01, 1.01));
+        assert!(set.query(&query, method).is_err());
     }
 
     #[test]
     fn find_reciprocal_frac_either_unbounded() {
         let query = BaseInterval::new(10, 20);
         let set = IntervalContainer::from_sorted(vec![BaseInterval::new(0, 10)]).unwrap();
-        assert!(set.find_reciprocal_frac_either(&query, 0.0, 0.0).is_err());
-        assert!(set.find_reciprocal_frac_either(&query, 1.01, 1.01).is_err());
+        let method = Query::new_predicate(QueryMethod::CompareReciprocalFractionOr(0.0, 0.0));
+        assert!(set.query(&query, method).is_err());
+        let method = Query::new_predicate(QueryMethod::CompareReciprocalFractionOr(1.01, 1.01));
+        assert!(set.query(&query, method).is_err());
     }
 }
