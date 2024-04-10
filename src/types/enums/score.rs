@@ -128,6 +128,17 @@ mod testing {
 
     use super::*;
     use std::str::FromStr;
+
+    #[test]
+    fn test_score_new() {
+        let a = Score::new(10.0);
+        assert_eq!(a, Score(Some(10.0)));
+    }
+    #[test]
+    fn test_score_empty() {
+        let a = Score::empty();
+        assert_eq!(a, Score(None));
+    }
     #[test]
     fn test_score_display() {
         let a = Score(Some(10.0));
@@ -148,22 +159,22 @@ mod testing {
     }
     #[test]
     fn test_score_from_f64() {
-        let a = Score::from(10.0);
+        let a = Score::from(10.0f64);
         assert_eq!(a, Score(Some(10.0)));
     }
     #[test]
     fn test_score_from_f32() {
-        let a = Score::from(10.0);
+        let a = Score::from(10.0f32);
         assert_eq!(a, Score(Some(10.0)));
     }
     #[test]
     fn test_score_from_i32() {
-        let a = Score::from(10);
+        let a = Score::from(10i32);
         assert_eq!(a, Score(Some(10.0)));
     }
     #[test]
     fn test_score_from_usize() {
-        let a = Score::from(10);
+        let a = Score::from(10usize);
         assert_eq!(a, Score(Some(10.0)));
     }
     #[test]
