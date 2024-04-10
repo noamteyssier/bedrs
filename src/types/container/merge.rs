@@ -196,11 +196,61 @@ where
             Err(SetError::UnsortedSet)
         }
     }
+
+    /// Merges overlapping intervals within a container
+    ///
+    /// ```text
+    /// (a)    |---->
+    /// (b)      |---->
+    /// (c)        <----|
+    /// (d)                  |---->
+    /// (e)                    |---->
+    /// ===============================
+    /// (1)    |------>
+    /// (2)        <----|
+    /// (3)                  |------>
+    /// ```
+    ///
+    /// Can return `None` in the case where there are no stranded intervals
+    pub fn merge_stranded(&self) -> Result<Option<Self>, SetError> {
+        if self.is_sorted() {
+            Ok(self.merge_stranded_unchecked())
+        } else {
+            Err(SetError::UnsortedSet)
+        }
+    }
 }
 
 #[cfg(test)]
 mod testing {
-    use crate::{traits::Coordinates, BaseInterval, Bed3, IntervalContainer};
+    use std::fmt::Debug;
+
+    use anyhow::Result;
+
+    use crate::{
+        traits::{ChromBounds, Coordinates, IntervalBounds, ValueBounds},
+        BaseInterval, Bed3, IntervalContainer, Strand, StrandedBed3,
+    };
+
+    fn validate_set<C, I, T>(set: &IntervalContainer<I, C, T>, expected: &[I])
+    where
+        I: IntervalBounds<C, T> + Debug,
+        C: ChromBounds,
+        T: ValueBounds,
+    {
+        println!("\nExpected:");
+        for iv in expected {
+            println!("{iv:?}");
+        }
+        println!("\nObserved:");
+        for iv in set.records() {
+            println!("{iv:?}");
+        }
+        assert_eq!(set.len(), expected.len());
+        for (c1, c2) in set.records().iter().zip(expected) {
+            assert!(c1.eq(c2));
+        }
+    }
 
     #[test]
     fn test_merging_one_cluster() {
@@ -215,10 +265,6 @@ mod testing {
         assert_eq!(merge_set.len(), 1);
         assert_eq!(iv.start(), 10);
         assert_eq!(iv.end(), 30);
-        // assert_eq!(merge_set.n_clusters(), 1);
-        // assert_eq!(merge_set.clusters(), &vec![0, 0, 0]);
-        // assert_eq!(merge_set.intervals()[0].start(), 10);
-        // assert_eq!(merge_set.intervals()[0].end(), 30);
     }
 
     #[test]
@@ -240,13 +286,6 @@ mod testing {
         assert_eq!(iv1.end(), 30);
         assert_eq!(iv2.start(), 35);
         assert_eq!(iv2.end(), 50);
-
-        // assert_eq!(merge_set.n_clusters(), 2);
-        // assert_eq!(merge_set.clusters(), &vec![0, 0, 0, 1, 1]);
-        // assert_eq!(merge_set.intervals()[0].start(), 10);
-        // assert_eq!(merge_set.intervals()[0].end(), 30);
-        // assert_eq!(merge_set.intervals()[1].start(), 35);
-        // assert_eq!(merge_set.intervals()[1].end(), 50);
     }
 
     #[test]
@@ -275,11 +314,6 @@ mod testing {
         assert_eq!(merge_set.len(), 1);
         assert_eq!(iv1.start(), 10);
         assert_eq!(iv1.end(), 30);
-
-        // assert_eq!(merge_set.n_clusters(), 1);
-        // assert_eq!(merge_set.clusters(), &vec![0, 0, 0]);
-        // assert_eq!(merge_set.intervals()[0].start(), 10);
-        // assert_eq!(merge_set.intervals()[0].end(), 30);
     }
 
     #[test]
@@ -299,11 +333,6 @@ mod testing {
         assert_eq!(iv1.end(), 30);
         assert_eq!(iv2.start(), 25);
         assert_eq!(iv2.end(), 30);
-
-        // assert_eq!(merge_set.n_clusters(), 2);
-        // assert_eq!(merge_set.clusters(), &vec![0, 0, 1]);
-        // assert_eq!(merge_set.intervals()[0].start(), 10);
-        // assert_eq!(merge_set.intervals()[0].end(), 30);
     }
 
     #[test]
@@ -320,10 +349,6 @@ mod testing {
         assert_eq!(merge_set.len(), 1);
         assert_eq!(iv.start(), 10);
         assert_eq!(iv.end(), 40);
-
-        // assert_eq!(merge_set.n_clusters(), 1);
-        // assert_eq!(merge_set.intervals()[0].start(), 10);
-        // assert_eq!(merge_set.intervals()[0].end(), 40);
     }
 
     #[test]
@@ -346,14 +371,85 @@ mod testing {
         assert_eq!(merge_set.max_len_mut().unwrap(), 30);
     }
 
-    // #[test]
-    // #[should_panic]
-    // fn merge_container_new() {
-    //     let records = vec![
-    //         BaseInterval::new(10, 20),
-    //         BaseInterval::new(20, 30),
-    //         BaseInterval::new(30, 40),
-    //     ];
-    //     let _merge_set: MergeResults<usize, usize, BaseInterval<usize>> = Container::new(records);
-    // }
+    #[test]
+    fn merge_intervals_stranded() -> Result<()> {
+        let records = vec![
+            StrandedBed3::new(1, 10, 20, Strand::Forward),
+            StrandedBed3::new(1, 15, 25, Strand::Forward),
+            StrandedBed3::new(1, 20, 30, Strand::Reverse), // overlapping but wrong strand
+            StrandedBed3::new(1, 40, 50, Strand::Reverse),
+            StrandedBed3::new(1, 45, 55, Strand::Reverse),
+        ];
+        let set = IntervalContainer::from_sorted(records)?;
+        let merge_set = set.merge_stranded()?.unwrap();
+        let expected = vec![
+            StrandedBed3::new(1, 10, 25, Strand::Forward),
+            StrandedBed3::new(1, 20, 30, Strand::Reverse),
+            StrandedBed3::new(1, 40, 55, Strand::Reverse),
+        ];
+
+        validate_set(&merge_set, &expected);
+        Ok(())
+    }
+
+    #[test]
+    fn merge_intervals_stranded_interleaved() -> Result<()> {
+        let records = vec![
+            StrandedBed3::new(1, 10, 20, Strand::Forward),
+            StrandedBed3::new(1, 15, 25, Strand::Forward),
+            StrandedBed3::new(1, 20, 30, Strand::Reverse), // overlapping but wrong strand
+            StrandedBed3::new(1, 22, 32, Strand::Forward), // Overlaps the n-2 interval
+            StrandedBed3::new(1, 25, 35, Strand::Reverse), // Overlaps the n-2 interval
+        ];
+        let set = IntervalContainer::from_sorted(records)?;
+        let merge_set = set.merge_stranded()?.unwrap();
+        let expected = vec![
+            StrandedBed3::new(1, 10, 32, Strand::Forward),
+            StrandedBed3::new(1, 20, 35, Strand::Reverse),
+        ];
+        validate_set(&merge_set, &expected);
+        Ok(())
+    }
+
+    #[test]
+    fn merge_intervals_stranded_interleaved_capped_fwd() -> Result<()> {
+        let records = vec![
+            StrandedBed3::new(1, 10, 20, Strand::Forward),
+            StrandedBed3::new(1, 15, 25, Strand::Forward),
+            StrandedBed3::new(1, 20, 30, Strand::Reverse), // overlapping but wrong strand
+            StrandedBed3::new(1, 22, 32, Strand::Forward), // Overlaps the n-2 interval
+            StrandedBed3::new(1, 25, 35, Strand::Reverse), // Overlaps the n-2 interval
+            StrandedBed3::new(2, 10, 20, Strand::Forward), // Doesn't Overlap any previous
+        ];
+        let set = IntervalContainer::from_sorted(records)?;
+        let merge_set = set.merge_stranded()?.unwrap();
+        let expected = vec![
+            StrandedBed3::new(1, 10, 32, Strand::Forward),
+            StrandedBed3::new(1, 20, 35, Strand::Reverse),
+            StrandedBed3::new(2, 10, 20, Strand::Forward),
+        ];
+        validate_set(&merge_set, &expected);
+        Ok(())
+    }
+
+    #[test]
+    fn merge_intervals_stranded_interleaved_capped_rev() -> Result<()> {
+        let records = vec![
+            StrandedBed3::new(1, 10, 20, Strand::Forward),
+            StrandedBed3::new(1, 15, 25, Strand::Forward),
+            StrandedBed3::new(1, 20, 30, Strand::Reverse), // overlapping but wrong strand
+            StrandedBed3::new(1, 22, 32, Strand::Forward), // Overlaps the n-2 interval
+            StrandedBed3::new(1, 25, 35, Strand::Reverse), // Overlaps the n-2 interval
+            StrandedBed3::new(2, 10, 20, Strand::Reverse), // Doesn't Overlap any previous
+        ];
+        let set = IntervalContainer::from_sorted(records)?;
+        let merge_set = set.merge_stranded()?.unwrap();
+        let expected = vec![
+            StrandedBed3::new(1, 10, 32, Strand::Forward),
+            StrandedBed3::new(1, 20, 35, Strand::Reverse),
+            StrandedBed3::new(2, 10, 20, Strand::Reverse),
+        ];
+        validate_set(&merge_set, &expected);
+        Ok(())
+    }
 }
