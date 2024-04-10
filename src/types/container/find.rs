@@ -1,7 +1,7 @@
 // use super::Container;
 use crate::{
     traits::{errors::SetError, ChromBounds, IntervalBounds, ValueBounds},
-    types::{FindIterSorted, FindIterSortedOwned, IntervalContainer, Query},
+    types::{FindIter, FindIterOwned, IntervalContainer, Query},
 };
 use anyhow::Result;
 
@@ -20,13 +20,13 @@ where
         &'a self,
         query: &'a Iv,
         method: Query<T>,
-    ) -> Result<FindIterSorted<'_, C, T, I, Iv>, SetError>
+    ) -> Result<FindIter<'_, C, T, I, Iv>, SetError>
     where
         Iv: IntervalBounds<C, T>,
     {
         if self.is_sorted() {
             method.validate()?;
-            Ok(FindIterSorted::new(
+            Ok(FindIter::new(
                 self.records(),
                 query,
                 self.lower_bound_unchecked(query),
@@ -44,18 +44,13 @@ where
         &self,
         query: Iv,
         method: Query<T>,
-    ) -> Result<FindIterSortedOwned<'_, C, T, I, Iv>, SetError>
+    ) -> Result<FindIterOwned<'_, C, T, I, Iv>, SetError>
     where
         Iv: IntervalBounds<C, T>,
     {
         if self.is_sorted() {
             let bound = self.lower_bound_unchecked(&query);
-            Ok(FindIterSortedOwned::new(
-                self.records(),
-                query,
-                bound,
-                method,
-            ))
+            Ok(FindIterOwned::new(self.records(), query, bound, method))
         } else {
             Err(SetError::UnsortedSet)
         }
