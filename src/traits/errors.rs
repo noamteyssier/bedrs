@@ -20,6 +20,9 @@ pub enum SetError {
 
     #[error("Provided fraction {frac} is oversized. Must be (0, 1]")]
     FractionUnbounded { frac: f64 },
+
+    #[error("Provided value must be greater than 0")]
+    ZeroOrNegative,
 }
 
 #[cfg(test)]
@@ -46,6 +49,8 @@ mod testing {
             format!("{err}"),
             "Provided fraction 1 is oversized. Must be (0, 1]"
         );
+        let err = SetError::ZeroOrNegative;
+        assert_eq!(format!("{err}"), "Provided value must be greater than 0");
     }
 
     #[test]

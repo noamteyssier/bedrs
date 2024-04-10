@@ -248,7 +248,10 @@ pub mod traits;
 /// Types used within the library
 pub mod types;
 
-pub use traits::{Coordinates, Distance, Intersect, Overlap, Segment, Subtract};
+pub use traits::{
+    Coordinates, Distance, Intersect, Overlap, Segment, StrandedOverlap, Subtract,
+    UnstrandedOverlap,
+};
 pub use types::{
     BaseInterval, Bed12, Bed3, Bed4, Bed6, BedGraph, Frame, Gtf, IntersectIter, IntervalContainer,
     IntervalIterOwned, IntervalIterRef, MergeIter, MetaInterval, Score, Strand, StrandedBed3,

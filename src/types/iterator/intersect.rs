@@ -1,7 +1,6 @@
-use super::find::predicate;
 use crate::{
     traits::{ChromBounds, IntervalBounds, ValueBounds},
-    types::QueryMethod,
+    types::Query,
     Intersect,
 };
 use std::{collections::VecDeque, fmt::Debug, marker::PhantomData};
@@ -31,7 +30,7 @@ where
     queue_left: VecDeque<I>,
     queue_right: VecDeque<I>,
     queue_right_matched: VecDeque<I>,
-    method: QueryMethod<T>,
+    method: Query<T>,
     phantom_c: PhantomData<C>,
     is_new: bool,
 }
@@ -49,13 +48,13 @@ where
             queue_left: VecDeque::new(),
             queue_right: VecDeque::new(),
             queue_right_matched: VecDeque::new(),
-            method: QueryMethod::default(),
+            method: Query::default(),
             phantom_c: PhantomData,
             is_new: true,
         }
     }
 
-    pub fn new_with_method(iter_left: It, iter_right: It, method: QueryMethod<T>) -> Self {
+    pub fn new_with_method(iter_left: It, iter_right: It, method: Query<T>) -> Self {
         Self {
             iter_left,
             iter_right,
@@ -129,7 +128,7 @@ where
         };
 
         loop {
-            if predicate(&target, &query, &self.method) {
+            if self.method.predicate(&target, &query) {
                 // find the intersection
                 let ix = query.intersect(&target);
 
@@ -164,7 +163,7 @@ mod testing {
     use super::IntersectIter;
     use crate::{
         traits::{ChromBounds, IntervalBounds, ValueBounds},
-        types::QueryMethod,
+        types::{Query, QueryMethod, StrandMethod},
         BaseInterval, Bed3,
     };
 
@@ -337,7 +336,10 @@ mod testing {
         let intervals_b = vec![BaseInterval::new(100, 200), BaseInterval::new(400, 450)];
         let expected = vec![BaseInterval::new(100, 200)];
         let frac = 0.5;
-        let method = QueryMethod::CompareByQueryFraction(frac);
+        let method = Query::new(
+            QueryMethod::CompareByQueryFraction(frac),
+            StrandMethod::Ignore,
+        );
         let iter_a = intervals_a.into_iter();
         let iter_b = intervals_b.into_iter();
         let ix_iter = IntersectIter::new_with_method(iter_a, iter_b, method);
@@ -355,7 +357,10 @@ mod testing {
         let intervals_b = vec![BaseInterval::new(100, 200), BaseInterval::new(400, 450)];
         let expected = vec![BaseInterval::new(100, 200), BaseInterval::new(400, 450)];
         let frac = 0.5;
-        let method = QueryMethod::CompareByTargetFraction(frac);
+        let method = Query::new(
+            QueryMethod::CompareByTargetFraction(frac),
+            StrandMethod::Ignore,
+        );
         let iter_a = intervals_a.into_iter();
         let iter_b = intervals_b.into_iter();
         let ix_iter = IntersectIter::new_with_method(iter_a, iter_b, method);

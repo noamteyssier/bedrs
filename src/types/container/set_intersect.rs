@@ -1,6 +1,6 @@
 use crate::{
     traits::{ChromBounds, IntervalBounds, ValueBounds},
-    types::QueryMethod,
+    types::Query,
     Intersect, IntervalContainer,
 };
 
@@ -21,15 +21,17 @@ where
     pub fn ix_set_target<Iv>(
         &'a self,
         other: &'a IntervalContainer<Iv, C, T>,
-        query_method: QueryMethod<T>,
+        method: Query<T>,
     ) -> Box<dyn Iterator<Item = Iv> + 'a>
     where
         Iv: IntervalBounds<C, T> + 'a,
+        &'a Iv: Intersect<C, T>,
     {
         let ix_iter = self.records().iter().flat_map(move |iv| {
             let overlaps = other
-                .find_method(iv, query_method)
-                .expect("Failed to find overlaps with provided query method");
+                .query_iter(iv, method)
+                .expect("Failed to find overlaps with provided query method")
+                .cloned();
             overlaps.into_iter().map(|ov| match iv.intersect(&ov) {
                 Some(x) => x,
                 None => panic!("Interval intersection failed"),
@@ -49,14 +51,14 @@ where
     pub fn ix_set_query<Iv>(
         &'a self,
         other: &'a IntervalContainer<Iv, C, T>,
-        query_method: QueryMethod<T>,
+        method: Query<T>,
     ) -> Box<dyn Iterator<Item = I> + 'a>
     where
         Iv: IntervalBounds<C, T> + 'a,
     {
         let ix_iter = self.records().iter().flat_map(move |iv| {
             let overlaps = other
-                .find_method(iv, query_method)
+                .query_iter(iv, method)
                 .expect("Failed to find overlaps with provided query method");
             overlaps.into_iter().map(|ov| match ov.intersect(iv) {
                 Some(x) => x,

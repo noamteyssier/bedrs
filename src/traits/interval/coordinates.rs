@@ -4,7 +4,10 @@ use crate::{
 };
 use std::cmp::Ordering;
 
-use super::{Distance, Segment};
+use super::{
+    overlap::{StrandedOverlap, UnstrandedOverlap},
+    Distance, Segment,
+};
 
 /// The main trait representing an interval.
 #[allow(clippy::len_without_is_empty)]
@@ -419,6 +422,22 @@ where
 }
 
 impl<I, C, T> Overlap<C, T> for I
+where
+    I: Coordinates<C, T>,
+    C: ChromBounds,
+    T: ValueBounds,
+{
+}
+
+impl<I, C, T> StrandedOverlap<C, T> for I
+where
+    I: Coordinates<C, T>,
+    C: ChromBounds,
+    T: ValueBounds,
+{
+}
+
+impl<I, C, T> UnstrandedOverlap<C, T> for I
 where
     I: Coordinates<C, T>,
     C: ChromBounds,
