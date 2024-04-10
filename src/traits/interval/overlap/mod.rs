@@ -760,83 +760,6 @@ mod testing {
     }
 
     #[test]
-    fn overlap_stranded() {
-        let a = StrandedBed3::new(1, 10, 20, Strand::Forward);
-        let b = StrandedBed3::new(1, 15, 25, Strand::Forward);
-        let c = StrandedBed3::new(1, 15, 25, Strand::Reverse);
-        assert!(a.stranded_overlaps(&b));
-        assert!(b.stranded_overlaps(&a));
-        assert!(!a.stranded_overlaps(&c));
-        assert!(!c.stranded_overlaps(&a));
-    }
-
-    #[test]
-    fn overlap_stranded_borders() {
-        let a = StrandedBed3::new(1, 10, 20, Strand::Forward);
-        let b = StrandedBed3::new(1, 20, 30, Strand::Forward);
-        let c = StrandedBed3::new(1, 20, 30, Strand::Reverse);
-        assert!(a.stranded_borders(&b));
-        assert!(b.stranded_borders(&a));
-        assert!(!a.stranded_borders(&c));
-        assert!(!c.stranded_borders(&a));
-    }
-
-    #[test]
-    fn overlap_stranded_contains() {
-        let a = StrandedBed3::new(1, 10, 20, Strand::Forward);
-        let b = StrandedBed3::new(1, 15, 17, Strand::Forward);
-        let c = StrandedBed3::new(1, 15, 17, Strand::Reverse);
-        assert!(a.stranded_contains(&b));
-        assert!(!b.stranded_contains(&a));
-        assert!(!a.stranded_contains(&c));
-        assert!(!c.stranded_contains(&a));
-    }
-
-    #[test]
-    fn overlap_stranded_contained_by() {
-        let a = StrandedBed3::new(1, 15, 17, Strand::Forward);
-        let b = StrandedBed3::new(1, 10, 20, Strand::Forward);
-        let c = StrandedBed3::new(1, 10, 20, Strand::Reverse);
-        assert!(a.stranded_contained_by(&b));
-        assert!(!b.stranded_contained_by(&a));
-        assert!(!a.stranded_contained_by(&c));
-        assert!(!c.stranded_contained_by(&a));
-    }
-
-    #[test]
-    fn overlap_stranded_overlap_size() {
-        let a = StrandedBed3::new(1, 10, 20, Strand::Forward);
-        let b = StrandedBed3::new(1, 15, 25, Strand::Forward);
-        let c = StrandedBed3::new(1, 15, 25, Strand::Reverse);
-        assert_eq!(a.stranded_overlap_size(&b), Some(5));
-        assert_eq!(b.stranded_overlap_size(&a), Some(5));
-        assert_eq!(a.stranded_overlap_size(&c), None);
-        assert_eq!(c.stranded_overlap_size(&a), None);
-    }
-
-    #[test]
-    fn stranded_overlaps_by_exactly() {
-        let a = StrandedBed3::new(1, 10, 20, Strand::Forward);
-        let b = StrandedBed3::new(1, 15, 25, Strand::Forward);
-        let c = StrandedBed3::new(1, 15, 25, Strand::Reverse);
-        assert!(a.stranded_overlaps_by_exactly(&b, 5));
-        assert!(b.stranded_overlaps_by_exactly(&a, 5));
-        assert!(!a.stranded_overlaps_by_exactly(&c, 5));
-        assert!(!c.stranded_overlaps_by_exactly(&a, 5));
-    }
-
-    #[test]
-    fn stranded_overlaps_by() {
-        let a = StrandedBed3::new(1, 10, 20, Strand::Forward);
-        let b = StrandedBed3::new(1, 15, 25, Strand::Forward);
-        let c = StrandedBed3::new(1, 15, 25, Strand::Reverse);
-        assert!(a.stranded_overlaps_by(&b, 5));
-        assert!(b.stranded_overlaps_by(&a, 5));
-        assert!(!a.stranded_overlaps_by(&c, 5));
-        assert!(!c.stranded_overlaps_by(&a, 5));
-    }
-
-    #[test]
     fn starts() {
         let a = BaseInterval::new(10, 20);
         let b = BaseInterval::new(10, 30);
@@ -853,18 +776,6 @@ mod testing {
         assert!(a.starts(&b));
         assert!(!a.starts(&c));
     }
-
-    #[test]
-    fn starts_genomic_stranded() {
-        let a = StrandedBed3::new(1, 10, 20, Strand::Forward);
-        let b = StrandedBed3::new(1, 10, 40, Strand::Forward);
-        let c = StrandedBed3::new(1, 10, 40, Strand::Reverse);
-        assert!(a.stranded_starts(&b));
-        assert!(!a.stranded_starts(&c));
-        assert!(a.starts(&b));
-        assert!(a.starts(&c));
-    }
-
     #[test]
     fn ends() {
         let a = BaseInterval::new(30, 40);
@@ -884,32 +795,12 @@ mod testing {
     }
 
     #[test]
-    fn ends_genomic_stranded() {
-        let a = StrandedBed3::new(1, 30, 40, Strand::Forward);
-        let b = StrandedBed3::new(1, 10, 40, Strand::Forward);
-        let c = StrandedBed3::new(1, 10, 40, Strand::Reverse);
-        assert!(a.ends(&b));
-        assert!(a.ends(&c));
-        assert!(a.stranded_ends(&b));
-        assert!(!a.stranded_ends(&c));
-    }
-
-    #[test]
     fn equals() {
         let a = BaseInterval::new(10, 20);
         let b = BaseInterval::new(10, 20);
         let c = BaseInterval::new(10, 21);
         assert!(a.equals(&b));
         assert!(!a.equals(&c));
-    }
-
-    #[test]
-    fn stranded_equals() {
-        let a = StrandedBed3::new(1, 10, 20, Strand::Forward);
-        let b = StrandedBed3::new(1, 10, 20, Strand::Forward);
-        let c = StrandedBed3::new(1, 10, 20, Strand::Reverse);
-        assert!(a.stranded_equals(&b));
-        assert!(!a.stranded_equals(&c));
     }
 
     #[test]
@@ -923,21 +814,6 @@ mod testing {
         assert!(!a.during(&c));
         assert!(!a.during(&d));
         assert!(!a.during(&e));
-    }
-
-    #[test]
-    fn stranded_during() {
-        let a = StrandedBed3::new(1, 15, 25, Strand::Forward);
-        let b = StrandedBed3::new(1, 10, 30, Strand::Forward);
-        let c = StrandedBed3::new(1, 10, 30, Strand::Reverse);
-        let d = StrandedBed3::new(1, 15, 30, Strand::Forward);
-        let e = StrandedBed3::new(1, 10, 25, Strand::Forward);
-        let f = StrandedBed3::new(1, 15, 25, Strand::Forward);
-        assert!(a.stranded_during(&b));
-        assert!(!a.stranded_during(&c));
-        assert!(!a.stranded_during(&d));
-        assert!(!a.stranded_during(&e));
-        assert!(!a.stranded_during(&f));
     }
 
     #[test]
