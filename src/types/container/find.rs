@@ -25,31 +25,16 @@ where
         Iv: IntervalBounds<C, T>,
     {
         if self.is_sorted() {
-            self.query_iter_unchecked(query, method)
+            method.validate()?;
+            Ok(FindIterSorted::new(
+                self.records(),
+                query,
+                self.lower_bound_unchecked(query),
+                method,
+            ))
         } else {
             Err(SetError::UnsortedSet)
         }
-    }
-
-    /// Find all intervals that overlap a query interval
-    /// and return an iterator over the intervals.
-    ///
-    /// Assumes the set is sorted.
-    pub fn query_iter_unchecked<'a, Iv>(
-        &'a self,
-        query: &'a Iv,
-        method: Query<T>,
-    ) -> Result<FindIterSorted<'_, C, T, I, Iv>, SetError>
-    where
-        Iv: IntervalBounds<C, T>,
-    {
-        method.validate()?;
-        Ok(FindIterSorted::new(
-            self.records(),
-            query,
-            self.lower_bound_unchecked(query),
-            method,
-        ))
     }
     /// Find all intervals that overlap a query interval
     /// and return an iterator over the intervals.
@@ -64,53 +49,22 @@ where
         Iv: IntervalBounds<C, T>,
     {
         if self.is_sorted() {
-            self.query_iter_owned_unchecked(query, method)
+            let bound = self.lower_bound_unchecked(&query);
+            Ok(FindIterSortedOwned::new(
+                self.records(),
+                query,
+                bound,
+                method,
+            ))
         } else {
             Err(SetError::UnsortedSet)
         }
     }
 
     /// Find all intervals that overlap a query interval
-    /// and return an iterator over the intervals.
-    ///
-    /// Assumes the set is sorted.
-    pub fn query_iter_owned_unchecked<Iv>(
-        &self,
-        query: Iv,
-        method: Query<T>,
-    ) -> Result<FindIterSortedOwned<'_, C, T, I, Iv>, SetError>
-    where
-        Iv: IntervalBounds<C, T>,
-    {
-        method.validate()?;
-        let bound = self.lower_bound_unchecked(&query);
-        Ok(FindIterSortedOwned::new(
-            self.records(),
-            query,
-            bound,
-            method,
-        ))
-    }
-
-    /// Find all intervals that overlap a query interval
     /// and return an `IntervalContainer` containing the intervals.
     ///
     /// Will return an error if the set is not sorted.
-    pub fn query_unchecked<'a, Iv>(
-        &'a self,
-        query: &'a Iv,
-        method: Query<T>,
-    ) -> Result<IntervalContainer<I, C, T>, SetError>
-    where
-        Iv: IntervalBounds<C, T>,
-    {
-        Ok(self.query_iter_unchecked(query, method)?.cloned().collect())
-    }
-
-    /// Find all intervals that overlap a query interval
-    /// and return an `IntervalContainer` containing the intervals.
-    ///
-    /// Assumes the set is sorted.
     pub fn query<'a, Iv>(
         &'a self,
         query: &'a Iv,
@@ -174,6 +128,22 @@ mod testing {
         let method = Query::default();
         let overlaps = set.query(&query, method).unwrap();
         assert_eq!(overlaps.len(), 4);
+    }
+
+    #[test]
+    fn find_owned() {
+        let query = BaseInterval::new(17, 27);
+        let starts = [10, 15, 20, 25];
+        let ends = [40, 45, 50, 55];
+        let records = starts
+            .iter()
+            .zip(ends.iter())
+            .map(|(s, e)| BaseInterval::new(*s, *e))
+            .collect::<Vec<BaseInterval<u32>>>();
+        let set = IntervalContainer::from_unsorted(records);
+        let method = Query::default();
+        let overlaps = set.query_iter_owned(query, method).unwrap();
+        assert_eq!(overlaps.count(), 4);
     }
 
     #[test]
