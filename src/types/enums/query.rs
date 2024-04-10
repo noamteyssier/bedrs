@@ -107,7 +107,7 @@ where
             QueryMethod::CompareReciprocalFractionAnd(f_query, f_target) => {
                 let query_min_overlap = query.f_len(f_query);
                 let target_min_overlap = target.f_len(f_target);
-                if let Some(ix) = target.overlap_size(query) {
+                if let Some(ix) = target.stranded_overlap_size(query) {
                     query_min_overlap <= ix && target_min_overlap <= ix
                 } else {
                     false
@@ -116,7 +116,7 @@ where
             QueryMethod::CompareReciprocalFractionOr(f_query, f_target) => {
                 let query_min_overlap = query.f_len(f_query);
                 let target_min_overlap = target.f_len(f_target);
-                if let Some(ix) = target.overlap_size(query) {
+                if let Some(ix) = target.stranded_overlap_size(query) {
                     query_min_overlap <= ix || target_min_overlap <= ix
                 } else {
                     false
