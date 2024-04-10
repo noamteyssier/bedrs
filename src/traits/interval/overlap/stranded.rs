@@ -212,7 +212,7 @@ where
     /// assert!(!interval1.stranded_borders(&interval3));
     /// ```
     fn stranded_borders<I: Coordinates<C, T>>(&self, other: &I) -> bool {
-        self.bounded_strand(other) && self.interval_borders(other)
+        self.bounded_strand(other) && self.borders(other)
     }
 }
 
