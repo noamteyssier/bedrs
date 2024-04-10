@@ -71,6 +71,23 @@ where
         }
     }
 
+    /// Finds the first stranded record in the set
+    ///
+    /// Initialize the relevant stranded base interval's coordinates
+    fn init_specific_strand(&self, strand: Strand) -> Option<I> {
+        // find the first stranded record
+        let siv = self
+            .records()
+            .iter()
+            .find(|x| x.strand().is_some_and(|x| x == strand))?;
+
+        // initialize the base interval
+        let mut tmp_iv = I::empty();
+        tmp_iv.update_all_from(siv);
+        tmp_iv.update_strand(siv.strand());
+        Some(tmp_iv)
+    }
+
     #[must_use]
     pub fn merge_unchecked(&self) -> Self {
         let mut base = I::empty();
@@ -88,6 +105,27 @@ where
         }
         Self::add_interval(&base, &mut cluster_intervals);
         IntervalContainer::from_sorted_unchecked(cluster_intervals)
+    }
+
+    /// Merges all intervals only from a specific strand
+    #[must_use]
+    pub fn merge_spec_strand_unchecked(&self, strand: Strand) -> Option<Self> {
+        let mut base = self.init_specific_strand(strand)?;
+        let mut cluster_intervals = Vec::with_capacity(self.len());
+        for iv in self
+            .records()
+            .iter()
+            .filter(|x| x.strand().is_some_and(|x| x == strand))
+        {
+            if Self::merge_pred(&base, iv) {
+                Self::update_base_coordinates(&mut base, iv);
+            } else {
+                Self::add_interval(&base, &mut cluster_intervals);
+                Self::reset_base(&mut base, iv);
+            }
+        }
+        Self::add_interval(&base, &mut cluster_intervals);
+        Some(IntervalContainer::from_sorted_unchecked(cluster_intervals))
     }
 
     // Keeps two Option<I> for potential base intervals
@@ -215,6 +253,34 @@ where
     pub fn merge_stranded(&self) -> Result<Option<Self>, SetError> {
         if self.is_sorted() {
             Ok(self.merge_stranded_unchecked())
+        } else {
+            Err(SetError::UnsortedSet)
+        }
+    }
+
+    /// Merges overlapping intervals within a container
+    /// if they are on a specific strand only.
+    ///
+    /// Ignores all other intervals
+    ///
+    /// ```text
+    /// (a)    |---->
+    /// (b)      |---->
+    /// (c)        <----|
+    /// (d)                  |---->
+    /// (e)                    |---->
+    /// ===============================
+    /// (1)    |------>
+    /// (3)                  |------>
+    /// ```
+    ///
+    /// Can return `None` in the case where there are no stranded intervals
+    pub fn merge_specific_strand(&self, strand: Strand) -> Result<Option<Self>, SetError> {
+        if self.is_sorted() {
+            match strand {
+                Strand::Unknown => Err(SetError::CannotAcceptUnknownStrand),
+                s => Ok(self.merge_spec_strand_unchecked(s)),
+            }
         } else {
             Err(SetError::UnsortedSet)
         }

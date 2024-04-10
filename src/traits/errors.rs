@@ -23,6 +23,9 @@ pub enum SetError {
 
     #[error("Provided value must be greater than 0")]
     ZeroOrNegative,
+
+    #[error("Cannot accept a strand input that is unknown")]
+    CannotAcceptUnknownStrand,
 }
 
 #[cfg(test)]
@@ -51,6 +54,11 @@ mod testing {
         );
         let err = SetError::ZeroOrNegative;
         assert_eq!(format!("{err}"), "Provided value must be greater than 0");
+        let err = SetError::CannotAcceptUnknownStrand;
+        assert_eq!(
+            format!("{err}"),
+            "Cannot accept a strand input that is unknown"
+        );
     }
 
     #[test]
