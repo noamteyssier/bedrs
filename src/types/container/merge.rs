@@ -452,4 +452,59 @@ mod testing {
         validate_set(&merge_set, &expected);
         Ok(())
     }
+
+    #[test]
+    fn merge_intervals_stranded_all_missing_strand_info() -> Result<()> {
+        let records = vec![
+            StrandedBed3::new(1, 10, 20, Strand::Unknown),
+            StrandedBed3::new(1, 15, 25, Strand::Unknown),
+            StrandedBed3::new(1, 20, 30, Strand::Unknown),
+            StrandedBed3::new(1, 22, 32, Strand::Unknown),
+            StrandedBed3::new(1, 25, 35, Strand::Unknown),
+            StrandedBed3::new(2, 10, 20, Strand::Unknown),
+        ];
+        let set = IntervalContainer::from_sorted(records)?;
+        let merge_set = set.merge_stranded()?;
+        assert!(merge_set.is_none());
+        Ok(())
+    }
+
+    #[test]
+    fn merge_intervals_stranded_all_missing_strand_info_minimal() -> Result<()> {
+        let records = vec![
+            Bed3::new(1, 10, 20),
+            Bed3::new(1, 15, 25),
+            Bed3::new(1, 20, 30),
+            Bed3::new(1, 22, 32),
+            Bed3::new(1, 25, 35),
+            Bed3::new(2, 10, 20),
+        ];
+        let set = IntervalContainer::from_sorted(records)?;
+        let merge_set = set.merge_stranded()?;
+        assert!(merge_set.is_none());
+        Ok(())
+    }
+
+    #[test]
+    fn merge_intervals_stranded_skip_missing() -> Result<()> {
+        let records = vec![
+            StrandedBed3::new(1, 10, 20, Strand::Forward),
+            StrandedBed3::new(1, 15, 25, Strand::Forward),
+            StrandedBed3::new(1, 20, 30, Strand::Unknown), // Missing info
+            StrandedBed3::new(1, 21, 31, Strand::Unknown), // Missing info
+            StrandedBed3::new(1, 22, 32, Strand::Forward), // Overlaps the n-2 interval
+            StrandedBed3::new(1, 25, 35, Strand::Reverse),
+            StrandedBed3::new(2, 10, 20, Strand::Reverse), // Doesn't Overlap any previous
+            StrandedBed3::new(2, 21, 31, Strand::Unknown), // Missing info
+        ];
+        let set = IntervalContainer::from_sorted(records)?;
+        let merge_set = set.merge_stranded()?.unwrap();
+        let expected = vec![
+            StrandedBed3::new(1, 10, 32, Strand::Forward),
+            StrandedBed3::new(1, 25, 35, Strand::Reverse),
+            StrandedBed3::new(2, 10, 20, Strand::Reverse),
+        ];
+        validate_set(&merge_set, &expected);
+        Ok(())
+    }
 }
