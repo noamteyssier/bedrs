@@ -163,3 +163,353 @@ where
         }
     }
 }
+
+#[cfg(test)]
+mod testing {
+    use super::*;
+    use crate::{Strand, StrandedBed3};
+
+    // Compare
+
+    #[test]
+    fn strand_ignore_compare() {
+        let iv_a = StrandedBed3::new(1, 10, 20, Strand::Forward);
+        let iv_b = StrandedBed3::new(1, 15, 25, Strand::Forward);
+        let iv_c = StrandedBed3::new(1, 15, 25, Strand::Reverse);
+        let iv_d = StrandedBed3::new(1, 30, 40, Strand::Forward);
+        let iv_e = StrandedBed3::new(1, 30, 40, Strand::Reverse);
+        let query = Query::new(QueryMethod::Compare, StrandMethod::Ignore);
+        assert!(query.predicate(&iv_a, &iv_b));
+        assert!(query.predicate(&iv_a, &iv_c));
+        assert!(!query.predicate(&iv_a, &iv_d));
+        assert!(!query.predicate(&iv_a, &iv_e));
+    }
+
+    #[test]
+    fn strand_match_compare() {
+        let iv_a = StrandedBed3::new(1, 10, 20, Strand::Forward);
+        let iv_b = StrandedBed3::new(1, 15, 25, Strand::Forward);
+        let iv_c = StrandedBed3::new(1, 15, 25, Strand::Reverse);
+        let iv_d = StrandedBed3::new(1, 30, 40, Strand::Forward);
+        let iv_e = StrandedBed3::new(1, 30, 40, Strand::Reverse);
+        let query = Query::new(QueryMethod::Compare, StrandMethod::MatchStrand);
+        assert!(query.predicate(&iv_a, &iv_b));
+        assert!(!query.predicate(&iv_a, &iv_c));
+        assert!(!query.predicate(&iv_a, &iv_d));
+        assert!(!query.predicate(&iv_a, &iv_e));
+    }
+
+    #[test]
+    fn strand_opposite_compare() {
+        let iv_a = StrandedBed3::new(1, 10, 20, Strand::Forward);
+        let iv_b = StrandedBed3::new(1, 15, 25, Strand::Forward);
+        let iv_c = StrandedBed3::new(1, 15, 25, Strand::Reverse);
+        let iv_d = StrandedBed3::new(1, 30, 40, Strand::Forward);
+        let iv_e = StrandedBed3::new(1, 30, 40, Strand::Reverse);
+        let query = Query::new(QueryMethod::Compare, StrandMethod::OppositeStrand);
+        assert!(!query.predicate(&iv_a, &iv_b));
+        assert!(query.predicate(&iv_a, &iv_c));
+        assert!(!query.predicate(&iv_a, &iv_d));
+        assert!(!query.predicate(&iv_a, &iv_e));
+    }
+
+    // CompareBy
+
+    #[test]
+    fn strand_ignore_compare_by() {
+        let iv_a = StrandedBed3::new(1, 10, 20, Strand::Forward);
+        let iv_b = StrandedBed3::new(1, 15, 25, Strand::Forward);
+        let iv_c = StrandedBed3::new(1, 15, 25, Strand::Reverse);
+        let iv_d = StrandedBed3::new(1, 12, 22, Strand::Forward);
+        let iv_e = StrandedBed3::new(1, 12, 22, Strand::Reverse);
+        let query = Query::new(QueryMethod::CompareBy(7), StrandMethod::Ignore);
+        assert!(!query.predicate(&iv_a, &iv_b));
+        assert!(!query.predicate(&iv_a, &iv_c));
+        assert!(query.predicate(&iv_a, &iv_d));
+        assert!(query.predicate(&iv_a, &iv_e));
+    }
+
+    #[test]
+    fn strand_match_compare_by() {
+        let iv_a = StrandedBed3::new(1, 10, 20, Strand::Forward);
+        let iv_b = StrandedBed3::new(1, 15, 25, Strand::Forward);
+        let iv_c = StrandedBed3::new(1, 15, 25, Strand::Reverse);
+        let iv_d = StrandedBed3::new(1, 12, 22, Strand::Forward);
+        let iv_e = StrandedBed3::new(1, 12, 22, Strand::Reverse);
+        let query = Query::new(QueryMethod::CompareBy(7), StrandMethod::MatchStrand);
+        assert!(!query.predicate(&iv_a, &iv_b));
+        assert!(!query.predicate(&iv_a, &iv_c));
+        assert!(query.predicate(&iv_a, &iv_d));
+        assert!(!query.predicate(&iv_a, &iv_e));
+    }
+
+    #[test]
+    fn strand_opposite_compare_by() {
+        let iv_a = StrandedBed3::new(1, 10, 20, Strand::Forward);
+        let iv_b = StrandedBed3::new(1, 15, 25, Strand::Forward);
+        let iv_c = StrandedBed3::new(1, 15, 25, Strand::Reverse);
+        let iv_d = StrandedBed3::new(1, 12, 22, Strand::Forward);
+        let iv_e = StrandedBed3::new(1, 12, 22, Strand::Reverse);
+        let query = Query::new(QueryMethod::CompareBy(7), StrandMethod::OppositeStrand);
+        assert!(!query.predicate(&iv_a, &iv_b));
+        assert!(!query.predicate(&iv_a, &iv_c));
+        assert!(!query.predicate(&iv_a, &iv_d));
+        assert!(query.predicate(&iv_a, &iv_e));
+    }
+
+    // CompareExact
+
+    #[test]
+    fn strand_ignore_compare_exact() {
+        let iv_a = StrandedBed3::new(1, 10, 20, Strand::Forward);
+        let iv_b = StrandedBed3::new(1, 15, 25, Strand::Forward);
+        let iv_c = StrandedBed3::new(1, 15, 25, Strand::Reverse);
+        let iv_d = StrandedBed3::new(1, 12, 22, Strand::Forward);
+        let iv_e = StrandedBed3::new(1, 12, 22, Strand::Reverse);
+        let query = Query::new(QueryMethod::CompareExact(5), StrandMethod::Ignore);
+        assert!(query.predicate(&iv_a, &iv_b));
+        assert!(query.predicate(&iv_a, &iv_c));
+        assert!(!query.predicate(&iv_a, &iv_d));
+        assert!(!query.predicate(&iv_a, &iv_e));
+    }
+
+    #[test]
+    fn strand_match_compare_exact() {
+        let iv_a = StrandedBed3::new(1, 10, 20, Strand::Forward);
+        let iv_b = StrandedBed3::new(1, 15, 25, Strand::Forward);
+        let iv_c = StrandedBed3::new(1, 15, 25, Strand::Reverse);
+        let iv_d = StrandedBed3::new(1, 12, 22, Strand::Forward);
+        let iv_e = StrandedBed3::new(1, 12, 22, Strand::Reverse);
+        let query = Query::new(QueryMethod::CompareExact(5), StrandMethod::MatchStrand);
+        assert!(query.predicate(&iv_a, &iv_b));
+        assert!(!query.predicate(&iv_a, &iv_c));
+        assert!(!query.predicate(&iv_a, &iv_d));
+        assert!(!query.predicate(&iv_a, &iv_e));
+    }
+
+    #[test]
+    fn strand_opposite_compare_exact() {
+        let iv_a = StrandedBed3::new(1, 10, 20, Strand::Forward);
+        let iv_b = StrandedBed3::new(1, 15, 25, Strand::Forward);
+        let iv_c = StrandedBed3::new(1, 15, 25, Strand::Reverse);
+        let iv_d = StrandedBed3::new(1, 12, 22, Strand::Forward);
+        let iv_e = StrandedBed3::new(1, 12, 22, Strand::Reverse);
+        let query = Query::new(QueryMethod::CompareExact(5), StrandMethod::OppositeStrand);
+        assert!(!query.predicate(&iv_a, &iv_b));
+        assert!(query.predicate(&iv_a, &iv_c));
+        assert!(!query.predicate(&iv_a, &iv_d));
+        assert!(!query.predicate(&iv_a, &iv_e));
+    }
+
+    // CompareByQueryFraction
+
+    #[test]
+    fn strand_ignore_compare_by_query_fraction() {
+        let iv_a = StrandedBed3::new(1, 10, 20, Strand::Forward);
+        let iv_b = StrandedBed3::new(1, 15, 25, Strand::Forward);
+        let iv_c = StrandedBed3::new(1, 15, 25, Strand::Reverse);
+        let iv_d = StrandedBed3::new(1, 10, 100, Strand::Forward);
+        let iv_e = StrandedBed3::new(1, 10, 100, Strand::Reverse);
+        let query = Query::new(
+            QueryMethod::CompareByQueryFraction(0.5),
+            StrandMethod::Ignore,
+        );
+        assert!(query.predicate(&iv_a, &iv_b));
+        assert!(query.predicate(&iv_a, &iv_c));
+        assert!(!query.predicate(&iv_a, &iv_d));
+        assert!(!query.predicate(&iv_a, &iv_e));
+    }
+
+    #[test]
+    fn strand_match_compare_by_query_fraction() {
+        let iv_a = StrandedBed3::new(1, 10, 20, Strand::Forward);
+        let iv_b = StrandedBed3::new(1, 15, 25, Strand::Forward);
+        let iv_c = StrandedBed3::new(1, 15, 25, Strand::Reverse);
+        let iv_d = StrandedBed3::new(1, 10, 100, Strand::Forward);
+        let iv_e = StrandedBed3::new(1, 10, 100, Strand::Reverse);
+        let query = Query::new(
+            QueryMethod::CompareByQueryFraction(0.5),
+            StrandMethod::MatchStrand,
+        );
+        assert!(query.predicate(&iv_a, &iv_b));
+        assert!(!query.predicate(&iv_a, &iv_c));
+        assert!(!query.predicate(&iv_a, &iv_d));
+        assert!(!query.predicate(&iv_a, &iv_e));
+    }
+
+    #[test]
+    fn strand_opposite_compare_by_query_fraction() {
+        let iv_a = StrandedBed3::new(1, 10, 20, Strand::Forward);
+        let iv_b = StrandedBed3::new(1, 15, 25, Strand::Forward);
+        let iv_c = StrandedBed3::new(1, 15, 25, Strand::Reverse);
+        let iv_d = StrandedBed3::new(1, 10, 100, Strand::Forward);
+        let iv_e = StrandedBed3::new(1, 10, 100, Strand::Reverse);
+        let query = Query::new(
+            QueryMethod::CompareByQueryFraction(0.5),
+            StrandMethod::OppositeStrand,
+        );
+        assert!(!query.predicate(&iv_a, &iv_b));
+        assert!(query.predicate(&iv_a, &iv_c));
+        assert!(!query.predicate(&iv_a, &iv_d));
+        assert!(!query.predicate(&iv_a, &iv_e));
+    }
+
+    // CompareByTargetFraction
+
+    #[test]
+    fn strand_ignore_compare_by_target_fraction() {
+        let iv_a = StrandedBed3::new(1, 10, 100, Strand::Forward);
+        let iv_b = StrandedBed3::new(1, 50, 150, Strand::Forward);
+        let iv_c = StrandedBed3::new(1, 50, 150, Strand::Reverse);
+        let iv_d = StrandedBed3::new(1, 15, 25, Strand::Forward);
+        let iv_e = StrandedBed3::new(1, 15, 25, Strand::Reverse);
+        let query = Query::new(
+            QueryMethod::CompareByTargetFraction(0.5),
+            StrandMethod::Ignore,
+        );
+        assert!(query.predicate(&iv_a, &iv_b));
+        assert!(query.predicate(&iv_a, &iv_c));
+        assert!(!query.predicate(&iv_a, &iv_d));
+        assert!(!query.predicate(&iv_a, &iv_e));
+    }
+
+    #[test]
+    fn strand_match_compare_by_target_fraction() {
+        let iv_a = StrandedBed3::new(1, 10, 100, Strand::Forward);
+        let iv_b = StrandedBed3::new(1, 50, 150, Strand::Forward);
+        let iv_c = StrandedBed3::new(1, 50, 150, Strand::Reverse);
+        let iv_d = StrandedBed3::new(1, 15, 25, Strand::Forward);
+        let iv_e = StrandedBed3::new(1, 15, 25, Strand::Reverse);
+        let query = Query::new(
+            QueryMethod::CompareByTargetFraction(0.5),
+            StrandMethod::MatchStrand,
+        );
+        assert!(query.predicate(&iv_a, &iv_b));
+        assert!(!query.predicate(&iv_a, &iv_c));
+        assert!(!query.predicate(&iv_a, &iv_d));
+        assert!(!query.predicate(&iv_a, &iv_e));
+    }
+
+    #[test]
+    fn strand_opposite_compare_by_target_fraction() {
+        let iv_a = StrandedBed3::new(1, 10, 100, Strand::Forward);
+        let iv_b = StrandedBed3::new(1, 50, 150, Strand::Forward);
+        let iv_c = StrandedBed3::new(1, 50, 150, Strand::Reverse);
+        let iv_d = StrandedBed3::new(1, 15, 25, Strand::Forward);
+        let iv_e = StrandedBed3::new(1, 15, 25, Strand::Reverse);
+        let query = Query::new(
+            QueryMethod::CompareByTargetFraction(0.5),
+            StrandMethod::OppositeStrand,
+        );
+        assert!(!query.predicate(&iv_a, &iv_b));
+        assert!(query.predicate(&iv_a, &iv_c));
+        assert!(!query.predicate(&iv_a, &iv_d));
+        assert!(!query.predicate(&iv_a, &iv_e));
+    }
+
+    // CompareReciprocalFractionAnd
+
+    #[test]
+    fn strand_ignore_compare_reciprocal_fraction_and() {
+        let iv_a = StrandedBed3::new(1, 10, 100, Strand::Forward);
+        let iv_b = StrandedBed3::new(1, 50, 150, Strand::Forward);
+        let iv_c = StrandedBed3::new(1, 50, 150, Strand::Reverse);
+        let iv_d = StrandedBed3::new(1, 15, 25, Strand::Forward);
+        let iv_e = StrandedBed3::new(1, 15, 25, Strand::Reverse);
+        let query = Query::new(
+            QueryMethod::CompareReciprocalFractionAnd(0.5, 0.5),
+            StrandMethod::Ignore,
+        );
+        assert!(query.predicate(&iv_a, &iv_b));
+        assert!(query.predicate(&iv_a, &iv_c));
+        assert!(!query.predicate(&iv_a, &iv_d));
+        assert!(!query.predicate(&iv_a, &iv_e));
+    }
+
+    #[test]
+    fn strand_match_compare_reciprocal_fraction_and() {
+        let iv_a = StrandedBed3::new(1, 10, 100, Strand::Forward);
+        let iv_b = StrandedBed3::new(1, 50, 150, Strand::Forward);
+        let iv_c = StrandedBed3::new(1, 50, 150, Strand::Reverse);
+        let iv_d = StrandedBed3::new(1, 15, 25, Strand::Forward);
+        let iv_e = StrandedBed3::new(1, 15, 25, Strand::Reverse);
+        let query = Query::new(
+            QueryMethod::CompareReciprocalFractionAnd(0.5, 0.5),
+            StrandMethod::MatchStrand,
+        );
+        assert!(query.predicate(&iv_a, &iv_b));
+        assert!(!query.predicate(&iv_a, &iv_c));
+        assert!(!query.predicate(&iv_a, &iv_d));
+        assert!(!query.predicate(&iv_a, &iv_e));
+    }
+
+    #[test]
+    fn strand_opposite_compare_reciprocal_fraction_and() {
+        let iv_a = StrandedBed3::new(1, 10, 100, Strand::Forward);
+        let iv_b = StrandedBed3::new(1, 50, 150, Strand::Forward);
+        let iv_c = StrandedBed3::new(1, 50, 150, Strand::Reverse);
+        let iv_d = StrandedBed3::new(1, 15, 25, Strand::Forward);
+        let iv_e = StrandedBed3::new(1, 15, 25, Strand::Reverse);
+        let query = Query::new(
+            QueryMethod::CompareReciprocalFractionAnd(0.5, 0.5),
+            StrandMethod::OppositeStrand,
+        );
+        assert!(!query.predicate(&iv_a, &iv_b));
+        assert!(query.predicate(&iv_a, &iv_c));
+        assert!(!query.predicate(&iv_a, &iv_d));
+        assert!(!query.predicate(&iv_a, &iv_e));
+    }
+
+    // CompareReciprocalFractionOr
+
+    #[test]
+    fn strand_ignore_compare_reciprocal_fraction_or() {
+        let iv_a = StrandedBed3::new(1, 10, 100, Strand::Forward);
+        let iv_b = StrandedBed3::new(1, 50, 150, Strand::Forward);
+        let iv_c = StrandedBed3::new(1, 50, 150, Strand::Reverse);
+        let iv_d = StrandedBed3::new(1, 15, 25, Strand::Forward);
+        let iv_e = StrandedBed3::new(1, 15, 25, Strand::Reverse);
+        let query = Query::new(
+            QueryMethod::CompareReciprocalFractionOr(0.5, 0.5),
+            StrandMethod::Ignore,
+        );
+        assert!(query.predicate(&iv_a, &iv_b));
+        assert!(query.predicate(&iv_a, &iv_c));
+        assert!(query.predicate(&iv_a, &iv_d));
+        assert!(query.predicate(&iv_a, &iv_e));
+    }
+
+    #[test]
+    fn strand_match_compare_reciprocal_fraction_or() {
+        let iv_a = StrandedBed3::new(1, 10, 100, Strand::Forward);
+        let iv_b = StrandedBed3::new(1, 50, 150, Strand::Forward);
+        let iv_c = StrandedBed3::new(1, 50, 150, Strand::Reverse);
+        let iv_d = StrandedBed3::new(1, 15, 25, Strand::Forward);
+        let iv_e = StrandedBed3::new(1, 15, 25, Strand::Reverse);
+        let query = Query::new(
+            QueryMethod::CompareReciprocalFractionOr(0.5, 0.5),
+            StrandMethod::MatchStrand,
+        );
+        assert!(query.predicate(&iv_a, &iv_b));
+        assert!(!query.predicate(&iv_a, &iv_c));
+        assert!(query.predicate(&iv_a, &iv_d));
+        assert!(!query.predicate(&iv_a, &iv_e));
+    }
+
+    #[test]
+    fn strand_opposite_compare_reciprocal_fraction_or() {
+        let iv_a = StrandedBed3::new(1, 10, 100, Strand::Forward);
+        let iv_b = StrandedBed3::new(1, 50, 150, Strand::Forward);
+        let iv_c = StrandedBed3::new(1, 50, 150, Strand::Reverse);
+        let iv_d = StrandedBed3::new(1, 15, 25, Strand::Forward);
+        let iv_e = StrandedBed3::new(1, 15, 25, Strand::Reverse);
+        let query = Query::new(
+            QueryMethod::CompareReciprocalFractionOr(0.5, 0.5),
+            StrandMethod::OppositeStrand,
+        );
+        assert!(!query.predicate(&iv_a, &iv_b));
+        assert!(query.predicate(&iv_a, &iv_c));
+        assert!(!query.predicate(&iv_a, &iv_d));
+        assert!(query.predicate(&iv_a, &iv_e));
+    }
+}
