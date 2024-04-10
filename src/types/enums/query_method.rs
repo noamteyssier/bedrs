@@ -2,9 +2,7 @@ use crate::traits::{SetError, ValueBounds};
 
 /// An enumeration of the different methods of querying a query
 /// interval and a target interval
-///
-/// TODO: Validate that the query method is valid and remove Result from Find methods
-#[derive(Debug, Default, Clone, Copy)]
+#[derive(Debug, Default, Clone, Copy, PartialEq)]
 pub enum QueryMethod<T: ValueBounds> {
     /// Compare the query and target intervals using the `overlaps` method
     #[default]
@@ -65,5 +63,60 @@ impl<T: ValueBounds> QueryMethod<T> {
                 }
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod testing {
+
+    use super::*;
+
+    #[test]
+    fn test_debug() {
+        let str_compare = format!("{:?}", QueryMethod::<usize>::Compare);
+        assert_eq!(str_compare, "Compare");
+
+        let str_compare_by = format!("{:?}", QueryMethod::<usize>::CompareBy(5));
+        assert_eq!(str_compare_by, "CompareBy(5)");
+
+        let str_compare_exact = format!("{:?}", QueryMethod::<usize>::CompareExact(5));
+        assert_eq!(str_compare_exact, "CompareExact(5)");
+
+        let str_compare_by_query_fraction =
+            format!("{:?}", QueryMethod::<usize>::CompareByQueryFraction(0.5));
+        assert_eq!(str_compare_by_query_fraction, "CompareByQueryFraction(0.5)");
+
+        let str_compare_by_target_fraction =
+            format!("{:?}", QueryMethod::<usize>::CompareByTargetFraction(0.5));
+        assert_eq!(
+            str_compare_by_target_fraction,
+            "CompareByTargetFraction(0.5)"
+        );
+
+        let str_compare_reciprocal_fraction_and = format!(
+            "{:?}",
+            QueryMethod::<usize>::CompareReciprocalFractionAnd(0.5, 0.5)
+        );
+        assert_eq!(
+            str_compare_reciprocal_fraction_and,
+            "CompareReciprocalFractionAnd(0.5, 0.5)"
+        );
+
+        let str_compare_reciprocal_fraction_or = format!(
+            "{:?}",
+            QueryMethod::<usize>::CompareReciprocalFractionOr(0.5, 0.5)
+        );
+        assert_eq!(
+            str_compare_reciprocal_fraction_or,
+            "CompareReciprocalFractionOr(0.5, 0.5)"
+        );
+    }
+
+    #[test]
+    #[allow(clippy::clone_on_copy)]
+    fn test_clone() {
+        let a = QueryMethod::<usize>::Compare;
+        let b = a.clone();
+        assert_eq!(a, b);
     }
 }
