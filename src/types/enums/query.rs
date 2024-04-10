@@ -169,6 +169,153 @@ mod testing {
     use super::*;
     use crate::{Strand, StrandedBed3};
 
+    const STRAND_METHODS: [StrandMethod; 3] = [
+        StrandMethod::Ignore,
+        StrandMethod::MatchStrand,
+        StrandMethod::OppositeStrand,
+    ];
+
+    // Validate Query
+    #[test]
+    fn validate_query_compare() {
+        for sm in &STRAND_METHODS {
+            let query: Query<usize> = Query::new(QueryMethod::Compare, *sm);
+            assert!(query.validate().is_ok());
+        }
+    }
+
+    #[test]
+    fn validate_query_compare_by() {
+        for sm in &STRAND_METHODS {
+            let query: Query<usize> = Query::new(QueryMethod::CompareBy(10), *sm);
+            assert!(query.validate().is_ok());
+
+            let query: Query<usize> = Query::new(QueryMethod::CompareBy(0), *sm);
+            assert!(query.validate().is_err());
+        }
+    }
+
+    #[test]
+    fn validate_query_compare_exact() {
+        for sm in &STRAND_METHODS {
+            let query: Query<usize> = Query::new(QueryMethod::CompareExact(10), *sm);
+            assert!(query.validate().is_ok());
+            let query: Query<usize> = Query::new(QueryMethod::CompareExact(0), *sm);
+            assert!(query.validate().is_err());
+        }
+    }
+
+    #[test]
+    fn validate_query_compare_by_query_fraction() {
+        for sm in &STRAND_METHODS {
+            let query: Query<usize> = Query::new(QueryMethod::CompareByQueryFraction(0.5), *sm);
+            assert!(query.validate().is_ok());
+            let query: Query<usize> = Query::new(QueryMethod::CompareByQueryFraction(1.0), *sm);
+            assert!(query.validate().is_ok());
+            let query: Query<usize> = Query::new(QueryMethod::CompareByQueryFraction(0.0), *sm);
+            assert!(query.validate().is_err());
+            let query: Query<usize> = Query::new(QueryMethod::CompareByQueryFraction(-0.1), *sm);
+            assert!(query.validate().is_err());
+            let query: Query<usize> = Query::new(QueryMethod::CompareByQueryFraction(2.0), *sm);
+            assert!(query.validate().is_err());
+        }
+    }
+
+    #[test]
+    fn validate_query_compare_by_target_fraction() {
+        for sm in &STRAND_METHODS {
+            let query: Query<usize> = Query::new(QueryMethod::CompareByTargetFraction(0.5), *sm);
+            assert!(query.validate().is_ok());
+            let query: Query<usize> = Query::new(QueryMethod::CompareByTargetFraction(1.0), *sm);
+            assert!(query.validate().is_ok());
+            let query: Query<usize> = Query::new(QueryMethod::CompareByTargetFraction(0.0), *sm);
+            assert!(query.validate().is_err());
+            let query: Query<usize> = Query::new(QueryMethod::CompareByTargetFraction(-0.1), *sm);
+            assert!(query.validate().is_err());
+            let query: Query<usize> = Query::new(QueryMethod::CompareByTargetFraction(2.0), *sm);
+            assert!(query.validate().is_err());
+        }
+    }
+
+    #[test]
+    fn validate_query_compare_reciprocal_fraction_and() {
+        for sm in &STRAND_METHODS {
+            let query: Query<usize> =
+                Query::new(QueryMethod::CompareReciprocalFractionAnd(0.5, 0.5), *sm);
+            assert!(query.validate().is_ok());
+            let query: Query<usize> =
+                Query::new(QueryMethod::CompareReciprocalFractionAnd(1.0, 1.0), *sm);
+            assert!(query.validate().is_ok());
+            let query: Query<usize> =
+                Query::new(QueryMethod::CompareReciprocalFractionAnd(0.0, 0.0), *sm);
+            assert!(query.validate().is_err());
+            let query: Query<usize> =
+                Query::new(QueryMethod::CompareReciprocalFractionAnd(-0.1, -0.1), *sm);
+            assert!(query.validate().is_err());
+            let query: Query<usize> =
+                Query::new(QueryMethod::CompareReciprocalFractionAnd(2.0, 2.0), *sm);
+            assert!(query.validate().is_err());
+
+            let query: Query<usize> =
+                Query::new(QueryMethod::CompareReciprocalFractionAnd(0.5, 0.0), *sm);
+            assert!(query.validate().is_err());
+            let query: Query<usize> =
+                Query::new(QueryMethod::CompareReciprocalFractionAnd(0.0, 0.5), *sm);
+            assert!(query.validate().is_err());
+            let query: Query<usize> =
+                Query::new(QueryMethod::CompareReciprocalFractionAnd(-0.1, 0.5), *sm);
+            assert!(query.validate().is_err());
+            let query: Query<usize> =
+                Query::new(QueryMethod::CompareReciprocalFractionAnd(0.5, -0.1), *sm);
+            assert!(query.validate().is_err());
+            let query: Query<usize> =
+                Query::new(QueryMethod::CompareReciprocalFractionAnd(2.0, 0.5), *sm);
+            assert!(query.validate().is_err());
+            let query: Query<usize> =
+                Query::new(QueryMethod::CompareReciprocalFractionAnd(0.5, 2.0), *sm);
+            assert!(query.validate().is_err());
+        }
+    }
+
+    #[test]
+    fn validate_query_compare_reciprocal_fraction_or() {
+        for sm in &STRAND_METHODS {
+            let query: Query<usize> =
+                Query::new(QueryMethod::CompareReciprocalFractionOr(0.5, 0.5), *sm);
+            assert!(query.validate().is_ok());
+            let query: Query<usize> =
+                Query::new(QueryMethod::CompareReciprocalFractionOr(1.0, 1.0), *sm);
+            assert!(query.validate().is_ok());
+            let query: Query<usize> =
+                Query::new(QueryMethod::CompareReciprocalFractionOr(0.0, 0.0), *sm);
+            assert!(query.validate().is_err());
+            let query: Query<usize> =
+                Query::new(QueryMethod::CompareReciprocalFractionOr(-0.1, -0.1), *sm);
+            assert!(query.validate().is_err());
+            let query: Query<usize> =
+                Query::new(QueryMethod::CompareReciprocalFractionOr(2.0, 2.0), *sm);
+            assert!(query.validate().is_err());
+            let query: Query<usize> =
+                Query::new(QueryMethod::CompareReciprocalFractionOr(0.5, 0.0), *sm);
+            assert!(query.validate().is_err());
+            let query: Query<usize> =
+                Query::new(QueryMethod::CompareReciprocalFractionOr(0.0, 0.5), *sm);
+            assert!(query.validate().is_err());
+            let query: Query<usize> =
+                Query::new(QueryMethod::CompareReciprocalFractionOr(-0.1, 0.5), *sm);
+            assert!(query.validate().is_err());
+            let query: Query<usize> =
+                Query::new(QueryMethod::CompareReciprocalFractionOr(0.5, -0.1), *sm);
+            assert!(query.validate().is_err());
+            let query: Query<usize> =
+                Query::new(QueryMethod::CompareReciprocalFractionOr(2.0, 0.5), *sm);
+            assert!(query.validate().is_err());
+            let query: Query<usize> =
+                Query::new(QueryMethod::CompareReciprocalFractionOr(0.5, 2.0), *sm);
+            assert!(query.validate().is_err());
+        }
+    }
+
     // Compare
 
     #[test]
