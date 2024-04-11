@@ -78,11 +78,14 @@ where
                 break;
             }
             let test_iv = &self.records()[position];
-            let distance = query.distance(test_iv)?;
-            if distance < current_dist {
-                current_dist = distance;
-                current_lowest = position;
-            } else if distance >= current_dist {
+            if let Some(distance) = query.distance(test_iv) {
+                if distance < current_dist {
+                    current_dist = distance;
+                    current_lowest = position;
+                } else if distance >= current_dist {
+                    break;
+                }
+            } else {
                 break;
             }
             position += 1;
@@ -126,13 +129,17 @@ where
                     }
                     StrandMethod::Ignore => {}
                 }
-                let distance = query.distance(test_iv)?;
-                if distance < current_dist {
-                    current_dist = distance;
-                    current_lowest = position;
-                } else if distance >= current_dist {
+                if let Some(distance) = query.distance(test_iv) {
+                    if distance < current_dist {
+                        current_dist = distance;
+                        current_lowest = position;
+                    } else if distance >= current_dist {
+                        break;
+                    }
+                } else {
                     break;
                 }
+                position += 1;
             }
             Some(&self.records()[current_lowest])
         } else {
@@ -176,11 +183,14 @@ where
                     }
                     StrandMethod::Ignore => {}
                 }
-                let distance = query.distance(test_iv)?;
-                if distance < current_dist {
-                    current_dist = distance;
-                    current_lowest = position;
-                } else if distance >= current_dist {
+                if let Some(distance) = query.distance(test_iv) {
+                    if distance < current_dist {
+                        current_dist = distance;
+                        current_lowest = position;
+                    } else if distance >= current_dist {
+                        break;
+                    }
+                } else {
                     break;
                 }
                 position += 1;
@@ -319,6 +329,80 @@ mod testing {
         let set = IntervalContainer::from_unsorted(intervals);
         let closest = set.closest(&query, StrandMethod::Ignore).unwrap().unwrap();
         assert!(closest.eq(&Bed3::new(1, 10, 20)));
+    }
+
+    #[test]
+    /// |1|        x----y   x----y
+    /// |1|   i-j
+    /// ========================================
+    ///           x-----y
+    fn closest_g() {
+        let set =
+            IntervalContainer::from_unsorted(vec![Bed3::new(1, 20, 30), Bed3::new(1, 40, 50)]);
+        let query = Bed3::new(1, 10, 15);
+        let closest = set.closest(&query, StrandMethod::Ignore).unwrap().unwrap();
+        assert!(closest.eq(&Bed3::new(1, 20, 30)));
+    }
+
+    #[test]
+    /// 1       715     865
+    /// 2       197     347
+    /// 3       623     773
+    /// 4       77      227
+    /// 4       418     568
+    /// 5       2       152
+    /// 5       275     425
+    /// 5       334     484
+    /// 5       501     651
+    /// 5       521     671
+    fn closest_h() {
+        let set = IntervalContainer::from_unsorted(vec![
+            Bed3::new(1, 715, 865),
+            Bed3::new(2, 197, 347),
+            Bed3::new(3, 623, 773),
+            Bed3::new(4, 77, 227),
+            Bed3::new(4, 418, 568),
+            Bed3::new(5, 2, 152),
+            Bed3::new(5, 275, 425),
+            Bed3::new(5, 334, 484),
+            Bed3::new(5, 501, 651),
+            Bed3::new(5, 521, 671),
+        ]);
+        let query = Bed3::new(1, 72, 222);
+        let closest = set.closest(&query, StrandMethod::Ignore).unwrap().unwrap();
+        assert!(closest.eq(&Bed3::new(1, 715, 865)));
+    }
+
+    #[test]
+    /// 1   715 865 0   .   +
+    /// 2   197 347 0   .   -
+    /// 3   623 773 0   .   -
+    /// 4   77  227 0   .   +
+    /// 4   418 568 0   .   +
+    /// 5   2   152 0   .   +
+    /// 5   275 425 0   .   -
+    /// 5   334 484 0   .   +
+    /// 5   501 651 0   .   +
+    /// 5   521 671 0   .   -
+    fn closest_stranded_a() {
+        let set = IntervalContainer::from_unsorted(vec![
+            StrandedBed3::new(1, 715, 865, Strand::Forward),
+            StrandedBed3::new(2, 197, 347, Strand::Reverse),
+            StrandedBed3::new(3, 623, 773, Strand::Reverse),
+            StrandedBed3::new(4, 77, 227, Strand::Forward),
+            StrandedBed3::new(4, 418, 568, Strand::Forward),
+            StrandedBed3::new(5, 2, 152, Strand::Forward),
+            StrandedBed3::new(5, 275, 425, Strand::Reverse),
+            StrandedBed3::new(5, 334, 484, Strand::Forward),
+            StrandedBed3::new(5, 501, 651, Strand::Forward),
+            StrandedBed3::new(5, 521, 671, Strand::Reverse),
+        ]);
+        let query = StrandedBed3::new(4, 212, 362, Strand::Forward);
+        let closest = set
+            .closest(&query, StrandMethod::MatchStrand)
+            .unwrap()
+            .unwrap();
+        assert!(closest.eq(&StrandedBed3::new(4, 418, 568, Strand::Forward)));
     }
 
     #[test]

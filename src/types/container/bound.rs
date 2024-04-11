@@ -432,9 +432,7 @@ where
         // partition point returns the first index in the slice for which
         // the predicate fails (i.e. the index of the first record that is
         // greater than the query).
-        let lt_bound = self
-            .records()
-            .partition_point(|iv| iv.lt(query) && iv.bounded_strand(query));
+        let lt_bound = self.records().partition_point(|iv| iv.lt(query));
 
         // Iterate from the low bound to the end of the set and find the first
         // record that shares a strand with the query.
@@ -460,9 +458,7 @@ where
         // partition point returns the first index in the slice for which
         // the predicate fails (i.e. the index of the first record that is
         // greater than the query).
-        let lt_bound = self
-            .records()
-            .partition_point(|iv| iv.lt(query) && !iv.bounded_strand(query));
+        let lt_bound = self.records().partition_point(|iv| iv.lt(query));
 
         // Iterate from the low bound to the end of the set and find the first
         // record that shares a strand with the query.
