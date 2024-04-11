@@ -11,7 +11,8 @@ where
     C: ChromBounds,
     T: ValueBounds,
 {
-    pub fn closest<Iv>(&self, query: &Iv) -> Result<Option<&I>, SetError>
+    /// Returns the closest interval to the query interval.
+    pub fn closest<Iv>(&self, query: &Iv, method: StrandMethod) -> Result<Option<&I>, SetError>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -19,7 +20,7 @@ where
             if self.records().is_empty() {
                 return Err(SetError::EmptySet);
             }
-            Ok(self.closest_unchecked(query))
+            Ok(self.closest_unchecked(query, method))
         } else {
             Err(SetError::UnsortedSet)
         }
@@ -61,13 +62,13 @@ where
         }
     }
 
-    pub fn closest_unchecked<Iv>(&self, query: &Iv) -> Option<&I>
+    pub fn closest_unchecked<Iv>(&self, query: &Iv, method: StrandMethod) -> Option<&I>
     where
         Iv: IntervalBounds<C, T>,
     {
-        let bound = match self.bound_upstream_unchecked(query) {
+        let bound = match self.bound_upstream_unchecked(query, method) {
             Some(bound) => bound,
-            None => self.bound_downstream_unchecked(query)?,
+            None => self.bound_downstream_unchecked(query, method)?,
         };
         let mut current_dist = T::max_value();
         let mut current_lowest = bound;
@@ -94,7 +95,7 @@ where
         Iv: IntervalBounds<C, T>,
     {
         let bound_fn = match method {
-            StrandMethod::Ignore => Self::bound_upstream_unchecked::<Iv>,
+            StrandMethod::Ignore => Self::bound_igstrand_upstream_unchecked::<Iv>,
             StrandMethod::MatchStrand => Self::bound_stranded_upstream_unchecked::<Iv>,
             StrandMethod::OppositeStrand => Self::bound_unstranded_upstream_unchecked::<Iv>,
         };
@@ -144,7 +145,7 @@ where
         Iv: IntervalBounds<C, T>,
     {
         let bound_fn = match method {
-            StrandMethod::Ignore => Self::bound_downstream_unchecked::<Iv>,
+            StrandMethod::Ignore => Self::bound_igstrand_downstream_unchecked::<Iv>,
             StrandMethod::MatchStrand => Self::bound_stranded_downstream_unchecked::<Iv>,
             StrandMethod::OppositeStrand => Self::bound_unstranded_downstream_unchecked::<Iv>,
         };
@@ -207,7 +208,7 @@ mod testing {
         ];
         let query = Bed3::new(1, 22, 23);
         let set = IntervalContainer::new(intervals);
-        assert!(set.closest(&query).is_err());
+        assert!(set.closest(&query, StrandMethod::Ignore).is_err());
         assert!(set.closest_upstream(&query, StrandMethod::Ignore).is_err());
         assert!(set
             .closest_downstream(&query, StrandMethod::Ignore)
@@ -219,7 +220,7 @@ mod testing {
         let intervals: Vec<Bed3<_, _>> = vec![];
         let query = Bed3::new(1, 22, 23);
         let set = IntervalContainer::from_unsorted(intervals);
-        assert!(set.closest(&query).is_err());
+        assert!(set.closest(&query, StrandMethod::Ignore).is_err());
         assert!(set.closest_upstream(&query, StrandMethod::Ignore).is_err());
         assert!(set
             .closest_downstream(&query, StrandMethod::Ignore)
@@ -239,7 +240,7 @@ mod testing {
         ];
         let query = Bed3::new(1, 22, 23);
         let set = IntervalContainer::from_unsorted(intervals);
-        let closest = set.closest(&query).unwrap().unwrap();
+        let closest = set.closest(&query, StrandMethod::Ignore).unwrap().unwrap();
         assert!(closest.eq(&Bed3::new(1, 10, 20)));
     }
 
@@ -256,7 +257,7 @@ mod testing {
         ];
         let query = Bed3::new(1, 22, 32);
         let set = IntervalContainer::from_unsorted(intervals);
-        let closest = set.closest(&query).unwrap().unwrap();
+        let closest = set.closest(&query, StrandMethod::Ignore).unwrap().unwrap();
         assert!(closest.eq(&Bed3::new(1, 30, 40)));
     }
 
@@ -273,7 +274,7 @@ mod testing {
         ];
         let query = Bed3::new(1, 22, 30);
         let set = IntervalContainer::from_unsorted(intervals);
-        let closest = set.closest(&query).unwrap().unwrap();
+        let closest = set.closest(&query, StrandMethod::Ignore).unwrap().unwrap();
         assert!(closest.eq(&Bed3::new(1, 30, 40)));
     }
 
@@ -290,7 +291,7 @@ mod testing {
         ];
         let query = Bed3::new(2, 46, 47);
         let set = IntervalContainer::from_unsorted(intervals);
-        let closest = set.closest(&query).unwrap().unwrap();
+        let closest = set.closest(&query, StrandMethod::Ignore).unwrap().unwrap();
         assert!(closest.eq(&Bed3::new(2, 50, 60)));
     }
 
@@ -303,7 +304,7 @@ mod testing {
         let intervals = vec![Bed3::new(1, 10, 20), Bed3::new(1, 30, 40)];
         let query = Bed3::new(2, 46, 47);
         let set = IntervalContainer::from_unsorted(intervals);
-        let closest = set.closest(&query).unwrap();
+        let closest = set.closest(&query, StrandMethod::Ignore).unwrap();
         assert!(closest.is_none());
     }
 
@@ -316,7 +317,7 @@ mod testing {
         let intervals = vec![Bed3::new(1, 10, 20), Bed3::new(1, 30, 40)];
         let query = Bed3::new(1, 24, 26);
         let set = IntervalContainer::from_unsorted(intervals);
-        let closest = set.closest(&query).unwrap().unwrap();
+        let closest = set.closest(&query, StrandMethod::Ignore).unwrap().unwrap();
         assert!(closest.eq(&Bed3::new(1, 10, 20)));
     }
 

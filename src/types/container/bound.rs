@@ -175,12 +175,29 @@ where
                 return Err(SetError::EmptySet);
             }
             match method {
-                StrandMethod::Ignore => Ok(self.bound_upstream_unchecked(query)),
+                StrandMethod::Ignore => Ok(self.bound_igstrand_upstream_unchecked(query)),
                 StrandMethod::MatchStrand => Ok(self.bound_stranded_upstream_unchecked(query)),
                 StrandMethod::OppositeStrand => Ok(self.bound_unstranded_upstream_unchecked(query)),
             }
         } else {
             Err(SetError::UnsortedSet)
+        }
+    }
+
+    /// Finds the latest record in the [Container] that shares a chromosome
+    /// with the query and is upstream. Can result in an error if the [Container]
+    /// is not sorted.
+    ///
+    /// Will return `None` if no record shares a chromosome with the query and is
+    /// upstream.
+    pub fn bound_upstream_unchecked<Iv>(&self, query: &Iv, method: StrandMethod) -> Option<usize>
+    where
+        Iv: IntervalBounds<C, T>,
+    {
+        match method {
+            StrandMethod::Ignore => self.bound_igstrand_upstream_unchecked(query),
+            StrandMethod::MatchStrand => self.bound_stranded_upstream_unchecked(query),
+            StrandMethod::OppositeStrand => self.bound_unstranded_upstream_unchecked(query),
         }
     }
 
@@ -203,7 +220,7 @@ where
                 return Err(SetError::EmptySet);
             }
             match method {
-                StrandMethod::Ignore => Ok(self.bound_downstream_unchecked(query)),
+                StrandMethod::Ignore => Ok(self.bound_igstrand_downstream_unchecked(query)),
                 StrandMethod::MatchStrand => Ok(self.bound_stranded_downstream_unchecked(query)),
                 StrandMethod::OppositeStrand => {
                     Ok(self.bound_unstranded_downstream_unchecked(query))
@@ -211,6 +228,23 @@ where
             }
         } else {
             Err(SetError::UnsortedSet)
+        }
+    }
+
+    /// Finds the earliest record in the [Container] that shares a chromosome
+    /// with the query and is downstream. Can result in an error if the [Container]
+    /// is not sorted.
+    ///
+    /// Will return `None` if no record shares a chromosome with the query and is
+    /// downstream.
+    pub fn bound_downstream_unchecked<Iv>(&self, query: &Iv, method: StrandMethod) -> Option<usize>
+    where
+        Iv: IntervalBounds<C, T>,
+    {
+        match method {
+            StrandMethod::Ignore => self.bound_igstrand_downstream_unchecked(query),
+            StrandMethod::MatchStrand => self.bound_stranded_downstream_unchecked(query),
+            StrandMethod::OppositeStrand => self.bound_unstranded_downstream_unchecked(query),
         }
     }
 
@@ -246,7 +280,7 @@ where
     /// Finds the latest record in the [Container] that shares a chromosome
     /// and is upstream of the query. Does not perform a check if it is
     /// sorted beforehand. Use at your own risk.
-    pub fn bound_upstream_unchecked<Iv>(&self, query: &Iv) -> Option<usize>
+    pub fn bound_igstrand_upstream_unchecked<Iv>(&self, query: &Iv) -> Option<usize>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -353,7 +387,7 @@ where
     /// Finds the earliest record in the [Container] that shares a chromosome
     /// and is downstream of the query. Does not perform a check if it is
     /// sorted beforehand. Use at your own risk.
-    pub fn bound_downstream_unchecked<Iv>(&self, query: &Iv) -> Option<usize>
+    pub fn bound_igstrand_downstream_unchecked<Iv>(&self, query: &Iv) -> Option<usize>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -1106,7 +1140,7 @@ mod testing {
         ];
         let set = IntervalContainer::from_sorted_unchecked(records);
         let query = Bed3::new(1, 5, 25);
-        let bound = set.bound_upstream_unchecked(&query);
+        let bound = set.bound_upstream_unchecked(&query, StrandMethod::Ignore);
         assert_eq!(bound, None);
     }
 
