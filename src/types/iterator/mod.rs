@@ -7,7 +7,7 @@ mod merge;
 mod subtract;
 pub use cluster::ClusterIter;
 pub use complement::ComplementIter;
-pub use find::{FindIter, FindIterOwned};
+pub use find::{FindIter, FindIterEnumerate, FindIterOwned};
 pub use intersect::IntersectIter;
 pub use interval::{IntervalIterOwned, IntervalIterRef};
 pub use merge::MergeIter;

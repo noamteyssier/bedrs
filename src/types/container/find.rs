@@ -1,7 +1,7 @@
 // use super::Container;
 use crate::{
     traits::{errors::SetError, ChromBounds, IntervalBounds, ValueBounds},
-    types::{FindIter, FindIterOwned, IntervalContainer, Query},
+    types::{FindIter, FindIterEnumerate, FindIterOwned, IntervalContainer, Query},
 };
 use anyhow::Result;
 
@@ -27,6 +27,32 @@ where
         if self.is_sorted() {
             method.validate()?;
             Ok(FindIter::new(
+                self.records(),
+                query,
+                self.lower_bound_unchecked(query),
+                method,
+            ))
+        } else {
+            Err(SetError::UnsortedSet)
+        }
+    }
+
+    /// Find all intervals that overlap a query interval
+    /// and return an iterator over the intervals alongside their
+    /// index in the sorted set.
+    ///
+    /// Will return an error if the set is not sorted.
+    pub fn query_iter_enumerate<'a, Iv>(
+        &'a self,
+        query: &'a Iv,
+        method: Query<T>,
+    ) -> Result<FindIterEnumerate<'_, C, T, I, Iv>, SetError>
+    where
+        Iv: IntervalBounds<C, T>,
+    {
+        if self.is_sorted() {
+            method.validate()?;
+            Ok(FindIterEnumerate::new(
                 self.records(),
                 query,
                 self.lower_bound_unchecked(query),
