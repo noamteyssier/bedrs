@@ -11,6 +11,76 @@ where
     C: ChromBounds,
     T: ValueBounds,
 {
+    /// Merges overlapping intervals within a container
+    ///
+    /// ```text
+    /// (a)    i----j
+    /// (b)      k----l
+    /// (c)        m----n
+    /// (d)                  o----p
+    /// (e)                    q----r
+    /// ===============================
+    /// (1)    i--------n
+    /// (2)                  o------r
+    /// ```
+    pub fn merge(&self) -> Result<Self, SetError> {
+        if self.is_sorted() {
+            Ok(self.merge_unchecked())
+        } else {
+            Err(SetError::UnsortedSet)
+        }
+    }
+
+    /// Merges overlapping intervals within a container
+    ///
+    /// ```text
+    /// (a)    |---->
+    /// (b)      |---->
+    /// (c)        <----|
+    /// (d)                  |---->
+    /// (e)                    |---->
+    /// ===============================
+    /// (1)    |------>
+    /// (2)        <----|
+    /// (3)                  |------>
+    /// ```
+    ///
+    /// Can return `None` in the case where there are no stranded intervals
+    pub fn merge_stranded(&self) -> Result<Option<Self>, SetError> {
+        if self.is_sorted() {
+            Ok(self.merge_stranded_unchecked())
+        } else {
+            Err(SetError::UnsortedSet)
+        }
+    }
+
+    /// Merges overlapping intervals within a container
+    /// if they are on a specific strand only.
+    ///
+    /// Ignores all other intervals
+    ///
+    /// ```text
+    /// (a)    |---->
+    /// (b)      |---->
+    /// (c)        <----|
+    /// (d)                  |---->
+    /// (e)                    |---->
+    /// ===============================
+    /// (1)    |------>
+    /// (3)                  |------>
+    /// ```
+    ///
+    /// Can return `None` in the case where there are no stranded intervals
+    pub fn merge_specific_strand(&self, strand: Strand) -> Result<Option<Self>, SetError> {
+        if self.is_sorted() {
+            match strand {
+                Strand::Unknown => Err(SetError::CannotAcceptUnknownStrand),
+                s => Ok(self.merge_spec_strand_unchecked(s)),
+            }
+        } else {
+            Err(SetError::UnsortedSet)
+        }
+    }
     fn merge_pred(a: &I, b: &I) -> bool {
         a.overlaps(b) || a.borders(b)
     }
@@ -213,77 +283,6 @@ where
             }
         }
         Some(IntervalContainer::from_sorted_unchecked(cluster_intervals))
-    }
-
-    /// Merges overlapping intervals within a container
-    ///
-    /// ```text
-    /// (a)    i----j
-    /// (b)      k----l
-    /// (c)        m----n
-    /// (d)                  o----p
-    /// (e)                    q----r
-    /// ===============================
-    /// (1)    i--------n
-    /// (2)                  o------r
-    /// ```
-    pub fn merge(&self) -> Result<Self, SetError> {
-        if self.is_sorted() {
-            Ok(self.merge_unchecked())
-        } else {
-            Err(SetError::UnsortedSet)
-        }
-    }
-
-    /// Merges overlapping intervals within a container
-    ///
-    /// ```text
-    /// (a)    |---->
-    /// (b)      |---->
-    /// (c)        <----|
-    /// (d)                  |---->
-    /// (e)                    |---->
-    /// ===============================
-    /// (1)    |------>
-    /// (2)        <----|
-    /// (3)                  |------>
-    /// ```
-    ///
-    /// Can return `None` in the case where there are no stranded intervals
-    pub fn merge_stranded(&self) -> Result<Option<Self>, SetError> {
-        if self.is_sorted() {
-            Ok(self.merge_stranded_unchecked())
-        } else {
-            Err(SetError::UnsortedSet)
-        }
-    }
-
-    /// Merges overlapping intervals within a container
-    /// if they are on a specific strand only.
-    ///
-    /// Ignores all other intervals
-    ///
-    /// ```text
-    /// (a)    |---->
-    /// (b)      |---->
-    /// (c)        <----|
-    /// (d)                  |---->
-    /// (e)                    |---->
-    /// ===============================
-    /// (1)    |------>
-    /// (3)                  |------>
-    /// ```
-    ///
-    /// Can return `None` in the case where there are no stranded intervals
-    pub fn merge_specific_strand(&self, strand: Strand) -> Result<Option<Self>, SetError> {
-        if self.is_sorted() {
-            match strand {
-                Strand::Unknown => Err(SetError::CannotAcceptUnknownStrand),
-                s => Ok(self.merge_spec_strand_unchecked(s)),
-            }
-        } else {
-            Err(SetError::UnsortedSet)
-        }
     }
 }
 
