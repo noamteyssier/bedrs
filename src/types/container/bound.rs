@@ -1,5 +1,6 @@
 use crate::{
     traits::{errors::SetError, ChromBounds, IntervalBounds, ValueBounds},
+    types::StrandMethod,
     IntervalContainer,
 };
 use std::cmp::Ordering;
@@ -161,7 +162,11 @@ where
     ///
     /// Will return `None` if no record shares a chromosome with the query and is
     /// upstream.
-    pub fn chr_bound_upstream<Iv>(&self, query: &Iv) -> Result<Option<usize>, SetError>
+    pub fn bound_upstream<Iv>(
+        &self,
+        query: &Iv,
+        method: StrandMethod,
+    ) -> Result<Option<usize>, SetError>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -169,27 +174,11 @@ where
             if self.records().is_empty() {
                 return Err(SetError::EmptySet);
             }
-            Ok(self.chr_bound_upstream_unchecked(query))
-        } else {
-            Err(SetError::UnsortedSet)
-        }
-    }
-
-    /// Finds the latest record in the [Container] that shares a chromosome
-    /// and a strand with the query and is upstream. Can result in an error if
-    /// the [Container] is not sorted.
-    ///
-    /// Will return `None` if no record shares a chromosome and a strand with
-    /// the query and is upstream.
-    pub fn stranded_upstream_bound<Iv>(&self, query: &Iv) -> Result<Option<usize>, SetError>
-    where
-        Iv: IntervalBounds<C, T>,
-    {
-        if self.is_sorted() {
-            if self.records().is_empty() {
-                return Err(SetError::EmptySet);
+            match method {
+                StrandMethod::Ignore => Ok(self.bound_upstream_unchecked(query)),
+                StrandMethod::MatchStrand => Ok(self.bound_stranded_upstream_unchecked(query)),
+                StrandMethod::OppositeStrand => Ok(self.bound_unstranded_upstream_unchecked(query)),
             }
-            Ok(self.stranded_upstream_bound_unchecked(query))
         } else {
             Err(SetError::UnsortedSet)
         }
@@ -201,7 +190,11 @@ where
     ///
     /// Will return `None` if no record shares a chromosome with the query and is
     /// downstream.
-    pub fn chr_bound_downstream<Iv>(&self, query: &Iv) -> Result<Option<usize>, SetError>
+    pub fn bound_downstream<Iv>(
+        &self,
+        query: &Iv,
+        method: StrandMethod,
+    ) -> Result<Option<usize>, SetError>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -209,27 +202,13 @@ where
             if self.records().is_empty() {
                 return Err(SetError::EmptySet);
             }
-            Ok(self.chr_bound_downstream_unchecked(query))
-        } else {
-            Err(SetError::UnsortedSet)
-        }
-    }
-
-    /// Finds the earliest record in the [Container] that shares a chromosome
-    /// and a strand with the query and is downstream. Can result in an error if
-    /// the [Container] is not sorted.
-    ///
-    /// Will return `None` if no record shares a chromosome and a strand with
-    /// the query and is downstream.
-    pub fn stranded_downstream_bound<Iv>(&self, query: &Iv) -> Result<Option<usize>, SetError>
-    where
-        Iv: IntervalBounds<C, T>,
-    {
-        if self.is_sorted() {
-            if self.records().is_empty() {
-                return Err(SetError::EmptySet);
+            match method {
+                StrandMethod::Ignore => Ok(self.bound_downstream_unchecked(query)),
+                StrandMethod::MatchStrand => Ok(self.bound_stranded_downstream_unchecked(query)),
+                StrandMethod::OppositeStrand => {
+                    Ok(self.bound_unstranded_downstream_unchecked(query))
+                }
             }
-            Ok(self.stranded_downstream_bound_unchecked(query))
         } else {
             Err(SetError::UnsortedSet)
         }
@@ -267,7 +246,7 @@ where
     /// Finds the latest record in the [Container] that shares a chromosome
     /// and is upstream of the query. Does not perform a check if it is
     /// sorted beforehand. Use at your own risk.
-    pub fn chr_bound_upstream_unchecked<Iv>(&self, query: &Iv) -> Option<usize>
+    pub fn bound_upstream_unchecked<Iv>(&self, query: &Iv) -> Option<usize>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -299,7 +278,7 @@ where
         }
     }
 
-    pub fn stranded_upstream_bound_unchecked<Iv>(&self, query: &Iv) -> Option<usize>
+    pub fn bound_stranded_upstream_unchecked<Iv>(&self, query: &Iv) -> Option<usize>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -335,10 +314,46 @@ where
         }
     }
 
+    pub fn bound_unstranded_upstream_unchecked<Iv>(&self, query: &Iv) -> Option<usize>
+    where
+        Iv: IntervalBounds<C, T>,
+    {
+        // partition point returns the first index in the slice for which
+        // the predicate fails (i.e. the index of the first record that is
+        // greater than the query).
+        let low = self
+            .records()
+            .partition_point(|iv| iv.lt(query) && !iv.bounded_strand(query));
+
+        // If the low index is 0, then the query is potentially less than
+        // all records in the set.
+        if low == 0 {
+            None
+        } else {
+            // otherwise the low index is the index of the first record that
+            // is greater than the query. We subtract 1 to get the index of
+            // the last record that is less than the query.
+            let idx = low - 1;
+
+            // If the record at the index has the same chromosome as the
+            // query and they share a strand then return the index.
+            if self.records()[idx].chr() == query.chr()
+                && self.records()[idx].strand() != query.strand()
+            {
+                Some(idx)
+
+            // Otherwise, the query is less than all records in the set
+            // that share a chromosome and strand.
+            } else {
+                None
+            }
+        }
+    }
+
     /// Finds the earliest record in the [Container] that shares a chromosome
     /// and is downstream of the query. Does not perform a check if it is
     /// sorted beforehand. Use at your own risk.
-    pub fn chr_bound_downstream_unchecked<Iv>(&self, query: &Iv) -> Option<usize>
+    pub fn bound_downstream_unchecked<Iv>(&self, query: &Iv) -> Option<usize>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -376,14 +391,16 @@ where
     /// Finds the earliest record in the [Container] that shares a chromosome
     /// and is downstream of the query and shares a strand. Does not perform a check if it is
     /// sorted beforehand. Use at your own risk.
-    pub fn stranded_downstream_bound_unchecked<Iv>(&self, query: &Iv) -> Option<usize>
+    pub fn bound_stranded_downstream_unchecked<Iv>(&self, query: &Iv) -> Option<usize>
     where
         Iv: IntervalBounds<C, T>,
     {
         // partition point returns the first index in the slice for which
         // the predicate fails (i.e. the index of the first record that is
         // greater than the query).
-        let lt_bound = self.records().partition_point(|iv| iv.lt(query));
+        let lt_bound = self
+            .records()
+            .partition_point(|iv| iv.lt(query) && iv.bounded_strand(query));
 
         // Iterate from the low bound to the end of the set and find the first
         // record that shares a strand with the query.
@@ -398,12 +415,41 @@ where
 
         Some(lt_bound + strand_bound)
     }
+
+    /// Finds the earliest record in the [Container] that shares a chromosome
+    /// and is downstream of the query and opposes its strand. Does not perform a check if it is
+    /// sorted beforehand. Use at your own risk.
+    pub fn bound_unstranded_downstream_unchecked<Iv>(&self, query: &Iv) -> Option<usize>
+    where
+        Iv: IntervalBounds<C, T>,
+    {
+        // partition point returns the first index in the slice for which
+        // the predicate fails (i.e. the index of the first record that is
+        // greater than the query).
+        let lt_bound = self
+            .records()
+            .partition_point(|iv| iv.lt(query) && !iv.bounded_strand(query));
+
+        // Iterate from the low bound to the end of the set and find the first
+        // record that shares a strand with the query.
+        // This will short-circuit on the first record that does not share a
+        // chromosome and return None.
+        let strand_bound = self.records()[lt_bound..]
+            .iter()
+            .enumerate()
+            .take_while(|(_, iv)| iv.bounded_chr(query))
+            .find(|(_, iv)| !iv.bounded_strand(query))?
+            .0;
+
+        Some(lt_bound + strand_bound)
+    }
 }
 
 #[cfg(test)]
 mod testing {
     use crate::{
-        traits::errors::SetError, BaseInterval, Bed3, IntervalContainer, Strand, StrandedBed3,
+        traits::errors::SetError, types::StrandMethod, BaseInterval, Bed3, IntervalContainer,
+        Strand, StrandedBed3,
     };
 
     #[test]
@@ -655,7 +701,8 @@ mod testing {
         ];
         let query = Bed3::new(2, 100, 300);
         let set = IntervalContainer::from_unsorted(intervals);
-        let bound = set.chr_bound_upstream(&query).unwrap();
+        let method = StrandMethod::Ignore;
+        let bound = set.bound_upstream(&query, method).unwrap();
         assert_eq!(bound, Some(2));
     }
 
@@ -669,7 +716,8 @@ mod testing {
         ];
         let query = Bed3::new(2, 18, 300);
         let set = IntervalContainer::from_unsorted(intervals);
-        let bound = set.chr_bound_upstream(&query).unwrap();
+        let method = StrandMethod::Ignore;
+        let bound = set.bound_upstream(&query, method).unwrap();
         assert_eq!(bound, Some(2));
     }
 
@@ -683,7 +731,8 @@ mod testing {
         ];
         let query = Bed3::new(2, 53, 300);
         let set = IntervalContainer::from_unsorted(intervals);
-        let bound = set.chr_bound_upstream(&query).unwrap();
+        let method = StrandMethod::Ignore;
+        let bound = set.bound_upstream(&query, method).unwrap();
         assert_eq!(bound, Some(2));
     }
 
@@ -697,7 +746,8 @@ mod testing {
         ];
         let query = Bed3::new(3, 54, 300);
         let set = IntervalContainer::from_unsorted(intervals);
-        let bound = set.chr_bound_upstream(&query).unwrap();
+        let method = StrandMethod::Ignore;
+        let bound = set.bound_upstream(&query, method).unwrap();
         assert_eq!(bound, Some(3));
     }
 
@@ -711,7 +761,8 @@ mod testing {
         ]; // no min
         let query = Bed3::new(3, 50, 52);
         let set = IntervalContainer::from_unsorted(intervals);
-        let bound = set.chr_bound_upstream(&query).unwrap();
+        let method = StrandMethod::Ignore;
+        let bound = set.bound_upstream(&query, method).unwrap();
         assert_eq!(bound, None);
     }
 
@@ -725,7 +776,8 @@ mod testing {
         ]; // no min
         let query = Bed3::new(1, 50, 52);
         let set = IntervalContainer::from_unsorted(intervals);
-        let bound = set.chr_bound_upstream(&query).unwrap();
+        let method = StrandMethod::Ignore;
+        let bound = set.bound_upstream(&query, method).unwrap();
         assert_eq!(bound, None);
     }
 
@@ -738,7 +790,8 @@ mod testing {
         ];
         let query = Bed3::new(1, 22, 32);
         let set = IntervalContainer::from_unsorted(intervals);
-        let bound = set.chr_bound_upstream(&query).unwrap();
+        let method = StrandMethod::Ignore;
+        let bound = set.bound_upstream(&query, method).unwrap();
         assert_eq!(bound, Some(0));
     }
 
@@ -752,7 +805,8 @@ mod testing {
         ];
         let query = Bed3::new(1, 8, 32);
         let set = IntervalContainer::from_unsorted(intervals);
-        let bound = set.chr_bound_upstream(&query).unwrap();
+        let method = StrandMethod::Ignore;
+        let bound = set.bound_upstream(&query, method).unwrap();
         assert_eq!(bound, None);
     }
 
@@ -768,7 +822,8 @@ mod testing {
         ];
         let query = StrandedBed3::new(2, 100, 300, Strand::Forward);
         let set = IntervalContainer::from_unsorted(intervals);
-        let bound = set.stranded_upstream_bound(&query).unwrap();
+        let method = StrandMethod::MatchStrand;
+        let bound = set.bound_upstream(&query, method).unwrap();
         assert_eq!(bound, Some(2));
     }
 
@@ -782,7 +837,8 @@ mod testing {
         ];
         let query = StrandedBed3::new(2, 100, 300, Strand::Forward);
         let set = IntervalContainer::from_unsorted(intervals);
-        let bound = set.stranded_upstream_bound(&query).unwrap();
+        let method = StrandMethod::MatchStrand;
+        let bound = set.bound_upstream(&query, method).unwrap();
         assert_eq!(bound, Some(1));
     }
 
@@ -795,7 +851,8 @@ mod testing {
         ];
         let query = StrandedBed3::new(2, 100, 300, Strand::Forward);
         let set = IntervalContainer::from_unsorted(intervals);
-        let bound = set.stranded_upstream_bound(&query).unwrap();
+        let method = StrandMethod::MatchStrand;
+        let bound = set.bound_upstream(&query, method).unwrap();
         assert_eq!(bound, None);
     }
 
@@ -809,7 +866,8 @@ mod testing {
         ];
         let query = StrandedBed3::new(2, 100, 300, Strand::Forward);
         let set = IntervalContainer::from_unsorted(intervals);
-        let bound = set.stranded_upstream_bound(&query).unwrap();
+        let method = StrandMethod::MatchStrand;
+        let bound = set.bound_upstream(&query, method).unwrap();
         assert_eq!(bound, Some(2));
     }
 
@@ -823,7 +881,7 @@ mod testing {
         ];
         let query = Bed3::new(2, 10, 300);
         let set = IntervalContainer::from_unsorted(intervals);
-        let bound = set.chr_bound_downstream(&query).unwrap();
+        let bound = set.bound_downstream(&query, StrandMethod::Ignore).unwrap();
         assert_eq!(bound, Some(2));
     }
 
@@ -837,7 +895,7 @@ mod testing {
         ];
         let query = Bed3::new(3, 10, 300);
         let set = IntervalContainer::from_unsorted(intervals);
-        let bound = set.chr_bound_downstream(&query).unwrap();
+        let bound = set.bound_downstream(&query, StrandMethod::Ignore).unwrap();
         assert_eq!(bound, Some(3));
     }
 
@@ -851,7 +909,7 @@ mod testing {
         ]; // no min
         let query = Bed3::new(3, 54, 300);
         let set = IntervalContainer::from_unsorted(intervals);
-        let bound = set.chr_bound_downstream(&query).unwrap();
+        let bound = set.bound_downstream(&query, StrandMethod::Ignore).unwrap();
         assert_eq!(bound, None);
     }
 
@@ -865,7 +923,7 @@ mod testing {
         ]; // no min
         let query = Bed3::new(1, 54, 300);
         let set = IntervalContainer::from_unsorted(intervals);
-        let bound = set.chr_bound_downstream(&query).unwrap();
+        let bound = set.bound_downstream(&query, StrandMethod::Ignore).unwrap();
         assert_eq!(bound, None);
     }
 
@@ -878,7 +936,7 @@ mod testing {
         ];
         let query = Bed3::new(1, 21, 71);
         let set = IntervalContainer::from_unsorted(intervals);
-        let bound = set.chr_bound_downstream(&query).unwrap();
+        let bound = set.bound_downstream(&query, StrandMethod::Ignore).unwrap();
         assert_eq!(bound, Some(0));
     }
 
@@ -896,7 +954,10 @@ mod testing {
         let set = IntervalContainer::from_unsorted(records);
         // set.sort();
         let query = Bed3::new(0, 12, 15);
-        let bound = set.chr_bound_downstream(&query).unwrap().unwrap();
+        let bound = set
+            .bound_downstream(&query, StrandMethod::Ignore)
+            .unwrap()
+            .unwrap();
         assert_eq!(bound, 4);
     }
 
@@ -911,7 +972,9 @@ mod testing {
         ];
         let query = StrandedBed3::new(2, 10, 300, Strand::Forward);
         let set = IntervalContainer::from_unsorted(intervals);
-        let bound = set.stranded_downstream_bound(&query).unwrap();
+        let bound = set
+            .bound_downstream(&query, StrandMethod::MatchStrand)
+            .unwrap();
         assert_eq!(bound, Some(2));
     }
 
@@ -926,7 +989,9 @@ mod testing {
         ];
         let query = StrandedBed3::new(2, 10, 300, Strand::Forward);
         let set = IntervalContainer::from_unsorted(intervals);
-        let bound = set.stranded_downstream_bound(&query).unwrap();
+        let bound = set
+            .bound_downstream(&query, StrandMethod::MatchStrand)
+            .unwrap();
         assert_eq!(bound, Some(3));
     }
 
@@ -942,7 +1007,9 @@ mod testing {
         ];
         let query = StrandedBed3::new(2, 10, 300, Strand::Forward);
         let set = IntervalContainer::from_unsorted(intervals);
-        let bound = set.stranded_downstream_bound(&query).unwrap();
+        let bound = set
+            .bound_downstream(&query, StrandMethod::MatchStrand)
+            .unwrap();
         assert_eq!(bound, Some(4));
     }
 
@@ -958,7 +1025,9 @@ mod testing {
         ];
         let query = StrandedBed3::new(2, 10, 300, Strand::Forward);
         let set = IntervalContainer::from_unsorted(intervals);
-        let bound = set.stranded_downstream_bound(&query).unwrap();
+        let bound = set
+            .bound_downstream(&query, StrandMethod::MatchStrand)
+            .unwrap();
         assert_eq!(bound, None);
     }
 
@@ -973,7 +1042,9 @@ mod testing {
         ];
         let query = StrandedBed3::new(1, 10, 300, Strand::Forward);
         let set = IntervalContainer::from_unsorted(intervals);
-        let bound = set.stranded_downstream_bound(&query).unwrap();
+        let bound = set
+            .bound_downstream(&query, StrandMethod::MatchStrand)
+            .unwrap();
         assert_eq!(bound, None);
     }
 
@@ -988,16 +1059,16 @@ mod testing {
         let bound = set.chr_bound(&query);
         assert_eq!(bound, Err(SetError::EmptySet));
 
-        let bound = set.chr_bound_upstream(&query);
+        let bound = set.bound_upstream(&query, StrandMethod::Ignore);
         assert_eq!(bound, Err(SetError::EmptySet));
 
-        let bound = set.chr_bound_downstream(&query);
+        let bound = set.bound_downstream(&query, StrandMethod::Ignore);
         assert_eq!(bound, Err(SetError::EmptySet));
 
-        let bound = set.stranded_upstream_bound(&query);
+        let bound = set.bound_upstream(&query, StrandMethod::MatchStrand);
         assert_eq!(bound, Err(SetError::EmptySet));
 
-        let bound = set.stranded_downstream_bound(&query);
+        let bound = set.bound_downstream(&query, StrandMethod::MatchStrand);
         assert_eq!(bound, Err(SetError::EmptySet));
     }
 
@@ -1013,16 +1084,16 @@ mod testing {
         let bound = set.chr_bound(&query);
         assert_eq!(bound, Err(SetError::UnsortedSet));
 
-        let bound = set.chr_bound_upstream(&query);
+        let bound = set.bound_upstream(&query, StrandMethod::Ignore);
         assert_eq!(bound, Err(SetError::UnsortedSet));
 
-        let bound = set.chr_bound_downstream(&query);
+        let bound = set.bound_downstream(&query, StrandMethod::Ignore);
         assert_eq!(bound, Err(SetError::UnsortedSet));
 
-        let bound = set.stranded_upstream_bound(&query);
+        let bound = set.bound_upstream(&query, StrandMethod::MatchStrand);
         assert_eq!(bound, Err(SetError::UnsortedSet));
 
-        let bound = set.stranded_downstream_bound(&query);
+        let bound = set.bound_downstream(&query, StrandMethod::MatchStrand);
         assert_eq!(bound, Err(SetError::UnsortedSet));
     }
 
@@ -1035,7 +1106,7 @@ mod testing {
         ];
         let set = IntervalContainer::from_sorted_unchecked(records);
         let query = Bed3::new(1, 5, 25);
-        let bound = set.chr_bound_upstream_unchecked(&query);
+        let bound = set.bound_upstream_unchecked(&query);
         assert_eq!(bound, None);
     }
 
@@ -1048,7 +1119,7 @@ mod testing {
         ];
         let set = IntervalContainer::from_sorted_unchecked(records);
         let query = StrandedBed3::new(1, 5, 25, Strand::Forward);
-        let bound = set.stranded_upstream_bound_unchecked(&query);
+        let bound = set.bound_stranded_upstream_unchecked(&query);
         assert_eq!(bound, None);
     }
 
@@ -1074,7 +1145,7 @@ mod testing {
         ];
         let set = IntervalContainer::from_sorted_unchecked(records);
         let query = StrandedBed3::new(1, 65, 75, Strand::Forward);
-        let bound = set.stranded_downstream_bound_unchecked(&query);
+        let bound = set.bound_stranded_downstream_unchecked(&query);
         assert_eq!(bound, None);
     }
 
@@ -1087,7 +1158,7 @@ mod testing {
         ];
         let set = IntervalContainer::from_sorted_unchecked(records);
         let query = StrandedBed3::new(1, 5, 10, Strand::Forward);
-        let bound = set.stranded_downstream_bound_unchecked(&query);
+        let bound = set.bound_stranded_downstream_unchecked(&query);
         assert_eq!(bound, Some(0));
     }
 
@@ -1100,7 +1171,7 @@ mod testing {
         ];
         let set = IntervalContainer::from_sorted_unchecked(records);
         let query = StrandedBed3::new(1, 5, 10, Strand::Reverse);
-        let bound = set.stranded_downstream_bound_unchecked(&query);
+        let bound = set.bound_stranded_downstream_unchecked(&query);
         assert_eq!(bound, None);
     }
 
@@ -1113,7 +1184,7 @@ mod testing {
         ];
         let set = IntervalContainer::from_sorted_unchecked(records);
         let query = StrandedBed3::new(1, 5, 10, Strand::Forward);
-        let bound = set.stranded_downstream_bound_unchecked(&query);
+        let bound = set.bound_stranded_downstream_unchecked(&query);
         assert_eq!(bound, None);
     }
 }
