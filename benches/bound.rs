@@ -1,4 +1,4 @@
-use bedrs::{BaseInterval, IntervalContainer};
+use bedrs::{types::StrandMethod, BaseInterval, IntervalContainer};
 use criterion::Criterion;
 
 const N: usize = 10000;
@@ -24,7 +24,7 @@ pub fn chr_bound_upstream(c: &mut Criterion) {
     let query = BaseInterval::new(20, 30);
     let set = IntervalContainer::new(records);
     c.bench_function("bound_upstream", |bench| {
-        bench.iter(|| set.bound_upstream_unchecked(&query))
+        bench.iter(|| set.bound_upstream_unchecked(&query, StrandMethod::Ignore))
     });
 }
 
@@ -36,6 +36,6 @@ pub fn chr_bound_downstream(c: &mut Criterion) {
     let query = BaseInterval::new(20, 30);
     let set = IntervalContainer::new(records);
     c.bench_function("bound_downstream", |bench| {
-        bench.iter(|| set.bound_downstream_unchecked(&query))
+        bench.iter(|| set.bound_downstream_unchecked(&query, StrandMethod::Ignore))
     });
 }
