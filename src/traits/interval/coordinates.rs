@@ -403,6 +403,15 @@ where
     fn eq<I: Coordinates<C, T>>(&self, other: &I) -> bool {
         self.coord_cmp(other) == Ordering::Equal
     }
+    fn pprint(&self) -> String {
+        format!(
+            "{:?}:{:?}-{:?}:{}",
+            self.chr(),
+            self.start(),
+            self.end(),
+            self.strand().unwrap_or(Strand::Unknown)
+        )
+    }
 }
 
 impl<I, C, T> Distance<C, T> for I
