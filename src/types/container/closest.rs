@@ -414,7 +414,7 @@ mod testing {
             .closest(&query, StrandMethod::MatchStrand)
             .unwrap()
             .unwrap();
-        assert!(closest.eq(&StrandedBed3::new(4, 418, 568, Strand::Forward)));
+        assert!(closest.eq(&StrandedBed3::new(4, 77, 227, Strand::Forward)));
     }
 
     #[test]

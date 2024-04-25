@@ -319,29 +319,30 @@ where
         // partition point returns the first index in the slice for which
         // the predicate fails (i.e. the index of the first record that is
         // greater than the query).
-        let low = self
-            .records()
-            .partition_point(|iv| iv.lt(query) && iv.bounded_strand(query));
+        //
+        // We subtract 1 to get the index of the last record that is less
+        // than the query.
+        let low = self.records().partition_point(|iv| iv.lt(query));
 
-        // If the low index is 0, then the query is potentially less than
-        // all records in the set.
         if low == 0 {
             None
         } else {
-            // otherwise the low index is the index of the first record that
-            // is greater than the query. We subtract 1 to get the index of
-            // the last record that is less than the query.
-            let idx = low - 1;
+            let low = low - 1;
+            // Start from the upper bound and iterate backwards until we find
+            // the first record that shares a strand with the query.
+            let strand_bound = self.records()[..=low]
+                .iter()
+                .rev()
+                .enumerate()
+                .take_while(|(_, iv)| iv.bounded_chr(query))
+                .find(|(_, iv)| iv.bounded_strand(query))?
+                .0;
 
-            // If the record at the index has the same chromosome as the
-            // query and they share a strand then return the index.
-            if self.records()[idx].chr() == query.chr()
-                && self.records()[idx].strand() == query.strand()
+            let bound = low - strand_bound;
+            if self.records()[bound].chr() == query.chr()
+                && self.records()[bound].bounded_strand(query)
             {
-                Some(idx)
-
-            // Otherwise, the query is less than all records in the set
-            // that share a chromosome and strand.
+                Some(bound)
             } else {
                 None
             }
@@ -355,29 +356,27 @@ where
         // partition point returns the first index in the slice for which
         // the predicate fails (i.e. the index of the first record that is
         // greater than the query).
-        let low = self
-            .records()
-            .partition_point(|iv| iv.lt(query) && !iv.bounded_strand(query));
+        let low = self.records().partition_point(|iv| iv.lt(query));
 
-        // If the low index is 0, then the query is potentially less than
-        // all records in the set.
         if low == 0 {
             None
         } else {
-            // otherwise the low index is the index of the first record that
-            // is greater than the query. We subtract 1 to get the index of
-            // the last record that is less than the query.
-            let idx = low - 1;
+            let low = low - 1;
+            // Start from the upper bound and iterate backwards until we find
+            // the first record that doesn't share a strand with the query.
+            let strand_bound = self.records()[..=low]
+                .iter()
+                .rev()
+                .enumerate()
+                .take_while(|(_, iv)| iv.bounded_chr(query))
+                .find(|(_, iv)| !iv.bounded_strand(query))?
+                .0;
 
-            // If the record at the index has the same chromosome as the
-            // query and they share a strand then return the index.
-            if self.records()[idx].chr() == query.chr()
-                && self.records()[idx].strand() != query.strand()
+            let bound = low - strand_bound;
+            if self.records()[bound].chr() == query.chr()
+                && !self.records()[bound].bounded_strand(query)
             {
-                Some(idx)
-
-            // Otherwise, the query is less than all records in the set
-            // that share a chromosome and strand.
+                Some(bound)
             } else {
                 None
             }
