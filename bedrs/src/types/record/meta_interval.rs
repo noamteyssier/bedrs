@@ -2,7 +2,7 @@ use crate::{
     traits::{ChromBounds, MetaBounds, ValueBounds},
     Bed3, Coordinates, Strand,
 };
-use num_traits::zero;
+use bedrs_derive::Coordinates;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -26,125 +26,19 @@ use serde::{Deserialize, Serialize};
 /// let b = MetaInterval::new(1, 20, 30, ("something_else", 20, '.'));
 /// assert!(a.overlaps(&b));
 /// ```
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Default, Clone, Copy, Coordinates)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct MetaInterval<C, T, M> {
-    chr: C,
-    start: T,
-    end: T,
-    meta: M,
-}
-impl<C, T, M> Coordinates<C, T> for MetaInterval<C, T, M>
+pub struct MetaInterval<C, T, M>
 where
     C: ChromBounds,
     T: ValueBounds,
     M: MetaBounds,
 {
-    fn empty() -> Self {
-        Self {
-            chr: C::default(),
-            start: zero::<T>(),
-            end: zero::<T>(),
-            meta: M::default(),
-        }
-    }
-    fn start(&self) -> T {
-        self.start
-    }
-    fn end(&self) -> T {
-        self.end
-    }
-    fn chr(&self) -> &C {
-        &self.chr
-    }
-    fn update_start(&mut self, val: &T) {
-        self.start = *val;
-    }
-    fn update_end(&mut self, val: &T) {
-        self.end = *val;
-    }
-    fn update_chr(&mut self, val: &C) {
-        self.chr = val.clone();
-    }
-    fn from<Iv: Coordinates<C, T>>(other: &Iv) -> Self {
-        Self {
-            chr: other.chr().clone(),
-            start: other.start(),
-            end: other.end(),
-            meta: M::default(),
-        }
-    }
+    pub chr: C,
+    pub start: T,
+    pub end: T,
+    meta: M,
 }
-impl<'a, C, T, M> Coordinates<C, T> for &'a MetaInterval<C, T, M>
-where
-    C: ChromBounds,
-    T: ValueBounds,
-{
-    fn empty() -> Self {
-        unreachable!("Cannot create an immutable empty reference")
-    }
-    fn start(&self) -> T {
-        self.start
-    }
-    fn end(&self) -> T {
-        self.end
-    }
-    fn chr(&self) -> &C {
-        &self.chr
-    }
-    #[allow(unused)]
-    fn update_start(&mut self, val: &T) {
-        unreachable!("Cannot update an immutable reference")
-    }
-    #[allow(unused)]
-    fn update_end(&mut self, val: &T) {
-        unreachable!("Cannot update an immutable reference")
-    }
-    #[allow(unused)]
-    fn update_chr(&mut self, val: &C) {
-        unreachable!("Cannot update an immutable reference")
-    }
-    #[allow(unused)]
-    fn update_strand(&mut self, strand: Option<Strand>) {
-        unreachable!("Cannot update an immutable reference")
-    }
-    #[allow(unused)]
-    fn from<Iv>(other: &Iv) -> Self {
-        unimplemented!("Cannot create a new reference from a reference")
-    }
-}
-impl<'a, C, T, M> Coordinates<C, T> for &'a mut MetaInterval<C, T, M>
-where
-    C: ChromBounds,
-    T: ValueBounds,
-{
-    fn empty() -> Self {
-        unreachable!("Cannot create an immutable empty reference")
-    }
-    fn start(&self) -> T {
-        self.start
-    }
-    fn end(&self) -> T {
-        self.end
-    }
-    fn chr(&self) -> &C {
-        &self.chr
-    }
-    fn update_start(&mut self, val: &T) {
-        self.start = *val;
-    }
-    fn update_end(&mut self, val: &T) {
-        self.end = *val;
-    }
-    fn update_chr(&mut self, val: &C) {
-        self.chr = val.clone();
-    }
-    #[allow(unused)]
-    fn from<Iv>(other: &Iv) -> Self {
-        unimplemented!("Cannot create a new reference from a mutable reference")
-    }
-}
-
 impl<C, T, M> MetaInterval<C, T, M>
 where
     C: ChromBounds,

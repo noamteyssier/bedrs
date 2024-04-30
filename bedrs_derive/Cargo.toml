@@ -1,0 +1,16 @@
+[package]
+name = "bedrs_derive"
+version = "0.1.0"
+edition = "2021"
+description = "Procedural macros for bedrs"
+license = "MIT"
+repository = "https://github.com/noamteyssier/bedrs"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+
+syn = "2.0.60"
+quote = "1.0.36"
+proc-macro2 = "1.0.81"

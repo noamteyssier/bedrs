@@ -3,6 +3,7 @@ use crate::{
     types::Score,
     Bed12, Bed3, Bed6, BedGraph, Coordinates, Strand,
 };
+use bedrs_derive::Coordinates;
 use num_traits::zero;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
@@ -27,124 +28,19 @@ use serde::{Deserialize, Serialize};
 /// let b = Bed4::new(1, 20, 30, 0);
 /// assert!(a.overlaps(&b));
 /// ```
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Default, Clone, Copy, Coordinates)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct Bed4<C, T, N> {
-    chr: C,
-    start: T,
-    end: T,
-    name: N,
-}
-
-impl<C, T, N> Coordinates<C, T> for Bed4<C, T, N>
+pub struct Bed4<C, T, N>
 where
     C: ChromBounds,
     T: ValueBounds,
     N: MetaBounds,
 {
-    fn empty() -> Self {
-        Self {
-            chr: C::default(),
-            start: zero::<T>(),
-            end: zero::<T>(),
-            name: N::default(),
-        }
-    }
-    fn start(&self) -> T {
-        self.start
-    }
-    fn end(&self) -> T {
-        self.end
-    }
-    fn chr(&self) -> &C {
-        &self.chr
-    }
-    fn update_start(&mut self, val: &T) {
-        self.start = *val;
-    }
-    fn update_end(&mut self, val: &T) {
-        self.end = *val;
-    }
-    fn update_chr(&mut self, val: &C) {
-        self.chr = val.clone();
-    }
-    fn from<Iv: Coordinates<C, T>>(other: &Iv) -> Self {
-        Self {
-            chr: other.chr().clone(),
-            start: other.start(),
-            end: other.end(),
-            name: N::default(),
-        }
-    }
+    pub chr: C,
+    pub start: T,
+    pub end: T,
+    pub name: N,
 }
-impl<'a, C, T, N> Coordinates<C, T> for &'a Bed4<C, T, N>
-where
-    C: ChromBounds,
-    T: ValueBounds,
-    N: MetaBounds,
-{
-    fn empty() -> Self {
-        unreachable!("Cannot create an immutable empty reference")
-    }
-    fn start(&self) -> T {
-        self.start
-    }
-    fn end(&self) -> T {
-        self.end
-    }
-    fn chr(&self) -> &C {
-        &self.chr
-    }
-    #[allow(unused)]
-    fn update_start(&mut self, val: &T) {
-        unreachable!("Cannot update an immutable reference")
-    }
-    #[allow(unused)]
-    fn update_end(&mut self, val: &T) {
-        unreachable!("Cannot update an immutable reference")
-    }
-    #[allow(unused)]
-    fn update_chr(&mut self, val: &C) {
-        unreachable!("Cannot update an immutable reference")
-    }
-    #[allow(unused)]
-    fn from<Iv>(other: &Iv) -> Self {
-        unimplemented!("Cannot create a new reference from a reference")
-    }
-}
-impl<'a, C, T, N> Coordinates<C, T> for &'a mut Bed4<C, T, N>
-where
-    C: ChromBounds,
-    T: ValueBounds,
-    N: MetaBounds,
-{
-    fn empty() -> Self {
-        unreachable!("Cannot create an immutable empty reference")
-    }
-    fn start(&self) -> T {
-        self.start
-    }
-    fn end(&self) -> T {
-        self.end
-    }
-    fn chr(&self) -> &C {
-        &self.chr
-    }
-    fn update_start(&mut self, val: &T) {
-        self.start = *val;
-    }
-    fn update_end(&mut self, val: &T) {
-        self.end = *val;
-    }
-    fn update_chr(&mut self, val: &C) {
-        self.chr = val.clone();
-    }
-    #[allow(unused)]
-    fn from<Iv>(other: &Iv) -> Self {
-        unimplemented!("Cannot create a new reference from a mutable reference")
-    }
-}
-
 impl<C, T, N> Bed4<C, T, N>
 where
     C: ChromBounds,
@@ -173,6 +69,7 @@ impl<C, T, N> From<Bed4<C, T, N>> for Bed3<C, T>
 where
     C: ChromBounds,
     T: ValueBounds,
+    N: MetaBounds,
 {
     fn from(bed: Bed4<C, T, N>) -> Self {
         Self::new(bed.chr, bed.start, bed.end)

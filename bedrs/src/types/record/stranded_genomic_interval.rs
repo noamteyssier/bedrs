@@ -1,8 +1,8 @@
 use crate::{
-    traits::{Coordinates, ValueBounds},
+    traits::{ChromBounds, Coordinates, ValueBounds},
     Strand,
 };
-use num_traits::zero;
+use bedrs_derive::Coordinates;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -25,134 +25,22 @@ use serde::{Deserialize, Serialize};
 /// assert!(a.overlaps(&b));
 /// assert!(!a.stranded_overlaps(&b));
 /// ```
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Default, Clone, Copy, Coordinates)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct StrandedBed3<T> {
-    chr: T,
-    start: T,
-    end: T,
+pub struct StrandedBed3<C, T>
+where
+    C: ChromBounds,
+    T: ValueBounds,
+{
+    pub chr: C,
+    pub start: T,
+    pub end: T,
     strand: Strand,
 }
 
-impl<T> Coordinates<T, T> for StrandedBed3<T>
+impl<C, T> StrandedBed3<C, T>
 where
-    T: ValueBounds,
-{
-    fn empty() -> Self {
-        Self {
-            chr: zero::<T>(),
-            start: zero::<T>(),
-            end: zero::<T>(),
-            strand: Strand::Forward,
-        }
-    }
-    fn start(&self) -> T {
-        self.start
-    }
-    fn end(&self) -> T {
-        self.end
-    }
-    fn chr(&self) -> &T {
-        &self.chr
-    }
-    fn strand(&self) -> Option<Strand> {
-        Some(self.strand)
-    }
-    fn update_start(&mut self, val: &T) {
-        self.start = *val;
-    }
-    fn update_end(&mut self, val: &T) {
-        self.end = *val;
-    }
-    fn update_chr(&mut self, val: &T) {
-        self.chr = *val;
-    }
-    fn update_strand(&mut self, strand: Option<Strand>) {
-        self.strand = strand.unwrap_or_default();
-    }
-    fn from<Iv: Coordinates<T, T>>(other: &Iv) -> Self {
-        Self {
-            chr: *other.chr(),
-            start: other.start(),
-            end: other.end(),
-            strand: other.strand().unwrap_or_default(),
-        }
-    }
-}
-
-impl<'a, T> Coordinates<T, T> for &'a StrandedBed3<T>
-where
-    T: ValueBounds,
-{
-    fn empty() -> Self {
-        unreachable!("Cannot create an empty reference")
-    }
-    fn start(&self) -> T {
-        self.start
-    }
-    fn end(&self) -> T {
-        self.end
-    }
-    fn chr(&self) -> &T {
-        &self.chr
-    }
-    fn strand(&self) -> Option<Strand> {
-        Some(self.strand)
-    }
-    #[allow(unused)]
-    fn update_start(&mut self, val: &T) {
-        unreachable!("Cannot update an immutable reference")
-    }
-    #[allow(unused)]
-    fn update_end(&mut self, val: &T) {
-        unreachable!("Cannot update an immutable reference")
-    }
-    #[allow(unused)]
-    fn update_chr(&mut self, val: &T) {
-        unreachable!("Cannot update an immutable reference")
-    }
-    #[allow(unused)]
-    fn from<Iv>(other: &Iv) -> Self {
-        unimplemented!("Cannot create a new reference from a reference")
-    }
-}
-
-impl<'a, T> Coordinates<T, T> for &'a mut StrandedBed3<T>
-where
-    T: ValueBounds,
-{
-    fn empty() -> Self {
-        unreachable!("Cannot create an empty reference")
-    }
-    fn start(&self) -> T {
-        self.start
-    }
-    fn end(&self) -> T {
-        self.end
-    }
-    fn chr(&self) -> &T {
-        &self.chr
-    }
-    fn strand(&self) -> Option<Strand> {
-        Some(self.strand)
-    }
-    fn update_start(&mut self, val: &T) {
-        self.start = *val;
-    }
-    fn update_end(&mut self, val: &T) {
-        self.end = *val;
-    }
-    fn update_chr(&mut self, val: &T) {
-        self.chr = *val;
-    }
-    #[allow(unused)]
-    fn from<Iv>(other: &Iv) -> Self {
-        unimplemented!("Cannot create a new reference from a reference")
-    }
-}
-
-impl<T> StrandedBed3<T>
-where
+    C: ChromBounds,
     T: ValueBounds,
 {
     /// Create a new `StrandedBed3`
@@ -167,7 +55,7 @@ where
     /// assert_eq!(a.end(), 30);
     /// assert_eq!(a.strand(), Some(Strand::Forward));
     /// ```
-    pub fn new(chr: T, start: T, end: T, strand: Strand) -> Self {
+    pub fn new(chr: C, start: T, end: T, strand: Strand) -> Self {
         Self {
             chr,
             start,
@@ -293,7 +181,7 @@ mod testing {
     #[test]
     fn test_from() {
         let a = StrandedBed3::new(1, 5, 100, Strand::Reverse);
-        let b: StrandedBed3<usize> = Coordinates::from(&a);
+        let b: StrandedBed3<_, _> = Coordinates::from(&a);
         assert!(a.eq(&b));
     }
 
@@ -302,7 +190,7 @@ mod testing {
     fn stranded_genomic_interval_serde() {
         let a = StrandedBed3::new(1, 5, 100, Strand::Reverse);
         let serialized = serialize(&a).unwrap();
-        let deserialized: StrandedBed3<u32> = deserialize(&serialized).unwrap();
+        let deserialized: StrandedBed3<_, _> = deserialize(&serialized).unwrap();
         assert!(a.eq(&deserialized));
     }
 
@@ -347,7 +235,7 @@ mod serde_testing {
             .has_headers(false)
             .from_reader(a.as_bytes());
         let mut iter = rdr.deserialize();
-        let b: StrandedBed3<i32> = iter.next().unwrap()?;
+        let b: StrandedBed3<i32, i32> = iter.next().unwrap()?;
         assert_eq!(b.chr(), &1);
         assert_eq!(b.start(), 20);
         assert_eq!(b.end(), 30);
