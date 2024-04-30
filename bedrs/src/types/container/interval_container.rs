@@ -462,7 +462,7 @@ mod testing {
         });
 
         set.records_mut().iter_mut().for_each(|r| {
-            r.set_strand(Strand::Reverse);
+            r.update_strand(Some(Strand::Reverse));
         });
 
         set.records().iter().for_each(|r| {
@@ -472,7 +472,8 @@ mod testing {
 
     #[test]
     fn test_span_empty() {
-        let set: IntervalContainer<StrandedBed3<u32>, u32, u32> = IntervalContainer::new(vec![]);
+        let set: IntervalContainer<StrandedBed3<u32, u32>, u32, u32> =
+            IntervalContainer::new(vec![]);
         let span = set.span();
         assert!(span.is_err());
     }
@@ -548,7 +549,7 @@ mod testing {
         let records = vec![StrandedBed3::new(1, 10, 100, Strand::Reverse); n_intervals];
         let set = IntervalContainer::new(records);
         let serialized = serialize(&set).unwrap();
-        let deserialized: IntervalContainer<StrandedBed3<usize>, usize, usize> =
+        let deserialized: IntervalContainer<StrandedBed3<usize, usize>, usize, usize> =
             deserialize(&serialized).unwrap();
 
         for (iv1, iv2) in set.records().iter().zip(deserialized.records().iter()) {

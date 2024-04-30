@@ -3,6 +3,9 @@ use crate::{
     types::Score,
     Bed12, Bed3, Bed4, BedGraph, Coordinates, Strand,
 };
+use bedrs_derive::Coordinates;
+use derive_new::new;
+use getset::{CopyGetters, Getters, Setters};
 use num_traits::zero;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
@@ -29,181 +32,22 @@ use serde::{Deserialize, Serialize};
 /// let b = Bed4::new(1, 20, 30, 0);
 /// assert!(a.overlaps(&b));
 /// ```
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Default, Clone, Copy, Coordinates, new, Getters, Setters, CopyGetters)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct Bed6<C, T, N> {
+pub struct Bed6<C, T, N>
+where
+    C: ChromBounds,
+    T: ValueBounds,
+    N: MetaBounds,
+{
     chr: C,
     start: T,
     end: T,
+    #[getset(get = "pub", set = "pub")]
     name: N,
+    #[getset(get_copy = "pub", set = "pub")]
     score: Score,
     strand: Strand,
-}
-
-impl<C, T, N> Coordinates<C, T> for Bed6<C, T, N>
-where
-    C: ChromBounds,
-    T: ValueBounds,
-    N: MetaBounds,
-{
-    fn empty() -> Self {
-        Self {
-            chr: C::default(),
-            start: zero::<T>(),
-            end: zero::<T>(),
-            name: N::default(),
-            score: Score::default(),
-            strand: Strand::Unknown,
-        }
-    }
-    fn start(&self) -> T {
-        self.start
-    }
-    fn end(&self) -> T {
-        self.end
-    }
-    fn chr(&self) -> &C {
-        &self.chr
-    }
-    fn strand(&self) -> Option<Strand> {
-        Some(self.strand)
-    }
-    fn update_start(&mut self, val: &T) {
-        self.start = *val;
-    }
-    fn update_end(&mut self, val: &T) {
-        self.end = *val;
-    }
-    fn update_chr(&mut self, val: &C) {
-        self.chr = val.clone();
-    }
-    fn update_strand(&mut self, strand: Option<Strand>) {
-        self.strand = strand.unwrap_or_default();
-    }
-    fn from<Iv: Coordinates<C, T>>(other: &Iv) -> Self {
-        Self {
-            chr: other.chr().clone(),
-            start: other.start(),
-            end: other.end(),
-            name: N::default(),
-            score: Score::default(),
-            strand: other.strand().unwrap_or_default(),
-        }
-    }
-}
-impl<'a, C, T, N> Coordinates<C, T> for &'a Bed6<C, T, N>
-where
-    C: ChromBounds,
-    T: ValueBounds,
-    N: MetaBounds,
-{
-    fn empty() -> Self {
-        unreachable!("Cannot create an immutable empty reference")
-    }
-    fn start(&self) -> T {
-        self.start
-    }
-    fn end(&self) -> T {
-        self.end
-    }
-    fn chr(&self) -> &C {
-        &self.chr
-    }
-    fn strand(&self) -> Option<Strand> {
-        Some(self.strand)
-    }
-    #[allow(unused)]
-    fn update_start(&mut self, val: &T) {
-        unreachable!("Cannot update an immutable reference")
-    }
-    #[allow(unused)]
-    fn update_end(&mut self, val: &T) {
-        unreachable!("Cannot update an immutable reference")
-    }
-    #[allow(unused)]
-    fn update_chr(&mut self, val: &C) {
-        unreachable!("Cannot update an immutable reference")
-    }
-    #[allow(unused)]
-    fn update_strand(&mut self, strand: Option<Strand>) {
-        unreachable!("Cannot update an immutable reference")
-    }
-    #[allow(unused)]
-    fn from<Iv>(other: &Iv) -> Self {
-        unimplemented!("Cannot create a new reference from a reference")
-    }
-}
-impl<'a, C, T, N> Coordinates<C, T> for &'a mut Bed6<C, T, N>
-where
-    C: ChromBounds,
-    T: ValueBounds,
-    N: MetaBounds,
-{
-    fn empty() -> Self {
-        unreachable!("Cannot create an immutable empty reference")
-    }
-    fn start(&self) -> T {
-        self.start
-    }
-    fn end(&self) -> T {
-        self.end
-    }
-    fn chr(&self) -> &C {
-        &self.chr
-    }
-    fn strand(&self) -> Option<Strand> {
-        Some(self.strand)
-    }
-    fn update_start(&mut self, val: &T) {
-        self.start = *val;
-    }
-    fn update_end(&mut self, val: &T) {
-        self.end = *val;
-    }
-    fn update_chr(&mut self, val: &C) {
-        self.chr = val.clone();
-    }
-    fn update_strand(&mut self, strand: Option<Strand>) {
-        self.strand = strand.unwrap_or_default();
-    }
-    #[allow(unused)]
-    fn from<Iv>(other: &Iv) -> Self {
-        unimplemented!("Cannot create a new reference from a mutable reference")
-    }
-}
-
-impl<C, T, N> Bed6<C, T, N>
-where
-    C: ChromBounds,
-    T: ValueBounds,
-    N: MetaBounds,
-{
-    pub fn new(chr: C, start: T, end: T, name: N, score: Score, strand: Strand) -> Self {
-        Self {
-            chr,
-            start,
-            end,
-            name,
-            score,
-            strand,
-        }
-    }
-
-    pub fn name(&self) -> &N {
-        &self.name
-    }
-
-    pub fn score(&self) -> Score {
-        self.score
-    }
-
-    pub fn update_name(&mut self, val: &N) {
-        self.name = val.clone();
-    }
-
-    pub fn update_score(&mut self, val: Score) {
-        self.score = val;
-    }
 }
 
 impl<C, T, N> From<Bed6<C, T, N>> for Bed3<C, T>

@@ -1,5 +1,6 @@
 use crate::traits::{Coordinates, ValueBounds};
-use num_traits::zero;
+use crate::Strand;
+use bedrs_derive::Coordinates;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -17,7 +18,7 @@ use serde::{Deserialize, Serialize};
 /// let b = BaseInterval::new(25, 35);
 /// assert!(a.overlaps(&b));
 /// ```
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Default, Coordinates)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct BaseInterval<T>
 where
@@ -38,104 +39,6 @@ where
             end,
             chr: T::default(),
         }
-    }
-}
-impl<T> Coordinates<T, T> for BaseInterval<T>
-where
-    T: ValueBounds,
-{
-    fn empty() -> Self {
-        Self {
-            chr: zero::<T>(),
-            start: zero::<T>(),
-            end: zero::<T>(),
-        }
-    }
-    fn start(&self) -> T {
-        self.start
-    }
-    fn end(&self) -> T {
-        self.end
-    }
-    fn chr(&self) -> &T {
-        &self.chr
-    }
-    fn update_start(&mut self, val: &T) {
-        self.start = *val;
-    }
-    fn update_end(&mut self, val: &T) {
-        self.end = *val;
-    }
-    #[allow(unused)]
-    fn update_chr(&mut self, val: &T) {}
-    fn from<Iv: Coordinates<T, T>>(other: &Iv) -> Self {
-        Self {
-            start: other.start(),
-            end: other.end(),
-            chr: T::default(),
-        }
-    }
-}
-impl<'a, T> Coordinates<T, T> for &'a BaseInterval<T>
-where
-    T: ValueBounds,
-{
-    fn empty() -> Self {
-        unreachable!("Cannot create an immutable reference to an empty interval")
-    }
-    fn start(&self) -> T {
-        self.start
-    }
-    fn end(&self) -> T {
-        self.end
-    }
-    fn chr(&self) -> &T {
-        &self.chr
-    }
-    #[allow(unused)]
-    fn update_start(&mut self, val: &T) {
-        unreachable!("Cannot update an immutable reference")
-    }
-    #[allow(unused)]
-    fn update_end(&mut self, val: &T) {
-        unreachable!("Cannot update an immutable reference")
-    }
-    #[allow(unused)]
-    fn update_chr(&mut self, val: &T) {
-        unreachable!("Cannot update an immutable reference")
-    }
-    #[allow(unused)]
-    fn from<Iv>(other: &Iv) -> Self {
-        unimplemented!("Cannot create a new reference from a reference")
-    }
-}
-impl<'a, T> Coordinates<T, T> for &'a mut BaseInterval<T>
-where
-    T: ValueBounds,
-{
-    fn empty() -> Self {
-        unreachable!("Cannot create an immutable reference to an empty interval")
-    }
-    fn start(&self) -> T {
-        self.start
-    }
-    fn end(&self) -> T {
-        self.end
-    }
-    fn chr(&self) -> &T {
-        &self.chr
-    }
-    fn update_start(&mut self, val: &T) {
-        self.start = *val;
-    }
-    fn update_end(&mut self, val: &T) {
-        self.end = *val;
-    }
-    #[allow(unused)]
-    fn update_chr(&mut self, val: &T) {}
-    #[allow(unused)]
-    fn from<Iv>(other: &Iv) -> Self {
-        unimplemented!("Cannot create a new reference from a mutable reference")
     }
 }
 

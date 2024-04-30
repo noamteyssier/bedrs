@@ -3,6 +3,9 @@ use crate::{
     types::Score,
     Bed12, Bed3, Bed6, Coordinates, Strand,
 };
+use bedrs_derive::Coordinates;
+use derive_new::new;
+use getset::{CopyGetters, Getters, Setters};
 use num_traits::zero;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
@@ -27,142 +30,18 @@ use serde::{Deserialize, Serialize};
 /// let b = BedGraph::new(1, 20, 30, 0.0);
 /// assert!(a.overlaps(&b));
 /// ```
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Default, Clone, Copy, Coordinates, Getters, Setters, CopyGetters, new)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct BedGraph<C, T> {
+pub struct BedGraph<C, T>
+where
+    C: ChromBounds,
+    T: ValueBounds,
+{
     chr: C,
     start: T,
     end: T,
+    #[getset(get_copy = "pub", set = "pub")]
     score: f64,
-}
-
-impl<C, T> Coordinates<C, T> for BedGraph<C, T>
-where
-    C: ChromBounds,
-    T: ValueBounds,
-{
-    fn empty() -> Self {
-        Self {
-            chr: C::default(),
-            start: zero::<T>(),
-            end: zero::<T>(),
-            score: f64::default(),
-        }
-    }
-    fn start(&self) -> T {
-        self.start
-    }
-    fn end(&self) -> T {
-        self.end
-    }
-    fn chr(&self) -> &C {
-        &self.chr
-    }
-    fn update_start(&mut self, val: &T) {
-        self.start = *val;
-    }
-    fn update_end(&mut self, val: &T) {
-        self.end = *val;
-    }
-    fn update_chr(&mut self, val: &C) {
-        self.chr = val.clone();
-    }
-    fn from<Iv: Coordinates<C, T>>(other: &Iv) -> Self {
-        Self {
-            chr: other.chr().clone(),
-            start: other.start(),
-            end: other.end(),
-            score: f64::default(),
-        }
-    }
-}
-impl<'a, C, T> Coordinates<C, T> for &'a BedGraph<C, T>
-where
-    C: ChromBounds,
-    T: ValueBounds,
-{
-    fn empty() -> Self {
-        unreachable!("Cannot create an immutable empty reference")
-    }
-    fn start(&self) -> T {
-        self.start
-    }
-    fn end(&self) -> T {
-        self.end
-    }
-    fn chr(&self) -> &C {
-        &self.chr
-    }
-    #[allow(unused)]
-    fn update_start(&mut self, val: &T) {
-        unreachable!("Cannot update an immutable reference")
-    }
-    #[allow(unused)]
-    fn update_end(&mut self, val: &T) {
-        unreachable!("Cannot update an immutable reference")
-    }
-    #[allow(unused)]
-    fn update_chr(&mut self, val: &C) {
-        unreachable!("Cannot update an immutable reference")
-    }
-    #[allow(unused)]
-    fn from<Iv>(other: &Iv) -> Self {
-        unimplemented!("Cannot create a new reference from a reference")
-    }
-}
-impl<'a, C, T> Coordinates<C, T> for &'a mut BedGraph<C, T>
-where
-    C: ChromBounds,
-    T: ValueBounds,
-{
-    fn empty() -> Self {
-        unreachable!("Cannot create an immutable empty reference")
-    }
-    fn start(&self) -> T {
-        self.start
-    }
-    fn end(&self) -> T {
-        self.end
-    }
-    fn chr(&self) -> &C {
-        &self.chr
-    }
-    fn update_start(&mut self, val: &T) {
-        self.start = *val;
-    }
-    fn update_end(&mut self, val: &T) {
-        self.end = *val;
-    }
-    fn update_chr(&mut self, val: &C) {
-        self.chr = val.clone();
-    }
-    #[allow(unused)]
-    fn from<Iv>(other: &Iv) -> Self {
-        unimplemented!("Cannot create a new reference from a mutable reference")
-    }
-}
-
-impl<C, T> BedGraph<C, T>
-where
-    C: ChromBounds,
-    T: ValueBounds,
-{
-    pub fn new(chr: C, start: T, end: T, score: f64) -> Self {
-        Self {
-            chr,
-            start,
-            end,
-            score,
-        }
-    }
-
-    pub fn score(&self) -> f64 {
-        self.score
-    }
-
-    pub fn update_score(&mut self, val: f64) {
-        self.score = val;
-    }
 }
 
 impl<C, T> From<BedGraph<C, T>> for Bed3<C, T>

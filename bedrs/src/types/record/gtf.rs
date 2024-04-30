@@ -3,6 +3,9 @@ use crate::{
     types::{enums::Frame, Score},
     Bed3, Coordinates, Strand,
 };
+use bedrs_derive::Coordinates;
+use derive_new::new;
+use getset::{CopyGetters, Getters, Setters};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -41,7 +44,8 @@ use serde::{Deserialize, Serialize};
 /// assert_eq!(record.end(), 4000);
 /// assert_eq!(record.strand(), Some(Strand::Forward));
 /// ```
-#[derive(Debug, Clone, Copy, Default)]
+#[allow(clippy::too_many_arguments)]
+#[derive(Debug, Clone, Copy, Default, Coordinates, Getters, Setters, CopyGetters, new)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Gtf<C, T, N>
 where
@@ -49,209 +53,20 @@ where
     T: ValueBounds,
     N: MetaBounds,
 {
-    seqname: C,
+    chr: C,
+    #[getset(get = "pub", set = "pub")]
     source: N,
+    #[getset(get = "pub", set = "pub")]
     feature: N,
     start: T,
     end: T,
+    #[getset(get_copy = "pub", set = "pub")]
     score: Score,
     strand: Strand,
+    #[getset(get_copy = "pub", set = "pub")]
     frame: Frame,
+    #[getset(get = "pub", set = "pub")]
     attributes: N,
-}
-impl<C, T, N> Coordinates<C, T> for Gtf<C, T, N>
-where
-    C: ChromBounds,
-    T: ValueBounds,
-    N: MetaBounds,
-{
-    fn empty() -> Self {
-        Self::default()
-    }
-    fn start(&self) -> T {
-        self.start
-    }
-    fn end(&self) -> T {
-        self.end
-    }
-    fn chr(&self) -> &C {
-        &self.seqname
-    }
-    fn strand(&self) -> Option<Strand> {
-        Some(self.strand)
-    }
-    fn update_start(&mut self, val: &T) {
-        self.start = *val;
-    }
-    fn update_end(&mut self, val: &T) {
-        self.end = *val;
-    }
-    fn update_chr(&mut self, val: &C) {
-        self.seqname = val.clone();
-    }
-    fn update_strand(&mut self, strand: Option<Strand>) {
-        self.strand = strand.unwrap_or_default();
-    }
-    fn from<Iv: Coordinates<C, T>>(other: &Iv) -> Self {
-        Self {
-            seqname: other.chr().clone(),
-            source: N::default(),
-            feature: N::default(),
-            start: other.start(),
-            end: other.end(),
-            score: Score::default(),
-            strand: other.strand().unwrap_or_default(),
-            frame: Frame::default(),
-            attributes: N::default(),
-        }
-    }
-}
-impl<'a, C, T, N> Coordinates<C, T> for &'a Gtf<C, T, N>
-where
-    C: ChromBounds,
-    T: ValueBounds,
-    N: MetaBounds,
-{
-    fn empty() -> Self {
-        unreachable!("Cannot create an immutable empty reference")
-    }
-    fn start(&self) -> T {
-        self.start
-    }
-    fn end(&self) -> T {
-        self.end
-    }
-    fn chr(&self) -> &C {
-        &self.seqname
-    }
-    fn strand(&self) -> Option<Strand> {
-        Some(self.strand)
-    }
-    #[allow(unused)]
-    fn update_start(&mut self, val: &T) {
-        unreachable!("Cannot update an immutable reference")
-    }
-    #[allow(unused)]
-    fn update_end(&mut self, val: &T) {
-        unreachable!("Cannot update an immutable reference")
-    }
-    #[allow(unused)]
-    fn update_chr(&mut self, val: &C) {
-        unreachable!("Cannot update an immutable reference")
-    }
-    #[allow(unused)]
-    fn update_strand(&mut self, strand: Option<Strand>) {
-        unreachable!("Cannot update an immutable reference")
-    }
-    #[allow(unused)]
-    fn from<Iv>(other: &Iv) -> Self {
-        unimplemented!("Cannot create a new reference from a reference")
-    }
-}
-impl<'a, C, T, N> Coordinates<C, T> for &'a mut Gtf<C, T, N>
-where
-    C: ChromBounds,
-    T: ValueBounds,
-    N: MetaBounds,
-{
-    fn empty() -> Self {
-        unreachable!("Cannot create an immutable empty reference")
-    }
-    fn start(&self) -> T {
-        self.start
-    }
-    fn end(&self) -> T {
-        self.end
-    }
-    fn chr(&self) -> &C {
-        &self.seqname
-    }
-    fn strand(&self) -> Option<Strand> {
-        Some(self.strand)
-    }
-    fn update_start(&mut self, val: &T) {
-        self.start = *val;
-    }
-    fn update_end(&mut self, val: &T) {
-        self.end = *val;
-    }
-    fn update_chr(&mut self, val: &C) {
-        self.seqname = val.clone();
-    }
-    fn update_strand(&mut self, strand: Option<Strand>) {
-        self.strand = strand.unwrap_or_default();
-    }
-    #[allow(unused)]
-    fn from<Iv>(other: &Iv) -> Self {
-        unimplemented!("Cannot create a new reference from a mutable reference")
-    }
-}
-impl<C, T, N> Gtf<C, T, N>
-where
-    C: ChromBounds,
-    T: ValueBounds,
-    N: MetaBounds,
-{
-    #[allow(clippy::too_many_arguments)]
-    pub fn new(
-        seqname: C,
-        source: N,
-        feature: N,
-        start: T,
-        end: T,
-        score: Score,
-        strand: Strand,
-        frame: Frame,
-        attributes: N,
-    ) -> Self {
-        Self {
-            seqname,
-            source,
-            feature,
-            start,
-            end,
-            score,
-            strand,
-            frame,
-            attributes,
-        }
-    }
-    pub fn seqname(&self) -> &C {
-        &self.seqname
-    }
-    pub fn source(&self) -> &N {
-        &self.source
-    }
-    pub fn feature(&self) -> &N {
-        &self.feature
-    }
-    pub fn score(&self) -> Score {
-        self.score
-    }
-    pub fn frame(&self) -> Frame {
-        self.frame
-    }
-    pub fn attributes(&self) -> &N {
-        &self.attributes
-    }
-    pub fn update_seqname(&mut self, val: &C) {
-        self.update_chr(val);
-    }
-    pub fn update_source(&mut self, val: &N) {
-        self.source = val.clone();
-    }
-    pub fn update_feature(&mut self, val: &N) {
-        self.feature = val.clone();
-    }
-    pub fn update_score(&mut self, val: Score) {
-        self.score = val;
-    }
-    pub fn update_frame(&mut self, val: Frame) {
-        self.frame = val;
-    }
-    pub fn update_attributes(&mut self, val: &N) {
-        self.attributes = val.clone();
-    }
 }
 
 impl<C, T, N> From<Gtf<C, T, N>> for Bed3<C, T>
@@ -261,7 +76,7 @@ where
     N: MetaBounds,
 {
     fn from(record: Gtf<C, T, N>) -> Self {
-        Self::new(record.seqname, record.start, record.end)
+        Self::new(record.chr, record.start, record.end)
     }
 }
 
@@ -318,14 +133,12 @@ mod testing {
         assert_eq!(record.frame(), 0.into());
         assert_eq!(record.attributes(), &"some_attr");
 
-        record.update_seqname(&2);
-        record.update_source(&"Havana");
-        record.update_feature(&"transcript");
-        record.update_score(Score(None));
-        record.update_frame(1.into());
-        record.update_attributes(&"");
+        record.set_source("Havana");
+        record.set_feature("transcript");
+        record.set_score(Score(None));
+        record.set_frame(1.into());
+        record.set_attributes("");
 
-        assert_eq!(record.seqname(), &2);
         assert_eq!(record.source(), &"Havana");
         assert_eq!(record.feature(), &"transcript");
         assert_eq!(record.score(), Score(None));
@@ -395,7 +208,7 @@ mod serde_testing {
             .from_reader(a.as_bytes());
         let mut iter = rdr.deserialize();
         let b: Gtf<String, i32, String> = iter.next().unwrap()?;
-        assert_eq!(b.seqname(), "chr1");
+        assert_eq!(b.chr(), "chr1");
         assert_eq!(b.source(), "Ensembl");
         assert_eq!(b.feature(), "gene");
         assert_eq!(b.start(), 20);
