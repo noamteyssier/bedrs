@@ -53,13 +53,13 @@ where
     T: ValueBounds,
     N: MetaBounds,
 {
-    pub chr: C,
+    chr: C,
     #[getset(get = "pub", set = "pub")]
     source: N,
     #[getset(get = "pub", set = "pub")]
     feature: N,
-    pub start: T,
-    pub end: T,
+    start: T,
+    end: T,
     #[getset(get_copy = "pub", set = "pub")]
     score: Score,
     strand: Strand,

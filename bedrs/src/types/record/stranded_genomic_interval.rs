@@ -33,9 +33,9 @@ where
     C: ChromBounds,
     T: ValueBounds,
 {
-    pub chr: C,
-    pub start: T,
-    pub end: T,
+    chr: C,
+    start: T,
+    end: T,
     strand: Strand,
 }
 

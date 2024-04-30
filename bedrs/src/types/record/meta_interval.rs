@@ -36,9 +36,9 @@ where
     T: ValueBounds,
     M: MetaBounds,
 {
-    pub chr: C,
-    pub start: T,
-    pub end: T,
+    chr: C,
+    start: T,
+    end: T,
     #[getset(get = "pub", set = "pub")]
     meta: M,
 }

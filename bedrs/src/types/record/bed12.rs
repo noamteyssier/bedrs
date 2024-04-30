@@ -51,9 +51,9 @@ where
     Si: MetaBounds,
     St: MetaBounds,
 {
-    pub chr: C,
-    pub start: T,
-    pub end: T,
+    chr: C,
+    start: T,
+    end: T,
     #[getset(get = "pub", set = "pub")]
     name: N,
     #[getset(get_copy = "pub", set = "pub")]

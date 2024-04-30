@@ -37,11 +37,11 @@ where
     C: ChromBounds,
     T: ValueBounds,
 {
-    pub chr: C,
-    pub start: T,
-    pub end: T,
+    chr: C,
+    start: T,
+    end: T,
     #[getset(get_copy = "pub", set = "pub")]
-    pub score: f64,
+    score: f64,
 }
 
 impl<C, T> From<BedGraph<C, T>> for Bed3<C, T>

@@ -38,11 +38,11 @@ where
     T: ValueBounds,
     N: MetaBounds,
 {
-    pub chr: C,
-    pub start: T,
-    pub end: T,
+    chr: C,
+    start: T,
+    end: T,
     #[getset(get = "pub", set = "pub")]
-    pub name: N,
+    name: N,
 }
 
 impl<C, T, N> From<Bed4<C, T, N>> for Bed3<C, T>
