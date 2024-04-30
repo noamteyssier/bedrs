@@ -3,6 +3,8 @@ use crate::{
     Bed3, Coordinates, Strand,
 };
 use bedrs_derive::Coordinates;
+use derive_new::new;
+use getset::{Getters, Setters};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -26,7 +28,7 @@ use serde::{Deserialize, Serialize};
 /// let b = MetaInterval::new(1, 20, 30, ("something_else", 20, '.'));
 /// assert!(a.overlaps(&b));
 /// ```
-#[derive(Debug, Default, Clone, Copy, Coordinates)]
+#[derive(Debug, Default, Clone, Copy, Coordinates, Getters, Setters, new)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct MetaInterval<C, T, M>
 where
@@ -37,28 +39,8 @@ where
     pub chr: C,
     pub start: T,
     pub end: T,
+    #[getset(get = "pub", set = "pub")]
     meta: M,
-}
-impl<C, T, M> MetaInterval<C, T, M>
-where
-    C: ChromBounds,
-    T: ValueBounds,
-    M: MetaBounds,
-{
-    pub fn new(chr: C, start: T, end: T, meta: M) -> Self {
-        Self {
-            chr,
-            start,
-            end,
-            meta,
-        }
-    }
-    pub fn meta(&self) -> &M {
-        &self.meta
-    }
-    pub fn update_meta(&mut self, val: &M) {
-        self.meta = val.clone();
-    }
 }
 
 impl<C, T, M> From<MetaInterval<C, T, M>> for Bed3<C, T>

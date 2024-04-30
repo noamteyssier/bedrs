@@ -4,6 +4,8 @@ use crate::{
     Bed3, Coordinates, Strand,
 };
 use bedrs_derive::Coordinates;
+use derive_new::new;
+use getset::{CopyGetters, Getters, Setters};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -42,7 +44,8 @@ use serde::{Deserialize, Serialize};
 /// assert_eq!(record.end(), 4000);
 /// assert_eq!(record.strand(), Some(Strand::Forward));
 /// ```
-#[derive(Debug, Clone, Copy, Default, Coordinates)]
+#[allow(clippy::too_many_arguments)]
+#[derive(Debug, Clone, Copy, Default, Coordinates, Getters, Setters, CopyGetters, new)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Gtf<C, T, N>
 where
@@ -51,81 +54,19 @@ where
     N: MetaBounds,
 {
     pub chr: C,
+    #[getset(get = "pub", set = "pub")]
     source: N,
+    #[getset(get = "pub", set = "pub")]
     feature: N,
     pub start: T,
     pub end: T,
+    #[getset(get_copy = "pub", set = "pub")]
     score: Score,
     strand: Strand,
+    #[getset(get_copy = "pub", set = "pub")]
     frame: Frame,
+    #[getset(get = "pub", set = "pub")]
     attributes: N,
-}
-impl<C, T, N> Gtf<C, T, N>
-where
-    C: ChromBounds,
-    T: ValueBounds,
-    N: MetaBounds,
-{
-    #[allow(clippy::too_many_arguments)]
-    pub fn new(
-        chr: C,
-        source: N,
-        feature: N,
-        start: T,
-        end: T,
-        score: Score,
-        strand: Strand,
-        frame: Frame,
-        attributes: N,
-    ) -> Self {
-        Self {
-            chr,
-            source,
-            feature,
-            start,
-            end,
-            score,
-            strand,
-            frame,
-            attributes,
-        }
-    }
-    pub fn seqname(&self) -> &C {
-        &self.chr
-    }
-    pub fn source(&self) -> &N {
-        &self.source
-    }
-    pub fn feature(&self) -> &N {
-        &self.feature
-    }
-    pub fn score(&self) -> Score {
-        self.score
-    }
-    pub fn frame(&self) -> Frame {
-        self.frame
-    }
-    pub fn attributes(&self) -> &N {
-        &self.attributes
-    }
-    pub fn update_seqname(&mut self, val: &C) {
-        self.update_chr(val);
-    }
-    pub fn update_source(&mut self, val: &N) {
-        self.source = val.clone();
-    }
-    pub fn update_feature(&mut self, val: &N) {
-        self.feature = val.clone();
-    }
-    pub fn update_score(&mut self, val: Score) {
-        self.score = val;
-    }
-    pub fn update_frame(&mut self, val: Frame) {
-        self.frame = val;
-    }
-    pub fn update_attributes(&mut self, val: &N) {
-        self.attributes = val.clone();
-    }
 }
 
 impl<C, T, N> From<Gtf<C, T, N>> for Bed3<C, T>
@@ -192,14 +133,12 @@ mod testing {
         assert_eq!(record.frame(), 0.into());
         assert_eq!(record.attributes(), &"some_attr");
 
-        record.update_seqname(&2);
-        record.update_source(&"Havana");
-        record.update_feature(&"transcript");
-        record.update_score(Score(None));
-        record.update_frame(1.into());
-        record.update_attributes(&"");
+        record.set_source("Havana");
+        record.set_feature("transcript");
+        record.set_score(Score(None));
+        record.set_frame(1.into());
+        record.set_attributes("");
 
-        assert_eq!(record.seqname(), &2);
         assert_eq!(record.source(), &"Havana");
         assert_eq!(record.feature(), &"transcript");
         assert_eq!(record.score(), Score(None));
@@ -269,7 +208,7 @@ mod serde_testing {
             .from_reader(a.as_bytes());
         let mut iter = rdr.deserialize();
         let b: Gtf<String, i32, String> = iter.next().unwrap()?;
-        assert_eq!(b.seqname(), "chr1");
+        assert_eq!(b.chr(), "chr1");
         assert_eq!(b.source(), "Ensembl");
         assert_eq!(b.feature(), "gene");
         assert_eq!(b.start(), 20);

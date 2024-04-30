@@ -20,6 +20,8 @@ rayon = { version = "1.10.0", optional = true }
 serde = { version = "1.0.197", features = ["derive"], optional = true }
 thiserror = "1.0.58"
 bedrs_derive = { path = "../bedrs_derive" }
+getset = "0.1.2"
+derive-new = "0.6.0"
 
 [features]
 serde = ["dep:serde"]

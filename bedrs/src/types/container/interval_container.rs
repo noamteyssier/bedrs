@@ -462,7 +462,7 @@ mod testing {
         });
 
         set.records_mut().iter_mut().for_each(|r| {
-            r.set_strand(Strand::Reverse);
+            r.update_strand(Some(Strand::Reverse));
         });
 
         set.records().iter().for_each(|r| {

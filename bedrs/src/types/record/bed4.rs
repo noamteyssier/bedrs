@@ -4,6 +4,8 @@ use crate::{
     Bed12, Bed3, Bed6, BedGraph, Coordinates, Strand,
 };
 use bedrs_derive::Coordinates;
+use derive_new::new;
+use getset::{Getters, Setters};
 use num_traits::zero;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
@@ -28,7 +30,7 @@ use serde::{Deserialize, Serialize};
 /// let b = Bed4::new(1, 20, 30, 0);
 /// assert!(a.overlaps(&b));
 /// ```
-#[derive(Debug, Default, Clone, Copy, Coordinates)]
+#[derive(Debug, Default, Clone, Copy, Coordinates, Getters, Setters, new)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Bed4<C, T, N>
 where
@@ -39,30 +41,8 @@ where
     pub chr: C,
     pub start: T,
     pub end: T,
+    #[getset(get = "pub", set = "pub")]
     pub name: N,
-}
-impl<C, T, N> Bed4<C, T, N>
-where
-    C: ChromBounds,
-    T: ValueBounds,
-    N: MetaBounds,
-{
-    pub fn new(chr: C, start: T, end: T, name: N) -> Self {
-        Self {
-            chr,
-            start,
-            end,
-            name,
-        }
-    }
-
-    pub fn name(&self) -> &N {
-        &self.name
-    }
-
-    pub fn update_name(&mut self, val: &N) {
-        self.name = val.clone();
-    }
 }
 
 impl<C, T, N> From<Bed4<C, T, N>> for Bed3<C, T>

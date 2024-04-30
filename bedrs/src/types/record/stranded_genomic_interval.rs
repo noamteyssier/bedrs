@@ -3,6 +3,7 @@ use crate::{
     Strand,
 };
 use bedrs_derive::Coordinates;
+use derive_new::new;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -25,7 +26,7 @@ use serde::{Deserialize, Serialize};
 /// assert!(a.overlaps(&b));
 /// assert!(!a.stranded_overlaps(&b));
 /// ```
-#[derive(Debug, Default, Clone, Copy, Coordinates)]
+#[derive(Debug, Default, Clone, Copy, Coordinates, new)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct StrandedBed3<C, T>
 where
@@ -36,49 +37,6 @@ where
     pub start: T,
     pub end: T,
     strand: Strand,
-}
-
-impl<C, T> StrandedBed3<C, T>
-where
-    C: ChromBounds,
-    T: ValueBounds,
-{
-    /// Create a new `StrandedBed3`
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use bedrs::{Coordinates, StrandedBed3, Strand};
-    /// let a = StrandedBed3::new(1, 20, 30, Strand::Forward);
-    /// assert_eq!(*a.chr(), 1);
-    /// assert_eq!(a.start(), 20);
-    /// assert_eq!(a.end(), 30);
-    /// assert_eq!(a.strand(), Some(Strand::Forward));
-    /// ```
-    pub fn new(chr: C, start: T, end: T, strand: Strand) -> Self {
-        Self {
-            chr,
-            start,
-            end,
-            strand,
-        }
-    }
-
-    /// Overwrite the strand of the interval.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use bedrs::{Coordinates, StrandedBed3, Strand};
-    ///
-    /// let mut a = StrandedBed3::new(1, 20, 30, Strand::Forward);
-    /// assert_eq!(a.strand(), Some(Strand::Forward));
-    /// a.set_strand(Strand::Reverse);
-    /// assert_eq!(a.strand(), Some(Strand::Reverse));
-    /// ```
-    pub fn set_strand(&mut self, strand: Strand) {
-        self.strand = strand;
-    }
 }
 
 #[cfg(test)]
@@ -141,7 +99,7 @@ mod testing {
     fn test_set_strand() {
         let mut a = StrandedBed3::new(1, 5, 100, Strand::Forward);
         assert_eq!(a.strand(), Some(Strand::Forward));
-        a.set_strand(Strand::Reverse);
+        a.update_strand(Some(Strand::Reverse));
         assert_eq!(a.strand(), Some(Strand::Reverse));
     }
 

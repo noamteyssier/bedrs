@@ -4,6 +4,8 @@ use crate::{
     Bed3, Bed4, Bed6, BedGraph, Coordinates, Strand,
 };
 use bedrs_derive::Coordinates;
+use derive_new::new;
+use getset::{CopyGetters, Getters, Setters};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -35,7 +37,8 @@ use serde::{Deserialize, Serialize};
 /// let b = Bed4::new(1, 20, 30, 0);
 /// assert!(a.overlaps(&b));
 /// ```
-#[derive(Debug, Default, Clone, Copy, Coordinates)]
+#[allow(clippy::too_many_arguments)]
+#[derive(Debug, Default, Clone, Copy, Coordinates, Getters, Setters, CopyGetters, new)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Bed12<C, T, N, Ts, Te, R, Si, St>
 where
@@ -51,122 +54,23 @@ where
     pub chr: C,
     pub start: T,
     pub end: T,
+    #[getset(get = "pub", set = "pub")]
     name: N,
+    #[getset(get_copy = "pub", set = "pub")]
     score: Score,
     strand: Strand,
+    #[getset(get_copy = "pub", set = "pub")]
     thick_start: Ts,
+    #[getset(get_copy = "pub", set = "pub")]
     thick_end: Te,
+    #[getset(get = "pub", set = "pub")]
     item_rgb: R,
+    #[getset(get_copy = "pub", set = "pub")]
     block_count: T,
+    #[getset(get = "pub", set = "pub")]
     block_sizes: Si,
+    #[getset(get = "pub", set = "pub")]
     block_starts: St,
-}
-
-impl<C, T, N, Ts, Te, R, Si, St> Bed12<C, T, N, Ts, Te, R, Si, St>
-where
-    C: ChromBounds,
-    T: ValueBounds,
-    N: MetaBounds,
-    Ts: ValueBounds,
-    Te: ValueBounds,
-    R: MetaBounds,
-    Si: MetaBounds,
-    St: MetaBounds,
-{
-    #[allow(clippy::too_many_arguments)]
-    pub fn new(
-        chr: C,
-        start: T,
-        end: T,
-        name: N,
-        score: Score,
-        strand: Strand,
-        thick_start: Ts,
-        thick_end: Te,
-        item_rgb: R,
-        block_count: T,
-        block_sizes: Si,
-        block_starts: St,
-    ) -> Self {
-        Self {
-            chr,
-            start,
-            end,
-            name,
-            score,
-            strand,
-            thick_start,
-            thick_end,
-            item_rgb,
-            block_count,
-            block_sizes,
-            block_starts,
-        }
-    }
-
-    pub fn name(&self) -> &N {
-        &self.name
-    }
-
-    pub fn score(&self) -> Score {
-        self.score
-    }
-
-    pub fn thick_start(&self) -> Ts {
-        self.thick_start
-    }
-
-    pub fn thick_end(&self) -> Te {
-        self.thick_end
-    }
-
-    pub fn item_rgb(&self) -> &R {
-        &self.item_rgb
-    }
-
-    pub fn block_count(&self) -> T {
-        self.block_count
-    }
-
-    pub fn block_sizes(&self) -> &Si {
-        &self.block_sizes
-    }
-
-    pub fn block_starts(&self) -> &St {
-        &self.block_starts
-    }
-
-    pub fn update_name(&mut self, val: &N) {
-        self.name = val.clone();
-    }
-
-    pub fn update_score(&mut self, val: Score) {
-        self.score = val;
-    }
-
-    pub fn update_thick_start(&mut self, val: &Ts) {
-        self.thick_start = *val;
-    }
-
-    pub fn update_thick_end(&mut self, val: &Te) {
-        self.thick_end = *val;
-    }
-
-    pub fn update_item_rgb(&mut self, val: &R) {
-        self.item_rgb = val.clone();
-    }
-
-    pub fn update_block_count(&mut self, val: &T) {
-        self.block_count = *val;
-    }
-
-    pub fn update_block_sizes(&mut self, val: &Si) {
-        self.block_sizes = val.clone();
-    }
-
-    pub fn update_block_starts(&mut self, val: &St) {
-        self.block_starts = val.clone();
-    }
 }
 
 impl<C, T, N, Ts, Te, R, Si, St> From<Bed12<C, T, N, Ts, Te, R, Si, St>> for Bed3<C, T>
@@ -281,14 +185,14 @@ mod testing {
         a.update_start(&20);
         a.update_end(&30);
         a.update_strand(Some(Strand::Reverse));
-        a.update_name(&String::from("new_name"));
-        a.update_score(2.into());
-        a.update_thick_start(&2);
-        a.update_thick_end(&3);
-        a.update_item_rgb(&String::from("1,1,1"));
-        a.update_block_count(&2);
-        a.update_block_sizes(&vec![1, 2]);
-        a.update_block_starts(&vec![1, 2]);
+        a.set_name(String::from("new_name"));
+        a.set_score(2.into());
+        a.set_thick_start(2);
+        a.set_thick_end(3);
+        a.set_item_rgb(String::from("1,1,1"));
+        a.set_block_count(2);
+        a.set_block_sizes(vec![1, 2]);
+        a.set_block_starts(vec![1, 2]);
         assert_eq!(a.chr(), "chr2");
         assert_eq!(a.start(), 20);
         assert_eq!(a.end(), 30);
