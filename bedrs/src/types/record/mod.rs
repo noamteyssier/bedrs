@@ -5,7 +5,6 @@ mod bed4;
 mod bed6;
 mod bedgraph;
 mod gtf;
-mod macros;
 mod meta_interval;
 mod stranded_genomic_interval;
 
