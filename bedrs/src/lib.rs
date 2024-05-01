@@ -4,249 +4,164 @@
     clippy::module_name_repetitions,
     clippy::missing_errors_doc
 )]
-
-//! # BEDRS
-//! bedtools-like functionality for interval sets in rust
+//! [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE.md)
+//! ![actions status](https://github.com/noamteyssier/bedrs/workflows/CI/badge.svg)
+//! [![codecov](https://codecov.io/gh/noamteyssier/bedrs/branch/main/graph/badge.svg?token=CZANC7RKWP)](https://codecov.io/gh/noamteyssier/bedrs)
+//! [![Crates.io](https://img.shields.io/crates/v/bedrs)](https://crates.io/crates/bedrs)
+//! [![docs.rs](https://img.shields.io/docsrs/bedrs/latest)](https://docs.rs/bedrs/latest/bedrs/)
+//!
+//! # bedrs
+//!
+//! `bedtools`-like functionality for interval sets in rust
 //!
 //! ## Summary
 //!
-//! I wanted some bedtools-like functionality in rust and I made this tool to both
-//! learn how to implement genomic arithmetic as well as get more comfortable with
-//! generics and traits in rust.
+//! This is an interval library written in rust that takes advantage of the trait
+//! system, generics, monomorphization, and procedural macros, for high efficiency
+//! interval operations with nice quality of life features for developers.
 //!
-//! This library will eventually be focused towards genome-specific arithmetic
-//! and focuses around a base [Coordinates] trait which includes methods to
-//! retrieve `<chr, start, stop>`.
+//! It focuses around the [`Coordinates`] trait, which once implemented on
+//! and arbitrary interval type allows for a wide range of genomic interval arithmetic.
 //!
-//! This is a work in progress and is subject to heavy changes.
+//! It also introduces a new collection type, [`IntervalContainer`], which acts as a collection
+//! of [`Coordinates`] and has many set operations implemented.
 //!
-//! If you want a more robust interval library I recommend the following:
+//! Interval arithmetic can be thought of as set theoretic operations (like intersection,
+//! union, difference, complement, etc.) on intervals with associated chromosomes, strands,
+//! and other genomic markers.
 //!
-//! - [rust_lapper](https://crates.io/crates/rust-lapper)
-//! - [COITrees](https://crates.io/crates/coitrees)
-//! - [rampart](https://crates.io/crates/rampart)
+//! This library facilitates the development of these types of operations on arbitrary types
+//! and lets the user tailor their structures to minimize computational overhead, but also
+//! remains a flexible library for general interval operations.
 //!
-//! This library is heavily inspired from those above.
+//! ## Usage
 //!
-//! ## Traits
+//! The main benefit of this library is that it is trait-based.
+//! So you can define your own types - but if they implement the
+//! [`Coordinates`] trait they can use the other functions within the
+//! library.
 //!
-//! The advantage of this library is that all of the functionality is implemented
-//! via traits.
-//! As a result, if you have a custom data type - if you implement the traits then
-//! you get all the functionality for free. There is a single main trait in this library
+//! For detailed usage and examples please review the [documentation](https://docs.rs/bedrs/latest/bedrs/).
 //!
-//! 1. [Coordinates] :: which applies to individual interval records.
+//! ### [`Coordinates`] Trait
 //!
-//! ### Coordinates
+//! The library centers around the [`Coordinates`] trait.
 //!
-//! The [Coordinates] trait is the base trait for all interval types.
-//! It is the trait that defines the `<chr, start, stop>` coordinates.
-//! It is also the trait that defines the methods for interval arithmetic.
-//! This trait is generic over the type of the coordinates.
+//! This trait defines some minimal functions that are required for all set operations.
+//! This includes things like getting the chromosome ID of an interval, or the start and
+//! endpoints of that interval, or the strand.
 //!
-//! You can explore the full functionality of this trait by looking at the
-//! [`crate::traits::interval`] module.
+//! This can be implemented by hand, or if you follow common naming conventions used in the
+//! library (`chr`, `start`, `end`, `strand`) then you can `[derive(Coordinates)]` on your
+//! custom interval type.
 //!
-//! Some examples of the functionality are:
-//! - [Distance](crate::traits::interval::Distance)
-//! - [Intersect](crate::traits::interval::Intersect)
-//! - [Overlap](crate::traits::interval::Overlap)
-//! - [Subtract](crate::traits::interval::Subtract)
+//! ```rust
+//! use bedrs::prelude::*;
 //!
-//! ### Container
-//!
-//! The main container type in the library is the [`IntervalContainer`].
-//! It implements all the operations that you would expect from a bedtools-like library.
-//!
-//! ## Types
-//!
-//! This library has batteries included and has a few types you can use immediately or
-//! as references for designing your own.
-//!
-//! ### Base Interval
-//!
-//! Here is an example of the base [`BaseInterval`](types::BaseInterval).
-//!
-//! This interval only has two coordinates: `start` and `end`.
-//! This is the classic interval type.
-//!
-//! ```
-//! use bedrs::{Overlap, BaseInterval};
-//!
-//! let a = BaseInterval::new(10, 20);
-//! let b = BaseInterval::new(15, 25);
-//! let c = BaseInterval::new(20, 30);
-//!
-//! assert!(a.overlaps(&b));
-//! assert!(!a.overlaps(&c));
-//! assert!(b.overlaps(&c));
+//! // define a custom interval struct for testing
+//! #[derive(Default, Coordinates)]
+//! struct MyInterval {
+//!     chr: usize,
+//!     start: usize,
+//!     end: usize,
+//! }
 //! ```
 //!
-//! ### Genomic Interval
+//! ### Interval Types
 //!
-//! Here is an example of a [`Bed3`](types::Bed3).
+//! While you can create your own interval types, there are plenty of 'batteries-included'
+//! types you can use in your own libraries already.
 //!
-//! This is the bread and butter of genomic arithmetic and has three
-//! coordinates: `chr`, `start`, and `end`.
+//! These include:
+//! - [`Bed3`]
+//! - [`Bed4`]
+//! - [`Bed6`]
+//! - [`Bed12`]
+//! - [`BedGraph`]
+//! - [`Gtf`]
+//! - [`MetaInterval`]
+//! - [`StrandedBed3`]
 //!
-//! ```
-//! use bedrs::{Overlap, Bed3};
+//! These are pre-built interval types and can be used in many usecases:
 //!
-//! let a = Bed3::new(1, 10, 20);
-//! let b = Bed3::new(1, 15, 25);
-//! let c = Bed3::new(2, 15, 25);
+//! ``` rust
+//! use bedrs::prelude::*;
 //!
-//! assert!(a.overlaps(&b));
-//! assert!(!a.overlaps(&c));
-//! assert!(!b.overlaps(&c));
+//! // An interval on chromosome 1 and spanning base 20 <-> 40
+//! let a = Bed3::new(1, 20, 40);
+//!
+//! // An interval on chromosome 1 and spanning base 30 <-> 50
+//! let b = Bed3::new(1, 30, 50);
+//!
+//! // Find the intersecting interval of the two
+//! // This returns an Option<Bed3> because they may not intersect.
+//! let c = a.intersect(&b).unwrap();
+//!
+//! assert_eq!(c.chr(), &1);
+//! assert_eq!(c.start(), 30);
+//! assert_eq!(c.end(), 40);
 //! ```
 //!
 //! ## Interval Operations
 //!
-//! The following operations with be shown with the base [`BaseInterval`], but
-//! the same operations can be done with a [`Bed3`] or any other
-//! custom type which implements the [Coordinates] trait.
+//! - [`Overlap`]
+//! - [`Distance`]
+//! - [`Intersect`]
+//! - [`Segment`]
+//! - [`Subtract`]
 //!
-//! ### Overlap
-//! ```
-//! use bedrs::{Overlap, BaseInterval};
+//! ## Interval Set Operations
 //!
-//! let a = BaseInterval::new(10, 20);
-//! let b = BaseInterval::new(15, 25);
-//! assert!(a.overlaps(&b));
-//! ```
+//! Set operations are performed using the methods of the [`IntervalContainer`].
 //!
-//! ### Containment
+//! We can build an [`IntervalContainer`] easily on any collection of intervals:
 //!
-//! Whether an interval is contained by another.
+//! ``` rust
+//! use bedrs::prelude::*;
 //!
-//! ```
-//! use bedrs::{Overlap, BaseInterval};
+//! let set = IntervalContainer::new(vec![
+//!     Bed3::new(1, 20, 30),
+//!     Bed3::new(1, 30, 40),
+//!     Bed3::new(1, 40, 50),
+//! ]);
 //!
-//! let a = BaseInterval::new(10, 30);
-//! let b = BaseInterval::new(15, 25);
-//! assert!(a.contains(&b));
-//! assert!(b.contained_by(&a));
+//! assert_eq!(set.len(), 3);
 //! ```
 //!
-//! ### Borders
+//! For more details on each of these and more please explore the [`IntervalContainer`] for all
+//! associated methods.
 //!
-//! Whether an interval is bordered by another.
+//! - Bound
+//! - Closest
+//! - Complement
+//! - Find
+//! - Internal
+//! - Merge
+//! - Sample
+//! - Intersect
+//! - Segment
+//! - Subtract
 //!
-//! ```
-//! use bedrs::{Overlap, BaseInterval};
+//! ## Other Work
 //!
-//! let a = BaseInterval::new(10, 30);
-//! let b = BaseInterval::new(30, 50);
-//! assert!(a.borders(&b));
-//! ```
+//! This library is heavily inspired by other interval libraries in rust
+//! which are listed below:
 //!
-//! ## `BaseInterval` Functions
+//! - [rampart](https://crates.io/crates/rampart)
+//! - [rust_lapper](https://crates.io/crates/rust-lapper)
+//! - [COITrees](https://crates.io/crates/coitrees)
 //!
-//! The following are active functions to generate more intervals using
-//! some query intervals.
-//!
-//! ### Intersect
-//!
-//! Here is an example of a positive intersect
-//!
-//! ```
-//! use bedrs::{BaseInterval, Coordinates, Intersect};
-//!
-//! let a = BaseInterval::new(10, 30);
-//! let b = BaseInterval::new(20, 40);
-//! let ix = a.intersect(&b).unwrap();
-//! assert_eq!(ix.start(), 20);
-//! assert_eq!(ix.end(), 30);
-//! ```
-//!
-//! Here is an example of a negative intersect
-//!
-//! ```
-//! use bedrs::{BaseInterval, Coordinates, Intersect};
-//!
-//! let a = BaseInterval::new(10, 30);
-//! let b = BaseInterval::new(30, 40);
-//! let ix = a.intersect(&b);
-//! assert!(ix.is_none());
-//! ```
-//!
-//! ### Subtract
-//!
-//! The following method subtracts an interval from another.
-//! This returns a vector of intervals, as there could be
-//! either zero, one, or two possible interval returned.
-//!
-//! #### Left-Hand Subtraction
-//!
-//! ```
-//! use bedrs::{BaseInterval, Coordinates, Subtract};
-//!
-//! let a = BaseInterval::new(10, 30);
-//! let b = BaseInterval::new(20, 40);
-//! let sub = a.subtract(&b).unwrap();
-//! assert_eq!(sub.len(), 1);
-//! assert_eq!(sub[0].start(), 10);
-//! assert_eq!(sub[0].end(), 20);
-//! ```
-//!
-//! #### Right-Hand Subtraction
-//!
-//! ```
-//! use bedrs::{BaseInterval, Coordinates, Subtract};
-//!
-//! let a = BaseInterval::new(20, 40);
-//! let b = BaseInterval::new(10, 30);
-//! let sub = a.subtract(&b).unwrap();
-//! assert_eq!(sub.len(), 1);
-//! assert_eq!(sub[0].start(), 30);
-//! assert_eq!(sub[0].end(), 40);
-//! ```
-//!
-//! #### Contained Subtraction
-//!
-//! ```
-//! use bedrs::{BaseInterval, Coordinates, Subtract};
-//!
-//! let a = BaseInterval::new(10, 40);
-//! let b = BaseInterval::new(20, 30);
-//! let sub = a.subtract(&b).unwrap();
-//! assert_eq!(sub.len(), 2);
-//! assert_eq!(sub[0].start(), 10);
-//! assert_eq!(sub[0].end(), 20);
-//! assert_eq!(sub[1].start(), 30);
-//! assert_eq!(sub[1].end(), 40);
-//! ```
-//!
-//! #### Contained-By Subtraction
-//!
-//! ```
-//! use bedrs::{BaseInterval, Coordinates, Subtract};
-//!
-//! let a = BaseInterval::new(20, 30);
-//! let b = BaseInterval::new(10, 40);
-//! let sub = a.subtract(&b);
-//! assert!(sub.is_none());
-//! ```
-//!
-//! #### No Overlap Subtraction
-//!
-//! ```
-//! use bedrs::{BaseInterval, Coordinates, Subtract};
-//!
-//! let a = BaseInterval::new(10, 20);
-//! let b = BaseInterval::new(20, 30);
-//! let sub = a.subtract(&b).unwrap();
-//! assert_eq!(sub.len(), 1);
-//! assert_eq!(sub[0].start(), 10);
-//! assert_eq!(sub[0].end(), 20);
-//! ```
-
+//! It also was motivated by the following interval toolkits in C++ and C respectively:
+//! - [bedtools](https://github.com/arq5x/bedtools2)
+//! - [bedops](https://github.com/bedops/bedops)
 /// Traits used within the library
 pub mod traits;
 
 /// Types used within the library
 pub mod types;
+
+/// Prelude for the library
+pub mod prelude;
 
 pub use traits::{
     Coordinates, Distance, Intersect, Overlap, Segment, StrandedOverlap, Subtract,

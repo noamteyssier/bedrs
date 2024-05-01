@@ -3,9 +3,6 @@ use std::fmt::Debug;
 
 pub mod errors;
 pub mod interval;
-// pub use container::{
-//     // Closest, Complement, Find, Internal, Merge, Sample, SetSubtract,
-// };
 pub use errors::SetError;
 pub use interval::{
     Coordinates, Distance, Intersect, Overlap, Segment, StrandedOverlap, Subtract,
@@ -40,7 +37,6 @@ where
 }
 impl<T> MetaBounds for T where T: Clone + Default + Debug + Send + Sync {}
 
-/// Generic bounds for coordinates to be used within [Container]s
 pub trait IntervalBounds<C, T>
 where
     Self: Coordinates<C, T> + Clone + Overlap<C, T> + Send + Sync,
