@@ -130,10 +130,10 @@ impl From<usize> for Frame {
 }
 
 impl From<Option<i32>> for Frame {
-    /// Convert an Option<i32> to a Frame
+    /// Convert an `Option<i32>`to a Frame
     ///
     /// # Arguments
-    /// * `i` - An Option<i32> to convert to a Frame
+    /// * `i` - An `Option<i32>` to convert to a Frame
     ///
     /// # Example
     ///

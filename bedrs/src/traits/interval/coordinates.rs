@@ -10,6 +10,48 @@ use super::{
 };
 
 /// The main trait representing an interval.
+///
+/// This trait can be derived on arbitrary structs that have
+/// the fields {chr, start, end} and those fields meet the
+/// minimum required bounds of `ChromBounds` and `ValueBounds`.
+///
+/// # Examples
+/// ```
+/// use bedrs::prelude::*;
+/// use bedrs_derive::Coordinates;
+///
+/// #[derive(Default, Coordinates)]
+/// struct MyInterval {
+///     chr: usize,
+///     start: usize,
+///     end: usize,
+/// }
+///
+/// let a = MyInterval { chr: 1, start: 10, end: 20};
+/// assert_eq!(a.chr(), &1);
+/// assert_eq!(a.start(), 10);
+/// assert_eq!(a.end(), 20);
+/// assert_eq!(a.strand(), None);
+///
+/// #[derive(Default, Coordinates)]
+/// struct MyStrandedInterval {
+///     chr: usize,
+///     start: usize,
+///     end: usize,
+///     strand: Strand,
+/// }
+///
+/// let a = MyStrandedInterval{
+///     chr: 1,
+///     start: 10,
+///     end: 20,
+///     strand: Strand::Reverse
+/// };
+/// assert_eq!(a.chr(), &1);
+/// assert_eq!(a.start(), 10);
+/// assert_eq!(a.end(), 20);
+/// assert_eq!(a.strand(), Some(Strand::Reverse));
+/// ```
 #[allow(clippy::len_without_is_empty)]
 pub trait Coordinates<C, T>
 where

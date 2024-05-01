@@ -5,17 +5,17 @@ use crate::{
 };
 use std::cmp::Ordering;
 
-/// Identifies the lower bound on a [Container] via a binary tree search
+/// Identifies the lower bound on a [`IntervalContainer`] via a binary tree search
 impl<I, C, T> IntervalContainer<I, C, T>
 where
     I: IntervalBounds<C, T>,
     C: ChromBounds,
     T: ValueBounds,
 {
-    /// Identifies the lower bound on the [Container] via a binary tree search
+    /// Identifies the lower bound on the [`IntervalContainer`] via a binary tree search
     /// for a provided query.
     ///
-    /// This first checks if the [Container] is sorted
+    /// This first checks if the [`IntervalContainer`] is sorted
     ///
     /// Then, it performs a binary tree search for the lower bound
     /// but performs a biased comparison to search for the lower bound
@@ -76,7 +76,7 @@ where
         }
     }
 
-    /// Identifies the lower bound on the [Container] via a binary tree search
+    /// Identifies the lower bound on the [`IntervalContainer`] via a binary tree search
     /// for a provided query.
     ///
     /// Does not perform a check if it is sorted beforehand.
@@ -121,7 +121,7 @@ where
     /// ```
     ///
     /// ## Panics
-    /// This will panic if the [Container] is empty or if the `max_len` is None.
+    /// This will panic if the [`IntervalContainer`] is empty or if the `max_len` is None.
     pub fn lower_bound_unchecked<Iv>(&self, query: &Iv) -> usize
     where
         Iv: IntervalBounds<C, T>,
@@ -140,8 +140,8 @@ where
             .unwrap_or_else(|x| x)
     }
 
-    /// Finds the earliest record in the [Container] that shares a chromosome
-    /// with the query. Can result in an error if the [Container] is not sorted.
+    /// Finds the earliest record in the [`IntervalContainer`] that shares a chromosome
+    /// with the query. Can result in an error if the [`IntervalContainer`] is not sorted.
     pub fn chr_bound<Iv>(&self, query: &Iv) -> Result<Option<usize>, SetError>
     where
         Iv: IntervalBounds<C, T>,
@@ -156,8 +156,8 @@ where
         }
     }
 
-    /// Finds the latest record in the [Container] that shares a chromosome
-    /// with the query and is upstream. Can result in an error if the [Container]
+    /// Finds the latest record in the [`IntervalContainer`] that shares a chromosome
+    /// with the query and is upstream. Can result in an error if the [`IntervalContainer`]
     /// is not sorted.
     ///
     /// Will return `None` if no record shares a chromosome with the query and is
@@ -184,8 +184,8 @@ where
         }
     }
 
-    /// Finds the latest record in the [Container] that shares a chromosome
-    /// with the query and is upstream. Can result in an error if the [Container]
+    /// Finds the latest record in the [`IntervalContainer`] that shares a chromosome
+    /// with the query and is upstream. Can result in an error if the [`IntervalContainer`]
     /// is not sorted.
     ///
     /// Will return `None` if no record shares a chromosome with the query and is
@@ -201,8 +201,8 @@ where
         }
     }
 
-    /// Finds the earliest record in the [Container] that shares a chromosome
-    /// with the query and is downstream. Can result in an error if the [Container]
+    /// Finds the earliest record in the [`IntervalContainer`] that shares a chromosome
+    /// with the query and is downstream. Can result in an error if the [`IntervalContainer`]
     /// is not sorted.
     ///
     /// Will return `None` if no record shares a chromosome with the query and is
@@ -231,8 +231,8 @@ where
         }
     }
 
-    /// Finds the earliest record in the [Container] that shares a chromosome
-    /// with the query and is downstream. Can result in an error if the [Container]
+    /// Finds the earliest record in the [`IntervalContainer`] that shares a chromosome
+    /// with the query and is downstream. Can result in an error if the [`IntervalContainer`]
     /// is not sorted.
     ///
     /// Will return `None` if no record shares a chromosome with the query and is
@@ -248,7 +248,7 @@ where
         }
     }
 
-    /// Finds the earliest record in the [Container] that shares a chromosome
+    /// Finds the earliest record in the [`IntervalContainer`] that shares a chromosome
     /// with the query. Does not perform a check if it is sorted beforehand.
     /// Use at your own risk.
     pub fn chr_bound_unchecked<Iv>(&self, query: &Iv) -> Option<usize>
@@ -277,7 +277,7 @@ where
         }
     }
 
-    /// Finds the latest record in the [Container] that shares a chromosome
+    /// Finds the latest record in the [`IntervalContainer`] that shares a chromosome
     /// and is upstream of the query. Does not perform a check if it is
     /// sorted beforehand. Use at your own risk.
     pub fn bound_igstrand_upstream_unchecked<Iv>(&self, query: &Iv) -> Option<usize>
@@ -383,7 +383,7 @@ where
         }
     }
 
-    /// Finds the earliest record in the [Container] that shares a chromosome
+    /// Finds the earliest record in the [`IntervalContainer`] that shares a chromosome
     /// and is downstream of the query. Does not perform a check if it is
     /// sorted beforehand. Use at your own risk.
     pub fn bound_igstrand_downstream_unchecked<Iv>(&self, query: &Iv) -> Option<usize>
@@ -421,7 +421,7 @@ where
         }
     }
 
-    /// Finds the earliest record in the [Container] that shares a chromosome
+    /// Finds the earliest record in the [`IntervalContainer`] that shares a chromosome
     /// and is downstream of the query and shares a strand. Does not perform a check if it is
     /// sorted beforehand. Use at your own risk.
     pub fn bound_stranded_downstream_unchecked<Iv>(&self, query: &Iv) -> Option<usize>
@@ -447,7 +447,7 @@ where
         Some(lt_bound + strand_bound)
     }
 
-    /// Finds the earliest record in the [Container] that shares a chromosome
+    /// Finds the earliest record in the [`IntervalContainer`] that shares a chromosome
     /// and is downstream of the query and opposes its strand. Does not perform a check if it is
     /// sorted beforehand. Use at your own risk.
     pub fn bound_unstranded_downstream_unchecked<Iv>(&self, query: &Iv) -> Option<usize>
