@@ -1,155 +1,140 @@
-# bedrs
-
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE.md)
 ![actions status](https://github.com/noamteyssier/bedrs/workflows/CI/badge.svg)
 [![codecov](https://codecov.io/gh/noamteyssier/bedrs/branch/main/graph/badge.svg?token=CZANC7RKWP)](https://codecov.io/gh/noamteyssier/bedrs)
 [![Crates.io](https://img.shields.io/crates/v/bedrs)](https://crates.io/crates/bedrs)
 [![docs.rs](https://img.shields.io/docsrs/bedrs/latest)](https://docs.rs/bedrs/latest/bedrs/)
 
+# bedrs
+
 `bedtools`-like functionality for interval sets in rust
 
 ## Summary
 
 This is an interval library written in rust that takes advantage of the trait
-system, generics, and monomorphization.
+system, generics, monomorphization, and procedural macros, for high efficiency
+interval operations with nice quality of life features for developers.
 
-It focuses around two main traits: `Coordinates` and `Container` which when
-implemented on an arbitrary type allow for a wide range of genomic interval
-arithmetic.
+It focuses around the [`Coordinates`] trait, which once implemented on
+and arbitrary interval type allows for a wide range of genomic interval arithmetic.
+
+It also introduces a new collection type, [`IntervalContainer`], which acts as a collection
+of [`Coordinates`] and has many set operations implemented.
 
 Interval arithmetic can be thought of as set theoretic operations (like intersection,
 union, difference, complement, etc.) on intervals with associated chromosomes, strands,
 and other genomic markers.
 
 This library facilitates the development of these types of operations on arbitrary types
-and lets the user tailor their structures to minimize overhead.
+and lets the user tailor their structures to minimize computational overhead, but also
+remains a flexible library for general interval operations.
 
 ## Usage
 
 The main benefit of this library is that it is trait-based.
 So you can define your own types - but if they implement the
-`Coordinates` trait they can use the other functions within the
+[`Coordinates`] trait they can use the other functions within the
 library.
 
 For detailed usage and examples please review the [documentation](https://docs.rs/bedrs/latest/bedrs/).
 
-### `Coordinates` Trait
+### [`Coordinates`] Trait
 
-The library centers around the `Coordinates` trait.
+The library centers around the [`Coordinates`] trait.
 
-The `ChromBounds` and `ValueBounds` are the minimal trait requirements
-for all the types that can be used as the chromosome and interval values.
+This trait defines some minimal functions that are required for all set operations.
+This includes things like getting the chromosome ID of an interval, or the start and
+endpoints of that interval, or the strand.
 
-```rust
-pub trait Coordinates<C, T>
-where
-    C: ChromBounds,
-    T: ValueBounds,
-{
-    fn start(&self) -> T;
-    fn end(&self) -> T;
-    fn chr(&self) -> &C;
-    fn update_start(&mut self, val: &T);
-    fn update_end(&mut self, val: &T);
-    fn update_chr(&mut self, val: &C);
-    fn from(other: &Self) -> Self;
-}
-```
-
-This is so that if you would like to implement your own interval type
-you will only need to implement the `Coordinates` trait for your type
-and you can use all the functionality of the library.
+This can be implemented by hand, or if you follow common naming conventions used in the
+library (`chr`, `start`, `end`, `strand`) then you can `[derive(Coordinates)]` on your
+custom interval type.
 
 ```rust
+use bedrs::prelude::*;
+
 // define a custom interval struct for testing
-struct CustomInterval {
-    left: usize,
-    right: usize,
-}
-impl Coordinates<usize> for CustomInterval {
-    fn start(&self) -> usize {
-        self.left
-    }
-    fn end(&self) -> usize {
-        self.right
-    }
-    fn chr(&self) -> &usize {
-        &0
-    }
-    fn update_start(&mut self, val: &usize) {
-        self.left = *val;
-    }
-    fn update_end(&mut self, val: &usize) {
-        self.right = *val;
-    }
-    fn from(other: &Self) -> Self {
-        Self {
-            left: other.start(),
-            right: other.end(),
-        }
-    }
+#[derive(Default, Coordinates)]
+struct MyInterval {
+    chr: usize,
+    start: usize,
+    end: usize,
 }
 ```
 
 ### Interval Types
 
-There are some base interval types provided however, which you can use
-for reference or directly for your use case.
+While you can create your own interval types, there are plenty of 'batteries-included'
+types you can use in your own libraries already.
 
-#### Base Interval
+These include:
+- [`Bed3`]
+- [`Bed4`]
+- [`Bed6`]
+- [`Bed12`]
+- [`BedGraph`]
+- [`Gtf`]
+- [`MetaInterval`]
+- [`StrandedBed3`]
 
-This is a straightforward singular interval type.
-It still implements the `chr()` method, but will return the
-default of its generic type.
+These are pre-built interval types and can be used in many usecases:
 
-```rust
-use bedrs::{Overlap, Interval};
+``` rust
+use bedrs::prelude::*;
 
-let a = Interval::new(10, 20);
-let b = Interval::new(15, 25);
-assert!(a.overlaps(&b));
+// An interval on chromosome 1 and spanning base 20 <-> 40
+let a = Bed3::new(1, 20, 40);
+
+// An interval on chromosome 1 and spanning base 30 <-> 50
+let b = Bed3::new(1, 30, 50);
+
+// Find the intersecting interval of the two
+// This returns an Option<Bed3> because they may not intersect.
+let c = a.intersect(&b).unwrap();
+
+assert_eq!(c.chr(), &1);
+assert_eq!(c.start(), 30);
+assert_eq!(c.end(), 40);
 ```
 
-#### Genomic Interval
+## Interval Operations
 
-This is the bread and butter of genomic arithmetic.
-It is a 3-attribute struct of `[chr, start, stop]`.
+- [`Overlap`]
+- [`Distance`]
+- [`Intersect`]
+- [`Segment`]
+- [`Subtract`]
 
-```rust
-use bedrs::{Overlap, GenomicInterval};
+## Interval Set Operations
 
-// Initializing two intervals on the same Chr
-let a = GenomicInterval::new(1, 10, 20);
-let b = GenomicInterval::new(1, 15, 25);
-assert!(a.overlaps(&b));
+Set operations are performed using the methods of the [`IntervalContainer`].
 
-// Initializing two intervals on different Chr
-let a = GenomicInterval::new(1, 10, 20);
-let b = GenomicInterval::new(2, 15, 25);
-assert!(!a.overlaps(&b));
+We can build an [`IntervalContainer`] easily on any collection of intervals:
+
+``` rust
+use bedrs::prelude::*;
+
+let set = IntervalContainer::new(vec![
+    Bed3::new(1, 20, 30),
+    Bed3::new(1, 30, 40),
+    Bed3::new(1, 40, 50),
+]);
+
+assert_eq!(set.len(), 3);
 ```
 
-#### Stranded Genomic Interval
+For more details on each of these and more please explore the [`IntervalContainer`] for all
+associated methods.
 
-This is another version of the genomic interval which includes strand information.
-It is a 4-attribute struct of `[chr, start, stop, strand]`
-
-```rust
-use bedrs::{Overlap, Strand, StrandedGenomicInterval};
-
-// Initializing three intervals on the same Chr with strands
-let a = StrandedGenomicInterval::new(1, 10, 20, Strand::Forward);
-let b = StrandedGenomicInterval::new(1, 15, 25, Strand::Forward);
-let c = StrandedGenomicInterval::new(1, 15, 25, Strand::Reverse);
-
-// All intervals overlap
-assert!(a.overlaps(&b));
-assert!(a.overlaps(&c));
-
-// Only `a` and `b` overlap on the same strand
-assert!(a.stranded_overlaps(&b));
-assert!(!a.stranded_overlaps(&c));
-```
+- Bound
+- Closest
+- Complement
+- Find
+- Internal
+- Merge
+- Sample
+- Intersect
+- Segment
+- Subtract
 
 ## Other Work
 
