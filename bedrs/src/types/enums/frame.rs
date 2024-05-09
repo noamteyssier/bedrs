@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use std::{fmt::Display, str::FromStr};
 
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
@@ -152,6 +152,17 @@ impl From<Option<i32>> for Frame {
             Some(1) => Frame::One,
             Some(2) => Frame::Two,
             _ => Frame::None,
+        }
+    }
+}
+
+impl Display for Frame {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Frame::Zero => write!(f, "0"),
+            Frame::One => write!(f, "1"),
+            Frame::Two => write!(f, "2"),
+            Frame::None => write!(f, "."),
         }
     }
 }
