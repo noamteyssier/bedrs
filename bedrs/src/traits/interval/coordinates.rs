@@ -2,7 +2,11 @@ use crate::{
     traits::{ChromBounds, ValueBounds},
     Intersect, Overlap, Strand, Subtract,
 };
-use std::cmp::Ordering;
+use num_traits::ToPrimitive;
+use std::{
+    cmp::Ordering,
+    ops::{Add, Sub},
+};
 
 use super::{
     overlap::{StrandedOverlap, UnstrandedOverlap},
@@ -22,9 +26,9 @@ use super::{
 ///
 /// #[derive(Default, Coordinates)]
 /// struct MyInterval {
-///     chr: usize,
-///     start: usize,
-///     end: usize,
+///     chr: i32,
+///     start: i32,
+///     end: i32,
 /// }
 ///
 /// let a = MyInterval { chr: 1, start: 10, end: 20};
@@ -35,9 +39,9 @@ use super::{
 ///
 /// #[derive(Default, Coordinates)]
 /// struct MyStrandedInterval {
-///     chr: usize,
-///     start: usize,
-///     end: usize,
+///     chr: i32,
+///     start: i32,
+///     end: i32,
 ///     strand: Strand,
 /// }
 ///
@@ -53,10 +57,9 @@ use super::{
 /// assert_eq!(a.strand(), Some(Strand::Reverse));
 /// ```
 #[allow(clippy::len_without_is_empty)]
-pub trait Coordinates<C, T>
+pub trait Coordinates<C>
 where
     C: ChromBounds,
-    T: ValueBounds,
 {
     /// Returns the start coordinate of the interval.
     ///
@@ -67,7 +70,7 @@ where
     /// let iv = Bed3::new(1, 10, 20);
     /// assert_eq!(iv.start(), 10);
     /// ```
-    fn start(&self) -> T;
+    fn start(&self) -> i32;
 
     /// Returns the end coordinate of the interval.
     ///
@@ -78,7 +81,7 @@ where
     /// let iv = Bed3::new(1, 10, 20);
     /// assert_eq!(iv.end(), 20);
     /// ```
-    fn end(&self) -> T;
+    fn end(&self) -> i32;
 
     /// Returns a reference to the chromosome of the interval.
     ///
@@ -128,7 +131,7 @@ where
     /// iv.update_start(&5);
     /// assert_eq!(iv.start(), 5);
     /// ```
-    fn update_start(&mut self, val: &T);
+    fn update_start(&mut self, val: &i32);
 
     /// Update the end coordinate of the interval.
     ///
@@ -143,7 +146,7 @@ where
     /// iv.update_end(&30);
     /// assert_eq!(iv.end(), 30);
     /// ```
-    fn update_end(&mut self, val: &T);
+    fn update_end(&mut self, val: &i32);
 
     /// Update the chromosome of the interval.
     ///
@@ -187,11 +190,11 @@ where
     /// use bedrs::{Coordinates, Bed3};
     ///
     /// let iv = Bed3::new(1, 10, 20);
-    /// let new_iv = <Bed3<usize, usize> as Coordinates<usize, usize>>::from(&iv);
+    /// let new_iv = <Bed3<i32, i32> as Coordinates<i32, i32>>::from(&iv);
     ///
     /// assert!(iv.eq(&new_iv));
     /// ```
-    fn from<Iv: Coordinates<C, T>>(other: &Iv) -> Self;
+    fn from<Iv: Coordinates<C>>(other: &Iv) -> Self;
 
     /// Creates an empty interval.
     fn empty() -> Self;
@@ -206,7 +209,7 @@ where
     /// let iv = Bed3::new(1, 10, 20);
     /// assert_eq!(iv.len(), 10);
     /// ```
-    fn len(&self) -> T {
+    fn len(&self) -> i32 {
         self.end().sub(self.start())
     }
 
@@ -222,7 +225,7 @@ where
     /// iv.update_all(&2, &5, &10);
     /// assert!(iv.eq(&Bed3::new(2, 5, 10)));
     /// ```
-    fn update_all(&mut self, chr: &C, start: &T, end: &T) {
+    fn update_all(&mut self, chr: &C, start: &i32, end: &i32) {
         self.update_chr(chr);
         self.update_endpoints(start, end);
     }
@@ -239,7 +242,7 @@ where
     /// iv.update_endpoints(&5, &10);
     /// assert!(iv.eq(&Bed3::new(1, 5, 10)));
     /// ```
-    fn update_endpoints(&mut self, start: &T, end: &T) {
+    fn update_endpoints(&mut self, start: &i32, end: &i32) {
         self.update_start(start);
         self.update_end(end);
     }
@@ -256,7 +259,7 @@ where
     /// iv.update_all_from(&Bed3::new(2, 5, 10));
     /// assert!(iv.eq(&Bed3::new(2, 5, 10)));
     /// ```
-    fn update_all_from<I: Coordinates<C, T>>(&mut self, other: &I) {
+    fn update_all_from<I: Coordinates<C>>(&mut self, other: &I) {
         self.update_chr(other.chr());
         self.update_endpoints(&other.start(), &other.end());
     }
@@ -273,7 +276,7 @@ where
     /// iv.update_endpoints_from(&Bed3::new(2, 5, 10));
     /// assert!(iv.eq(&Bed3::new(1, 5, 10)));
     /// ```
-    fn update_endpoints_from<I: Coordinates<C, T>>(&mut self, other: &I) {
+    fn update_endpoints_from<I: Coordinates<C>>(&mut self, other: &I) {
         self.update_start(&other.start());
         self.update_end(&other.end());
     }
@@ -291,9 +294,9 @@ where
     /// iv.extend_left(&5);
     /// assert!(iv.eq(&Bed3::new(1, 5, 20)));
     /// ```
-    fn extend_left(&mut self, val: &T) {
+    fn extend_left(&mut self, val: &i32) {
         if self.start().lt(val) {
-            self.update_start(&T::zero());
+            self.update_start(&0);
         } else {
             self.update_start(&self.start().sub(*val));
         }
@@ -318,7 +321,7 @@ where
     /// iv.extend_right(&5, Some(27));
     /// assert!(iv.eq(&Bed3::new(1, 10, 27)));
     /// ```
-    fn extend_right(&mut self, val: &T, max_bound: Option<T>) {
+    fn extend_right(&mut self, val: &i32, max_bound: Option<i32>) {
         let new_end = self.end().add(*val);
         if let Some(max) = max_bound {
             self.update_end(&new_end.min(max));
@@ -347,7 +350,7 @@ where
     /// iv.extend(&5, Some(27));
     /// assert!(iv.eq(&Bed3::new(1, 0, 27)));
     /// ```
-    fn extend(&mut self, val: &T, max_bound: Option<T>) {
+    fn extend(&mut self, val: &i32, max_bound: Option<i32>) {
         self.extend_left(val);
         self.extend_right(val, max_bound);
     }
@@ -363,10 +366,10 @@ where
     /// assert_eq!(iv.f_len(0.3), 3);
     /// assert_eq!(iv.f_len(2.0), 20);
     /// ```
-    fn f_len(&self, frac: f64) -> T {
+    fn f_len(&self, frac: f64) -> i32 {
         let len_f: f64 = self.len().to_f64().unwrap();
         let n = len_f * frac;
-        T::from_f64(n.round()).unwrap()
+        n.round() as i32
     }
 
     /// Compare two intervals by their genomic coordinates.
@@ -393,7 +396,7 @@ where
     /// // a > e
     /// assert_eq!(a.coord_cmp(&e), std::cmp::Ordering::Greater);
     /// ```
-    fn coord_cmp<I: Coordinates<C, T>>(&self, other: &I) -> Ordering {
+    fn coord_cmp<I: Coordinates<C>>(&self, other: &I) -> Ordering {
         match self.chr().cmp(other.chr()) {
             Ordering::Equal => match self.start().cmp(&other.start()) {
                 Ordering::Equal => match self.end().cmp(&other.end()) {
@@ -410,7 +413,7 @@ where
     ///
     /// Used to find the lower bound of an interval in a sorted container
     /// where the maximum range of the intervals is known a priori.
-    fn biased_coord_cmp<I: Coordinates<C, T>>(&self, other: &I, bias: T) -> Ordering {
+    fn biased_coord_cmp<I: Coordinates<C>>(&self, other: &I, bias: i32) -> Ordering {
         match self.chr().cmp(other.chr()) {
             Ordering::Equal => {
                 let comp = if other.start() < bias {
@@ -433,16 +436,16 @@ where
             order => order,
         }
     }
-    fn biased_lt<I: Coordinates<C, T>>(&self, other: &I, bias: T) -> bool {
+    fn biased_lt<I: Coordinates<C>>(&self, other: &I, bias: i32) -> bool {
         self.biased_coord_cmp(other, bias) == Ordering::Less
     }
-    fn lt<I: Coordinates<C, T>>(&self, other: &I) -> bool {
+    fn lt<I: Coordinates<C>>(&self, other: &I) -> bool {
         self.coord_cmp(other) == Ordering::Less
     }
-    fn gt<I: Coordinates<C, T>>(&self, other: &I) -> bool {
+    fn gt<I: Coordinates<C>>(&self, other: &I) -> bool {
         self.coord_cmp(other) == Ordering::Greater
     }
-    fn eq<I: Coordinates<C, T>>(&self, other: &I) -> bool {
+    fn eq<I: Coordinates<C>>(&self, other: &I) -> bool {
         self.coord_cmp(other) == Ordering::Equal
     }
     fn pprint(&self) -> String {
@@ -456,59 +459,59 @@ where
     }
 }
 
-impl<I, C, T> Distance<C, T> for I
+impl<I, C> Distance<C, i32> for I
 where
-    I: Coordinates<C, T>,
+    I: Coordinates<C>,
     C: ChromBounds,
-    T: ValueBounds,
+    i32: ValueBounds,
 {
 }
 
-impl<I, C, T> Intersect<C, T> for I
+impl<I, C> Intersect<C, i32> for I
 where
-    I: Coordinates<C, T>,
+    I: Coordinates<C>,
     C: ChromBounds,
-    T: ValueBounds,
+    i32: ValueBounds,
 {
 }
 
-impl<I, C, T> Overlap<C, T> for I
+impl<I, C> Overlap<C, i32> for I
 where
-    I: Coordinates<C, T>,
+    I: Coordinates<C>,
     C: ChromBounds,
-    T: ValueBounds,
+    i32: ValueBounds,
 {
 }
 
-impl<I, C, T> StrandedOverlap<C, T> for I
+impl<I, C> StrandedOverlap<C, i32> for I
 where
-    I: Coordinates<C, T>,
+    I: Coordinates<C>,
     C: ChromBounds,
-    T: ValueBounds,
+    i32: ValueBounds,
 {
 }
 
-impl<I, C, T> UnstrandedOverlap<C, T> for I
+impl<I, C> UnstrandedOverlap<C, i32> for I
 where
-    I: Coordinates<C, T>,
+    I: Coordinates<C>,
     C: ChromBounds,
-    T: ValueBounds,
+    i32: ValueBounds,
 {
 }
 
-impl<I, C, T> Subtract<C, T> for I
+impl<I, C> Subtract<C, i32> for I
 where
-    I: Coordinates<C, T>,
+    I: Coordinates<C>,
     C: ChromBounds,
-    T: ValueBounds,
+    i32: ValueBounds,
 {
 }
 
-impl<I, C, T> Segment<C, T> for I
+impl<I, C> Segment<C, i32> for I
 where
-    I: Coordinates<C, T>,
+    I: Coordinates<C>,
     C: ChromBounds,
-    T: ValueBounds,
+    i32: ValueBounds,
 {
 }
 
@@ -518,31 +521,31 @@ mod testing {
 
     // define a custom interval struct for testing
     struct CustomInterval {
-        left: usize,
-        right: usize,
+        left: i32,
+        right: i32,
     }
-    impl Coordinates<usize, usize> for CustomInterval {
+    impl Coordinates<i32> for CustomInterval {
         fn empty() -> Self {
             Self { left: 0, right: 0 }
         }
-        fn start(&self) -> usize {
+        fn start(&self) -> i32 {
             self.left
         }
-        fn end(&self) -> usize {
+        fn end(&self) -> i32 {
             self.right
         }
-        fn chr(&self) -> &usize {
+        fn chr(&self) -> &i32 {
             &0
         }
-        fn update_start(&mut self, val: &usize) {
+        fn update_start(&mut self, val: &i32) {
             self.left = *val;
         }
-        fn update_end(&mut self, val: &usize) {
+        fn update_end(&mut self, val: &i32) {
             self.right = *val;
         }
         #[allow(unused)]
-        fn update_chr(&mut self, val: &usize) {}
-        fn from<Iv: Coordinates<usize, usize>>(other: &Iv) -> Self {
+        fn update_chr(&mut self, val: &i32) {}
+        fn from<Iv: Coordinates<i32>>(other: &Iv) -> Self {
             Self {
                 left: other.start(),
                 right: other.end(),
@@ -552,11 +555,11 @@ mod testing {
 
     // define a custom interval struct for testing
     struct CustomIntervalMeta {
-        left: usize,
-        right: usize,
+        left: i32,
+        right: i32,
         meta: String,
     }
-    impl Coordinates<usize, usize> for CustomIntervalMeta {
+    impl Coordinates<i32> for CustomIntervalMeta {
         fn empty() -> Self {
             Self {
                 left: 0,
@@ -564,24 +567,24 @@ mod testing {
                 meta: String::new(),
             }
         }
-        fn start(&self) -> usize {
+        fn start(&self) -> i32 {
             self.left
         }
-        fn end(&self) -> usize {
+        fn end(&self) -> i32 {
             self.right
         }
-        fn chr(&self) -> &usize {
+        fn chr(&self) -> &i32 {
             &0
         }
-        fn update_start(&mut self, val: &usize) {
+        fn update_start(&mut self, val: &i32) {
             self.left = *val;
         }
-        fn update_end(&mut self, val: &usize) {
+        fn update_end(&mut self, val: &i32) {
             self.right = *val;
         }
         #[allow(unused)]
-        fn update_chr(&mut self, val: &usize) {}
-        fn from<Iv: Coordinates<usize, usize>>(other: &Iv) -> Self {
+        fn update_chr(&mut self, val: &i32) {}
+        fn from<Iv: Coordinates<i32>>(other: &Iv) -> Self {
             Self {
                 left: other.start(),
                 right: other.end(),
