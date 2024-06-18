@@ -1,10 +1,9 @@
-use crate::traits::{ChromBounds, Coordinates, Overlap, ValueBounds};
+use crate::traits::{ChromBounds, Coordinates, Overlap};
 
-pub trait StrandedOverlap<C, T>: Coordinates<C, T>
+pub trait StrandedOverlap<C>: Coordinates<C>
 where
     Self: Sized,
     C: ChromBounds,
-    T: ValueBounds,
 {
     /// Returns true if the current interval overlaps the other
     /// and both intervals are on the same chromosome and strand.
@@ -23,7 +22,7 @@ where
     /// (Self)        <--------|
     /// (Other)   <--------|
     /// ```
-    fn stranded_overlaps<I: Coordinates<C, T>>(&self, other: &I) -> bool {
+    fn stranded_overlaps<I: Coordinates<C>>(&self, other: &I) -> bool {
         self.bounded_strand(other) && self.overlaps(other)
     }
 
@@ -44,19 +43,19 @@ where
     /// (Self)        <--------
     /// (Other)   <--------
     /// ```
-    fn stranded_overlaps_by<I: Coordinates<C, T>>(&self, other: &I, bases: T) -> bool {
+    fn stranded_overlaps_by<I: Coordinates<C>>(&self, other: &I, bases: i32) -> bool {
         self.stranded_overlap_size(other)
             .map_or(false, |n| n >= bases)
     }
     /// Returns true if the current interval overlaps the other by exactly `bases`
     /// and both intervals are on the same chromosome and strand.
-    fn stranded_overlaps_by_exactly<I: Coordinates<C, T>>(&self, other: &I, bases: T) -> bool {
+    fn stranded_overlaps_by_exactly<I: Coordinates<C>>(&self, other: &I, bases: i32) -> bool {
         self.stranded_overlap_size(other)
             .map_or(false, |n| n == bases)
     }
     /// Returns the size of the overlap between the current interval and the other
     /// if the intervals are on the same chromosome and strand.
-    fn stranded_overlap_size<I: Coordinates<C, T>>(&self, other: &I) -> Option<T> {
+    fn stranded_overlap_size<I: Coordinates<C>>(&self, other: &I) -> Option<i32> {
         if self.bounded_strand(other) {
             self.overlap_size(other)
         } else {
@@ -78,7 +77,7 @@ where
     /// assert!(interval1.stranded_starts(&interval2));
     /// assert!(!interval1.stranded_starts(&interval3));
     /// ```
-    fn stranded_starts<I: Coordinates<C, T>>(&self, other: &I) -> bool {
+    fn stranded_starts<I: Coordinates<C>>(&self, other: &I) -> bool {
         self.bounded_strand(other) && self.starts(other)
     }
 
@@ -97,7 +96,7 @@ where
     /// assert!(interval1.stranded_ends(&interval2));
     /// assert!(!interval1.stranded_ends(&interval3));
     /// ```
-    fn stranded_ends<I: Coordinates<C, T>>(&self, other: &I) -> bool {
+    fn stranded_ends<I: Coordinates<C>>(&self, other: &I) -> bool {
         self.bounded_strand(other) && self.ends(other)
     }
     /// Returns true if the current interval equals the other and they are on the same strand
@@ -115,7 +114,7 @@ where
     /// assert!(interval1.stranded_equals(&interval2));
     /// assert!(!interval1.stranded_equals(&interval3));
     /// ```
-    fn stranded_equals<I: Coordinates<C, T>>(&self, other: &I) -> bool {
+    fn stranded_equals<I: Coordinates<C>>(&self, other: &I) -> bool {
         self.bounded_strand(other) && self.equals(other)
     }
     /// Returns true if the current interval is during the other and
@@ -133,7 +132,7 @@ where
     /// assert!(interval1.stranded_during(&interval2));
     /// assert!(!interval1.stranded_during(&interval3));
     /// ```
-    fn stranded_during<I: Coordinates<C, T>>(&self, other: &I) -> bool {
+    fn stranded_during<I: Coordinates<C>>(&self, other: &I) -> bool {
         self.bounded_strand(other) && self.during(other)
     }
     /// Returns true if the current interval contains the other and
@@ -156,7 +155,7 @@ where
     /// assert!(interval1.stranded_contains(&interval2));
     /// assert!(!interval1.stranded_contains(&interval3));
     /// ```
-    fn stranded_contains<I: Coordinates<C, T>>(&self, other: &I) -> bool {
+    fn stranded_contains<I: Coordinates<C>>(&self, other: &I) -> bool {
         self.bounded_strand(other) && self.contains(other)
     }
     /// Returns true if the current interval is contained by the other and
@@ -183,7 +182,7 @@ where
     /// assert!(interval1.stranded_contained_by(&interval2));
     /// assert!(!interval1.stranded_contained_by(&interval3));
     /// ```
-    fn stranded_contained_by<I: Coordinates<C, T>>(&self, other: &I) -> bool {
+    fn stranded_contained_by<I: Coordinates<C>>(&self, other: &I) -> bool {
         other.stranded_contains(self)
     }
 
@@ -211,7 +210,7 @@ where
     /// assert!(interval1.stranded_borders(&interval2));
     /// assert!(!interval1.stranded_borders(&interval3));
     /// ```
-    fn stranded_borders<I: Coordinates<C, T>>(&self, other: &I) -> bool {
+    fn stranded_borders<I: Coordinates<C>>(&self, other: &I) -> bool {
         self.bounded_strand(other) && self.borders(other)
     }
 }

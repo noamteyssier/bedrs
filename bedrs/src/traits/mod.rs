@@ -37,17 +37,15 @@ where
 }
 impl<T> MetaBounds for T where T: Clone + Default + Debug + Send + Sync {}
 
-pub trait IntervalBounds<C, T>
+pub trait IntervalBounds<C>
 where
-    Self: Coordinates<C, T> + Clone + Overlap<C, T> + Send + Sync,
+    Self: Coordinates<C> + Clone + Overlap<C> + Send + Sync,
     C: ChromBounds,
-    T: ValueBounds,
 {
 }
-impl<I, C, T> IntervalBounds<C, T> for I
+impl<I, C> IntervalBounds<C> for I
 where
-    I: Coordinates<C, T> + Clone + Overlap<C, T> + Send + Sync,
+    I: Coordinates<C> + Clone + Overlap<C> + Send + Sync,
     C: ChromBounds,
-    T: ValueBounds,
 {
 }

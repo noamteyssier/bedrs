@@ -64,14 +64,14 @@ use crate::{
 /// let b = Bed3::new(2, 10, 20);
 /// assert_eq!(a.distance(&b), None);
 /// ```
-pub trait Distance<C, T>: Coordinates<C, T> + Overlap<C, T>
+pub trait Distance<C>: Coordinates<C> + Overlap<C>
 where
     C: ChromBounds,
-    T: ValueBounds,
+    i32: ValueBounds,
 {
-    fn distance<I: Coordinates<C, T>>(&self, other: &I) -> Option<T> {
+    fn distance<I: Coordinates<C>>(&self, other: &I) -> Option<i32> {
         if self.overlaps(other) || self.borders(other) {
-            Some(T::zero())
+            Some(0)
         } else if self.chr() != other.chr() {
             None
         } else if self.gt(other) {
@@ -81,15 +81,14 @@ where
         }
     }
 
-    fn directed_distance<I: Coordinates<C, T>>(&self, other: &I) -> Option<isize> {
+    fn directed_distance<I: Coordinates<C>>(&self, other: &I) -> Option<i32> {
         if self.overlaps(other) || self.borders(other) {
             Some(0)
         } else if self.chr() != other.chr() {
             None
-        } else if self.gt(other) {
-            (self.start() - other.end()).to_isize().map(|x| -x)
         } else {
-            (other.start() - self.end()).to_isize()
+            // always signed
+            Some(self.start() - other.end())
         }
     }
 }

@@ -459,7 +459,7 @@ where
     }
 }
 
-impl<I, C> Distance<C, i32> for I
+impl<I, C> Distance<C> for I
 where
     I: Coordinates<C>,
     C: ChromBounds,
@@ -467,7 +467,7 @@ where
 {
 }
 
-impl<I, C> Intersect<C, i32> for I
+impl<I, C> Intersect<C> for I
 where
     I: Coordinates<C>,
     C: ChromBounds,
@@ -475,7 +475,28 @@ where
 {
 }
 
-impl<I, C> Overlap<C, i32> for I
+impl<I, C> Overlap<C> for I
+where
+    I: Coordinates<C>,
+    C: ChromBounds,
+{
+}
+
+impl<I, C> StrandedOverlap<C> for I
+where
+    I: Coordinates<C>,
+    C: ChromBounds,
+{
+}
+
+impl<I, C> UnstrandedOverlap<C> for I
+where
+    I: Coordinates<C>,
+    C: ChromBounds,
+{
+}
+
+impl<I, C> Subtract<C> for I
 where
     I: Coordinates<C>,
     C: ChromBounds,
@@ -483,35 +504,10 @@ where
 {
 }
 
-impl<I, C> StrandedOverlap<C, i32> for I
+impl<I, C> Segment<C> for I
 where
     I: Coordinates<C>,
     C: ChromBounds,
-    i32: ValueBounds,
-{
-}
-
-impl<I, C> UnstrandedOverlap<C, i32> for I
-where
-    I: Coordinates<C>,
-    C: ChromBounds,
-    i32: ValueBounds,
-{
-}
-
-impl<I, C> Subtract<C, i32> for I
-where
-    I: Coordinates<C>,
-    C: ChromBounds,
-    i32: ValueBounds,
-{
-}
-
-impl<I, C> Segment<C, i32> for I
-where
-    I: Coordinates<C>,
-    C: ChromBounds,
-    i32: ValueBounds,
 {
 }
 

@@ -1,21 +1,20 @@
 use crate::{
-    traits::{ChromBounds, IntervalBounds, ValueBounds},
+    traits::{ChromBounds, IntervalBounds},
     Coordinates, Intersect, Overlap, Subtract,
 };
 
-pub trait Segment<C, T>: Coordinates<C, T> + Overlap<C, T>
+pub trait Segment<C>: Coordinates<C> + Overlap<C>
 where
     C: ChromBounds,
-    T: ValueBounds,
 {
     #[must_use]
-    fn build_self<I: Coordinates<C, T>>(&self, other: &I) -> Self {
+    fn build_self<I: Coordinates<C>>(&self, other: &I) -> Self {
         let mut sub = Self::from(other);
         sub.update_all(self.chr(), &self.start(), &self.end());
         sub
     }
     #[must_use]
-    fn build_other<I: Coordinates<C, T>>(&self, other: &I) -> Self {
+    fn build_other<I: Coordinates<C>>(&self, other: &I) -> Self {
         let mut sub = Self::from(other);
         sub.update_all(other.chr(), &other.start(), &other.end());
         sub
@@ -23,14 +22,14 @@ where
 
     /// Insert the left-hand side interval segment (i.e. the left-hand subtraction) into
     /// the segments vector
-    fn insert_lhs<I: Coordinates<C, T>>(&self, other: &I, segments: &mut Vec<Self>) {
+    fn insert_lhs<I: Coordinates<C>>(&self, other: &I, segments: &mut Vec<Self>) {
         let sub = self.subtract(other).unwrap();
         segments.extend(sub);
     }
 
     /// Insert the central segment into the segments vector
     /// (i.e. the intersection of the pairs)
-    fn insert_center<I: Coordinates<C, T>>(&self, other: &I, segments: &mut Vec<Self>) {
+    fn insert_center<I: Coordinates<C>>(&self, other: &I, segments: &mut Vec<Self>) {
         if let Some(ix) = other.intersect(self) {
             segments.push(ix);
         }
@@ -38,7 +37,7 @@ where
 
     /// Insert the right-hand side interval segment (i.e. the right-hand subtraction) into
     /// the segments vector
-    fn insert_rhs<I: Coordinates<C, T>>(&self, other: &I, segments: &mut Vec<Self>) {
+    fn insert_rhs<I: Coordinates<C>>(&self, other: &I, segments: &mut Vec<Self>) {
         let sub = other.subtract(self).unwrap();
         for s in sub {
             segments.push(self.build_other(&s));
@@ -47,7 +46,7 @@ where
 
     /// Insert the contained interval segment into the segments vector
     /// first insert the left-hand subtraction, then the center, then the right-hand subtraction
-    fn insert_internal_contained<I: Coordinates<C, T>>(&self, other: &I, segments: &mut Vec<Self>) {
+    fn insert_internal_contained<I: Coordinates<C>>(&self, other: &I, segments: &mut Vec<Self>) {
         let sub = self.subtract(other).unwrap();
         segments.push(self.build_other(&sub[0]));
         self.insert_center(other, segments);
@@ -56,7 +55,7 @@ where
 
     /// Insert the contained interval segment into the segments vector
     /// first insert the left-hand subtraction, then the center, then the right-hand subtraction
-    fn insert_external_contained<I: Coordinates<C, T>>(&self, other: &I, segments: &mut Vec<Self>) {
+    fn insert_external_contained<I: Coordinates<C>>(&self, other: &I, segments: &mut Vec<Self>) {
         let sub = other.subtract(self).unwrap();
         segments.push(self.build_other(&sub[0]));
         self.insert_center(other, segments);
@@ -65,7 +64,7 @@ where
 
     /// Insert the left-hand overlap into the segments vector
     /// first insert the left-hand subtraction, then the center, then the right-hand subtraction
-    fn insert_lh_overlap<I: Coordinates<C, T>>(&self, other: &I, segments: &mut Vec<Self>) {
+    fn insert_lh_overlap<I: Coordinates<C>>(&self, other: &I, segments: &mut Vec<Self>) {
         self.insert_lhs(other, segments);
         self.insert_center(other, segments);
         self.insert_rhs(other, segments);
@@ -73,7 +72,7 @@ where
 
     /// Insert the right-hand overlap into the segments vector
     /// first insert the right-hand subtraction, then the center, then the left-hand subtraction
-    fn insert_rh_overlap<I: Coordinates<C, T>>(&self, other: &I, segments: &mut Vec<Self>) {
+    fn insert_rh_overlap<I: Coordinates<C>>(&self, other: &I, segments: &mut Vec<Self>) {
         self.insert_rhs(other, segments);
         self.insert_center(other, segments);
         self.insert_lhs(other, segments);
@@ -81,7 +80,7 @@ where
 
     /// Insert the overlap into the segments vector but checks which side the overlap is on
     /// to ensure sorting
-    fn run_overlap<I: Coordinates<C, T>>(&self, other: &I, segments: &mut Vec<Self>) {
+    fn run_overlap<I: Coordinates<C>>(&self, other: &I, segments: &mut Vec<Self>) {
         if self.lt(other) {
             self.insert_lh_overlap(other, segments);
         } else {
@@ -90,18 +89,18 @@ where
     }
 
     /// Insert the unaltered input interval pairs into the segments vector
-    fn insert_input<I: Coordinates<C, T>>(&self, other: &I, segments: &mut Vec<Self>) {
+    fn insert_input<I: Coordinates<C>>(&self, other: &I, segments: &mut Vec<Self>) {
         segments.push(self.build_self(other));
         segments.push(self.build_other(other));
     }
 
     /// Insert the interval into the segments vector
-    fn insert_self<I: Coordinates<C, T>>(&self, other: &I, segments: &mut Vec<Self>) {
+    fn insert_self<I: Coordinates<C>>(&self, other: &I, segments: &mut Vec<Self>) {
         segments.push(self.build_self(other));
     }
 
     /// Handles the case where the self interval contains the other interval
-    fn run_internal_containment<I: Coordinates<C, T>>(&self, other: &I, segments: &mut Vec<Self>) {
+    fn run_internal_containment<I: Coordinates<C>>(&self, other: &I, segments: &mut Vec<Self>) {
         if other.starts(self) {
             self.insert_center(other, segments);
             self.insert_lhs(other, segments);
@@ -114,7 +113,7 @@ where
     }
 
     /// Handles the case where the other interval contains the self interval
-    fn run_external_containment<I: Coordinates<C, T>>(&self, other: &I, segments: &mut Vec<Self>) {
+    fn run_external_containment<I: Coordinates<C>>(&self, other: &I, segments: &mut Vec<Self>) {
         if self.starts(other) {
             self.insert_center(other, segments);
             self.insert_rhs(other, segments);
@@ -127,7 +126,7 @@ where
     }
 
     #[must_use]
-    fn segment<I: IntervalBounds<C, T>>(&self, other: &I) -> Vec<Self> {
+    fn segment<I: IntervalBounds<C>>(&self, other: &I) -> Vec<Self> {
         let mut segments = Vec::new();
         if self.equals(other) {
             self.insert_self(other, &mut segments);
@@ -150,7 +149,7 @@ mod testing {
     use super::*;
     use crate::Bed3;
 
-    fn validate_segments<T: ValueBounds>(observed: &[Bed3<i32, T>], expected: &[Bed3<i32, T>]) {
+    fn validate_segments(observed: &[Bed3<i32, i32>], expected: &[Bed3<i32, i32>]) {
         assert_eq!(observed.len(), expected.len());
 
         println!("Expected:");

@@ -1,15 +1,11 @@
-use crate::{
-    traits::{ChromBounds, ValueBounds},
-    Coordinates, Overlap,
-};
+use crate::{traits::ChromBounds, Coordinates, Overlap};
 
 /// Calculates the intersection between two coordinates.
-pub trait Intersect<C, T>: Coordinates<C, T> + Overlap<C, T>
+pub trait Intersect<C>: Coordinates<C> + Overlap<C>
 where
     C: ChromBounds,
-    T: ValueBounds,
 {
-    fn build_intersection_interval<I: Coordinates<C, T>>(&self, other: &I) -> I {
+    fn build_intersection_interval<I: Coordinates<C>>(&self, other: &I) -> I {
         let chr = self.chr();
         let start = self.start().max(other.start());
         let end = self.end().min(other.end());
@@ -30,7 +26,7 @@ where
     /// assert_eq!(ix.start(), 15);
     /// assert_eq!(ix.end(), 20);
     /// ```
-    fn intersect<I: Coordinates<C, T>>(&self, other: &I) -> Option<I> {
+    fn intersect<I: Coordinates<C>>(&self, other: &I) -> Option<I> {
         if self.overlaps(other) {
             let ix = self.build_intersection_interval(other);
             Some(ix)
@@ -56,7 +52,7 @@ where
     ///
     /// assert!(a.stranded_intersect(&c).is_none());
     /// ```
-    fn stranded_intersect<I: Coordinates<C, T>>(&self, other: &I) -> Option<I> {
+    fn stranded_intersect<I: Coordinates<C>>(&self, other: &I) -> Option<I> {
         if self.stranded_overlaps(other) {
             let ix = self.build_intersection_interval(other);
             Some(ix)
