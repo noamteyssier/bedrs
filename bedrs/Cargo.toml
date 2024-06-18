@@ -22,6 +22,7 @@ thiserror = "1.0.58"
 bedrs_derive = "0.1.0"
 getset = "0.1.2"
 derive-new = "0.6.0"
+coitrees = "0.4.0"
 
 [features]
 serde = ["dep:serde"]
