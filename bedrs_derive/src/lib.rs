@@ -71,14 +71,12 @@ fn generate_impl(
         end,
         strand,
     } = fields;
-    if let (Some(chr), Some(start), Some(end)) = (chr, start, end) {
+    if let (Some(chr), Some(_start), Some(_end)) = (chr, start, end) {
         let strand_method = generate_strand_method(strand);
         let update_strand_method = generate_update_strand_method(strand);
         let owned_impl = generate_impl_owned_block(
             name,
             chr,
-            start,
-            end,
             &strand_method,
             &update_strand_method,
             impl_generics,
@@ -88,8 +86,6 @@ fn generate_impl(
         let ref_impl = generate_impl_ref_block(
             name,
             chr,
-            start,
-            end,
             &strand_method,
             ref_impl_generics.clone(),
             ty_generics.clone(),
@@ -98,8 +94,6 @@ fn generate_impl(
         let mut_ref_impl = generate_impl_mut_ref_block(
             name,
             chr,
-            start,
-            end,
             &strand_method,
             &update_strand_method,
             ref_impl_generics.clone(),
@@ -124,8 +118,6 @@ fn generate_impl(
 fn generate_impl_owned_block(
     name: &Ident,
     chr: &Type,
-    start: &Type,
-    end: &Type,
     strand_method: &proc_macro2::TokenStream,
     update_strand_method: &proc_macro2::TokenStream,
     impl_generics: syn::ImplGenerics,
@@ -133,16 +125,16 @@ fn generate_impl_owned_block(
     where_clause: Option<&syn::WhereClause>,
 ) -> proc_macro2::TokenStream {
     quote! {
-        impl #impl_generics Coordinates<#chr, #start> for #name #ty_generics #where_clause {
+        impl #impl_generics Coordinates<#chr> for #name #ty_generics #where_clause {
             fn empty() -> Self {
                 Self::default()
             }
 
-            fn start(&self) -> #start {
+            fn start(&self) -> i32 {
                 self.start
             }
 
-            fn end(&self) -> #end {
+            fn end(&self) -> i32 {
                 self.end
             }
 
@@ -150,11 +142,11 @@ fn generate_impl_owned_block(
                 &self.chr
             }
 
-            fn update_start(&mut self, val: &#start) {
+            fn update_start(&mut self, val: &i32) {
                 self.start = *val;
             }
 
-            fn update_end(&mut self, val: &#end) {
+            fn update_end(&mut self, val: &i32) {
                 self.end = *val;
             }
 
@@ -162,7 +154,7 @@ fn generate_impl_owned_block(
                 self.chr = val.clone();
             }
 
-            fn from<Iv: Coordinates<#chr, #start>>(other: &Iv) -> Self {
+            fn from<Iv: Coordinates<#chr>>(other: &Iv) -> Self {
                 let mut new = Self::empty();
                 new.update_chr(other.chr());
                 new.update_start(&other.start());
@@ -183,24 +175,22 @@ fn generate_impl_owned_block(
 fn generate_impl_ref_block(
     name: &Ident,
     chr: &Type,
-    start: &Type,
-    end: &Type,
     strand_method: &proc_macro2::TokenStream,
     ref_impl_generics: syn::ImplGenerics,
     ty_generics: syn::TypeGenerics,
     where_clause: Option<&syn::WhereClause>,
 ) -> proc_macro2::TokenStream {
     quote! {
-        impl #ref_impl_generics Coordinates<#chr, #start> for &'a #name #ty_generics #where_clause {
+        impl #ref_impl_generics Coordinates<#chr> for &'a #name #ty_generics #where_clause {
             fn empty() -> Self {
                 unimplemented!("Cannot create an empty interval as an immutable reference")
             }
 
-            fn start(&self) -> #start {
+            fn start(&self) -> i32 {
                 self.start
             }
 
-            fn end(&self) -> #end {
+            fn end(&self) -> i32 {
                 self.end
             }
 
@@ -208,11 +198,11 @@ fn generate_impl_ref_block(
                 &self.chr
             }
 
-            fn update_start(&mut self, val: &#start) {
+            fn update_start(&mut self, val: &i32) {
                 unimplemented!("Cannot update an immutable reference")
             }
 
-            fn update_end(&mut self, val: &#end) {
+            fn update_end(&mut self, val: &i32) {
                 unimplemented!("Cannot update an immutable reference")
             }
 
@@ -224,7 +214,7 @@ fn generate_impl_ref_block(
                 unimplemented!("Cannot update an immutable reference")
             }
 
-            fn from<Iv: Coordinates<#chr, #start>>(other: &Iv) -> Self {
+            fn from<Iv: Coordinates<#chr>>(other: &Iv) -> Self {
                 unimplemented!("Cannot create a new reference from a reference")
             }
 
@@ -238,8 +228,6 @@ fn generate_impl_ref_block(
 fn generate_impl_mut_ref_block(
     name: &Ident,
     chr: &Type,
-    start: &Type,
-    end: &Type,
     strand_method: &proc_macro2::TokenStream,
     update_strand_method: &proc_macro2::TokenStream,
     ref_impl_generics: syn::ImplGenerics,
@@ -247,16 +235,16 @@ fn generate_impl_mut_ref_block(
     where_clause: Option<&syn::WhereClause>,
 ) -> proc_macro2::TokenStream {
     quote! {
-        impl #ref_impl_generics Coordinates<#chr, #start> for &'a mut #name #ty_generics #where_clause {
+        impl #ref_impl_generics Coordinates<#chr> for &'a mut #name #ty_generics #where_clause {
             fn empty() -> Self {
                 unimplemented!("Cannot create an empty interval as an immutable reference")
             }
 
-            fn start(&self) -> #start {
+            fn start(&self) -> i32 {
                 self.start
             }
 
-            fn end(&self) -> #end {
+            fn end(&self) -> i32 {
                 self.end
             }
 
@@ -264,11 +252,11 @@ fn generate_impl_mut_ref_block(
                 &self.chr
             }
 
-            fn update_start(&mut self, val: &#start) {
+            fn update_start(&mut self, val: &i32) {
                 self.start = *val;
             }
 
-            fn update_end(&mut self, val: &#end) {
+            fn update_end(&mut self, val: &i32) {
                 self.end = *val;
             }
 
@@ -276,7 +264,7 @@ fn generate_impl_mut_ref_block(
                 self.chr = val.clone();
             }
 
-            fn from<Iv: Coordinates<#chr, #start>>(other: &Iv) -> Self {
+            fn from<Iv: Coordinates<#chr>>(other: &Iv) -> Self {
                 unimplemented!("Cannot create a new reference from a reference")
             }
 
