@@ -23,7 +23,7 @@ where
     /// ## On base coordinates
     ///
     /// ```
-    /// use bedrs::{BaseInterval, IntervalContainer};
+    /// use bedrs::prelude::*;
     ///
     /// let records = vec![
     ///     BaseInterval::new(0, 10),
@@ -43,7 +43,7 @@ where
     /// ## On genomic coordinates
     ///
     /// ```
-    /// use bedrs::{Bed3, IntervalContainer};
+    /// use bedrs::prelude::*;
     ///
     /// let records = vec![
     ///     bed3![1, 10, 20],
@@ -84,7 +84,7 @@ where
     /// ## On base coordinates
     ///
     /// ```
-    /// use bedrs::{BaseInterval, IntervalContainer};
+    /// use bedrs::prelude::*;
     ///
     /// let records = vec![
     ///     BaseInterval::new(0, 10),
@@ -103,7 +103,7 @@ where
     /// ## On genomic coordinates
     ///
     /// ```
-    /// use bedrs::{Bed3, IntervalContainer};
+    /// use bedrs::prelude::*;
     ///
     /// let records = vec![
     ///     bed3![1, 10, 20],

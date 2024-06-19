@@ -13,7 +13,7 @@ use std::{collections::VecDeque, marker::PhantomData};
 /// ## Using a vector of interval records
 ///
 /// ```
-/// use bedrs::*;
+/// use bedrs::prelude::*;
 ///
 /// let intervals = vec![
 ///     BaseInterval::new(1, 10),
@@ -33,7 +33,7 @@ use std::{collections::VecDeque, marker::PhantomData};
 /// ## Iterating on a container of interval records
 ///
 /// ```
-/// use bedrs::*;
+/// use bedrs::prelude::*;
 ///
 /// let intervals = vec![
 ///     BaseInterval::new(1, 10),
@@ -93,7 +93,7 @@ where
 /// ## Using a vector of interval records
 ///
 /// ```
-/// use bedrs::*;
+/// use bedrs::prelude::*;
 ///
 /// let intervals = vec![
 ///     BaseInterval::new(1, 10),
@@ -116,7 +116,7 @@ where
 /// ## Iterating on a container of interval records
 ///
 /// ```
-/// use bedrs::*;
+/// use bedrs::prelude::*;
 ///
 /// let intervals = vec![
 ///     BaseInterval::new(1, 10),

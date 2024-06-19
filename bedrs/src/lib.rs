@@ -62,8 +62,8 @@
 //! #[derive(Default, Coordinates)]
 //! struct MyInterval {
 //!     chr: usize,
-//!     start: usize,
-//!     end: usize,
+//!     start: i32,
+//!     end: i32,
 //! }
 //! ```
 //!
@@ -88,10 +88,10 @@
 //! use bedrs::prelude::*;
 //!
 //! // An interval on chromosome 1 and spanning base 20 <-> 40
-//! let a = Bed3::new(1, 20, 40);
+//! let a = bed3![1, 20, 40];
 //!
 //! // An interval on chromosome 1 and spanning base 30 <-> 50
-//! let b = Bed3::new(1, 30, 50);
+//! let b = bed3![1, 30, 50];
 //!
 //! // Find the intersecting interval of the two
 //! // This returns an Option<Bed3> because they may not intersect.
@@ -120,9 +120,9 @@
 //! use bedrs::prelude::*;
 //!
 //! let set = IntervalContainer::new(vec![
-//!     Bed3::new(1, 20, 30),
-//!     Bed3::new(1, 30, 40),
-//!     Bed3::new(1, 40, 50),
+//!     bed3![1, 20, 30],
+//!     bed3![1, 30, 40],
+//!     bed3![1, 40, 50],
 //! ]);
 //!
 //! assert_eq!(set.len(), 3);

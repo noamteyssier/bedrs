@@ -38,7 +38,7 @@ impl FromStr for Strand {
     /// # Example
     ///
     /// ```
-    /// use bedrs::Strand;
+    /// use bedrs::prelude::*;
     /// use std::str::FromStr;
     ///
     /// assert_eq!(Strand::from_str("+").unwrap(), Strand::Forward);
@@ -66,7 +66,7 @@ impl TryFrom<char> for Strand {
     /// # Example
     ///
     /// ```
-    /// use bedrs::Strand;
+    /// use bedrs::prelude::*;
     ///
     /// assert_eq!(Strand::try_from('+').unwrap(), Strand::Forward);
     /// assert_eq!(Strand::try_from('-').unwrap(), Strand::Reverse);
@@ -92,7 +92,7 @@ impl TryFrom<u8> for Strand {
     ///
     /// # Example
     /// ```
-    /// use bedrs::Strand;
+    /// use bedrs::prelude::*;
     ///
     /// assert_eq!(Strand::try_from(b'+').unwrap(), Strand::Forward);
     /// assert_eq!(Strand::try_from(b'-').unwrap(), Strand::Reverse);
@@ -115,7 +115,7 @@ impl From<Strand> for char {
     /// # Example
     ///
     /// ```
-    /// use bedrs::Strand;
+    /// use bedrs::prelude::*;
     ///
     /// let char_forward: char = Strand::Forward.into();
     /// let char_reverse: char = Strand::Reverse.into();
@@ -139,7 +139,7 @@ impl From<Strand> for u8 {
     /// # Example
     ///
     /// ```
-    /// use bedrs::Strand;
+    /// use bedrs::prelude::*;
     ///
     /// let u8_forward: u8 = Strand::Forward.into();
     /// let u8_reverse: u8 = Strand::Reverse.into();

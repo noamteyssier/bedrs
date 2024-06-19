@@ -21,7 +21,7 @@ where
     /// # Example
     ///
     /// ```
-    /// use bedrs::{Bed3, Overlap};
+    /// use bedrs::prelude::*;
     ///
     /// let interval1 = bed3![1, 100, 200];
     /// let interval2 = bed3![1, 150, 250];
@@ -80,7 +80,7 @@ where
     /// # Example
     ///
     /// ```
-    /// use bedrs::{BaseInterval, Overlap};
+    /// use bedrs::prelude::*;
     ///
     /// // base interval
     /// let interval1 = BaseInterval::new(100, 200);
@@ -118,7 +118,7 @@ where
     /// # Example
     ///
     /// ```
-    /// use bedrs::{BaseInterval, Overlap};
+    /// use bedrs::prelude::*;
     ///
     /// let interval1 = BaseInterval::new(100, 200);
     /// let interval2 = BaseInterval::new(150, 160);
@@ -149,7 +149,7 @@ where
     ///
     /// # Example
     /// ```
-    /// use bedrs::{BaseInterval, Overlap};
+    /// use bedrs::prelude::*;
     ///
     /// let interval1 = BaseInterval::new(100, 200);
     /// let interval2 = BaseInterval::new(200, 300);
@@ -178,7 +178,7 @@ where
     /// # Example
     ///
     /// ```
-    /// use bedrs::{Bed3, Overlap};
+    /// use bedrs::prelude::*;
     ///
     /// let interval1 = bed3![1, 100, 200];
     /// let interval2 = bed3![1, 150, 250];
@@ -215,7 +215,7 @@ where
     /// # Example
     ///
     /// ```
-    /// use bedrs::{Bed3, Overlap};
+    /// use bedrs::prelude::*;
     ///
     /// let interval1 = bed3![1, 100, 200];
     /// let interval2 = bed3![1, 150, 250];
@@ -250,7 +250,7 @@ where
     /// # Example
     ///
     /// ```
-    /// use bedrs::{Bed3, Overlap};
+    /// use bedrs::prelude::*;
     ///
     /// let interval1 = bed3![1, 100, 200];
     /// let interval2 = bed3![1, 150, 250];
@@ -296,7 +296,7 @@ where
     /// # Example
     ///
     /// ```
-    /// use bedrs::{Bed3, Overlap};
+    /// use bedrs::prelude::*;
     ///
     /// let interval1 = bed3![1, 100, 200];
     /// let interval2 = bed3![1, 150, 250];
@@ -334,7 +334,7 @@ where
     /// # Example
     ///
     /// ```
-    /// use bedrs::{Bed3, Overlap};
+    /// use bedrs::prelude::*;
     ///
     /// let interval1 = bed3![1, 100, 200];
     /// let interval2 = bed3![1, 150, 160];
@@ -356,7 +356,7 @@ where
     /// ```
     /// # Example
     /// ```
-    /// use bedrs::{Bed3, Overlap};
+    /// use bedrs::prelude::*;
     /// let interval1 = bed3![1, 100, 200];
     /// let interval2 = bed3![1, 100, 400];
     /// let interval3 = bed3![2, 100, 400];
@@ -376,7 +376,7 @@ where
     /// ```
     /// # Example
     /// ```
-    /// use bedrs::{Bed3, Overlap};
+    /// use bedrs::prelude::*;
     /// let interval1 = bed3![1, 300, 400];
     /// let interval2 = bed3![1, 100, 400];
     /// let interval3 = bed3![2, 100, 400];
@@ -395,7 +395,7 @@ where
     /// ```
     /// # Example
     /// ```
-    /// use bedrs::{Bed3, Overlap};
+    /// use bedrs::prelude::*;
     /// let interval1 = bed3![1, 100, 200];
     /// let interval2 = bed3![1, 100, 200];
     /// let interval3 = bed3![2, 100, 200];
@@ -415,7 +415,7 @@ where
     /// ```
     /// # Example
     /// ```
-    /// use bedrs::{Bed3, Overlap};
+    /// use bedrs::prelude::*;
     /// let interval1 = bed3![1, 150, 160];
     /// let interval2 = bed3![1, 100, 200];
     /// let interval3 = bed3![2, 100, 200];
@@ -441,7 +441,7 @@ where
     /// # Example
     ///
     /// ```
-    /// use bedrs::{Bed3, Overlap};
+    /// use bedrs::prelude::*;
     ///
     /// let interval1 = bed3![1, 150, 16];
     /// let interval2 = bed3![1, 100, 200];
@@ -470,7 +470,7 @@ where
     /// # Example
     ///
     /// ```
-    /// use bedrs::{Bed3, Overlap};
+    /// use bedrs::prelude::*;
     ///
     /// let interval1 = bed3![1, 100, 200];
     /// let interval2 = bed3![1, 200, 300];

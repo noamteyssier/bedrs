@@ -17,7 +17,7 @@ where
     /// Calculates the intersection between two coordinates if they overlap.
     ///
     /// ```
-    /// use bedrs::{Coordinates, Intersect, BaseInterval};
+    /// use bedrs::prelude::*;
     ///
     /// let a = BaseInterval::new(10, 20);
     /// let b = BaseInterval::new(15, 25);
@@ -39,7 +39,7 @@ where
     /// and are on the same strand.
     ///
     /// ```
-    /// use bedrs::{Coordinates, Intersect, StrandedBed3, Strand};
+    /// use bedrs::prelude::*;
     ///
     /// let a = bed3![1, 10, 20, Strand::Forward];
     /// let b = bed3![1, 15, 25, Strand::Forward];

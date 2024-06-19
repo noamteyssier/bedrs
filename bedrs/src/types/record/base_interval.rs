@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 /// Has two coordinates: `start` and `end`.
 ///
 /// ```
-/// use bedrs::{Coordinates, BaseInterval, Overlap};
+/// use bedrs::prelude::*;
 ///
 /// let a = BaseInterval::new(20, 30);
 /// assert_eq!(a.start(), 20);

@@ -16,7 +16,7 @@ use crate::{
 /// It is symmetric between the two coordinates.
 ///
 /// ```
-/// use bedrs::*;
+/// use bedrs::prelude::*;
 ///
 /// let a = BaseInterval::new(10, 20);
 /// let b = BaseInterval::new(30, 40);
@@ -33,7 +33,7 @@ use crate::{
 /// A negative value indicates that the first coordinate is downstream of the second.
 ///
 /// ```
-/// use bedrs::*;
+/// use bedrs::prelude::*;
 ///
 /// let a = BaseInterval::new(10, 20);
 /// let b = BaseInterval::new(30, 40);
@@ -47,7 +47,7 @@ use crate::{
 /// If the two coordinates are on different chromosomes, the distance is undefined.
 ///
 /// ```
-/// use bedrs::*;
+/// use bedrs::prelude::*;
 ///
 /// // Bordering Intervals
 /// let a = BaseInterval::new(10, 20);

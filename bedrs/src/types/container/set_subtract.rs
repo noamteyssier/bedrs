@@ -24,7 +24,7 @@ where
     /// // (s1) i--j
     /// // (s2)               m--n
     ///
-    /// use bedrs::{Coordinates, BaseInterval, IntervalContainer};
+    /// use bedrs::prelude::*;
     ///
     /// let q = BaseInterval::new(20, 40);
     /// let a = BaseInterval::new(10, 15);
@@ -74,7 +74,7 @@ where
     /// // (s2)       j---k
     /// // (s3)              l---y
     ///
-    /// use bedrs::{Coordinates, BaseInterval, IntervalContainer};
+    /// use bedrs::prelude::*;
     ///
     /// let q = BaseInterval::new(20, 40);
     /// let a = BaseInterval::new(25, 27);

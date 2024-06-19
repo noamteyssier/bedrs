@@ -15,7 +15,7 @@ where
     ///
     /// # Example
     /// ```
-    /// use bedrs::{BaseInterval, IntervalContainer};
+    /// use bedrs::prelude::*;
     /// use rand::thread_rng;
     ///
     /// let intervals = vec![
@@ -36,7 +36,7 @@ where
     ///
     /// # Example
     /// ```
-    /// use bedrs::{BaseInterval, IntervalContainer};
+    /// use bedrs::prelude::*;
     ///
     /// let intervals = vec![
     ///    BaseInterval::new(10, 100),
@@ -56,7 +56,7 @@ where
     ///
     /// # Example
     /// ```
-    /// use bedrs::{BaseInterval, IntervalContainer};
+    /// use bedrs::prelude::*;
     ///
     /// let intervals = vec![
     ///    BaseInterval::new(10, 100),
@@ -76,7 +76,7 @@ where
     ///
     /// # Example
     /// ```
-    /// use bedrs::{BaseInterval, IntervalContainer};
+    /// use bedrs::prelude::*;
     ///
     /// let intervals = vec![
     ///     BaseInterval::new(10, 100),
@@ -103,7 +103,7 @@ where
     ///
     /// # Example
     /// ```
-    /// use bedrs::{BaseInterval, IntervalContainer};
+    /// use bedrs::prelude::*;
     ///
     /// let intervals = vec![
     ///     BaseInterval::new(10, 100),
@@ -127,7 +127,7 @@ where
     ///
     /// # Example
     /// ```
-    /// use bedrs::{BaseInterval, IntervalContainer};
+    /// use bedrs::prelude::*;
     ///
     /// let intervals = vec![
     ///     BaseInterval::new(10, 100),
@@ -154,7 +154,7 @@ where
     ///
     /// # Example
     /// ```
-    /// use bedrs::{BaseInterval, IntervalContainer};
+    /// use bedrs::prelude::*;
     ///
     /// let intervals = vec![
     ///    BaseInterval::new(10, 100),
@@ -183,7 +183,7 @@ where
     ///
     /// # Example
     /// ```
-    /// use bedrs::{BaseInterval, IntervalContainer};
+    /// use bedrs::prelude::*;
     ///
     /// let intervals = vec![
     ///    BaseInterval::new(10, 100),
@@ -210,7 +210,7 @@ where
     ///
     /// # Example
     /// ```
-    /// use bedrs::{BaseInterval, IntervalContainer};
+    /// use bedrs::prelude::*;
     ///
     /// let intervals = vec![
     ///    BaseInterval::new(10, 100),

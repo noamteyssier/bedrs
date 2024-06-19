@@ -66,7 +66,7 @@ where
     ///
     /// ## Left Overlap
     /// ```
-    /// use bedrs::{Coordinates, Subtract, BaseInterval};
+    /// use bedrs::prelude::*;
     ///
     /// // (a)       x-------y
     /// // (b)   i-----j
@@ -83,7 +83,7 @@ where
     ///
     /// ## Right Overlap
     /// ```
-    /// use bedrs::{Coordinates, Subtract, BaseInterval};
+    /// use bedrs::prelude::*;
     ///
     /// // (a)   x-----y
     /// // (b)       i-------j
@@ -100,7 +100,7 @@ where
     ///
     /// ## Contains
     /// ```
-    /// use bedrs::{Coordinates, Subtract, BaseInterval};
+    /// use bedrs::prelude::*;
     ///
     /// // (a)   x-----------y
     /// // (b)       i--j
@@ -119,7 +119,7 @@ where
     ///
     /// ## Contained by
     /// ```
-    /// use bedrs::{Coordinates, Subtract, BaseInterval};
+    /// use bedrs::prelude::*;
     ///
     /// // (a)       x--y
     /// // (b)   i-----------j
@@ -134,7 +134,7 @@ where
     ///
     /// ## Complete Overlap
     /// ```
-    /// use bedrs::{Coordinates, Subtract, BaseInterval};
+    /// use bedrs::prelude::*;
     ///
     /// // (a)       x--y
     /// // (b)       i--j
@@ -149,7 +149,7 @@ where
     ///
     /// ## No Overlap
     /// ```
-    /// use bedrs::{Coordinates, Subtract, BaseInterval};
+    /// use bedrs::prelude::*;
     ///
     /// // (a)  x--y
     /// // (b)       i--j

@@ -27,7 +27,7 @@ impl FromStr for Frame {
     /// # Example
     ///
     /// ```
-    /// use bedrs::Frame;
+    /// use bedrs::prelude::*;
     /// use std::str::FromStr;
     ///
     /// assert_eq!(Frame::from_str("0").unwrap(), Frame::Zero);
@@ -56,7 +56,7 @@ impl From<char> for Frame {
     /// # Example
     ///
     /// ```
-    /// use bedrs::Frame;
+    /// use bedrs::prelude::*;
     /// use std::convert::TryFrom;
     ///
     /// assert_eq!(Frame::from('0'), Frame::Zero);
@@ -84,7 +84,7 @@ impl From<i32> for Frame {
     /// # Example
     ///
     /// ```
-    /// use bedrs::Frame;
+    /// use bedrs::prelude::*;
     ///
     /// assert_eq!(Frame::from(0), Frame::Zero);
     /// assert_eq!(Frame::from(1), Frame::One);
@@ -111,7 +111,7 @@ impl From<usize> for Frame {
     /// # Example
     ///
     /// ```
-    /// use bedrs::Frame;
+    /// use bedrs::prelude::*;
     ///
     /// assert_eq!(Frame::from(0), Frame::Zero);
     /// assert_eq!(Frame::from(1), Frame::One);
@@ -138,7 +138,7 @@ impl From<Option<i32>> for Frame {
     /// # Example
     ///
     /// ```
-    /// use bedrs::Frame;
+    /// use bedrs::prelude::*;
     ///
     /// assert_eq!(Frame::from(Some(0)), Frame::Zero);
     /// assert_eq!(Frame::from(Some(1)), Frame::One);

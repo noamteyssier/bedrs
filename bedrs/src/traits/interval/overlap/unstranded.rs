@@ -43,7 +43,7 @@ where
     /// ```
     /// # Example
     /// ```
-    /// use bedrs::{StrandedBed3, Strand, Coordinates, Overlap, UnstrandedOverlap};
+    /// use bedrs::prelude::*;
     /// let interval1 = bed3![1, 100, 200, Strand::Forward];
     /// let interval2 = bed3![1, 100, 400, Strand::Reverse];
     /// let interval3 = bed3![1, 100, 400, Strand::Forward];
@@ -61,7 +61,7 @@ where
     /// ```
     /// # Example
     /// ```
-    /// use bedrs::{StrandedBed3, Strand, Coordinates, Overlap, UnstrandedOverlap};
+    /// use bedrs::prelude::*;
     /// let interval1 = bed3![1, 300, 400, Strand::Forward];
     /// let interval2 = bed3![1, 100, 400, Strand::Reverse];
     /// let interval3 = bed3![1, 100, 400, Strand::Forward];
@@ -78,7 +78,7 @@ where
     /// ```
     /// # Example
     /// ```
-    /// use bedrs::{StrandedBed3, Strand, Coordinates, Overlap, UnstrandedOverlap};
+    /// use bedrs::prelude::*;
     /// let interval1 = bed3![1, 100, 200, Strand::Forward];
     /// let interval2 = bed3![1, 100, 200, Strand::Reverse];
     /// let interval3 = bed3![1, 100, 200, Strand::Forward];
@@ -95,7 +95,7 @@ where
     /// ```
     /// # Example
     /// ```
-    /// use bedrs::{StrandedBed3, Strand, Coordinates, Overlap, UnstrandedOverlap};
+    /// use bedrs::prelude::*;
     /// let interval1 = bed3![1, 150, 160, Strand::Forward];
     /// let interval2 = bed3![1, 100, 200, Strand::Reverse];
     /// let interval3 = bed3![1, 100, 200, Strand::Forward];
@@ -112,7 +112,7 @@ where
     /// ```
     /// # Example
     /// ```
-    /// use bedrs::{StrandedBed3, Strand, Coordinates, Overlap, UnstrandedOverlap};
+    /// use bedrs::prelude::*;
     /// let interval1 = bed3![1, 100, 200, Strand::Forward];
     /// let interval2 = bed3![1, 150, 160, Strand::Reverse];
     /// let interval3 = bed3![1, 150, 160, Strand::Forward];
@@ -129,7 +129,7 @@ where
     /// ```
     /// # Example
     /// ```
-    /// use bedrs::{StrandedBed3, Strand, Coordinates, Overlap, UnstrandedOverlap};
+    /// use bedrs::prelude::*;
     /// let interval1 = bed3![1, 150, 160, Strand::Forward];
     /// let interval2 = bed3![1, 100, 200, Strand::Reverse];
     /// let interval3 = bed3![1, 100, 200, Strand::Forward];
@@ -152,7 +152,7 @@ where
     /// # Example
     ///
     /// ```
-    /// use bedrs::{StrandedBed3, Strand, Coordinates, Overlap, UnstrandedOverlap};
+    /// use bedrs::prelude::*;
     ///
     /// let interval1 = bed3![1, 100, 200, Strand::Forward];
     /// let interval2 = bed3![1, 200, 300, Strand::Reverse];

@@ -20,7 +20,7 @@ type ComplementIterOwned<I, C> = ComplementIter<IntervalIterOwned<I, C>, I, C>;
 /// # Examples
 ///
 /// ```
-/// use bedrs::{BaseInterval, Coordinates, IntervalContainer};
+/// use bedrs::prelude::*;
 ///
 /// let intervals = vec![
 ///     BaseInterval::new(10, 20),

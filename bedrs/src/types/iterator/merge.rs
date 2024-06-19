@@ -11,7 +11,7 @@ use std::{collections::VecDeque, marker::PhantomData};
 /// # Example
 ///
 /// ```
-/// use bedrs::{Bed3, MergeIter};
+/// use bedrs::prelude::*;
 ///
 /// let intervals = vec![
 ///     bed3![1, 1, 10],

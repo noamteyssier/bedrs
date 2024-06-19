@@ -65,7 +65,7 @@ where
     ///
     /// # Examples
     /// ```
-    /// use bedrs::{Coordinates, Bed3};
+    /// use bedrs::prelude::*;
     ///
     /// let iv = bed3![1, 10, 20];
     /// assert_eq!(iv.start(), 10);
@@ -76,7 +76,7 @@ where
     ///
     /// # Examples
     /// ```
-    /// use bedrs::{Coordinates, Bed3};
+    /// use bedrs::prelude::*;
     ///
     /// let iv = bed3![1, 10, 20];
     /// assert_eq!(iv.end(), 20);
@@ -90,7 +90,7 @@ where
     ///
     /// # Examples
     /// ```
-    /// use bedrs::{Coordinates, Bed3};
+    /// use bedrs::prelude::*;
     ///
     /// let iv = bed3![1, 10, 20];
     /// assert_eq!(iv.chr(), &1);
@@ -105,12 +105,12 @@ where
     /// # Examples
     ///
     /// ```
-    /// use bedrs::{Coordinates, Bed3, Strand, StrandedBed3};
+    /// use bedrs::prelude::*;
     ///
     /// let iv = bed3![1, 10, 20];
     /// assert_eq!(iv.strand(), None);
     ///
-    /// let siv = Strandedbed3![1, 10, 20, Strand::Forward];
+    /// let siv = bed3![1, 10, 20, Strand::Forward];
     /// assert_eq!(siv.strand(), Some(Strand::Forward));
     /// ```
     fn strand(&self) -> Option<Strand> {
@@ -123,7 +123,7 @@ where
     /// # Examples
     ///
     /// ```
-    /// use bedrs::{Coordinates, Bed3};
+    /// use bedrs::prelude::*;
     ///
     /// let mut iv = bed3![1, 10, 20];
     /// assert_eq!(iv.start(), 10);
@@ -138,7 +138,7 @@ where
     /// # Examples
     ///
     /// ```
-    /// use bedrs::{Coordinates, Bed3};
+    /// use bedrs::prelude::*;
     ///
     /// let mut iv = bed3![1, 10, 20];
     /// assert_eq!(iv.end(), 20);
@@ -153,7 +153,7 @@ where
     /// # Examples
     ///
     /// ```
-    /// use bedrs::{Coordinates, Bed3};
+    /// use bedrs::prelude::*;
     ///
     /// let mut iv = bed3![1, 10, 20];
     /// assert_eq!(iv.chr(), &1);
@@ -167,9 +167,9 @@ where
     ///
     /// # Examples
     /// ```
-    /// use bedrs::{Coordinates, StrandedBed3, Strand};
+    /// use bedrs::prelude::*;
     ///
-    /// let mut siv = Strandedbed3![1, 10, 20, Strand::Forward];
+    /// let mut siv = bed3![1, 10, 20, Strand::Forward];
     /// assert_eq!(siv.strand(), Some(Strand::Forward));
     ///
     /// siv.update_strand(Some(Strand::Reverse));
@@ -187,10 +187,10 @@ where
     /// # Examples
     ///
     /// ```
-    /// use bedrs::{Coordinates, Bed3};
+    /// use bedrs::prelude::*;
     ///
     /// let iv = bed3![1, 10, 20];
-    /// let new_iv = <Bed3<i32, i32> as Coordinates<i32, i32>>::from(&iv);
+    /// let new_iv = <Bed3<i32> as Coordinates<i32>>::from(&iv);
     ///
     /// assert!(iv.eq(&new_iv));
     /// ```
@@ -204,7 +204,7 @@ where
     /// # Examples
     ///
     /// ```
-    /// use bedrs::{Coordinates, Bed3};
+    /// use bedrs::prelude::*;
     ///
     /// let iv = bed3![1, 10, 20];
     /// assert_eq!(iv.len(), 10);
@@ -217,7 +217,7 @@ where
     ///
     /// # Examples
     /// ```
-    /// use bedrs::{Coordinates, Bed3};
+    /// use bedrs::prelude::*;
     ///
     /// let mut iv = bed3![1, 10, 20];
     /// assert!(iv.eq(&bed3![1, 10, 20]));
@@ -234,7 +234,7 @@ where
     ///
     /// # Examples
     /// ```
-    /// use bedrs::{Coordinates, Bed3};
+    /// use bedrs::prelude::*;
     ///
     /// let mut iv = bed3![1, 10, 20];
     /// assert!(iv.eq(&bed3![1, 10, 20]));
@@ -251,7 +251,7 @@ where
     ///
     /// # Examples
     /// ```
-    /// use bedrs::{Coordinates, Bed3};
+    /// use bedrs::prelude::*;
     ///
     /// let mut iv = bed3![1, 10, 20];
     /// assert!(iv.eq(&bed3![1, 10, 20]));
@@ -268,7 +268,7 @@ where
     ///
     /// # Examples
     /// ```
-    /// use bedrs::{Coordinates, Bed3};
+    /// use bedrs::prelude::*;
     ///
     /// let mut iv = bed3![1, 10, 20];
     /// assert!(iv.eq(&bed3![1, 10, 20]));
@@ -286,7 +286,7 @@ where
     ///
     /// # Examples
     /// ```
-    /// use bedrs::{Coordinates, Bed3};
+    /// use bedrs::prelude::*;
     ///
     /// let mut iv = bed3![1, 10, 20];
     /// assert!(iv.eq(&bed3![1, 10, 20]));
@@ -310,7 +310,7 @@ where
     ///
     /// # Examples
     /// ```
-    /// use bedrs::{Coordinates, Bed3};
+    /// use bedrs::prelude::*;
     ///
     /// let mut iv = bed3![1, 10, 20];
     /// assert!(iv.eq(&bed3![1, 10, 20]));
@@ -339,7 +339,7 @@ where
     ///
     /// # Examples
     /// ```
-    /// use bedrs::{Coordinates, Bed3};
+    /// use bedrs::prelude::*;
     ///
     /// let mut iv = bed3![1, 10, 20];
     /// assert!(iv.eq(&bed3![1, 10, 20]));
@@ -359,7 +359,7 @@ where
     ///
     /// # Examples
     /// ```
-    /// use bedrs::{Coordinates, Bed3};
+    /// use bedrs::prelude::*;
     ///
     /// let iv = bed3![1, 10, 20];
     /// assert_eq!(iv.f_len(0.5), 5);
@@ -377,7 +377,7 @@ where
     ///
     /// # Examples
     /// ```
-    /// use bedrs::{Coordinates, Bed3};
+    /// use bedrs::prelude::*;
     ///
     /// let a = bed3![1, 10, 20];
     /// let b = bed3![1, 10, 20];
