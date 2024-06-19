@@ -1,4 +1,7 @@
-use bedrs::types::{BaseInterval, Bed3, IntervalContainer, Query};
+use bedrs::{
+    bed3,
+    types::{BaseInterval, IntervalContainer, Query},
+};
 use criterion::Criterion;
 
 const N: i32 = 10000;
@@ -46,9 +49,9 @@ pub fn find_iter_sort_base(c: &mut Criterion) {
 pub fn find_genomic(c: &mut Criterion) {
     let records = (0..N)
         .map(|x| (x, x + SIZE, x % 5))
-        .map(|(x, y, z)| Bed3::new(z, x, y))
+        .map(|(x, y, z)| bed3![z, x, y])
         .collect();
-    let query = Bed3::new(2, 20, 30);
+    let query = bed3![2, 20, 30];
     let set = IntervalContainer::from_sorted_unchecked(records);
     let method = Query::default();
     c.bench_function("find-genomic", |bench| {
@@ -59,9 +62,9 @@ pub fn find_genomic(c: &mut Criterion) {
 pub fn find_iter_genomic(c: &mut Criterion) {
     let records = (0..N)
         .map(|x| (x, x + SIZE, x % 5))
-        .map(|(x, y, z)| Bed3::new(z, x, y))
+        .map(|(x, y, z)| bed3![z, x, y])
         .collect();
-    let query = Bed3::new(2, 20, 30);
+    let query = bed3![2, 20, 30];
     let set = IntervalContainer::from_sorted_unchecked(records);
     let method = Query::default();
     c.bench_function("find-iter-genomic", |bench| {
@@ -72,9 +75,9 @@ pub fn find_iter_genomic(c: &mut Criterion) {
 pub fn find_iter_sort_genomic(c: &mut Criterion) {
     let records = (0..N)
         .map(|x| (x, x + SIZE, x % 5))
-        .map(|(x, y, z)| Bed3::new(z, x, y))
+        .map(|(x, y, z)| bed3![z, x, y])
         .collect();
-    let query = Bed3::new(2, 20, 30);
+    let query = bed3![2, 20, 30];
     let set = IntervalContainer::from_sorted_unchecked(records);
     let method = Query::default();
     c.bench_function("find-iter-sort-genomic", |bench| {

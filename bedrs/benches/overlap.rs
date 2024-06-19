@@ -1,7 +1,4 @@
-use bedrs::{
-    traits::Overlap,
-    types::{BaseInterval, Bed3},
-};
+use bedrs::{bed3, traits::Overlap, types::BaseInterval};
 use criterion::Criterion;
 
 pub fn overlap_base(c: &mut Criterion) {
@@ -11,9 +8,9 @@ pub fn overlap_base(c: &mut Criterion) {
 }
 
 pub fn overlap_genomic(c: &mut Criterion) {
-    let x = Bed3::new(1, 10, 100);
-    let y = Bed3::new(1, 50, 150);
-    let z = Bed3::new(2, 50, 150);
+    let x = bed3![1, 10, 100];
+    let y = bed3![1, 50, 150];
+    let z = bed3![2, 50, 150];
     c.bench_function("overlap-genomic-true", |bench| {
         bench.iter(|| x.overlaps(&y))
     });
@@ -23,9 +20,9 @@ pub fn overlap_genomic(c: &mut Criterion) {
 }
 
 pub fn overlap_named(c: &mut Criterion) {
-    let x = Bed3::new("chr1", 10, 100);
-    let y = Bed3::new("chr1", 50, 150);
-    let z = Bed3::new("chr2", 50, 150);
+    let x = bed3!["chr1", 10, 100];
+    let y = bed3!["chr1", 50, 150];
+    let z = bed3!["chr2", 50, 150];
     c.bench_function("overlap-named-true", |bench| bench.iter(|| x.overlaps(&y)));
     c.bench_function("overlap-named-false", |bench| bench.iter(|| x.overlaps(&z)));
 }
