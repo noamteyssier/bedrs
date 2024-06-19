@@ -1,4 +1,5 @@
 use crate::{
+    bed3,
     traits::{ChromBounds, MetaBounds, ValueBounds},
     types::Score,
     Bed12, Bed3, Bed6, BedGraph, Coordinates, Strand,
@@ -21,13 +22,13 @@ use serde::{Deserialize, Serialize};
 /// ```
 /// use bedrs::{Coordinates, Bed4, Overlap};
 ///
-/// let a = Bed4::new(1, 20, 30, 10);
+/// let a = bed4![1, 20, 30, 10];
 /// assert_eq!(*a.chr(), 1);
 /// assert_eq!(a.start(), 20);
 /// assert_eq!(a.end(), 30);
 /// assert_eq!(*a.name(), 10);
 ///
-/// let b = Bed4::new(1, 20, 30, 0);
+/// let b = bed4![1, 20, 30, 0];
 /// assert!(a.overlaps(&b));
 /// ```
 #[derive(Debug, Default, Clone, Copy, Coordinates, Getters, Setters, new)]
@@ -50,7 +51,7 @@ where
     N: MetaBounds,
 {
     fn from(bed: Bed4<C, N>) -> Self {
-        Self::new(bed.chr, bed.start, bed.end)
+        bed3![bed.chr, bed.start, bed.end]
     }
 }
 
@@ -113,35 +114,37 @@ where
 
 #[cfg(test)]
 mod testing {
+    use crate::{bed3, bed4};
+
     use super::*;
 
     #[test]
     fn test_init_chrom_numeric() {
-        let b = Bed4::new(1, 10, 20, "test".to_string());
+        let b = bed4![1, 10, 20, "test".to_string()];
         assert_eq!(b.chr(), &1);
     }
 
     #[test]
     fn test_init_chrom_string() {
-        let b = Bed4::new("chr1".to_string(), 10, 20, "test".to_string());
+        let b = bed4!["chr1".to_string(), 10, 20, "test".to_string()];
         assert_eq!(b.chr(), "chr1");
     }
 
     #[test]
     fn test_init_name_numeric() {
-        let b = Bed4::new(1, 10, 20, 30);
-        assert_eq!(b.name(), &30);
+        let b = bed4![1, 10, 20, 30];
+        assert_eq!(b.metadata.name(), &30);
     }
 
     #[test]
     fn test_init_name_string() {
-        let b = Bed4::new(1, 10, 20, "test".to_string());
-        assert_eq!(b.name(), "test");
+        let b = bed4![1, 10, 20, "test".to_string()];
+        assert_eq!(b.metadata.name(), "test");
     }
 
     #[test]
     fn convert_to_bed3() {
-        let b = Bed4::new(1, 10, 20, "test".to_string());
+        let b = bed4![1, 10, 20, "test".to_string()];
         let b3: Bed3<_> = b.into();
         assert_eq!(b3.chr(), &1);
         assert_eq!(b3.start(), 10);
@@ -150,7 +153,7 @@ mod testing {
 
     #[test]
     fn convert_to_bed6() {
-        let b = Bed4::new(1, 10, 20, "test".to_string());
+        let b = bed4![1, 10, 20, "test".to_string()];
         let b6: Bed6<i32, String> = b.into();
         assert_eq!(b6.chr(), &1);
         assert_eq!(b6.start(), 10);
@@ -162,7 +165,7 @@ mod testing {
 
     #[test]
     fn convert_to_bed12() {
-        let b = Bed4::new(1, 10, 20, "test".to_string());
+        let b = bed4![1, 10, 20, "test".to_string()];
         let b12: Bed12<i32, String, i32, i32, i32, i32, i32, i32> = b.into();
         assert_eq!(b12.chr(), &1);
         assert_eq!(b12.start(), 10);
@@ -180,7 +183,7 @@ mod testing {
 
     #[test]
     fn from_bed3() {
-        let b3 = Bed3::new(1, 10, 20);
+        let b3 = bed3![1, 10, 20];
         let b4: Bed4<_, String> = b3.into();
         assert_eq!(b4.chr(), &1);
         assert_eq!(b4.start(), 10);
@@ -226,12 +229,13 @@ mod testing {
 #[cfg(test)]
 mod serde_testing {
     use super::*;
+    use crate::bed4;
     use anyhow::Result;
     use csv::WriterBuilder;
 
     #[test]
     fn test_csv_serialization() -> Result<()> {
-        let a = Bed4::new("chr1", 20, 30, "metadata");
+        let a = bed4!["chr1", 20, 30, "metadata"];
         let mut wtr = WriterBuilder::new().has_headers(false).from_writer(vec![]);
         wtr.serialize(a)?;
         let result = String::from_utf8(wtr.into_inner()?)?;

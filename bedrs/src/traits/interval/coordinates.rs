@@ -67,7 +67,7 @@ where
     /// ```
     /// use bedrs::{Coordinates, Bed3};
     ///
-    /// let iv = Bed3::new(1, 10, 20);
+    /// let iv = bed3![1, 10, 20];
     /// assert_eq!(iv.start(), 10);
     /// ```
     fn start(&self) -> i32;
@@ -78,7 +78,7 @@ where
     /// ```
     /// use bedrs::{Coordinates, Bed3};
     ///
-    /// let iv = Bed3::new(1, 10, 20);
+    /// let iv = bed3![1, 10, 20];
     /// assert_eq!(iv.end(), 20);
     /// ```
     fn end(&self) -> i32;
@@ -92,7 +92,7 @@ where
     /// ```
     /// use bedrs::{Coordinates, Bed3};
     ///
-    /// let iv = Bed3::new(1, 10, 20);
+    /// let iv = bed3![1, 10, 20];
     /// assert_eq!(iv.chr(), &1);
     /// ```
     fn chr(&self) -> &C;
@@ -107,10 +107,10 @@ where
     /// ```
     /// use bedrs::{Coordinates, Bed3, Strand, StrandedBed3};
     ///
-    /// let iv = Bed3::new(1, 10, 20);
+    /// let iv = bed3![1, 10, 20];
     /// assert_eq!(iv.strand(), None);
     ///
-    /// let siv = StrandedBed3::new(1, 10, 20, Strand::Forward);
+    /// let siv = Strandedbed3![1, 10, 20, Strand::Forward];
     /// assert_eq!(siv.strand(), Some(Strand::Forward));
     /// ```
     fn strand(&self) -> Option<Strand> {
@@ -125,7 +125,7 @@ where
     /// ```
     /// use bedrs::{Coordinates, Bed3};
     ///
-    /// let mut iv = Bed3::new(1, 10, 20);
+    /// let mut iv = bed3![1, 10, 20];
     /// assert_eq!(iv.start(), 10);
     ///
     /// iv.update_start(&5);
@@ -140,7 +140,7 @@ where
     /// ```
     /// use bedrs::{Coordinates, Bed3};
     ///
-    /// let mut iv = Bed3::new(1, 10, 20);
+    /// let mut iv = bed3![1, 10, 20];
     /// assert_eq!(iv.end(), 20);
     ///
     /// iv.update_end(&30);
@@ -155,7 +155,7 @@ where
     /// ```
     /// use bedrs::{Coordinates, Bed3};
     ///
-    /// let mut iv = Bed3::new(1, 10, 20);
+    /// let mut iv = bed3![1, 10, 20];
     /// assert_eq!(iv.chr(), &1);
     ///
     /// iv.update_chr(&2);
@@ -169,7 +169,7 @@ where
     /// ```
     /// use bedrs::{Coordinates, StrandedBed3, Strand};
     ///
-    /// let mut siv = StrandedBed3::new(1, 10, 20, Strand::Forward);
+    /// let mut siv = Strandedbed3![1, 10, 20, Strand::Forward];
     /// assert_eq!(siv.strand(), Some(Strand::Forward));
     ///
     /// siv.update_strand(Some(Strand::Reverse));
@@ -189,7 +189,7 @@ where
     /// ```
     /// use bedrs::{Coordinates, Bed3};
     ///
-    /// let iv = Bed3::new(1, 10, 20);
+    /// let iv = bed3![1, 10, 20];
     /// let new_iv = <Bed3<i32, i32> as Coordinates<i32, i32>>::from(&iv);
     ///
     /// assert!(iv.eq(&new_iv));
@@ -206,7 +206,7 @@ where
     /// ```
     /// use bedrs::{Coordinates, Bed3};
     ///
-    /// let iv = Bed3::new(1, 10, 20);
+    /// let iv = bed3![1, 10, 20];
     /// assert_eq!(iv.len(), 10);
     /// ```
     fn len(&self) -> i32 {
@@ -219,11 +219,11 @@ where
     /// ```
     /// use bedrs::{Coordinates, Bed3};
     ///
-    /// let mut iv = Bed3::new(1, 10, 20);
-    /// assert!(iv.eq(&Bed3::new(1, 10, 20)));
+    /// let mut iv = bed3![1, 10, 20];
+    /// assert!(iv.eq(&bed3![1, 10, 20]));
     ///
     /// iv.update_all(&2, &5, &10);
-    /// assert!(iv.eq(&Bed3::new(2, 5, 10)));
+    /// assert!(iv.eq(&bed3![2, 5, 10]));
     /// ```
     fn update_all(&mut self, chr: &C, start: &i32, end: &i32) {
         self.update_chr(chr);
@@ -236,11 +236,11 @@ where
     /// ```
     /// use bedrs::{Coordinates, Bed3};
     ///
-    /// let mut iv = Bed3::new(1, 10, 20);
-    /// assert!(iv.eq(&Bed3::new(1, 10, 20)));
+    /// let mut iv = bed3![1, 10, 20];
+    /// assert!(iv.eq(&bed3![1, 10, 20]));
     ///
     /// iv.update_endpoints(&5, &10);
-    /// assert!(iv.eq(&Bed3::new(1, 5, 10)));
+    /// assert!(iv.eq(&bed3![1, 5, 10]));
     /// ```
     fn update_endpoints(&mut self, start: &i32, end: &i32) {
         self.update_start(start);
@@ -253,11 +253,11 @@ where
     /// ```
     /// use bedrs::{Coordinates, Bed3};
     ///
-    /// let mut iv = Bed3::new(1, 10, 20);
-    /// assert!(iv.eq(&Bed3::new(1, 10, 20)));
+    /// let mut iv = bed3![1, 10, 20];
+    /// assert!(iv.eq(&bed3![1, 10, 20]));
     ///
-    /// iv.update_all_from(&Bed3::new(2, 5, 10));
-    /// assert!(iv.eq(&Bed3::new(2, 5, 10)));
+    /// iv.update_all_from(&bed3![2, 5, 10]);
+    /// assert!(iv.eq(&bed3![2, 5, 10]));
     /// ```
     fn update_all_from<I: Coordinates<C>>(&mut self, other: &I) {
         self.update_chr(other.chr());
@@ -270,11 +270,11 @@ where
     /// ```
     /// use bedrs::{Coordinates, Bed3};
     ///
-    /// let mut iv = Bed3::new(1, 10, 20);
-    /// assert!(iv.eq(&Bed3::new(1, 10, 20)));
+    /// let mut iv = bed3![1, 10, 20];
+    /// assert!(iv.eq(&bed3![1, 10, 20]));
     ///
-    /// iv.update_endpoints_from(&Bed3::new(2, 5, 10));
-    /// assert!(iv.eq(&Bed3::new(1, 5, 10)));
+    /// iv.update_endpoints_from(&bed3![2, 5, 10]);
+    /// assert!(iv.eq(&bed3![1, 5, 10]));
     /// ```
     fn update_endpoints_from<I: Coordinates<C>>(&mut self, other: &I) {
         self.update_start(&other.start());
@@ -288,11 +288,11 @@ where
     /// ```
     /// use bedrs::{Coordinates, Bed3};
     ///
-    /// let mut iv = Bed3::new(1, 10, 20);
-    /// assert!(iv.eq(&Bed3::new(1, 10, 20)));
+    /// let mut iv = bed3![1, 10, 20];
+    /// assert!(iv.eq(&bed3![1, 10, 20]));
     ///
     /// iv.extend_left(&5);
-    /// assert!(iv.eq(&Bed3::new(1, 5, 20)));
+    /// assert!(iv.eq(&bed3![1, 5, 20]));
     /// ```
     fn extend_left(&mut self, val: &i32) {
         if self.start().lt(val) {
@@ -312,14 +312,14 @@ where
     /// ```
     /// use bedrs::{Coordinates, Bed3};
     ///
-    /// let mut iv = Bed3::new(1, 10, 20);
-    /// assert!(iv.eq(&Bed3::new(1, 10, 20)));
+    /// let mut iv = bed3![1, 10, 20];
+    /// assert!(iv.eq(&bed3![1, 10, 20]));
     ///
     /// iv.extend_right(&5, None);
-    /// assert!(iv.eq(&Bed3::new(1, 10, 25)));
+    /// assert!(iv.eq(&bed3![1, 10, 25]));
     ///
     /// iv.extend_right(&5, Some(27));
-    /// assert!(iv.eq(&Bed3::new(1, 10, 27)));
+    /// assert!(iv.eq(&bed3![1, 10, 27]));
     /// ```
     fn extend_right(&mut self, val: &i32, max_bound: Option<i32>) {
         let new_end = self.end().add(*val);
@@ -341,14 +341,14 @@ where
     /// ```
     /// use bedrs::{Coordinates, Bed3};
     ///
-    /// let mut iv = Bed3::new(1, 10, 20);
-    /// assert!(iv.eq(&Bed3::new(1, 10, 20)));
+    /// let mut iv = bed3![1, 10, 20];
+    /// assert!(iv.eq(&bed3![1, 10, 20]));
     ///
     /// iv.extend(&5, None);
-    /// assert!(iv.eq(&Bed3::new(1, 5, 25)));
+    /// assert!(iv.eq(&bed3![1, 5, 25]));
 
     /// iv.extend(&5, Some(27));
-    /// assert!(iv.eq(&Bed3::new(1, 0, 27)));
+    /// assert!(iv.eq(&bed3![1, 0, 27]));
     /// ```
     fn extend(&mut self, val: &i32, max_bound: Option<i32>) {
         self.extend_left(val);
@@ -361,7 +361,7 @@ where
     /// ```
     /// use bedrs::{Coordinates, Bed3};
     ///
-    /// let iv = Bed3::new(1, 10, 20);
+    /// let iv = bed3![1, 10, 20];
     /// assert_eq!(iv.f_len(0.5), 5);
     /// assert_eq!(iv.f_len(0.3), 3);
     /// assert_eq!(iv.f_len(2.0), 20);
@@ -379,11 +379,11 @@ where
     /// ```
     /// use bedrs::{Coordinates, Bed3};
     ///
-    /// let a = Bed3::new(1, 10, 20);
-    /// let b = Bed3::new(1, 10, 20);
-    /// let c = Bed3::new(1, 20, 30);
-    /// let d = Bed3::new(2, 10, 20);
-    /// let e = Bed3::new(1, 5, 10);
+    /// let a = bed3![1, 10, 20];
+    /// let b = bed3![1, 10, 20];
+    /// let c = bed3![1, 20, 30];
+    /// let d = bed3![2, 10, 20];
+    /// let e = bed3![1, 5, 10];
     ///
     /// // a == b
     /// assert_eq!(a.coord_cmp(&b), std::cmp::Ordering::Equal);
@@ -514,7 +514,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::{traits::Coordinates, BaseInterval, Bed3};
+    use crate::{bed3, traits::Coordinates, BaseInterval};
 
     // define a custom interval struct for testing
     struct CustomInterval {
@@ -738,8 +738,8 @@ mod testing {
 
     #[test]
     fn test_update_from() {
-        let mut a = Bed3::new(1, 10, 20);
-        let b = Bed3::new(2, 30, 50);
+        let mut a = bed3![1, 10, 20];
+        let b = bed3![2, 30, 50];
         a.update_endpoints_from(&b);
         assert_eq!(a.chr(), &1);
         assert_eq!(a.start(), 30);

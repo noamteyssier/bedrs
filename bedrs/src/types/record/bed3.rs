@@ -1,4 +1,5 @@
 use crate::{
+    bed4,
     traits::{ChromBounds, MetaBounds, ValueBounds},
     types::Score,
     Bed12, Bed4, Bed6, BedGraph, Coordinates, Strand,
@@ -44,7 +45,7 @@ where
     N: MetaBounds,
 {
     fn from(bed: Bed3<C>) -> Self {
-        Self::new(bed.chr, bed.start, bed.end, N::default())
+        bed4![bed.chr, bed.start, bed.end, N::default()]
     }
 }
 
@@ -105,6 +106,8 @@ where
 
 #[cfg(test)]
 mod testing {
+    use crate::bed4;
+
     use super::*;
 
     #[test]
@@ -130,7 +133,7 @@ mod testing {
         assert_eq!(*b.chr(), "chr1");
         assert_eq!(b.start(), 20);
         assert_eq!(b.end(), 30);
-        assert_eq!(b.name(), &0);
+        assert_eq!(b.metadata.name(), &0);
     }
 
     #[test]
@@ -165,7 +168,7 @@ mod testing {
 
     #[test]
     fn from_bed4() {
-        let a = Bed4::new("chr1", 20, 30, 40);
+        let a = bed4!["chr1", 20, 30, 40];
         let b: Bed3<_> = a.into();
         assert_eq!(*b.chr(), "chr1");
         assert_eq!(b.start(), 20);

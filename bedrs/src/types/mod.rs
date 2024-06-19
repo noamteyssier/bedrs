@@ -1,6 +1,7 @@
 pub mod container;
 pub mod enums;
 pub mod iterator;
+pub mod macros;
 pub mod meta;
 pub mod record;
 pub use container::IntervalContainer;

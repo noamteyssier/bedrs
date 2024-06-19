@@ -23,9 +23,9 @@ where
     /// ```
     /// use bedrs::{Bed3, Overlap};
     ///
-    /// let interval1 = Bed3::new(1, 100, 200);
-    /// let interval2 = Bed3::new(1, 150, 250);
-    /// let interval3 = Bed3::new(2, 100, 200);
+    /// let interval1 = bed3![1, 100, 200];
+    /// let interval2 = bed3![1, 150, 250];
+    /// let interval3 = bed3![2, 100, 200];
     ///
     /// assert!(interval1.bounded_chr(&interval2));
     /// assert!(!interval1.bounded_chr(&interval3));
@@ -180,10 +180,10 @@ where
     /// ```
     /// use bedrs::{Bed3, Overlap};
     ///
-    /// let interval1 = Bed3::new(1, 100, 200);
-    /// let interval2 = Bed3::new(1, 150, 250);
-    /// let interval3 = Bed3::new(1, 50, 150);
-    /// let interval4 = Bed3::new(2, 150, 250);
+    /// let interval1 = bed3![1, 100, 200];
+    /// let interval2 = bed3![1, 150, 250];
+    /// let interval3 = bed3![1, 50, 150];
+    /// let interval4 = bed3![2, 150, 250];
     ///
     /// assert!(interval1.overlaps(&interval2));
     /// assert!(interval1.overlaps(&interval3));
@@ -217,10 +217,10 @@ where
     /// ```
     /// use bedrs::{Bed3, Overlap};
     ///
-    /// let interval1 = Bed3::new(1, 100, 200);
-    /// let interval2 = Bed3::new(1, 150, 250);
-    /// let interval3 = Bed3::new(1, 149, 250);
-    /// let interval4 = Bed3::new(1, 151, 250);
+    /// let interval1 = bed3![1, 100, 200];
+    /// let interval2 = bed3![1, 150, 250];
+    /// let interval3 = bed3![1, 149, 250];
+    /// let interval4 = bed3![1, 151, 250];
     ///
     /// assert!(interval1.overlaps_by(&interval2, 50));
     /// assert!(interval1.overlaps_by(&interval3, 50));
@@ -252,10 +252,10 @@ where
     /// ```
     /// use bedrs::{Bed3, Overlap};
     ///
-    /// let interval1 = Bed3::new(1, 100, 200);
-    /// let interval2 = Bed3::new(1, 150, 250);
-    /// let interval3 = Bed3::new(1, 149, 250);
-    /// let interval4 = Bed3::new(1, 151, 250);
+    /// let interval1 = bed3![1, 100, 200];
+    /// let interval2 = bed3![1, 150, 250];
+    /// let interval3 = bed3![1, 149, 250];
+    /// let interval4 = bed3![1, 151, 250];
     ///
     /// assert!(interval1.overlaps_by_exactly(&interval2, 50));
     /// assert!(!interval1.overlaps_by_exactly(&interval3, 50));
@@ -298,10 +298,10 @@ where
     /// ```
     /// use bedrs::{Bed3, Overlap};
     ///
-    /// let interval1 = Bed3::new(1, 100, 200);
-    /// let interval2 = Bed3::new(1, 150, 250);
-    /// let interval3 = Bed3::new(1, 149, 250);
-    /// let interval4 = Bed3::new(1, 151, 250);
+    /// let interval1 = bed3![1, 100, 200];
+    /// let interval2 = bed3![1, 150, 250];
+    /// let interval3 = bed3![1, 149, 250];
+    /// let interval4 = bed3![1, 151, 250];
     ///
     /// assert_eq!(interval1.overlap_size(&interval2), Some(50));
     /// assert_eq!(interval1.overlap_size(&interval3), Some(51));
@@ -336,9 +336,9 @@ where
     /// ```
     /// use bedrs::{Bed3, Overlap};
     ///
-    /// let interval1 = Bed3::new(1, 100, 200);
-    /// let interval2 = Bed3::new(1, 150, 160);
-    /// let interval3 = Bed3::new(2, 150, 160);
+    /// let interval1 = bed3![1, 100, 200];
+    /// let interval2 = bed3![1, 150, 160];
+    /// let interval3 = bed3![2, 150, 160];
     ///
     /// assert!(interval1.contains(&interval2));
     /// assert!(!interval1.contains(&interval3));
@@ -357,9 +357,9 @@ where
     /// # Example
     /// ```
     /// use bedrs::{Bed3, Overlap};
-    /// let interval1 = Bed3::new(1, 100, 200);
-    /// let interval2 = Bed3::new(1, 100, 400);
-    /// let interval3 = Bed3::new(2, 100, 400);
+    /// let interval1 = bed3![1, 100, 200];
+    /// let interval2 = bed3![1, 100, 400];
+    /// let interval3 = bed3![2, 100, 400];
     /// assert!(interval1.starts(&interval2));
     /// assert!(!interval1.starts(&interval3));
     /// ```
@@ -377,9 +377,9 @@ where
     /// # Example
     /// ```
     /// use bedrs::{Bed3, Overlap};
-    /// let interval1 = Bed3::new(1, 300, 400);
-    /// let interval2 = Bed3::new(1, 100, 400);
-    /// let interval3 = Bed3::new(2, 100, 400);
+    /// let interval1 = bed3![1, 300, 400];
+    /// let interval2 = bed3![1, 100, 400];
+    /// let interval3 = bed3![2, 100, 400];
     /// assert!(interval1.ends(&interval2));
     /// assert!(!interval1.ends(&interval3));
     /// ```
@@ -396,9 +396,9 @@ where
     /// # Example
     /// ```
     /// use bedrs::{Bed3, Overlap};
-    /// let interval1 = Bed3::new(1, 100, 200);
-    /// let interval2 = Bed3::new(1, 100, 200);
-    /// let interval3 = Bed3::new(2, 100, 200);
+    /// let interval1 = bed3![1, 100, 200];
+    /// let interval2 = bed3![1, 100, 200];
+    /// let interval3 = bed3![2, 100, 200];
     /// assert!(interval1.equals(&interval2));
     /// assert!(!interval1.equals(&interval3));
     /// ```
@@ -416,11 +416,11 @@ where
     /// # Example
     /// ```
     /// use bedrs::{Bed3, Overlap};
-    /// let interval1 = Bed3::new(1, 150, 160);
-    /// let interval2 = Bed3::new(1, 100, 200);
-    /// let interval3 = Bed3::new(2, 100, 200);
-    /// let interval4 = Bed3::new(2, 100, 160);
-    /// let interval5 = Bed3::new(2, 150, 160);
+    /// let interval1 = bed3![1, 150, 160];
+    /// let interval2 = bed3![1, 100, 200];
+    /// let interval3 = bed3![2, 100, 200];
+    /// let interval4 = bed3![2, 100, 160];
+    /// let interval5 = bed3![2, 150, 160];
     /// assert!(interval1.during(&interval2));
     /// assert!(!interval1.during(&interval3));
     /// assert!(!interval1.during(&interval4));
@@ -443,9 +443,9 @@ where
     /// ```
     /// use bedrs::{Bed3, Overlap};
     ///
-    /// let interval1 = Bed3::new(1, 150, 16);
-    /// let interval2 = Bed3::new(1, 100, 200);
-    /// let interval3 = Bed3::new(2, 100, 200);
+    /// let interval1 = bed3![1, 150, 16];
+    /// let interval2 = bed3![1, 100, 200];
+    /// let interval3 = bed3![2, 100, 200];
     ///
     /// assert!(interval1.contained_by(&interval2));
     /// assert!(!interval1.contained_by(&interval3));
@@ -472,9 +472,9 @@ where
     /// ```
     /// use bedrs::{Bed3, Overlap};
     ///
-    /// let interval1 = Bed3::new(1, 100, 200);
-    /// let interval2 = Bed3::new(1, 200, 300);
-    /// let interval3 = Bed3::new(2, 200, 300);
+    /// let interval1 = bed3![1, 100, 200];
+    /// let interval2 = bed3![1, 200, 300];
+    /// let interval3 = bed3![2, 200, 300];
     ///
     /// assert!(interval1.borders(&interval2));
     /// assert!(!interval1.borders(&interval3));
@@ -488,10 +488,7 @@ where
 #[allow(clippy::many_single_char_names)]
 mod testing {
     use super::*;
-    use crate::{
-        types::{record::Bed3, BaseInterval},
-        Coordinates, Strand, StrandedBed3,
-    };
+    use crate::{bed3, types::BaseInterval, Coordinates, Strand, StrandedBed3};
 
     #[test]
     fn test_overlap_self() {
@@ -533,36 +530,36 @@ mod testing {
 
     #[test]
     fn test_genomic_overlap_self() {
-        let a = Bed3::new(1, 10, 20);
+        let a = bed3![1, 10, 20];
         assert!(a.overlaps(&a));
     }
 
     #[test]
     fn test_genomic_overlap_reciprocity() {
-        let a = Bed3::new(1, 10, 20);
-        let b = Bed3::new(1, 15, 25);
+        let a = bed3![1, 10, 20];
+        let b = bed3![1, 15, 25];
         assert!(a.overlaps(&b));
 
-        let a = Bed3::new(1, 15, 25);
-        let b = Bed3::new(1, 10, 20);
+        let a = bed3![1, 15, 25];
+        let b = bed3![1, 10, 20];
         assert!(a.overlaps(&b));
     }
 
     #[test]
     fn test_genomic_overlap_negative_reciprocity() {
-        let a = Bed3::new(1, 10, 20);
-        let b = Bed3::new(1, 25, 35);
+        let a = bed3![1, 10, 20];
+        let b = bed3![1, 25, 35];
         assert!(!a.overlaps(&b));
 
-        let a = Bed3::new(1, 25, 35);
-        let b = Bed3::new(1, 10, 20);
+        let a = bed3![1, 25, 35];
+        let b = bed3![1, 10, 20];
         assert!(!a.overlaps(&b));
     }
 
     #[test]
     fn test_genomic_overlap_wrong_chr() {
-        let a = Bed3::new(1, 10, 20);
-        let b = Bed3::new(2, 10, 20);
+        let a = bed3![1, 10, 20];
+        let b = bed3![2, 10, 20];
         assert!(!a.overlaps(&b));
     }
 
@@ -590,11 +587,11 @@ mod testing {
 
     #[test]
     fn test_genomic_contained() {
-        let a = Bed3::new(1, 10, 30);
-        let b = Bed3::new(1, 15, 25);
-        let c = Bed3::new(1, 10, 30);
-        let d = Bed3::new(1, 9, 31);
-        let e = Bed3::new(2, 15, 25);
+        let a = bed3![1, 10, 30];
+        let b = bed3![1, 15, 25];
+        let c = bed3![1, 10, 30];
+        let d = bed3![1, 9, 31];
+        let e = bed3![2, 15, 25];
         assert!(a.contains(&b));
         assert!(b.contained_by(&a));
         assert!(a.contains(&c));
@@ -622,9 +619,9 @@ mod testing {
 
     #[test]
     fn genomic_borders() {
-        let a = Bed3::new(1, 10, 20);
-        let b = Bed3::new(1, 20, 30);
-        let c = Bed3::new(2, 20, 30);
+        let a = bed3![1, 10, 20];
+        let b = bed3![1, 20, 30];
+        let c = bed3![2, 20, 30];
         assert!(a.borders(&b));
         assert!(b.borders(&a));
         assert!(!a.borders(&c));
@@ -768,9 +765,9 @@ mod testing {
 
     #[test]
     fn starts_genomic() {
-        let a = Bed3::new(1, 10, 20);
-        let b = Bed3::new(1, 10, 40);
-        let c = Bed3::new(2, 10, 40);
+        let a = bed3![1, 10, 20];
+        let b = bed3![1, 10, 40];
+        let c = bed3![2, 10, 40];
         assert!(a.starts(&b));
         assert!(!a.starts(&c));
     }
@@ -785,9 +782,9 @@ mod testing {
 
     #[test]
     fn ends_genomic() {
-        let a = Bed3::new(1, 30, 40);
-        let b = Bed3::new(1, 10, 40);
-        let c = Bed3::new(2, 10, 40);
+        let a = bed3![1, 30, 40];
+        let b = bed3![1, 10, 40];
+        let c = bed3![2, 10, 40];
         assert!(a.ends(&b));
         assert!(!a.ends(&c));
     }
@@ -816,8 +813,8 @@ mod testing {
 
     #[test]
     fn bounded_strand_missing_info() {
-        let a = Bed3::new(1, 10, 20);
-        let b = Bed3::new(1, 15, 25);
+        let a = bed3![1, 10, 20];
+        let b = bed3![1, 15, 25];
         let c = StrandedBed3::new(1, 15, 25, Strand::Forward);
         assert!(a.bounded_strand(&b));
         assert!(a.bounded_strand(&c));

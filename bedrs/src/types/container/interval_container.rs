@@ -255,7 +255,7 @@ where
 mod testing {
 
     use super::*;
-    use crate::{BaseInterval, Bed3, Coordinates, Strand, StrandedBed3};
+    use crate::{bed3, BaseInterval, Bed3, Coordinates, Strand, StrandedBed3};
     #[cfg(feature = "serde")]
     use bincode::{deserialize, serialize};
 
@@ -327,11 +327,7 @@ mod testing {
 
     #[test]
     fn build_genomic_interval_container() {
-        let records = vec![
-            Bed3::new(1, 1, 10),
-            Bed3::new(1, 2, 20),
-            Bed3::new(1, 3, 30),
-        ];
+        let records = vec![bed3![1, 1, 10], bed3![1, 2, 20], bed3![1, 3, 30]];
         let container = IntervalContainer::from_unsorted(records);
         assert_eq!(container.len(), 3);
     }
@@ -339,7 +335,7 @@ mod testing {
     #[test]
     fn test_genomic_interval_set_init_from_records() {
         let n_intervals = 10;
-        let records = vec![Bed3::new(1, 10, 100); n_intervals];
+        let records = vec![bed3![1, 10, 100]; n_intervals];
         let set = IntervalContainer::new(records);
         assert_eq!(set.len(), n_intervals);
     }
@@ -347,7 +343,7 @@ mod testing {
     #[test]
     fn test_genomic_from_iterator() {
         let n_intervals = 10;
-        let records = vec![Bed3::new(1, 10, 100); n_intervals];
+        let records = vec![bed3![1, 10, 100]; n_intervals];
         let set = IntervalContainer::from_iter(records);
         assert_eq!(set.len(), n_intervals);
     }
@@ -363,14 +359,14 @@ mod testing {
 
     #[test]
     fn test_genomic_span() {
-        let intervals = vec![Bed3::new(1, 10, 100), Bed3::new(1, 20, 200)];
+        let intervals = vec![bed3![1, 10, 100], bed3![1, 20, 200]];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
-        assert!(set.span().unwrap().eq(&Bed3::new(1, 10, 200)));
+        assert!(set.span().unwrap().eq(&bed3![1, 10, 200]));
     }
 
     #[test]
     fn test_genomic_span_errors() {
-        let intervals = vec![Bed3::new(1, 10, 100), Bed3::new(2, 20, 200)];
+        let intervals = vec![bed3![1, 10, 100], bed3![2, 20, 200]];
         let mut set = IntervalContainer::from_iter(intervals);
         match set.span() {
             Err(e) => assert_eq!(e.to_string(), "Cannot get span of unsorted interval set"),
@@ -389,26 +385,30 @@ mod testing {
     #[test]
     #[cfg(feature = "serde")]
     fn test_genomic_serialization() {
+        use crate::bed3;
+
         let n_intervals = 10;
-        let records = vec![Bed3::new(1, 10, 100); n_intervals];
+        let records = vec![bed3![1, 10, 100]; n_intervals];
         let set = IntervalContainer::new(records);
         let serialized = serialize(&set).unwrap();
         let deserialized: IntervalContainer<Bed3<i32>, i32> = deserialize(&serialized).unwrap();
 
         for (iv1, iv2) in set.records().iter().zip(deserialized.records().iter()) {
-            assert!(iv1.eq(&iv2));
+            assert!(iv1.eq(iv2));
         }
     }
 
     #[test]
     #[cfg(feature = "rayon")]
     fn test_genomic_par_sort() {
+        use crate::bed3;
+
         let n_intervals = 10;
-        let records = vec![Bed3::new(1, 10, 100); n_intervals];
+        let records = vec![bed3![1, 10, 100]; n_intervals];
         let mut set = IntervalContainer::new(records.clone());
         set.par_sort();
         for (iv1, iv2) in set.records().iter().zip(records.iter()) {
-            assert!(iv1.eq(&iv2));
+            assert!(iv1.eq(iv2));
         }
     }
 

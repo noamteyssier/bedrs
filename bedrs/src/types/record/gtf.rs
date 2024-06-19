@@ -1,4 +1,5 @@
 use crate::{
+    bed3,
     traits::{ChromBounds, MetaBounds},
     types::{enums::Frame, Score},
     Bed3, Coordinates, Strand,
@@ -74,7 +75,7 @@ where
     N: MetaBounds,
 {
     fn from(record: Gtf<C, N>) -> Self {
-        Self::new(record.chr, record.start, record.end)
+        bed3![record.chr, record.start, record.end]
     }
 }
 

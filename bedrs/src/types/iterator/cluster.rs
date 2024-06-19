@@ -89,7 +89,7 @@ where
 #[cfg(test)]
 mod testing {
     use super::*;
-    use crate::{Bed3, Coordinates};
+    use crate::{bed3, Bed3, Coordinates};
 
     type ClusterTuple = (Bed3<u32>, usize);
     fn validate_clusters(observed: &[ClusterTuple], expected: &[ClusterTuple]) {
@@ -126,18 +126,18 @@ mod testing {
     #[test]
     fn cluster_iterator() {
         let intervals = vec![
-            Bed3::new(1, 10, 20),
-            Bed3::new(1, 15, 25),
-            Bed3::new(1, 20, 30),
-            Bed3::new(1, 40, 50),
-            Bed3::new(1, 45, 55),
+            bed3![1, 10, 20],
+            bed3![1, 15, 25],
+            bed3![1, 20, 30],
+            bed3![1, 40, 50],
+            bed3![1, 45, 55],
         ];
         let expected = vec![
-            (Bed3::new(1, 10, 20), 0),
-            (Bed3::new(1, 15, 25), 0),
-            (Bed3::new(1, 20, 30), 0),
-            (Bed3::new(1, 40, 50), 1),
-            (Bed3::new(1, 45, 55), 1),
+            (bed3![1, 10, 20], 0),
+            (bed3![1, 15, 25], 0),
+            (bed3![1, 20, 30], 0),
+            (bed3![1, 40, 50], 1),
+            (bed3![1, 45, 55], 1),
         ];
         let observed = ClusterIter::new(intervals.into_iter()).collect::<Vec<ClusterTuple>>();
         validate_clusters(&observed, &expected);
@@ -159,20 +159,20 @@ mod testing {
     #[test]
     fn cluster_iterator_3_clusters() {
         let intervals = vec![
-            Bed3::new(1, 10, 20),
-            Bed3::new(1, 15, 25),
-            Bed3::new(1, 40, 50),
-            Bed3::new(1, 45, 55),
-            Bed3::new(1, 60, 70),
-            Bed3::new(1, 65, 75),
+            bed3![1, 10, 20],
+            bed3![1, 15, 25],
+            bed3![1, 40, 50],
+            bed3![1, 45, 55],
+            bed3![1, 60, 70],
+            bed3![1, 65, 75],
         ];
         let expected = vec![
-            (Bed3::new(1, 10, 20), 0),
-            (Bed3::new(1, 15, 25), 0),
-            (Bed3::new(1, 40, 50), 1),
-            (Bed3::new(1, 45, 55), 1),
-            (Bed3::new(1, 60, 70), 2),
-            (Bed3::new(1, 65, 75), 2),
+            (bed3![1, 10, 20], 0),
+            (bed3![1, 15, 25], 0),
+            (bed3![1, 40, 50], 1),
+            (bed3![1, 45, 55], 1),
+            (bed3![1, 60, 70], 2),
+            (bed3![1, 65, 75], 2),
         ];
         let observed = ClusterIter::new(intervals.into_iter()).collect::<Vec<ClusterTuple>>();
         validate_clusters(&observed, &expected);
@@ -188,15 +188,11 @@ mod testing {
     /// (1)        m----n
     #[test]
     fn cluster_iterator_spanned() {
-        let intervals = vec![
-            Bed3::new(0, 10, 500),
-            Bed3::new(0, 20, 60),
-            Bed3::new(0, 30, 70),
-        ];
+        let intervals = vec![bed3![0, 10, 500], bed3![0, 20, 60], bed3![0, 30, 70]];
         let expected = vec![
-            (Bed3::new(0, 10, 500), 0),
-            (Bed3::new(0, 20, 60), 0),
-            (Bed3::new(0, 30, 70), 0),
+            (bed3![0, 10, 500], 0),
+            (bed3![0, 20, 60], 0),
+            (bed3![0, 30, 70], 0),
         ];
         let observed = ClusterIter::new(intervals.into_iter()).collect::<Vec<ClusterTuple>>();
         validate_clusters(&observed, &expected);
@@ -212,15 +208,11 @@ mod testing {
     /// (1)        m----n
     #[test]
     fn cluster_iterator_internal_span() {
-        let intervals = vec![
-            Bed3::new(0, 10, 50),
-            Bed3::new(0, 20, 500),
-            Bed3::new(0, 30, 70),
-        ];
+        let intervals = vec![bed3![0, 10, 50], bed3![0, 20, 500], bed3![0, 30, 70]];
         let expected = vec![
-            (Bed3::new(0, 10, 50), 0),
-            (Bed3::new(0, 20, 500), 0),
-            (Bed3::new(0, 30, 70), 0),
+            (bed3![0, 10, 50], 0),
+            (bed3![0, 20, 500], 0),
+            (bed3![0, 30, 70], 0),
         ];
         let observed = ClusterIter::new(intervals.into_iter()).collect::<Vec<ClusterTuple>>();
         validate_clusters(&observed, &expected);
@@ -247,24 +239,24 @@ mod testing {
     #[test]
     fn cluster_iterator_duplicates() {
         let intervals = vec![
-            Bed3::new(0, 10, 50),
-            Bed3::new(0, 10, 50),
-            Bed3::new(0, 30, 70),
-            Bed3::new(0, 30, 70),
-            Bed3::new(0, 50, 90),
-            Bed3::new(0, 50, 90),
-            Bed3::new(0, 100, 120),
-            Bed3::new(0, 100, 120),
+            bed3![0, 10, 50],
+            bed3![0, 10, 50],
+            bed3![0, 30, 70],
+            bed3![0, 30, 70],
+            bed3![0, 50, 90],
+            bed3![0, 50, 90],
+            bed3![0, 100, 120],
+            bed3![0, 100, 120],
         ];
         let expected = vec![
-            (Bed3::new(0, 10, 50), 0),
-            (Bed3::new(0, 10, 50), 0),
-            (Bed3::new(0, 30, 70), 0),
-            (Bed3::new(0, 30, 70), 0),
-            (Bed3::new(0, 50, 90), 0),
-            (Bed3::new(0, 50, 90), 0),
-            (Bed3::new(0, 100, 120), 1),
-            (Bed3::new(0, 100, 120), 1),
+            (bed3![0, 10, 50], 0),
+            (bed3![0, 10, 50], 0),
+            (bed3![0, 30, 70], 0),
+            (bed3![0, 30, 70], 0),
+            (bed3![0, 50, 90], 0),
+            (bed3![0, 50, 90], 0),
+            (bed3![0, 100, 120], 1),
+            (bed3![0, 100, 120], 1),
         ];
         let observed = ClusterIter::new(intervals.into_iter()).collect::<Vec<ClusterTuple>>();
         validate_clusters(&observed, &expected);

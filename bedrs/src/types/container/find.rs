@@ -104,9 +104,10 @@ mod testing {
     use anyhow::Result;
 
     use crate::{
+        bed3,
         traits::{ChromBounds, IntervalBounds, ValueBounds},
         types::{Query, QueryMethod, StrandMethod},
-        BaseInterval, Bed3, Coordinates, IntervalContainer, Strand, StrandedBed3,
+        BaseInterval, Coordinates, IntervalContainer, Strand, StrandedBed3,
     };
 
     fn validate_set<C, I>(set: &IntervalContainer<I, C>, expected: &[I])
@@ -367,16 +368,16 @@ mod testing {
 
     #[test]
     fn find_iter_sorted_min_genomic() {
-        let query = Bed3::new(3, 17, 27);
+        let query = bed3![3, 17, 27];
         let intervals = vec![
-            Bed3::new(1, 10, 20),
-            Bed3::new(2, 15, 25),
-            Bed3::new(3, 10, 20), // bounded, but missing overlap req
-            Bed3::new(3, 15, 25), // first
-            Bed3::new(3, 20, 30), // last
-            Bed3::new(3, 40, 50), // unbounded
-            Bed3::new(4, 10, 20),
-            Bed3::new(4, 25, 35),
+            bed3![1, 10, 20],
+            bed3![2, 15, 25],
+            bed3![3, 10, 20], // bounded, but missing overlap req
+            bed3![3, 15, 25], // first
+            bed3![3, 20, 30], // last
+            bed3![3, 40, 50], // unbounded
+            bed3![4, 10, 20],
+            bed3![4, 25, 35],
         ];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
         let mut overlaps = set
@@ -385,22 +386,22 @@ mod testing {
             .copied();
         let first = overlaps.next().unwrap();
         let last = overlaps.last().unwrap();
-        assert!(first.eq(&Bed3::new(3, 15, 25)));
-        assert!(last.eq(&Bed3::new(3, 20, 30)));
+        assert!(first.eq(&bed3![3, 15, 25]));
+        assert!(last.eq(&bed3![3, 20, 30]));
     }
 
     #[test]
     fn find_iter_sorted_exact_genomic() {
-        let query = Bed3::new(3, 17, 27);
+        let query = bed3![3, 17, 27];
         let intervals = vec![
-            Bed3::new(1, 10, 20),
-            Bed3::new(2, 15, 25),
-            Bed3::new(3, 10, 20), // bounded, but missing overlap req
-            Bed3::new(3, 15, 25), // bounded, but missing overlap req
-            Bed3::new(3, 20, 30), // first and last
-            Bed3::new(3, 40, 50), // unbounded
-            Bed3::new(4, 10, 20),
-            Bed3::new(4, 25, 35),
+            bed3![1, 10, 20],
+            bed3![2, 15, 25],
+            bed3![3, 10, 20], // bounded, but missing overlap req
+            bed3![3, 15, 25], // bounded, but missing overlap req
+            bed3![3, 20, 30], // first and last
+            bed3![3, 40, 50], // unbounded
+            bed3![4, 10, 20],
+            bed3![4, 25, 35],
         ];
         let set = IntervalContainer::from_sorted(intervals).unwrap();
         let mut overlaps = set
@@ -409,7 +410,7 @@ mod testing {
             .copied();
         let first = overlaps.next().unwrap();
         let last = overlaps.last();
-        assert!(first.eq(&Bed3::new(3, 20, 30)));
+        assert!(first.eq(&bed3![3, 20, 30]));
         assert!(last.is_none());
     }
 

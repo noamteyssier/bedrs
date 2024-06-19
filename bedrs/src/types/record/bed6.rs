@@ -1,4 +1,5 @@
 use crate::{
+    bed3, bed4,
     traits::{ChromBounds, MetaBounds, ValueBounds},
     types::Score,
     Bed12, Bed3, Bed4, BedGraph, Coordinates, Strand,
@@ -55,7 +56,7 @@ where
     N: MetaBounds,
 {
     fn from(bed: Bed6<C, N>) -> Self {
-        Self::new(bed.chr, bed.start, bed.end)
+        bed3![bed.chr, bed.start, bed.end]
     }
 }
 
@@ -65,7 +66,7 @@ where
     N: MetaBounds,
 {
     fn from(bed: Bed6<C, N>) -> Self {
-        Self::new(bed.chr, bed.start, bed.end, bed.name)
+        bed4![bed.chr, bed.start, bed.end, bed.name]
     }
 }
 
@@ -112,7 +113,7 @@ where
 #[cfg(test)]
 #[allow(clippy::float_cmp)]
 mod testing {
-    use crate::IntervalContainer;
+    use crate::{bed4, IntervalContainer};
 
     use super::*;
 
@@ -178,7 +179,7 @@ mod testing {
         assert_eq!(b.chr(), &1);
         assert_eq!(b.start(), 10);
         assert_eq!(b.end(), 20);
-        assert_eq!(b.name(), "name");
+        assert_eq!(b.metadata.name(), "name");
     }
 
     #[test]
@@ -201,7 +202,7 @@ mod testing {
 
     #[test]
     fn from_bed3() {
-        let a = Bed3::new(1, 10, 20);
+        let a = bed3![1, 10, 20];
         let b: Bed6<i32, String> = a.into();
         assert_eq!(b.chr(), &1);
         assert_eq!(b.start(), 10);
@@ -213,7 +214,7 @@ mod testing {
 
     #[test]
     fn from_bed4() {
-        let a = Bed4::new(1, 10, 20, "name".to_string());
+        let a = bed4![1, 10, 20, "name".to_string()];
         let b: Bed6<i32, String> = a.into();
         assert_eq!(b.chr(), &1);
         assert_eq!(b.start(), 10);

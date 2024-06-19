@@ -125,7 +125,7 @@ where
 #[cfg(test)]
 mod testing {
     use super::*;
-    use crate::{Bed3, Coordinates, Overlap};
+    use crate::{bed3, Bed3, Coordinates, Overlap};
 
     fn validate_segments(observed: &[Bed3<i32>], expected: &[Bed3<i32>]) {
         println!("Expected:");
@@ -156,11 +156,7 @@ mod testing {
 
     #[test]
     fn segment_unsorted_container() {
-        let intervals = vec![
-            Bed3::new(0, 10, 50),
-            Bed3::new(0, 30, 70),
-            Bed3::new(0, 20, 60),
-        ];
+        let intervals = vec![bed3![0, 10, 50], bed3![0, 30, 70], bed3![0, 20, 60]];
         let set = IntervalContainer::from_iter(intervals);
         let segments = set.segment();
         assert!(segments.is_err());
@@ -178,19 +174,15 @@ mod testing {
     /// (5)            l-n
     #[test]
     fn segment_container() {
-        let intervals = vec![
-            Bed3::new(0, 10, 50),
-            Bed3::new(0, 20, 60),
-            Bed3::new(0, 30, 70),
-        ];
+        let intervals = vec![bed3![0, 10, 50], bed3![0, 20, 60], bed3![0, 30, 70]];
         let set = IntervalContainer::from_sorted_unchecked(intervals);
         let segments = set.segment().unwrap();
         let expected = vec![
-            Bed3::new(0, 10, 20),
-            Bed3::new(0, 20, 30),
-            Bed3::new(0, 30, 50),
-            Bed3::new(0, 50, 60),
-            Bed3::new(0, 60, 70),
+            bed3![0, 10, 20],
+            bed3![0, 20, 30],
+            bed3![0, 30, 50],
+            bed3![0, 50, 60],
+            bed3![0, 60, 70],
         ];
         let observed = segments.records();
         validate_segments(observed, &expected);
@@ -214,23 +206,23 @@ mod testing {
     #[test]
     fn segment_container_clustered() {
         let intervals = vec![
-            Bed3::new(0, 10, 50),
-            Bed3::new(0, 20, 60),
-            Bed3::new(0, 30, 70),
-            Bed3::new(0, 80, 90),
-            Bed3::new(0, 85, 95),
+            bed3![0, 10, 50],
+            bed3![0, 20, 60],
+            bed3![0, 30, 70],
+            bed3![0, 80, 90],
+            bed3![0, 85, 95],
         ];
         let set = IntervalContainer::from_sorted_unchecked(intervals);
         let segments = set.segment().unwrap();
         let expected = vec![
-            Bed3::new(0, 10, 20),
-            Bed3::new(0, 20, 30),
-            Bed3::new(0, 30, 50),
-            Bed3::new(0, 50, 60),
-            Bed3::new(0, 60, 70),
-            Bed3::new(0, 80, 85),
-            Bed3::new(0, 85, 90),
-            Bed3::new(0, 90, 95),
+            bed3![0, 10, 20],
+            bed3![0, 20, 30],
+            bed3![0, 30, 50],
+            bed3![0, 50, 60],
+            bed3![0, 60, 70],
+            bed3![0, 80, 85],
+            bed3![0, 85, 90],
+            bed3![0, 90, 95],
         ];
         let observed = segments.records();
         validate_segments(observed, &expected);
@@ -256,25 +248,25 @@ mod testing {
     #[test]
     fn segment_container_clustered_with_single() {
         let intervals = vec![
-            Bed3::new(0, 10, 50),
-            Bed3::new(0, 20, 60),
-            Bed3::new(0, 30, 70),
-            Bed3::new(0, 80, 90),
-            Bed3::new(0, 85, 95),
-            Bed3::new(0, 100, 110),
+            bed3![0, 10, 50],
+            bed3![0, 20, 60],
+            bed3![0, 30, 70],
+            bed3![0, 80, 90],
+            bed3![0, 85, 95],
+            bed3![0, 100, 110],
         ];
         let set = IntervalContainer::from_sorted_unchecked(intervals);
         let segments = set.segment().unwrap();
         let expected = vec![
-            Bed3::new(0, 10, 20),
-            Bed3::new(0, 20, 30),
-            Bed3::new(0, 30, 50),
-            Bed3::new(0, 50, 60),
-            Bed3::new(0, 60, 70),
-            Bed3::new(0, 80, 85),
-            Bed3::new(0, 85, 90),
-            Bed3::new(0, 90, 95),
-            Bed3::new(0, 100, 110),
+            bed3![0, 10, 20],
+            bed3![0, 20, 30],
+            bed3![0, 30, 50],
+            bed3![0, 50, 60],
+            bed3![0, 60, 70],
+            bed3![0, 80, 85],
+            bed3![0, 85, 90],
+            bed3![0, 90, 95],
+            bed3![0, 100, 110],
         ];
         let observed = segments.records();
         validate_segments(observed, &expected);
@@ -292,19 +284,15 @@ mod testing {
     /// (5)             n---------j
     #[test]
     fn segment_container_spanned() {
-        let intervals = vec![
-            Bed3::new(0, 10, 500),
-            Bed3::new(0, 20, 60),
-            Bed3::new(0, 30, 70),
-        ];
+        let intervals = vec![bed3![0, 10, 500], bed3![0, 20, 60], bed3![0, 30, 70]];
         let set = IntervalContainer::from_sorted_unchecked(intervals);
         let segments = set.segment().unwrap();
         let expected = vec![
-            Bed3::new(0, 10, 20),
-            Bed3::new(0, 20, 30),
-            Bed3::new(0, 30, 60),
-            Bed3::new(0, 60, 70),
-            Bed3::new(0, 70, 500),
+            bed3![0, 10, 20],
+            bed3![0, 20, 30],
+            bed3![0, 30, 60],
+            bed3![0, 60, 70],
+            bed3![0, 70, 500],
         ];
         let observed = segments.records();
         validate_segments(observed, &expected);
@@ -322,19 +310,15 @@ mod testing {
     /// (5)             n--l
     #[test]
     fn segment_container_spanned_inner() {
-        let intervals = vec![
-            Bed3::new(0, 10, 50),
-            Bed3::new(0, 20, 500),
-            Bed3::new(0, 30, 70),
-        ];
+        let intervals = vec![bed3![0, 10, 50], bed3![0, 20, 500], bed3![0, 30, 70]];
         let set = IntervalContainer::from_sorted_unchecked(intervals);
         let segments = set.segment().unwrap();
         let expected = vec![
-            Bed3::new(0, 10, 20),
-            Bed3::new(0, 20, 30),
-            Bed3::new(0, 30, 50),
-            Bed3::new(0, 50, 70),
-            Bed3::new(0, 70, 500),
+            bed3![0, 10, 20],
+            bed3![0, 20, 30],
+            bed3![0, 30, 50],
+            bed3![0, 50, 70],
+            bed3![0, 70, 500],
         ];
         let observed = segments.records();
         validate_segments(observed, &expected);
@@ -359,23 +343,23 @@ mod testing {
     #[test]
     fn segment_container_duplicate_intervals() {
         let intervals = vec![
-            Bed3::new(0, 10, 50),
-            Bed3::new(0, 10, 50),
-            Bed3::new(0, 30, 70),
-            Bed3::new(0, 30, 70),
-            Bed3::new(0, 50, 90),
-            Bed3::new(0, 50, 90),
-            Bed3::new(0, 100, 120),
-            Bed3::new(0, 100, 120),
+            bed3![0, 10, 50],
+            bed3![0, 10, 50],
+            bed3![0, 30, 70],
+            bed3![0, 30, 70],
+            bed3![0, 50, 90],
+            bed3![0, 50, 90],
+            bed3![0, 100, 120],
+            bed3![0, 100, 120],
         ];
         let set = IntervalContainer::from_unsorted(intervals);
         let segments = set.segment().unwrap();
         let expected = vec![
-            Bed3::new(0, 10, 30),
-            Bed3::new(0, 30, 50),
-            Bed3::new(0, 50, 70),
-            Bed3::new(0, 70, 90),
-            Bed3::new(0, 100, 120),
+            bed3![0, 10, 30],
+            bed3![0, 30, 50],
+            bed3![0, 50, 70],
+            bed3![0, 70, 90],
+            bed3![0, 100, 120],
         ];
         let observed = segments.records();
         validate_segments(observed, &expected);
@@ -396,19 +380,19 @@ mod testing {
     #[test]
     fn segment_container_duplicate_start_sites() {
         let intervals = vec![
-            Bed3::new(0, 10, 50),
-            Bed3::new(0, 10, 70),
-            Bed3::new(0, 30, 90),
-            Bed3::new(0, 50, 110),
+            bed3![0, 10, 50],
+            bed3![0, 10, 70],
+            bed3![0, 30, 90],
+            bed3![0, 50, 110],
         ];
         let set = IntervalContainer::from_unsorted(intervals);
         let segments = set.segment().unwrap();
         let expected = vec![
-            Bed3::new(0, 10, 30),
-            Bed3::new(0, 30, 50),
-            Bed3::new(0, 50, 70),
-            Bed3::new(0, 70, 90),
-            Bed3::new(0, 90, 110),
+            bed3![0, 10, 30],
+            bed3![0, 30, 50],
+            bed3![0, 50, 70],
+            bed3![0, 70, 90],
+            bed3![0, 90, 110],
         ];
         let observed = segments.records();
         validate_segments(observed, &expected);
@@ -429,20 +413,20 @@ mod testing {
     #[test]
     fn segment_container_duplicate_end_sites() {
         let intervals = vec![
-            Bed3::new(0, 10, 50),
-            Bed3::new(0, 20, 60),
-            Bed3::new(0, 30, 60),
-            Bed3::new(0, 40, 110),
+            bed3![0, 10, 50],
+            bed3![0, 20, 60],
+            bed3![0, 30, 60],
+            bed3![0, 40, 110],
         ];
         let set = IntervalContainer::from_unsorted(intervals);
         let segments = set.segment().unwrap();
         let expected = vec![
-            Bed3::new(0, 10, 20),
-            Bed3::new(0, 20, 30),
-            Bed3::new(0, 30, 40),
-            Bed3::new(0, 40, 50),
-            Bed3::new(0, 50, 60),
-            Bed3::new(0, 60, 110),
+            bed3![0, 10, 20],
+            bed3![0, 20, 30],
+            bed3![0, 30, 40],
+            bed3![0, 40, 50],
+            bed3![0, 50, 60],
+            bed3![0, 60, 110],
         ];
         let observed = segments.records();
         validate_segments(observed, &expected);
@@ -460,19 +444,15 @@ mod testing {
     /// (5)                             o--j
     #[test]
     fn segment_container_spanned_internal_segments() {
-        let intervals = vec![
-            Bed3::new(0, 100, 200),
-            Bed3::new(0, 110, 150),
-            Bed3::new(0, 160, 180),
-        ];
+        let intervals = vec![bed3![0, 100, 200], bed3![0, 110, 150], bed3![0, 160, 180]];
         let set = IntervalContainer::from_unsorted(intervals);
         let segments = set.segment().unwrap();
         let expected = vec![
-            Bed3::new(0, 100, 110),
-            Bed3::new(0, 110, 150),
-            Bed3::new(0, 150, 160),
-            Bed3::new(0, 160, 180),
-            Bed3::new(0, 180, 200),
+            bed3![0, 100, 110],
+            bed3![0, 110, 150],
+            bed3![0, 150, 160],
+            bed3![0, 160, 180],
+            bed3![0, 180, 200],
         ];
         let observed = segments.records();
         validate_segments(observed, &expected);
@@ -493,20 +473,20 @@ mod testing {
     #[test]
     fn segment_container_spanned_internal_segments_with_clusters() {
         let intervals = vec![
-            Bed3::new(0, 100, 200),
-            Bed3::new(0, 110, 150),
-            Bed3::new(0, 160, 180),
-            Bed3::new(0, 250, 270),
+            bed3![0, 100, 200],
+            bed3![0, 110, 150],
+            bed3![0, 160, 180],
+            bed3![0, 250, 270],
         ];
         let set = IntervalContainer::from_unsorted(intervals);
         let segments = set.segment().unwrap();
         let expected = vec![
-            Bed3::new(0, 100, 110),
-            Bed3::new(0, 110, 150),
-            Bed3::new(0, 150, 160),
-            Bed3::new(0, 160, 180),
-            Bed3::new(0, 180, 200),
-            Bed3::new(0, 250, 270),
+            bed3![0, 100, 110],
+            bed3![0, 110, 150],
+            bed3![0, 150, 160],
+            bed3![0, 160, 180],
+            bed3![0, 180, 200],
+            bed3![0, 250, 270],
         ];
         let observed = segments.records();
         validate_segments(observed, &expected);

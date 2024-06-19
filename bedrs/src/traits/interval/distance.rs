@@ -60,8 +60,8 @@ use crate::{
 /// assert_eq!(a.distance(&b), Some(0));
 ///
 /// // Different Chromosomes
-/// let a = Bed3::new(1, 10, 20);
-/// let b = Bed3::new(2, 10, 20);
+/// let a = bed3![1, 10, 20];
+/// let b = bed3![2, 10, 20];
 /// assert_eq!(a.distance(&b), None);
 /// ```
 pub trait Distance<C>: Coordinates<C> + Overlap<C>
@@ -97,7 +97,7 @@ where
 #[cfg(test)]
 #[allow(clippy::doc_markdown)]
 mod testing {
-    use crate::{traits::interval::Distance, BaseInterval, Bed3};
+    use crate::{bed3, traits::interval::Distance, BaseInterval};
 
     #[test]
     ///    x-----y
@@ -149,8 +149,8 @@ mod testing {
     /// ===================
     /// distance = 1
     fn distance_e() {
-        let a = Bed3::new(1, 21, 30);
-        let b = Bed3::new(1, 10, 20);
+        let a = bed3![1, 21, 30];
+        let b = bed3![1, 10, 20];
         assert_eq!(a.distance(&b), Some(1));
     }
 
@@ -160,8 +160,8 @@ mod testing {
     /// ===================
     /// distance = None
     fn distance_f() {
-        let a = Bed3::new(2, 21, 30);
-        let b = Bed3::new(1, 10, 20);
+        let a = bed3![2, 21, 30];
+        let b = bed3![1, 10, 20];
         assert_eq!(a.distance(&b), None);
     }
 
@@ -171,8 +171,8 @@ mod testing {
     /// ===================
     /// distance = None
     fn distance_g() {
-        let a = Bed3::new(1, 10, 20);
-        let b = Bed3::new(2, 21, 30);
+        let a = bed3![1, 10, 20];
+        let b = bed3![2, 21, 30];
         assert_eq!(a.distance(&b), None);
     }
 
@@ -182,8 +182,8 @@ mod testing {
     /// ===================
     /// distance = None
     fn distance_h() {
-        let a = Bed3::new(2, 10, 20);
-        let b = Bed3::new(1, 21, 30);
+        let a = bed3![2, 10, 20];
+        let b = bed3![1, 21, 30];
         assert_eq!(a.distance(&b), None);
     }
 
@@ -193,8 +193,8 @@ mod testing {
     /// ===================
     /// distance = None
     fn distance_i() {
-        let a = Bed3::new(2, 21, 30);
-        let b = Bed3::new(1, 10, 20);
+        let a = bed3![2, 21, 30];
+        let b = bed3![1, 10, 20];
         assert_eq!(a.distance(&b), None);
     }
 
@@ -248,8 +248,8 @@ mod testing {
     /// ===================
     /// directed_distance = None
     fn directed_distance_e() {
-        let a = Bed3::new(2, 21, 30);
-        let b = Bed3::new(1, 10, 20);
+        let a = bed3![2, 21, 30];
+        let b = bed3![1, 10, 20];
         assert_eq!(a.directed_distance(&b), None);
     }
 
@@ -259,8 +259,8 @@ mod testing {
     /// ===================
     /// directed_distance = None
     fn directed_distance_f() {
-        let a = Bed3::new(1, 10, 20);
-        let b = Bed3::new(2, 21, 30);
+        let a = bed3![1, 10, 20];
+        let b = bed3![2, 21, 30];
         assert_eq!(a.directed_distance(&b), None);
     }
 
@@ -270,8 +270,8 @@ mod testing {
     /// ===================
     /// directed_distance = None
     fn directed_distance_g() {
-        let a = Bed3::new(2, 10, 20);
-        let b = Bed3::new(1, 21, 30);
+        let a = bed3![2, 10, 20];
+        let b = bed3![1, 21, 30];
         assert_eq!(a.directed_distance(&b), None);
     }
 
@@ -281,8 +281,8 @@ mod testing {
     /// ===================
     /// directed_distance = None
     fn directed_distance_h() {
-        let a = Bed3::new(2, 21, 30);
-        let b = Bed3::new(1, 10, 20);
+        let a = bed3![2, 21, 30];
+        let b = bed3![1, 10, 20];
         assert_eq!(a.directed_distance(&b), None);
     }
 }

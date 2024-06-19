@@ -213,7 +213,7 @@ where
 #[cfg(test)]
 mod testing {
     use super::Subtract;
-    use crate::{BaseInterval, Bed3, Coordinates};
+    use crate::{bed3, BaseInterval, Coordinates};
 
     #[test]
     ///      x-------y
@@ -235,8 +235,8 @@ mod testing {
     /// ==================
     ///         j----y
     fn subtraction_genomic_a() {
-        let a = Bed3::new(1, 20, 30);
-        let b = Bed3::new(1, 15, 25);
+        let a = bed3![1, 20, 30];
+        let b = bed3![1, 15, 25];
         let sub = a.subtract(&b).unwrap();
         assert_eq!(sub.len(), 1);
         assert_eq!(sub[0].start(), 25);
@@ -347,16 +347,16 @@ mod testing {
     /// ==================
     /// none
     fn subtraction_genomic_e() {
-        let a = Bed3::new(1, 10, 30);
-        let b = Bed3::new(1, 10, 30);
+        let a = bed3![1, 10, 30];
+        let b = bed3![1, 10, 30];
         let sub = a.subtract(&b);
         assert!(sub.is_none());
     }
 
     #[test]
     fn subtraction_genomic_e_iter() {
-        let a = Bed3::new(1, 10, 30);
-        let b = Bed3::new(1, 10, 30);
+        let a = bed3![1, 10, 30];
+        let b = bed3![1, 10, 30];
         let mut sub = a.subtract_iter(&b);
         assert!(sub.next().is_none());
     }
@@ -367,8 +367,8 @@ mod testing {
     /// ==================
     ///     x--y
     fn subtraction_genomic_e_wrong_chr() {
-        let a = Bed3::new(1, 10, 30);
-        let b = Bed3::new(2, 10, 30);
+        let a = bed3![1, 10, 30];
+        let b = bed3![2, 10, 30];
         let sub = a.subtract(&b).unwrap();
         assert_eq!(sub.len(), 1);
         assert_eq!(sub[0].start(), 10);
@@ -377,8 +377,8 @@ mod testing {
 
     #[test]
     fn subtraction_genomic_e_wrong_chr_iter() {
-        let a = Bed3::new(1, 10, 30);
-        let b = Bed3::new(2, 10, 30);
+        let a = bed3![1, 10, 30];
+        let b = bed3![2, 10, 30];
         let mut sub = a.subtract_iter(&b);
         let first = sub.next().unwrap();
         assert_eq!(first.start(), 10);

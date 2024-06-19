@@ -66,7 +66,7 @@ where
 #[allow(clippy::many_single_char_names)]
 mod testing {
     use super::Intersect;
-    use crate::{BaseInterval, Bed3, Coordinates, Strand, StrandedBed3};
+    use crate::{bed3, BaseInterval, Coordinates, Strand, StrandedBed3};
 
     #[test]
     ///       x-------y
@@ -83,9 +83,9 @@ mod testing {
 
     #[test]
     fn intersection_case_a_genomic() {
-        let a = Bed3::new(1, 20, 30);
-        let b = Bed3::new(1, 15, 25);
-        let c = Bed3::new(2, 15, 25);
+        let a = bed3![1, 20, 30];
+        let b = bed3![1, 15, 25];
+        let c = bed3![2, 15, 25];
         let ix = a.intersect(&b).unwrap();
         assert_eq!(ix.start(), 20);
         assert_eq!(ix.end(), 25);
@@ -123,9 +123,9 @@ mod testing {
 
     #[test]
     fn intersection_case_b_genomic() {
-        let a = Bed3::new(1, 20, 30);
-        let b = Bed3::new(1, 25, 35);
-        let c = Bed3::new(2, 25, 35);
+        let a = bed3![1, 20, 30];
+        let b = bed3![1, 25, 35];
+        let c = bed3![2, 25, 35];
         let ix = a.intersect(&b).unwrap();
         assert_eq!(ix.start(), 25);
         assert_eq!(ix.end(), 30);
@@ -163,9 +163,9 @@ mod testing {
 
     #[test]
     fn intersection_case_c_genomic() {
-        let a = Bed3::new(1, 20, 40);
-        let b = Bed3::new(1, 25, 35);
-        let c = Bed3::new(2, 25, 35);
+        let a = bed3![1, 20, 40];
+        let b = bed3![1, 25, 35];
+        let c = bed3![2, 25, 35];
         let ix = a.intersect(&b).unwrap();
         assert_eq!(ix.start(), 25);
         assert_eq!(ix.end(), 35);
@@ -203,9 +203,9 @@ mod testing {
 
     #[test]
     fn intersection_case_d_genomic() {
-        let a = Bed3::new(1, 25, 35);
-        let b = Bed3::new(1, 20, 40);
-        let c = Bed3::new(2, 20, 40);
+        let a = bed3![1, 25, 35];
+        let b = bed3![1, 20, 40];
+        let c = bed3![2, 20, 40];
         let ix = a.intersect(&b).unwrap();
         assert_eq!(ix.start(), 25);
         assert_eq!(ix.end(), 35);
@@ -243,9 +243,9 @@ mod testing {
 
     #[test]
     fn intersection_case_e_genomic() {
-        let a = Bed3::new(1, 20, 40);
-        let b = Bed3::new(1, 20, 40);
-        let c = Bed3::new(2, 20, 40);
+        let a = bed3![1, 20, 40];
+        let b = bed3![1, 20, 40];
+        let c = bed3![2, 20, 40];
         let ix = a.intersect(&b).unwrap();
         assert_eq!(ix.start(), 20);
         assert_eq!(ix.end(), 40);
@@ -282,9 +282,9 @@ mod testing {
 
     #[test]
     fn intersection_case_none_genomic() {
-        let a = Bed3::new(1, 10, 15);
-        let b = Bed3::new(1, 20, 25);
-        let c = Bed3::new(2, 20, 25);
+        let a = bed3![1, 10, 15];
+        let b = bed3![1, 20, 25];
+        let c = bed3![2, 20, 25];
         assert!(a.intersect(&b).is_none());
         assert!(a.intersect(&c).is_none());
     }

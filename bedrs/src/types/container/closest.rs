@@ -216,18 +216,14 @@ where
 #[cfg(test)]
 mod testing {
     use crate::{
-        types::StrandMethod, BaseInterval, Bed3, Coordinates, IntervalContainer, Strand,
+        bed3, types::StrandMethod, BaseInterval, Bed3, Coordinates, IntervalContainer, Strand,
         StrandedBed3,
     };
 
     #[test]
     fn closest_unsorted() {
-        let intervals = vec![
-            Bed3::new(1, 10, 20),
-            Bed3::new(1, 30, 40),
-            Bed3::new(1, 50, 60),
-        ];
-        let query = Bed3::new(1, 22, 23);
+        let intervals = vec![bed3![1, 10, 20], bed3![1, 30, 40], bed3![1, 50, 60]];
+        let query = bed3![1, 22, 23];
         let set = IntervalContainer::new(intervals);
         assert!(set.closest(&query, StrandMethod::Ignore).is_err());
         assert!(set.closest_upstream(&query, StrandMethod::Ignore).is_err());
@@ -239,7 +235,7 @@ mod testing {
     #[test]
     fn closest_empty() {
         let intervals: Vec<Bed3<i32>> = vec![];
-        let query = Bed3::new(1, 22, 23);
+        let query = bed3![1, 22, 23];
         let set = IntervalContainer::from_unsorted(intervals);
         assert!(set.closest(&query, StrandMethod::Ignore).is_err());
         assert!(set.closest_upstream(&query, StrandMethod::Ignore).is_err());
@@ -254,15 +250,11 @@ mod testing {
     /// =====================================
     ///    x-----y
     fn closest_a() {
-        let intervals = vec![
-            Bed3::new(1, 10, 20),
-            Bed3::new(1, 30, 40),
-            Bed3::new(1, 50, 60),
-        ];
-        let query = Bed3::new(1, 22, 23);
+        let intervals = vec![bed3![1, 10, 20], bed3![1, 30, 40], bed3![1, 50, 60]];
+        let query = bed3![1, 22, 23];
         let set = IntervalContainer::from_unsorted(intervals);
         let closest = set.closest(&query, StrandMethod::Ignore).unwrap().unwrap();
-        assert!(closest.eq(&Bed3::new(1, 10, 20)));
+        assert!(closest.eq(&bed3![1, 10, 20]));
     }
 
     #[test]
@@ -271,15 +263,11 @@ mod testing {
     /// =====================================
     ///                 x-----y
     fn closest_b() {
-        let intervals = vec![
-            Bed3::new(1, 10, 20),
-            Bed3::new(1, 30, 40),
-            Bed3::new(1, 50, 60),
-        ];
-        let query = Bed3::new(1, 22, 32);
+        let intervals = vec![bed3![1, 10, 20], bed3![1, 30, 40], bed3![1, 50, 60]];
+        let query = bed3![1, 22, 32];
         let set = IntervalContainer::from_unsorted(intervals);
         let closest = set.closest(&query, StrandMethod::Ignore).unwrap().unwrap();
-        assert!(closest.eq(&Bed3::new(1, 30, 40)));
+        assert!(closest.eq(&bed3![1, 30, 40]));
     }
 
     #[test]
@@ -288,15 +276,11 @@ mod testing {
     /// =====================================
     ///                 x-----y
     fn closest_c() {
-        let intervals = vec![
-            Bed3::new(1, 10, 20),
-            Bed3::new(1, 30, 40),
-            Bed3::new(1, 50, 60),
-        ];
-        let query = Bed3::new(1, 22, 30);
+        let intervals = vec![bed3![1, 10, 20], bed3![1, 30, 40], bed3![1, 50, 60]];
+        let query = bed3![1, 22, 30];
         let set = IntervalContainer::from_unsorted(intervals);
         let closest = set.closest(&query, StrandMethod::Ignore).unwrap().unwrap();
-        assert!(closest.eq(&Bed3::new(1, 30, 40)));
+        assert!(closest.eq(&bed3![1, 30, 40]));
     }
 
     #[test]
@@ -305,15 +289,11 @@ mod testing {
     /// =================================================
     ///                                      x-------y
     fn closest_d() {
-        let intervals = vec![
-            Bed3::new(1, 10, 20),
-            Bed3::new(2, 30, 40),
-            Bed3::new(2, 50, 60),
-        ];
-        let query = Bed3::new(2, 46, 47);
+        let intervals = vec![bed3![1, 10, 20], bed3![2, 30, 40], bed3![2, 50, 60]];
+        let query = bed3![2, 46, 47];
         let set = IntervalContainer::from_unsorted(intervals);
         let closest = set.closest(&query, StrandMethod::Ignore).unwrap().unwrap();
-        assert!(closest.eq(&Bed3::new(2, 50, 60)));
+        assert!(closest.eq(&bed3![2, 50, 60]));
     }
 
     #[test]
@@ -322,8 +302,8 @@ mod testing {
     /// ========================================
     /// None
     fn closest_e() {
-        let intervals = vec![Bed3::new(1, 10, 20), Bed3::new(1, 30, 40)];
-        let query = Bed3::new(2, 46, 47);
+        let intervals = vec![bed3![1, 10, 20], bed3![1, 30, 40]];
+        let query = bed3![2, 46, 47];
         let set = IntervalContainer::from_unsorted(intervals);
         let closest = set.closest(&query, StrandMethod::Ignore).unwrap();
         assert!(closest.is_none());
@@ -335,11 +315,11 @@ mod testing {
     /// ========================================
     ///       x-----y
     fn closest_f() {
-        let intervals = vec![Bed3::new(1, 10, 20), Bed3::new(1, 30, 40)];
-        let query = Bed3::new(1, 24, 26);
+        let intervals = vec![bed3![1, 10, 20], bed3![1, 30, 40]];
+        let query = bed3![1, 24, 26];
         let set = IntervalContainer::from_unsorted(intervals);
         let closest = set.closest(&query, StrandMethod::Ignore).unwrap().unwrap();
-        assert!(closest.eq(&Bed3::new(1, 10, 20)));
+        assert!(closest.eq(&bed3![1, 10, 20]));
     }
 
     #[test]
@@ -348,11 +328,10 @@ mod testing {
     /// ========================================
     ///           x-----y
     fn closest_g() {
-        let set =
-            IntervalContainer::from_unsorted(vec![Bed3::new(1, 20, 30), Bed3::new(1, 40, 50)]);
-        let query = Bed3::new(1, 10, 15);
+        let set = IntervalContainer::from_unsorted(vec![bed3![1, 20, 30], bed3![1, 40, 50]]);
+        let query = bed3![1, 10, 15];
         let closest = set.closest(&query, StrandMethod::Ignore).unwrap().unwrap();
-        assert!(closest.eq(&Bed3::new(1, 20, 30)));
+        assert!(closest.eq(&bed3![1, 20, 30]));
     }
 
     #[test]
@@ -368,20 +347,20 @@ mod testing {
     /// 5       521     671
     fn closest_h() {
         let set = IntervalContainer::from_unsorted(vec![
-            Bed3::new(1, 715, 865),
-            Bed3::new(2, 197, 347),
-            Bed3::new(3, 623, 773),
-            Bed3::new(4, 77, 227),
-            Bed3::new(4, 418, 568),
-            Bed3::new(5, 2, 152),
-            Bed3::new(5, 275, 425),
-            Bed3::new(5, 334, 484),
-            Bed3::new(5, 501, 651),
-            Bed3::new(5, 521, 671),
+            bed3![1, 715, 865],
+            bed3![2, 197, 347],
+            bed3![3, 623, 773],
+            bed3![4, 77, 227],
+            bed3![4, 418, 568],
+            bed3![5, 2, 152],
+            bed3![5, 275, 425],
+            bed3![5, 334, 484],
+            bed3![5, 501, 651],
+            bed3![5, 521, 671],
         ]);
-        let query = Bed3::new(1, 72, 222);
+        let query = bed3![1, 72, 222];
         let closest = set.closest(&query, StrandMethod::Ignore).unwrap().unwrap();
-        assert!(closest.eq(&Bed3::new(1, 715, 865)));
+        assert!(closest.eq(&bed3![1, 715, 865]));
     }
 
     #[test]
@@ -422,18 +401,14 @@ mod testing {
     /// =====================================
     ///    x-----y
     fn closest_upstream_a() {
-        let intervals = vec![
-            Bed3::new(1, 10, 20),
-            Bed3::new(1, 30, 40),
-            Bed3::new(1, 50, 60),
-        ];
-        let query = Bed3::new(1, 22, 32);
+        let intervals = vec![bed3![1, 10, 20], bed3![1, 30, 40], bed3![1, 50, 60]];
+        let query = bed3![1, 22, 32];
         let set = IntervalContainer::from_unsorted(intervals);
         let closest = set
             .closest_upstream(&query, StrandMethod::Ignore)
             .unwrap()
             .unwrap();
-        assert!(closest.eq(&Bed3::new(1, 10, 20)));
+        assert!(closest.eq(&bed3![1, 10, 20]));
     }
 
     #[test]
@@ -442,18 +417,14 @@ mod testing {
     /// =====================================
     ///                    x-----y
     fn closest_upstream_b() {
-        let intervals = vec![
-            Bed3::new(1, 10, 20),
-            Bed3::new(2, 30, 40),
-            Bed3::new(2, 50, 60),
-        ];
-        let query = Bed3::new(2, 32, 55);
+        let intervals = vec![bed3![1, 10, 20], bed3![2, 30, 40], bed3![2, 50, 60]];
+        let query = bed3![2, 32, 55];
         let set = IntervalContainer::from_unsorted(intervals);
         let closest = set
             .closest_upstream(&query, StrandMethod::Ignore)
             .unwrap()
             .unwrap();
-        assert!(closest.eq(&Bed3::new(2, 30, 40)));
+        assert!(closest.eq(&bed3![2, 30, 40]));
     }
 
     #[test]
@@ -463,18 +434,18 @@ mod testing {
     ///                          x-----y
     fn closest_upstream_c() {
         let intervals = vec![
-            Bed3::new(1, 10, 20),
-            Bed3::new(2, 10, 20),
-            Bed3::new(2, 30, 40),
-            Bed3::new(2, 50, 60),
+            bed3![1, 10, 20],
+            bed3![2, 10, 20],
+            bed3![2, 30, 40],
+            bed3![2, 50, 60],
         ];
-        let query = Bed3::new(2, 32, 55);
+        let query = bed3![2, 32, 55];
         let set = IntervalContainer::from_unsorted(intervals);
         let closest = set
             .closest_upstream(&query, StrandMethod::Ignore)
             .unwrap()
             .unwrap();
-        assert!(closest.eq(&Bed3::new(2, 30, 40)));
+        assert!(closest.eq(&bed3![2, 30, 40]));
     }
 
     #[test]
@@ -521,18 +492,14 @@ mod testing {
     /// =====================================
     ///                 x-----y
     fn closest_downstream_a() {
-        let intervals = vec![
-            Bed3::new(1, 10, 20),
-            Bed3::new(1, 30, 40),
-            Bed3::new(1, 50, 60),
-        ];
-        let query = Bed3::new(1, 22, 32);
+        let intervals = vec![bed3![1, 10, 20], bed3![1, 30, 40], bed3![1, 50, 60]];
+        let query = bed3![1, 22, 32];
         let set = IntervalContainer::from_unsorted(intervals);
         let closest = set
             .closest_downstream(&query, StrandMethod::Ignore)
             .unwrap()
             .unwrap();
-        assert!(closest.eq(&Bed3::new(1, 30, 40)));
+        assert!(closest.eq(&bed3![1, 30, 40]));
     }
 
     #[test]
@@ -541,18 +508,14 @@ mod testing {
     /// =====================================
     ///                              x-------y
     fn closest_downstream_b() {
-        let intervals = vec![
-            Bed3::new(1, 10, 20),
-            Bed3::new(2, 30, 40),
-            Bed3::new(2, 50, 60),
-        ];
-        let query = Bed3::new(2, 32, 55);
+        let intervals = vec![bed3![1, 10, 20], bed3![2, 30, 40], bed3![2, 50, 60]];
+        let query = bed3![2, 32, 55];
         let set = IntervalContainer::from_unsorted(intervals);
         let closest = set
             .closest_downstream(&query, StrandMethod::Ignore)
             .unwrap()
             .unwrap();
-        assert!(closest.eq(&Bed3::new(2, 50, 60)));
+        assert!(closest.eq(&bed3![2, 50, 60]));
     }
 
     #[test]
@@ -562,34 +525,34 @@ mod testing {
     ///                              x-------y
     fn closest_downstream_c() {
         let intervals = vec![
-            Bed3::new(1, 10, 20),
-            Bed3::new(2, 30, 40),
-            Bed3::new(2, 50, 60),
-            Bed3::new(2, 70, 80),
+            bed3![1, 10, 20],
+            bed3![2, 30, 40],
+            bed3![2, 50, 60],
+            bed3![2, 70, 80],
         ];
-        let query = Bed3::new(2, 32, 55);
+        let query = bed3![2, 32, 55];
         let set = IntervalContainer::from_unsorted(intervals);
         let closest = set
             .closest_downstream(&query, StrandMethod::Ignore)
             .unwrap()
             .unwrap();
-        assert!(closest.eq(&Bed3::new(2, 50, 60)));
+        assert!(closest.eq(&bed3![2, 50, 60]));
     }
 
     #[test]
     fn closest_downstream_d() {
         let intervals = vec![
-            Bed3::new(1, 70, 220), // <- min
-            Bed3::new(1, 142, 292),
-            Bed3::new(1, 154, 304),
+            bed3![1, 70, 220], // <- min
+            bed3![1, 142, 292],
+            bed3![1, 154, 304],
         ];
-        let query = Bed3::new(1, 21, 71);
+        let query = bed3![1, 21, 71];
         let set = IntervalContainer::from_unsorted(intervals);
         let closest = set
             .closest_downstream(&query, StrandMethod::Ignore)
             .unwrap()
             .unwrap();
-        assert!(closest.eq(&Bed3::new(1, 70, 220)));
+        assert!(closest.eq(&bed3![1, 70, 220]));
     }
 
     #[test]
@@ -617,15 +580,15 @@ mod testing {
             .iter()
             .zip(starts.iter())
             .zip(ends.iter())
-            .map(|((c, s), e)| Bed3::new(*c, *s, *e))
+            .map(|((c, s), e)| bed3![*c, *s, *e])
             .collect::<Vec<_>>();
         let intervals = IntervalContainer::from_unsorted(records);
-        let query = Bed3::new(1, 12, 15);
+        let query = bed3![1, 12, 15];
         let closest = intervals
             .closest_downstream(&query, StrandMethod::Ignore)
             .unwrap()
             .unwrap();
-        assert!(closest.eq(&Bed3::new(1, 13, 23)));
+        assert!(closest.eq(&bed3![1, 13, 23]));
     }
 
     #[test]
@@ -637,15 +600,15 @@ mod testing {
             .iter()
             .zip(starts.iter())
             .zip(ends.iter())
-            .map(|((c, s), e)| Bed3::new(*c, *s, *e))
+            .map(|((c, s), e)| bed3![*c, *s, *e])
             .collect::<Vec<_>>();
         let intervals = IntervalContainer::from_unsorted(records);
-        let query = Bed3::new(0, 12, 15);
+        let query = bed3![0, 12, 15];
         let closest = intervals
             .closest_downstream(&query, StrandMethod::Ignore)
             .unwrap()
             .unwrap();
-        assert!(closest.eq(&Bed3::new(0, 12, 22)));
+        assert!(closest.eq(&bed3![0, 12, 22]));
     }
 
     #[test]

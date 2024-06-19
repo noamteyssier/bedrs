@@ -159,9 +159,10 @@ where
 mod testing {
     use super::IntersectIter;
     use crate::{
+        bed3,
         traits::{ChromBounds, IntervalBounds},
         types::{Query, QueryMethod, StrandMethod},
-        BaseInterval, Bed3,
+        BaseInterval,
     };
 
     fn validate_records<I, C>(obs: &[I], exp: &[I])
@@ -370,17 +371,9 @@ mod testing {
     ///   ==================================
     ///        i---j        i-j
     fn intersections_genomic_a() {
-        let intervals_a = vec![
-            Bed3::new(1, 100, 300),
-            Bed3::new(1, 400, 475),
-            Bed3::new(1, 500, 550),
-        ];
-        let intervals_b = vec![
-            Bed3::new(1, 120, 160),
-            Bed3::new(1, 460, 470),
-            Bed3::new(1, 490, 500),
-        ];
-        let expected = vec![Bed3::new(1, 120, 160), Bed3::new(1, 460, 470)];
+        let intervals_a = vec![bed3![1, 100, 300], bed3![1, 400, 475], bed3![1, 500, 550]];
+        let intervals_b = vec![bed3![1, 120, 160], bed3![1, 460, 470], bed3![1, 490, 500]];
+        let expected = vec![bed3![1, 120, 160], bed3![1, 460, 470]];
 
         let iter_a = intervals_a.into_iter();
         let iter_b = intervals_b.into_iter();
@@ -395,17 +388,9 @@ mod testing {
     ///   ==================================
     ///        i---j    
     fn intersections_genomic_b() {
-        let intervals_a = vec![
-            Bed3::new(1, 100, 300),
-            Bed3::new(2, 400, 475),
-            Bed3::new(2, 500, 550),
-        ];
-        let intervals_b = vec![
-            Bed3::new(1, 120, 160),
-            Bed3::new(1, 460, 470),
-            Bed3::new(1, 490, 500),
-        ];
-        let expected = vec![Bed3::new(1, 120, 160)];
+        let intervals_a = vec![bed3![1, 100, 300], bed3![2, 400, 475], bed3![2, 500, 550]];
+        let intervals_b = vec![bed3![1, 120, 160], bed3![1, 460, 470], bed3![1, 490, 500]];
+        let expected = vec![bed3![1, 120, 160]];
 
         let iter_a = intervals_a.into_iter();
         let iter_b = intervals_b.into_iter();
@@ -420,13 +405,9 @@ mod testing {
     ///   =========================================
     ///                           i-j       i-j
     fn intersections_genomic_c() {
-        let intervals_a = vec![Bed3::new(2, 400, 475), Bed3::new(2, 500, 550)];
-        let intervals_b = vec![
-            Bed3::new(1, 120, 160),
-            Bed3::new(2, 460, 470),
-            Bed3::new(2, 510, 520),
-        ];
-        let expected = vec![Bed3::new(2, 460, 470), Bed3::new(2, 510, 520)];
+        let intervals_a = vec![bed3![2, 400, 475], bed3![2, 500, 550]];
+        let intervals_b = vec![bed3![1, 120, 160], bed3![2, 460, 470], bed3![2, 510, 520]];
+        let expected = vec![bed3![2, 460, 470], bed3![2, 510, 520]];
 
         let iter_a = intervals_a.into_iter();
         let iter_b = intervals_b.into_iter();
@@ -441,13 +422,9 @@ mod testing {
     ///   =========================================
     ///                           i-j       i-j
     fn intersections_genomic_d() {
-        let intervals_a = vec![
-            Bed3::new(1, 120, 160),
-            Bed3::new(2, 400, 475),
-            Bed3::new(2, 500, 550),
-        ];
-        let intervals_b = vec![Bed3::new(2, 460, 470), Bed3::new(2, 510, 520)];
-        let expected = vec![Bed3::new(2, 460, 470), Bed3::new(2, 510, 520)];
+        let intervals_a = vec![bed3![1, 120, 160], bed3![2, 400, 475], bed3![2, 500, 550]];
+        let intervals_b = vec![bed3![2, 460, 470], bed3![2, 510, 520]];
+        let expected = vec![bed3![2, 460, 470], bed3![2, 510, 520]];
 
         let iter_a = intervals_a.into_iter();
         let iter_b = intervals_b.into_iter();

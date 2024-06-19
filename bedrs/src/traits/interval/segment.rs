@@ -147,7 +147,7 @@ where
 mod testing {
 
     use super::*;
-    use crate::Bed3;
+    use crate::{bed3, Bed3};
 
     fn validate_segments(observed: &[Bed3<i32>], expected: &[Bed3<i32>]) {
         assert_eq!(observed.len(), expected.len());
@@ -175,9 +175,9 @@ mod testing {
     /// 2:                  w--------z
     #[test]
     fn non_overlapping() {
-        let iv1 = Bed3::new(1, 20, 30);
-        let iv2 = Bed3::new(1, 40, 50);
-        let expected = vec![Bed3::new(1, 20, 30), Bed3::new(1, 40, 50)];
+        let iv1 = bed3![1, 20, 30];
+        let iv2 = bed3![1, 40, 50];
+        let expected = vec![bed3![1, 20, 30], bed3![1, 40, 50]];
         let observed = iv1.segment(&iv2);
         validate_segments(&observed, &expected);
     }
@@ -188,9 +188,9 @@ mod testing {
     /// 1:    x--------y
     #[test]
     fn segments_equal() {
-        let iv1 = Bed3::new(1, 20, 30);
-        let iv2 = Bed3::new(1, 20, 30);
-        let expected = vec![Bed3::new(1, 20, 30)];
+        let iv1 = bed3![1, 20, 30];
+        let iv2 = bed3![1, 20, 30];
+        let expected = vec![bed3![1, 20, 30]];
         let observed = iv1.segment(&iv2);
         validate_segments(&observed, &expected);
     }
@@ -203,13 +203,9 @@ mod testing {
     /// 3:             z---y
     #[test]
     fn segments_overlap_left() {
-        let iv1 = Bed3::new(1, 25, 35);
-        let iv2 = Bed3::new(1, 20, 30);
-        let expected = vec![
-            Bed3::new(1, 20, 25),
-            Bed3::new(1, 25, 30),
-            Bed3::new(1, 30, 35),
-        ];
+        let iv1 = bed3![1, 25, 35];
+        let iv2 = bed3![1, 20, 30];
+        let expected = vec![bed3![1, 20, 25], bed3![1, 25, 30], bed3![1, 30, 35]];
         let observed = iv1.segment(&iv2);
         validate_segments(&observed, &expected);
     }
@@ -222,13 +218,9 @@ mod testing {
     /// 3:             y---z
     #[test]
     fn segments_overlap_right() {
-        let iv1 = Bed3::new(1, 20, 30);
-        let iv2 = Bed3::new(1, 25, 35);
-        let expected = vec![
-            Bed3::new(1, 20, 25),
-            Bed3::new(1, 25, 30),
-            Bed3::new(1, 30, 35),
-        ];
+        let iv1 = bed3![1, 20, 30];
+        let iv2 = bed3![1, 25, 35];
+        let expected = vec![bed3![1, 20, 25], bed3![1, 25, 30], bed3![1, 30, 35]];
         let observed = iv1.segment(&iv2);
         validate_segments(&observed, &expected);
     }
@@ -241,13 +233,9 @@ mod testing {
     /// 3:           z-y
     #[test]
     fn segments_internal_containment() {
-        let iv1 = Bed3::new(1, 20, 40);
-        let iv2 = Bed3::new(1, 25, 35);
-        let expected = vec![
-            Bed3::new(1, 20, 25),
-            Bed3::new(1, 25, 35),
-            Bed3::new(1, 35, 40),
-        ];
+        let iv1 = bed3![1, 20, 40];
+        let iv2 = bed3![1, 25, 35];
+        let expected = vec![bed3![1, 20, 25], bed3![1, 25, 35], bed3![1, 35, 40]];
         let observed = iv1.segment(&iv2);
         validate_segments(&observed, &expected);
     }
@@ -259,9 +247,9 @@ mod testing {
     /// 2:         z---y
     #[test]
     fn segments_internal_starts() {
-        let iv1 = Bed3::new(1, 20, 40);
-        let iv2 = Bed3::new(1, 20, 30);
-        let expected = vec![Bed3::new(1, 20, 30), Bed3::new(1, 30, 40)];
+        let iv1 = bed3![1, 20, 40];
+        let iv2 = bed3![1, 20, 30];
+        let expected = vec![bed3![1, 20, 30], bed3![1, 30, 40]];
         let observed = iv1.segment(&iv2);
         validate_segments(&observed, &expected);
     }
@@ -273,9 +261,9 @@ mod testing {
     /// 2:        w----y
     #[test]
     fn segments_internal_ends() {
-        let iv1 = Bed3::new(1, 20, 40);
-        let iv2 = Bed3::new(1, 30, 40);
-        let expected = vec![Bed3::new(1, 20, 30), Bed3::new(1, 30, 40)];
+        let iv1 = bed3![1, 20, 40];
+        let iv2 = bed3![1, 30, 40];
+        let expected = vec![bed3![1, 20, 30], bed3![1, 30, 40]];
         let observed = iv1.segment(&iv2);
         validate_segments(&observed, &expected);
     }
@@ -288,13 +276,9 @@ mod testing {
     /// 3:           z-y
     #[test]
     fn segments_external_containment() {
-        let iv1 = Bed3::new(1, 25, 35);
-        let iv2 = Bed3::new(1, 20, 40);
-        let expected = vec![
-            Bed3::new(1, 20, 25),
-            Bed3::new(1, 25, 35),
-            Bed3::new(1, 35, 40),
-        ];
+        let iv1 = bed3![1, 25, 35];
+        let iv2 = bed3![1, 20, 40];
+        let expected = vec![bed3![1, 20, 25], bed3![1, 25, 35], bed3![1, 35, 40]];
         let observed = iv1.segment(&iv2);
         validate_segments(&observed, &expected);
     }
@@ -306,9 +290,9 @@ mod testing {
     /// 2:         z---y
     #[test]
     fn segments_external_starts() {
-        let iv1 = Bed3::new(1, 20, 30);
-        let iv2 = Bed3::new(1, 20, 40);
-        let expected = vec![Bed3::new(1, 20, 30), Bed3::new(1, 30, 40)];
+        let iv1 = bed3![1, 20, 30];
+        let iv2 = bed3![1, 20, 40];
+        let expected = vec![bed3![1, 20, 30], bed3![1, 30, 40]];
         let observed = iv1.segment(&iv2);
         validate_segments(&observed, &expected);
     }
@@ -320,9 +304,9 @@ mod testing {
     /// 2:        w----y
     #[test]
     fn segments_external_ends() {
-        let iv1 = Bed3::new(1, 30, 40);
-        let iv2 = Bed3::new(1, 20, 40);
-        let expected = vec![Bed3::new(1, 20, 30), Bed3::new(1, 30, 40)];
+        let iv1 = bed3![1, 30, 40];
+        let iv2 = bed3![1, 20, 40];
+        let expected = vec![bed3![1, 20, 30], bed3![1, 30, 40]];
         let observed = iv1.segment(&iv2);
         validate_segments(&observed, &expected);
     }

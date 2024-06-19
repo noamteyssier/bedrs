@@ -1,4 +1,5 @@
 use crate::{
+    bed3, bed4,
     traits::{ChromBounds, MetaBounds, ValueBounds},
     types::Score,
     Bed3, Bed4, Bed6, BedGraph, Coordinates, Strand,
@@ -85,7 +86,7 @@ where
     St: MetaBounds,
 {
     fn from(bed: Bed12<C, N, Ts, Te, R, T, Si, St>) -> Self {
-        Bed3::new(bed.chr, bed.start, bed.end)
+        bed3![bed.chr, bed.start, bed.end]
     }
 }
 
@@ -101,7 +102,7 @@ where
     St: MetaBounds,
 {
     fn from(bed: Bed12<C, N, Ts, Te, R, T, Si, St>) -> Self {
-        Bed4::new(bed.chr, bed.start, bed.end, bed.name)
+        bed4![bed.chr, bed.start, bed.end, bed.name]
     }
 }
 
@@ -141,6 +142,8 @@ where
 #[cfg(test)]
 #[allow(clippy::float_cmp)]
 mod testing {
+    use crate::{bed3, bed4};
+
     use super::*;
 
     #[test]
@@ -429,7 +432,7 @@ mod testing {
         assert_eq!(b.chr(), "chr1");
         assert_eq!(b.start(), 10);
         assert_eq!(b.end(), 20);
-        assert_eq!(b.name(), "name");
+        assert_eq!(b.metadata.name(), "name");
     }
 
     #[test]
@@ -459,7 +462,7 @@ mod testing {
 
     #[test]
     fn from_bed3() {
-        let a = Bed3::new("chr1".to_string(), 10, 20);
+        let a = bed3!["chr1".to_string(), 10, 20];
         let b: Bed12<String, String, i32, i32, String, i32, Vec<i32>, Vec<i32>> = a.into();
         assert_eq!(b.chr(), "chr1");
         assert_eq!(b.start(), 10);
@@ -477,7 +480,7 @@ mod testing {
 
     #[test]
     fn from_bed4() {
-        let a = Bed4::new("chr1".to_string(), 10, 20, "name".to_string());
+        let a = bed4!["chr1".to_string(), 10, 20, "name".to_string()];
         let b: Bed12<String, String, i32, i32, String, i32, Vec<i32>, Vec<i32>> = a.into();
         assert_eq!(b.chr(), "chr1");
         assert_eq!(b.start(), 10);

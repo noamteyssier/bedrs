@@ -46,16 +46,16 @@ where
     /// use bedrs::{Bed3, IntervalContainer};
     ///
     /// let records = vec![
-    ///     Bed3::new(1, 10, 20),
-    ///     Bed3::new(2, 10, 20),
-    ///     Bed3::new(3, 10, 20), // <- min
-    ///     Bed3::new(3, 20, 20),
-    ///     Bed3::new(3, 30, 20),
-    ///     Bed3::new(4, 10, 20),
+    ///     bed3![1, 10, 20],
+    ///     bed3![2, 10, 20],
+    ///     bed3![3, 10, 20], // <- min
+    ///     bed3![3, 20, 20],
+    ///     bed3![3, 30, 20],
+    ///     bed3![4, 10, 20],
     /// ];
     /// let mut set = IntervalContainer::new(records);
     /// set.sort();
-    /// let query = Bed3::new(3, 10, 20);
+    /// let query = bed3![3, 10, 20];
     /// let bound = set.lower_bound(&query);
     /// assert_eq!(bound, Ok(2));
     /// ```
@@ -106,15 +106,15 @@ where
     /// use bedrs::{Bed3, IntervalContainer};
     ///
     /// let records = vec![
-    ///     Bed3::new(1, 10, 20),
-    ///     Bed3::new(2, 10, 20),
-    ///     Bed3::new(3, 10, 20), // <- min
-    ///     Bed3::new(3, 20, 20),
-    ///     Bed3::new(3, 30, 20),
-    ///     Bed3::new(4, 10, 20),
+    ///     bed3![1, 10, 20],
+    ///     bed3![2, 10, 20],
+    ///     bed3![3, 10, 20], // <- min
+    ///     bed3![3, 20, 20],
+    ///     bed3![3, 30, 20],
+    ///     bed3![4, 10, 20],
     /// ];
     /// let set = IntervalContainer::new(records);
-    /// let query = Bed3::new(3, 10, 20);
+    /// let query = bed3![3, 10, 20];
     /// let bound = set.lower_bound_unchecked(&query);
     /// assert_eq!(bound, 2);
     /// ```
@@ -476,7 +476,7 @@ where
 #[cfg(test)]
 mod testing {
     use crate::{
-        traits::errors::SetError, types::StrandMethod, BaseInterval, Bed3, IntervalContainer,
+        bed3, traits::errors::SetError, types::StrandMethod, BaseInterval, IntervalContainer,
         Strand, StrandedBed3,
     };
 
@@ -523,16 +523,16 @@ mod testing {
     #[test]
     fn bsearch_genomic_low() {
         let records = vec![
-            Bed3::new(1, 10, 20),
-            Bed3::new(2, 10, 20),
-            Bed3::new(3, 10, 20), // <- min
-            Bed3::new(3, 20, 20),
-            Bed3::new(3, 30, 20),
-            Bed3::new(4, 10, 20),
+            bed3![1, 10, 20],
+            bed3![2, 10, 20],
+            bed3![3, 10, 20], // <- min
+            bed3![3, 20, 20],
+            bed3![3, 30, 20],
+            bed3![4, 10, 20],
         ];
         let mut set = IntervalContainer::new(records);
         set.sort();
-        let query = Bed3::new(3, 10, 20);
+        let query = bed3![3, 10, 20];
         let bound = set.lower_bound(&query);
         assert_eq!(bound, Ok(2));
     }
@@ -540,16 +540,16 @@ mod testing {
     #[test]
     fn bsearch_genomic_high() {
         let records = vec![
-            Bed3::new(1, 10, 20),
-            Bed3::new(2, 10, 20),
-            Bed3::new(3, 10, 20),
-            Bed3::new(3, 20, 20), // <- min
-            Bed3::new(3, 30, 40),
-            Bed3::new(4, 10, 20),
+            bed3![1, 10, 20],
+            bed3![2, 10, 20],
+            bed3![3, 10, 20],
+            bed3![3, 20, 20], // <- min
+            bed3![3, 30, 40],
+            bed3![4, 10, 20],
         ];
         let mut set = IntervalContainer::new(records);
         set.sort();
-        let query = Bed3::new(3, 25, 20);
+        let query = bed3![3, 25, 20];
         let bound = set.lower_bound(&query);
         assert_eq!(bound, Ok(3));
     }
@@ -613,13 +613,13 @@ mod testing {
 
     #[test]
     fn bsearch_zero_example() {
-        let query = Bed3::new(2, 226, 376);
+        let query = bed3![2, 226, 376];
         let intervals = vec![
-            Bed3::new(1, 0, 300),
-            Bed3::new(2, 0, 300), // <- min
-            Bed3::new(2, 16, 316),
-            Bed3::new(2, 53, 353),
-            Bed3::new(2, 204, 504),
+            bed3![1, 0, 300],
+            bed3![2, 0, 300], // <- min
+            bed3![2, 16, 316],
+            bed3![2, 53, 353],
+            bed3![2, 204, 504],
         ];
         let set = IntervalContainer::new(intervals);
         let bound = set.lower_bound_unchecked(&query);
@@ -650,12 +650,12 @@ mod testing {
     #[test]
     fn bsearch_chr_a() {
         let intervals = vec![
-            Bed3::new(1, 0, 300),
-            Bed3::new(2, 0, 300), // <- min
-            Bed3::new(2, 16, 316),
-            Bed3::new(3, 53, 353),
+            bed3![1, 0, 300],
+            bed3![2, 0, 300], // <- min
+            bed3![2, 16, 316],
+            bed3![3, 53, 353],
         ];
-        let query = Bed3::new(2, 100, 300);
+        let query = bed3![2, 100, 300];
         let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.chr_bound(&query).unwrap();
         assert_eq!(bound, Some(1));
@@ -664,12 +664,12 @@ mod testing {
     #[test]
     fn bsearch_chr_b() {
         let intervals = vec![
-            Bed3::new(1, 0, 300), // <- min
-            Bed3::new(2, 0, 300),
-            Bed3::new(3, 16, 316),
-            Bed3::new(4, 53, 353),
+            bed3![1, 0, 300], // <- min
+            bed3![2, 0, 300],
+            bed3![3, 16, 316],
+            bed3![4, 53, 353],
         ];
-        let query = Bed3::new(1, 100, 300);
+        let query = bed3![1, 100, 300];
         let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.chr_bound(&query).unwrap();
         assert_eq!(bound, Some(0));
@@ -678,12 +678,12 @@ mod testing {
     #[test]
     fn bsearch_chr_c() {
         let intervals = vec![
-            Bed3::new(1, 0, 300),
-            Bed3::new(2, 0, 300),
-            Bed3::new(2, 16, 316),
-            Bed3::new(3, 53, 353), // <- min
+            bed3![1, 0, 300],
+            bed3![2, 0, 300],
+            bed3![2, 16, 316],
+            bed3![3, 53, 353], // <- min
         ];
-        let query = Bed3::new(3, 100, 300);
+        let query = bed3![3, 100, 300];
         let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.chr_bound(&query).unwrap();
         assert_eq!(bound, Some(3));
@@ -693,12 +693,12 @@ mod testing {
     fn bsearch_chr_d() {
         // no minimum in this set
         let intervals = vec![
-            Bed3::new(1, 0, 300),
-            Bed3::new(2, 0, 300),
-            Bed3::new(2, 16, 316),
-            Bed3::new(3, 53, 353),
+            bed3![1, 0, 300],
+            bed3![2, 0, 300],
+            bed3![2, 16, 316],
+            bed3![3, 53, 353],
         ];
-        let query = Bed3::new(4, 100, 300);
+        let query = bed3![4, 100, 300];
         let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.chr_bound(&query).unwrap();
         assert_eq!(bound, None);
@@ -708,12 +708,12 @@ mod testing {
     fn bsearch_chr_e() {
         // no minimum in this set
         let intervals = vec![
-            Bed3::new(2, 0, 300),
-            Bed3::new(3, 0, 300),
-            Bed3::new(4, 16, 316),
-            Bed3::new(5, 53, 353),
+            bed3![2, 0, 300],
+            bed3![3, 0, 300],
+            bed3![4, 16, 316],
+            bed3![5, 53, 353],
         ];
-        let query = Bed3::new(1, 100, 300);
+        let query = bed3![1, 100, 300];
         let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.chr_bound(&query).unwrap();
         assert_eq!(bound, None);
@@ -722,12 +722,12 @@ mod testing {
     #[test]
     fn bsearch_chr_upstream_a() {
         let intervals = vec![
-            Bed3::new(1, 0, 300),
-            Bed3::new(2, 0, 300),
-            Bed3::new(2, 16, 316), // <- closest
-            Bed3::new(3, 53, 353),
+            bed3![1, 0, 300],
+            bed3![2, 0, 300],
+            bed3![2, 16, 316], // <- closest
+            bed3![3, 53, 353],
         ];
-        let query = Bed3::new(2, 100, 300);
+        let query = bed3![2, 100, 300];
         let set = IntervalContainer::from_unsorted(intervals);
         let method = StrandMethod::Ignore;
         let bound = set.bound_upstream(&query, method).unwrap();
@@ -737,12 +737,12 @@ mod testing {
     #[test]
     fn bsearch_chr_upstream_b() {
         let intervals = vec![
-            Bed3::new(1, 0, 300),
-            Bed3::new(2, 0, 300),
-            Bed3::new(2, 16, 316), // <- closest
-            Bed3::new(3, 53, 353),
+            bed3![1, 0, 300],
+            bed3![2, 0, 300],
+            bed3![2, 16, 316], // <- closest
+            bed3![3, 53, 353],
         ];
-        let query = Bed3::new(2, 18, 300);
+        let query = bed3![2, 18, 300];
         let set = IntervalContainer::from_unsorted(intervals);
         let method = StrandMethod::Ignore;
         let bound = set.bound_upstream(&query, method).unwrap();
@@ -752,12 +752,12 @@ mod testing {
     #[test]
     fn bsearch_chr_upstream_c() {
         let intervals = vec![
-            Bed3::new(1, 0, 300),
-            Bed3::new(2, 0, 300),
-            Bed3::new(2, 16, 316), // <- closest
-            Bed3::new(3, 53, 353),
+            bed3![1, 0, 300],
+            bed3![2, 0, 300],
+            bed3![2, 16, 316], // <- closest
+            bed3![3, 53, 353],
         ];
-        let query = Bed3::new(2, 53, 300);
+        let query = bed3![2, 53, 300];
         let set = IntervalContainer::from_unsorted(intervals);
         let method = StrandMethod::Ignore;
         let bound = set.bound_upstream(&query, method).unwrap();
@@ -767,12 +767,12 @@ mod testing {
     #[test]
     fn bsearch_chr_upstream_d() {
         let intervals = vec![
-            Bed3::new(1, 0, 300),
-            Bed3::new(2, 0, 300),
-            Bed3::new(2, 16, 316),
-            Bed3::new(3, 53, 353), // <- min
+            bed3![1, 0, 300],
+            bed3![2, 0, 300],
+            bed3![2, 16, 316],
+            bed3![3, 53, 353], // <- min
         ];
-        let query = Bed3::new(3, 54, 300);
+        let query = bed3![3, 54, 300];
         let set = IntervalContainer::from_unsorted(intervals);
         let method = StrandMethod::Ignore;
         let bound = set.bound_upstream(&query, method).unwrap();
@@ -782,12 +782,12 @@ mod testing {
     #[test]
     fn bsearch_chr_upstream_e() {
         let intervals = vec![
-            Bed3::new(1, 0, 300),
-            Bed3::new(2, 0, 300),
-            Bed3::new(2, 16, 316),
-            Bed3::new(3, 53, 353),
+            bed3![1, 0, 300],
+            bed3![2, 0, 300],
+            bed3![2, 16, 316],
+            bed3![3, 53, 353],
         ]; // no min
-        let query = Bed3::new(3, 50, 52);
+        let query = bed3![3, 50, 52];
         let set = IntervalContainer::from_unsorted(intervals);
         let method = StrandMethod::Ignore;
         let bound = set.bound_upstream(&query, method).unwrap();
@@ -797,12 +797,12 @@ mod testing {
     #[test]
     fn bsearch_chr_upstream_f() {
         let intervals = vec![
-            Bed3::new(2, 0, 300),
-            Bed3::new(3, 0, 300),
-            Bed3::new(3, 16, 316),
-            Bed3::new(4, 53, 353),
+            bed3![2, 0, 300],
+            bed3![3, 0, 300],
+            bed3![3, 16, 316],
+            bed3![4, 53, 353],
         ]; // no min
-        let query = Bed3::new(1, 50, 52);
+        let query = bed3![1, 50, 52];
         let set = IntervalContainer::from_unsorted(intervals);
         let method = StrandMethod::Ignore;
         let bound = set.bound_upstream(&query, method).unwrap();
@@ -812,11 +812,11 @@ mod testing {
     #[test]
     fn bsearch_chr_upstream_g() {
         let intervals = vec![
-            Bed3::new(1, 10, 20), // <- min
-            Bed3::new(1, 30, 40),
-            Bed3::new(1, 50, 60),
+            bed3![1, 10, 20], // <- min
+            bed3![1, 30, 40],
+            bed3![1, 50, 60],
         ];
-        let query = Bed3::new(1, 22, 32);
+        let query = bed3![1, 22, 32];
         let set = IntervalContainer::from_unsorted(intervals);
         let method = StrandMethod::Ignore;
         let bound = set.bound_upstream(&query, method).unwrap();
@@ -827,11 +827,11 @@ mod testing {
     fn bsearch_chr_upstream_h() {
         let intervals = vec![
             // no min
-            Bed3::new(1, 10, 20),
-            Bed3::new(1, 30, 40),
-            Bed3::new(1, 50, 60),
+            bed3![1, 10, 20],
+            bed3![1, 30, 40],
+            bed3![1, 50, 60],
         ];
-        let query = Bed3::new(1, 8, 32);
+        let query = bed3![1, 8, 32];
         let set = IntervalContainer::from_unsorted(intervals);
         let method = StrandMethod::Ignore;
         let bound = set.bound_upstream(&query, method).unwrap();
@@ -902,12 +902,12 @@ mod testing {
     #[test]
     fn bsearch_chr_downstream_a() {
         let intervals = vec![
-            Bed3::new(1, 0, 300),
-            Bed3::new(2, 0, 300),
-            Bed3::new(2, 16, 316), // <- min
-            Bed3::new(3, 53, 353),
+            bed3![1, 0, 300],
+            bed3![2, 0, 300],
+            bed3![2, 16, 316], // <- min
+            bed3![3, 53, 353],
         ];
-        let query = Bed3::new(2, 10, 300);
+        let query = bed3![2, 10, 300];
         let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.bound_downstream(&query, StrandMethod::Ignore).unwrap();
         assert_eq!(bound, Some(2));
@@ -916,12 +916,12 @@ mod testing {
     #[test]
     fn bsearch_chr_downstream_c() {
         let intervals = vec![
-            Bed3::new(1, 0, 300),
-            Bed3::new(2, 0, 300),
-            Bed3::new(2, 16, 316),
-            Bed3::new(3, 53, 353), // <- min
+            bed3![1, 0, 300],
+            bed3![2, 0, 300],
+            bed3![2, 16, 316],
+            bed3![3, 53, 353], // <- min
         ];
-        let query = Bed3::new(3, 10, 300);
+        let query = bed3![3, 10, 300];
         let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.bound_downstream(&query, StrandMethod::Ignore).unwrap();
         assert_eq!(bound, Some(3));
@@ -930,12 +930,12 @@ mod testing {
     #[test]
     fn bsearch_chr_downstream_d() {
         let intervals = vec![
-            Bed3::new(1, 0, 300),
-            Bed3::new(2, 0, 300),
-            Bed3::new(2, 16, 316),
-            Bed3::new(3, 53, 353),
+            bed3![1, 0, 300],
+            bed3![2, 0, 300],
+            bed3![2, 16, 316],
+            bed3![3, 53, 353],
         ]; // no min
-        let query = Bed3::new(3, 54, 300);
+        let query = bed3![3, 54, 300];
         let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.bound_downstream(&query, StrandMethod::Ignore).unwrap();
         assert_eq!(bound, None);
@@ -944,12 +944,12 @@ mod testing {
     #[test]
     fn bsearch_chr_downstream_e() {
         let intervals = vec![
-            Bed3::new(2, 0, 300),
-            Bed3::new(3, 0, 300),
-            Bed3::new(3, 16, 316),
-            Bed3::new(4, 53, 353),
+            bed3![2, 0, 300],
+            bed3![3, 0, 300],
+            bed3![3, 16, 316],
+            bed3![4, 53, 353],
         ]; // no min
-        let query = Bed3::new(1, 54, 300);
+        let query = bed3![1, 54, 300];
         let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.bound_downstream(&query, StrandMethod::Ignore).unwrap();
         assert_eq!(bound, None);
@@ -958,11 +958,11 @@ mod testing {
     #[test]
     fn bsearch_chr_downstream_f() {
         let intervals = vec![
-            Bed3::new(1, 70, 220), // <- min
-            Bed3::new(1, 142, 292),
-            Bed3::new(1, 154, 304),
+            bed3![1, 70, 220], // <- min
+            bed3![1, 142, 292],
+            bed3![1, 154, 304],
         ];
-        let query = Bed3::new(1, 21, 71);
+        let query = bed3![1, 21, 71];
         let set = IntervalContainer::from_unsorted(intervals);
         let bound = set.bound_downstream(&query, StrandMethod::Ignore).unwrap();
         assert_eq!(bound, Some(0));
@@ -977,11 +977,11 @@ mod testing {
             .iter()
             .zip(starts.iter())
             .zip(ends.iter())
-            .map(|((&chr, &start), &end)| Bed3::new(chr, start, end))
+            .map(|((&chr, &start), &end)| bed3![chr, start, end])
             .collect::<Vec<_>>();
         let set = IntervalContainer::from_unsorted(records);
         // set.sort();
-        let query = Bed3::new(0, 12, 15);
+        let query = bed3![0, 12, 15];
         let bound = set
             .bound_downstream(&query, StrandMethod::Ignore)
             .unwrap()
@@ -1127,13 +1127,9 @@ mod testing {
 
     #[test]
     fn upstream_bound_smaller_initial_record() {
-        let records = vec![
-            Bed3::new(1, 10, 20),
-            Bed3::new(1, 30, 40),
-            Bed3::new(1, 50, 60),
-        ];
+        let records = vec![bed3![1, 10, 20], bed3![1, 30, 40], bed3![1, 50, 60]];
         let set = IntervalContainer::from_sorted_unchecked(records);
-        let query = Bed3::new(1, 5, 25);
+        let query = bed3![1, 5, 25];
         let bound = set.bound_upstream_unchecked(&query, StrandMethod::Ignore);
         assert_eq!(bound, None);
     }
@@ -1153,13 +1149,9 @@ mod testing {
 
     #[test]
     fn bound_query_upstream_of_all() {
-        let records = vec![
-            Bed3::new(1, 10, 20),
-            Bed3::new(1, 30, 40),
-            Bed3::new(1, 50, 60),
-        ];
+        let records = vec![bed3![1, 10, 20], bed3![1, 30, 40], bed3![1, 50, 60]];
         let set = IntervalContainer::from_sorted_unchecked(records);
-        let query = Bed3::new(2, 65, 75);
+        let query = bed3![2, 65, 75];
         let bound = set.chr_bound_unchecked(&query);
         assert_eq!(bound, None);
     }

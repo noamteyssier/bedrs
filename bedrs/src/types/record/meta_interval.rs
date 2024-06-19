@@ -1,4 +1,5 @@
 use crate::{
+    bed3,
     traits::{ChromBounds, MetaBounds},
     Bed3, Coordinates, Strand,
 };
@@ -48,7 +49,7 @@ where
     M: MetaBounds,
 {
     fn from(bed: MetaInterval<C, M>) -> Self {
-        Self::new(bed.chr, bed.start, bed.end)
+        bed3![bed.chr, bed.start, bed.end]
     }
 }
 

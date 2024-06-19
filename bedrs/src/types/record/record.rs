@@ -1,10 +1,15 @@
-use super::Coordinate;
-use crate::{traits::ChromBounds, types::meta::RecordMetadata, Coordinates};
+use super::{Bed3, Bed4, Coordinate};
+use crate::{
+    traits::{ChromBounds, MetaBounds},
+    types::meta::RecordMetadata,
+    Coordinates,
+};
 use coitrees::GenericInterval;
+use derive_new::new;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Copy, Default)]
+#[derive(Debug, Clone, Copy, Default, new)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Record<C, M>
 where
@@ -12,9 +17,9 @@ where
     M: RecordMetadata,
 {
     #[cfg_attr(feature = "serde", serde(flatten))]
-    coordinates: Coordinate<C>,
+    pub coordinates: Coordinate<C>,
     #[cfg_attr(feature = "serde", serde(flatten))]
-    metadata: M,
+    pub metadata: M,
 }
 
 /// Implements the `GenericInterval` trait for `Record` types.
@@ -74,5 +79,19 @@ where
     }
     fn empty() -> Self {
         Self::default()
+    }
+}
+
+// ===========
+// Conversions
+// ===========
+
+impl<C, N> From<Bed4<C, N>> for Bed3<C>
+where
+    C: ChromBounds,
+    N: MetaBounds,
+{
+    fn from(record: Bed4<C, N>) -> Self {
+        Bed3::new(record.coordinates.clone(), record.metadata.into())
     }
 }

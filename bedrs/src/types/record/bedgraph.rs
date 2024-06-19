@@ -1,4 +1,5 @@
 use crate::{
+    bed3,
     traits::{ChromBounds, MetaBounds, ValueBounds},
     types::Score,
     Bed12, Bed3, Bed6, Coordinates, Strand,
@@ -48,7 +49,7 @@ where
     C: ChromBounds,
 {
     fn from(bed: BedGraph<C>) -> Self {
-        Self::new(bed.chr, bed.start, bed.end)
+        bed3![bed.chr, bed.start, bed.end]
     }
 }
 
@@ -101,7 +102,7 @@ where
 #[cfg(test)]
 mod testing {
     use super::*;
-    use crate::Bed4;
+    use crate::bed4;
 
     fn float_eq(a: f64, b: f64) -> bool {
         (a - b).abs() < f64::EPSILON
@@ -182,7 +183,7 @@ mod testing {
 
     #[test]
     fn from_bed3() {
-        let b3 = Bed3::new(1, 10, 20);
+        let b3 = bed3![1, 10, 20];
         let bg: BedGraph<_> = b3.into();
         assert_eq!(bg.chr(), &1);
         assert_eq!(bg.start(), 10);
@@ -192,7 +193,7 @@ mod testing {
 
     #[test]
     fn from_bed4() {
-        let b4 = Bed4::new(1, 10, 20, 66.6);
+        let b4 = bed4![1, 10, 20, 66.6];
         let bg: BedGraph<_> = b4.into();
         assert_eq!(bg.chr(), &1);
         assert_eq!(bg.start(), 10);

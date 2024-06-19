@@ -292,8 +292,9 @@ mod testing {
     use anyhow::Result;
 
     use crate::{
+        bed3,
         traits::{ChromBounds, Coordinates, IntervalBounds},
-        BaseInterval, Bed3, IntervalContainer, Strand, StrandedBed3,
+        BaseInterval, IntervalContainer, Strand, StrandedBed3,
     };
 
     fn validate_set<C, I>(set: &IntervalContainer<I, C>, expected: &[I])
@@ -365,11 +366,7 @@ mod testing {
 
     #[test]
     fn test_merging_one_cluster_genomic() {
-        let records = vec![
-            Bed3::new(1, 10, 30),
-            Bed3::new(1, 15, 20),
-            Bed3::new(1, 25, 30),
-        ];
+        let records = vec![bed3![1, 10, 30], bed3![1, 15, 20], bed3![1, 25, 30]];
         let set = IntervalContainer::from_unsorted(records);
         let merge_set = set.merge().unwrap();
         let iv1 = merge_set.records()[0];
@@ -381,11 +378,7 @@ mod testing {
 
     #[test]
     fn test_merging_two_cluster_genomic() {
-        let records = vec![
-            Bed3::new(1, 10, 30),
-            Bed3::new(1, 15, 20),
-            Bed3::new(2, 25, 30),
-        ];
+        let records = vec![bed3![1, 10, 30], bed3![1, 15, 20], bed3![2, 25, 30]];
         let set = IntervalContainer::from_unsorted(records);
         let merge_set = set.merge().unwrap();
         let iv1 = merge_set.records()[0];
@@ -535,12 +528,12 @@ mod testing {
     #[test]
     fn merge_intervals_stranded_all_missing_strand_info_minimal() -> Result<()> {
         let records = vec![
-            Bed3::new(1, 10, 20),
-            Bed3::new(1, 15, 25),
-            Bed3::new(1, 20, 30),
-            Bed3::new(1, 22, 32),
-            Bed3::new(1, 25, 35),
-            Bed3::new(2, 10, 20),
+            bed3![1, 10, 20],
+            bed3![1, 15, 25],
+            bed3![1, 20, 30],
+            bed3![1, 22, 32],
+            bed3![1, 25, 35],
+            bed3![2, 10, 20],
         ];
         let set = IntervalContainer::from_sorted(records)?;
         let merge_set = set.merge_stranded()?;
@@ -654,12 +647,12 @@ mod testing {
     #[test]
     fn merge_intervals_specific_strand_missing_strand_fwd() -> Result<()> {
         let set = IntervalContainer::from_sorted(vec![
-            Bed3::new(1, 10, 20),
-            Bed3::new(1, 15, 25),
-            Bed3::new(1, 20, 30),
-            Bed3::new(1, 22, 32),
-            Bed3::new(1, 25, 35),
-            Bed3::new(2, 10, 20),
+            bed3![1, 10, 20],
+            bed3![1, 15, 25],
+            bed3![1, 20, 30],
+            bed3![1, 22, 32],
+            bed3![1, 25, 35],
+            bed3![2, 10, 20],
         ])?;
         let merge_set = set.merge_specific_strand(Strand::Forward)?;
         assert!(merge_set.is_none());
@@ -669,12 +662,12 @@ mod testing {
     #[test]
     fn merge_intervals_specific_strand_missing_strand_rev() -> Result<()> {
         let set = IntervalContainer::from_sorted(vec![
-            Bed3::new(1, 10, 20),
-            Bed3::new(1, 15, 25),
-            Bed3::new(1, 20, 30),
-            Bed3::new(1, 22, 32),
-            Bed3::new(1, 25, 35),
-            Bed3::new(2, 10, 20),
+            bed3![1, 10, 20],
+            bed3![1, 15, 25],
+            bed3![1, 20, 30],
+            bed3![1, 22, 32],
+            bed3![1, 25, 35],
+            bed3![2, 10, 20],
         ])?;
         let merge_set = set.merge_specific_strand(Strand::Reverse)?;
         assert!(merge_set.is_none());
