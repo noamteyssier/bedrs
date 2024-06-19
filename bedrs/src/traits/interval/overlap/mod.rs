@@ -488,7 +488,7 @@ where
 #[allow(clippy::many_single_char_names)]
 mod testing {
     use super::*;
-    use crate::{bed3, types::BaseInterval, Coordinates, Strand, StrandedBed3};
+    use crate::{bed3, types::BaseInterval, Coordinates, Strand};
 
     #[test]
     fn test_overlap_self() {
@@ -815,7 +815,7 @@ mod testing {
     fn bounded_strand_missing_info() {
         let a = bed3![1, 10, 20];
         let b = bed3![1, 15, 25];
-        let c = StrandedBed3::new(1, 15, 25, Strand::Forward);
+        let c = bed3![1, 15, 25, Strand::Forward];
         assert!(a.bounded_strand(&b));
         assert!(a.bounded_strand(&c));
         assert!(c.bounded_strand(&a));

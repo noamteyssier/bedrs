@@ -1,9 +1,5 @@
-use super::{Bed3, Bed4, Coordinate};
-use crate::{
-    traits::{ChromBounds, MetaBounds},
-    types::meta::RecordMetadata,
-    Coordinates,
-};
+use super::Coordinate;
+use crate::{traits::ChromBounds, types::meta::RecordMetadata, Coordinates};
 use coitrees::GenericInterval;
 use derive_new::new;
 #[cfg(feature = "serde")]
@@ -86,12 +82,16 @@ where
 // Conversions
 // ===========
 
-impl<C, N> From<Bed4<C, N>> for Bed3<C>
+impl<C, M1, M2> From<&Record<C, M1>> for Record<C, M2>
 where
     C: ChromBounds,
-    N: MetaBounds,
+    M1: RecordMetadata,
+    M2: RecordMetadata + From<M1>,
 {
-    fn from(record: Bed4<C, N>) -> Self {
-        Bed3::new(record.coordinates.clone(), record.metadata.into())
+    fn from(rec: &Record<C, M1>) -> Self {
+        Record {
+            coordinates: rec.coordinates.clone(),
+            metadata: rec.metadata.clone().into(),
+        }
     }
 }

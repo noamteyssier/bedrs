@@ -20,12 +20,12 @@ use serde::{Deserialize, Serialize};
 /// ```
 /// use bedrs::{Coordinates, Bed3, Overlap};
 ///
-/// let a = Bed3::new(1, 20, 30);
+/// let a = bed3![1, 20, 30];
 /// assert_eq!(*a.chr(), 1);
 /// assert_eq!(a.start(), 20);
 /// assert_eq!(a.end(), 30);
 ///
-/// let b = Bed3::new(1, 20, 30);
+/// let b = bed3![1, 20, 30];
 /// assert!(a.overlaps(&b));
 /// ```
 #[derive(Debug, Default, Clone, Copy, Coordinates, new)]
@@ -106,13 +106,19 @@ where
 
 #[cfg(test)]
 mod testing {
+    use crate::bed3;
     use crate::bed4;
-
-    use super::*;
+    use crate::bed6;
+    use crate::types::Bed3;
+    use crate::types::Bed4;
+    use crate::types::Bed6;
+    use crate::Coordinates;
+    use crate::Score;
+    use crate::Strand;
 
     #[test]
     fn test_init_numeric() {
-        let a = Bed3::new(1, 20, 30);
+        let a = bed3![1, 20, 30];
         assert_eq!(*a.chr(), 1);
         assert_eq!(a.start(), 20);
         assert_eq!(a.end(), 30);
@@ -120,7 +126,7 @@ mod testing {
 
     #[test]
     fn test_init_named() {
-        let a = Bed3::new("chr1", 20, 30);
+        let a = bed3!["chr1", 20, 30];
         assert_eq!(*a.chr(), "chr1");
         assert_eq!(a.start(), 20);
         assert_eq!(a.end(), 30);
@@ -128,8 +134,8 @@ mod testing {
 
     #[test]
     fn convert_to_bed4() {
-        let a = Bed3::new("chr1", 20, 30);
-        let b: Bed4<_, i32> = a.into();
+        let a = bed3!["chr1", 20, 30];
+        let b: Bed4<_, i32> = (&a).into();
         assert_eq!(*b.chr(), "chr1");
         assert_eq!(b.start(), 20);
         assert_eq!(b.end(), 30);
@@ -138,19 +144,19 @@ mod testing {
 
     #[test]
     fn convert_to_bed6() {
-        let a = Bed3::new("chr1", 20, 30);
-        let b: Bed6<_, i32> = a.into();
+        let a = bed3!["chr1", 20, 30];
+        let b: Bed6<_, i32> = (&a).into();
         assert_eq!(*b.chr(), "chr1");
         assert_eq!(b.start(), 20);
         assert_eq!(b.end(), 30);
-        assert_eq!(b.name(), &0);
-        assert_eq!(b.score(), Score(None));
+        assert_eq!(b.metadata.name(), &0);
+        assert_eq!(*b.metadata.score(), Score(None));
         assert_eq!(b.strand().unwrap(), Strand::Unknown);
     }
 
     #[test]
     fn convert_to_bed12() {
-        let a = Bed3::new("chr1", 20, 30);
+        let a = bed3!["chr1", 20, 30];
         let b: Bed12<_, i32, i32, i32, i32, i32, i32, i32> = a.into();
         assert_eq!(*b.chr(), "chr1");
         assert_eq!(b.start(), 20);
@@ -168,8 +174,8 @@ mod testing {
 
     #[test]
     fn from_bed4() {
-        let a = bed4!["chr1", 20, 30, 40];
-        let b: Bed3<_> = a.into();
+        let a = bed4!["chr1", 20, 30, 40i32];
+        let b: Bed3<_> = (&a).into();
         assert_eq!(*b.chr(), "chr1");
         assert_eq!(b.start(), 20);
         assert_eq!(b.end(), 30);
@@ -177,8 +183,8 @@ mod testing {
 
     #[test]
     fn from_bed6() {
-        let a = Bed6::new("chr1", 20, 30, 40, 50.into(), Strand::Forward);
-        let b: Bed3<_> = a.into();
+        let a = bed6!["chr1", 20, 30, 40, 50.into(), Strand::Forward];
+        let b: Bed3<_> = (&a).into();
         assert_eq!(*b.chr(), "chr1");
         assert_eq!(b.start(), 20);
         assert_eq!(b.end(), 30);
@@ -211,12 +217,13 @@ mod testing {
 #[cfg(test)]
 mod serde_testing {
     use super::*;
+    use crate::bed3;
     use anyhow::Result;
     use csv::WriterBuilder;
 
     #[test]
     fn test_csv_serialization() -> Result<()> {
-        let a = Bed3::new("chr1", 20, 30);
+        let a = bed3!["chr1", 20, 30];
         let mut wtr = WriterBuilder::new().has_headers(false).from_writer(vec![]);
         wtr.serialize(a)?;
         let result = String::from_utf8(wtr.into_inner()?)?;

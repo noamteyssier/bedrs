@@ -71,9 +71,9 @@ where
     /// # Example
     /// ```
     /// use bedrs::{StrandedBed3, Strand, Coordinates, Overlap, StrandedOverlap};
-    /// let interval1 = StrandedBed3::new(1, 100, 200, Strand::Forward);
-    /// let interval2 = StrandedBed3::new(1, 100, 400, Strand::Forward);
-    /// let interval3 = StrandedBed3::new(1, 100, 400, Strand::Reverse);
+    /// let interval1 = bed3![1, 100, 200, Strand::Forward];
+    /// let interval2 = bed3![1, 100, 400, Strand::Forward];
+    /// let interval3 = bed3![1, 100, 400, Strand::Reverse];
     /// assert!(interval1.stranded_starts(&interval2));
     /// assert!(!interval1.stranded_starts(&interval3));
     /// ```
@@ -90,9 +90,9 @@ where
     /// # Example
     /// ```
     /// use bedrs::{StrandedBed3, Strand, Coordinates, Overlap, StrandedOverlap};
-    /// let interval1 = StrandedBed3::new(1, 300, 400, Strand::Forward);
-    /// let interval2 = StrandedBed3::new(1, 100, 400, Strand::Forward);
-    /// let interval3 = StrandedBed3::new(1, 100, 400, Strand::Reverse);
+    /// let interval1 = bed3![1, 300, 400, Strand::Forward];
+    /// let interval2 = bed3![1, 100, 400, Strand::Forward];
+    /// let interval3 = bed3![1, 100, 400, Strand::Reverse];
     /// assert!(interval1.stranded_ends(&interval2));
     /// assert!(!interval1.stranded_ends(&interval3));
     /// ```
@@ -108,9 +108,9 @@ where
     /// # Example
     /// ```
     /// use bedrs::{StrandedBed3, Strand, Coordinates, Overlap, StrandedOverlap};
-    /// let interval1 = StrandedBed3::new(1, 100, 200, Strand::Forward);
-    /// let interval2 = StrandedBed3::new(1, 100, 200, Strand::Forward);
-    /// let interval3 = StrandedBed3::new(1, 100, 200, Strand::Reverse);
+    /// let interval1 = bed3![1, 100, 200, Strand::Forward];
+    /// let interval2 = bed3![1, 100, 200, Strand::Forward];
+    /// let interval3 = bed3![1, 100, 200, Strand::Reverse];
     /// assert!(interval1.stranded_equals(&interval2));
     /// assert!(!interval1.stranded_equals(&interval3));
     /// ```
@@ -126,9 +126,9 @@ where
     /// # Example
     /// ```
     /// use bedrs::{StrandedBed3, Strand, Coordinates, Overlap, StrandedOverlap};
-    /// let interval1 = StrandedBed3::new(1, 150, 160, Strand::Forward);
-    /// let interval2 = StrandedBed3::new(1, 100, 200, Strand::Forward);
-    /// let interval3 = StrandedBed3::new(1, 100, 200, Strand::Reverse);
+    /// let interval1 = bed3![1, 150, 160, Strand::Forward];
+    /// let interval2 = bed3![1, 100, 200, Strand::Forward];
+    /// let interval3 = bed3![1, 100, 200, Strand::Reverse];
     /// assert!(interval1.stranded_during(&interval2));
     /// assert!(!interval1.stranded_during(&interval3));
     /// ```
@@ -148,9 +148,9 @@ where
     /// ```
     /// use bedrs::{StrandedBed3, Strand, Coordinates, Overlap, StrandedOverlap};
     ///
-    /// let interval1 = StrandedBed3::new(1, 100, 200, Strand::Forward);
-    /// let interval2 = StrandedBed3::new(1, 150, 160, Strand::Forward);
-    /// let interval3 = StrandedBed3::new(1, 150, 160, Strand::Reverse);
+    /// let interval1 = bed3![1, 100, 200, Strand::Forward];
+    /// let interval2 = bed3![1, 150, 160, Strand::Forward];
+    /// let interval3 = bed3![1, 150, 160, Strand::Reverse];
     ///
     /// assert!(interval1.stranded_contains(&interval2));
     /// assert!(!interval1.stranded_contains(&interval3));
@@ -175,9 +175,9 @@ where
     /// ```
     /// use bedrs::{StrandedBed3, Strand, Coordinates, Overlap, StrandedOverlap};
     ///
-    /// let interval1 = StrandedBed3::new(1, 150, 160, Strand::Forward);
-    /// let interval2 = StrandedBed3::new(1, 100, 200, Strand::Forward);
-    /// let interval3 = StrandedBed3::new(1, 100, 200, Strand::Reverse);
+    /// let interval1 = bed3![1, 150, 160, Strand::Forward];
+    /// let interval2 = bed3![1, 100, 200, Strand::Forward];
+    /// let interval3 = bed3![1, 100, 200, Strand::Reverse];
     ///
     /// assert!(interval1.stranded_contained_by(&interval2));
     /// assert!(!interval1.stranded_contained_by(&interval3));
@@ -203,9 +203,9 @@ where
     /// ```
     /// use bedrs::{StrandedBed3, Strand, Coordinates, Overlap, StrandedOverlap};
     ///
-    /// let interval1 = StrandedBed3::new(1, 100, 200, Strand::Forward);
-    /// let interval2 = StrandedBed3::new(1, 200, 300, Strand::Forward);
-    /// let interval3 = StrandedBed3::new(1, 200, 300, Strand::Reverse);
+    /// let interval1 = bed3![1, 100, 200, Strand::Forward];
+    /// let interval2 = bed3![1, 200, 300, Strand::Forward];
+    /// let interval3 = bed3![1, 200, 300, Strand::Reverse];
     ///
     /// assert!(interval1.stranded_borders(&interval2));
     /// assert!(!interval1.stranded_borders(&interval3));
@@ -219,24 +219,24 @@ where
 mod testing {
 
     use super::*;
-    use crate::{Strand, StrandedBed3};
+    use crate::{bed3, Strand};
 
     #[test]
     fn test_same_overlaps() {
-        let iv_a = StrandedBed3::new(1, 100, 200, Strand::Forward);
-        let iv_b = StrandedBed3::new(1, 150, 250, Strand::Forward);
-        let iv_c = StrandedBed3::new(1, 150, 250, Strand::Reverse);
+        let iv_a = bed3![1, 100, 200, Strand::Forward];
+        let iv_b = bed3![1, 150, 250, Strand::Forward];
+        let iv_c = bed3![1, 150, 250, Strand::Reverse];
         assert!(iv_a.stranded_overlaps(&iv_b));
         assert!(!iv_a.stranded_overlaps(&iv_c));
     }
 
     #[test]
     fn test_same_overlaps_by() {
-        let iv_a = StrandedBed3::new(1, 100, 200, Strand::Forward);
-        let iv_b = StrandedBed3::new(1, 150, 250, Strand::Forward);
-        let iv_c = StrandedBed3::new(1, 150, 250, Strand::Reverse);
-        let iv_d = StrandedBed3::new(1, 170, 250, Strand::Forward);
-        let iv_e = StrandedBed3::new(1, 170, 250, Strand::Reverse);
+        let iv_a = bed3![1, 100, 200, Strand::Forward];
+        let iv_b = bed3![1, 150, 250, Strand::Forward];
+        let iv_c = bed3![1, 150, 250, Strand::Reverse];
+        let iv_d = bed3![1, 170, 250, Strand::Forward];
+        let iv_e = bed3![1, 170, 250, Strand::Reverse];
         assert!(iv_a.stranded_overlaps_by(&iv_b, 50));
         assert!(!iv_a.stranded_overlaps_by(&iv_c, 50));
         assert!(!iv_a.stranded_overlaps_by(&iv_d, 50));
@@ -245,11 +245,11 @@ mod testing {
 
     #[test]
     fn test_same_overlaps_by_exactly() {
-        let iv_a = StrandedBed3::new(1, 100, 200, Strand::Forward);
-        let iv_b = StrandedBed3::new(1, 150, 250, Strand::Forward);
-        let iv_c = StrandedBed3::new(1, 150, 250, Strand::Reverse);
-        let iv_d = StrandedBed3::new(1, 170, 250, Strand::Forward);
-        let iv_e = StrandedBed3::new(1, 170, 250, Strand::Reverse);
+        let iv_a = bed3![1, 100, 200, Strand::Forward];
+        let iv_b = bed3![1, 150, 250, Strand::Forward];
+        let iv_c = bed3![1, 150, 250, Strand::Reverse];
+        let iv_d = bed3![1, 170, 250, Strand::Forward];
+        let iv_e = bed3![1, 170, 250, Strand::Reverse];
         assert!(iv_a.stranded_overlaps_by_exactly(&iv_b, 50));
         assert!(!iv_a.stranded_overlaps_by_exactly(&iv_c, 50));
         assert!(!iv_a.stranded_overlaps_by_exactly(&iv_d, 50));
@@ -260,11 +260,11 @@ mod testing {
 
     #[test]
     fn test_same_overlap_size() {
-        let iv_a = StrandedBed3::new(1, 100, 200, Strand::Forward);
-        let iv_b = StrandedBed3::new(1, 150, 250, Strand::Forward);
-        let iv_c = StrandedBed3::new(1, 150, 250, Strand::Reverse);
-        let iv_d = StrandedBed3::new(1, 170, 250, Strand::Forward);
-        let iv_e = StrandedBed3::new(1, 170, 250, Strand::Reverse);
+        let iv_a = bed3![1, 100, 200, Strand::Forward];
+        let iv_b = bed3![1, 150, 250, Strand::Forward];
+        let iv_c = bed3![1, 150, 250, Strand::Reverse];
+        let iv_d = bed3![1, 170, 250, Strand::Forward];
+        let iv_e = bed3![1, 170, 250, Strand::Reverse];
         assert_eq!(iv_a.stranded_overlap_size(&iv_b), Some(50));
         assert_eq!(iv_a.stranded_overlap_size(&iv_c), None);
         assert_eq!(iv_a.stranded_overlap_size(&iv_d), Some(30));
@@ -273,11 +273,11 @@ mod testing {
 
     #[test]
     fn test_same_starts() {
-        let iv_a = StrandedBed3::new(1, 100, 200, Strand::Forward);
-        let iv_b = StrandedBed3::new(1, 150, 250, Strand::Forward);
-        let iv_c = StrandedBed3::new(1, 150, 250, Strand::Reverse);
-        let iv_d = StrandedBed3::new(1, 100, 250, Strand::Forward);
-        let iv_e = StrandedBed3::new(1, 100, 250, Strand::Reverse);
+        let iv_a = bed3![1, 100, 200, Strand::Forward];
+        let iv_b = bed3![1, 150, 250, Strand::Forward];
+        let iv_c = bed3![1, 150, 250, Strand::Reverse];
+        let iv_d = bed3![1, 100, 250, Strand::Forward];
+        let iv_e = bed3![1, 100, 250, Strand::Reverse];
         assert!(!iv_a.stranded_starts(&iv_b));
         assert!(!iv_a.stranded_starts(&iv_c));
         assert!(iv_a.stranded_starts(&iv_d));
@@ -286,11 +286,11 @@ mod testing {
 
     #[test]
     fn test_same_ends() {
-        let iv_a = StrandedBed3::new(1, 100, 200, Strand::Forward);
-        let iv_b = StrandedBed3::new(1, 150, 250, Strand::Forward);
-        let iv_c = StrandedBed3::new(1, 150, 250, Strand::Reverse);
-        let iv_d = StrandedBed3::new(1, 50, 200, Strand::Forward);
-        let iv_e = StrandedBed3::new(1, 50, 200, Strand::Reverse);
+        let iv_a = bed3![1, 100, 200, Strand::Forward];
+        let iv_b = bed3![1, 150, 250, Strand::Forward];
+        let iv_c = bed3![1, 150, 250, Strand::Reverse];
+        let iv_d = bed3![1, 50, 200, Strand::Forward];
+        let iv_e = bed3![1, 50, 200, Strand::Reverse];
         assert!(!iv_a.stranded_ends(&iv_b));
         assert!(!iv_a.stranded_ends(&iv_c));
         assert!(iv_a.stranded_ends(&iv_d));
@@ -299,11 +299,11 @@ mod testing {
 
     #[test]
     fn test_same_equals() {
-        let iv_a = StrandedBed3::new(1, 100, 200, Strand::Forward);
-        let iv_b = StrandedBed3::new(1, 150, 250, Strand::Forward);
-        let iv_c = StrandedBed3::new(1, 150, 250, Strand::Reverse);
-        let iv_d = StrandedBed3::new(1, 100, 200, Strand::Forward);
-        let iv_e = StrandedBed3::new(1, 100, 200, Strand::Reverse);
+        let iv_a = bed3![1, 100, 200, Strand::Forward];
+        let iv_b = bed3![1, 150, 250, Strand::Forward];
+        let iv_c = bed3![1, 150, 250, Strand::Reverse];
+        let iv_d = bed3![1, 100, 200, Strand::Forward];
+        let iv_e = bed3![1, 100, 200, Strand::Reverse];
         assert!(!iv_a.stranded_equals(&iv_b));
         assert!(!iv_a.stranded_equals(&iv_c));
         assert!(iv_a.stranded_equals(&iv_d));
@@ -312,13 +312,13 @@ mod testing {
 
     #[test]
     fn test_same_during() {
-        let iv_a = StrandedBed3::new(1, 150, 160, Strand::Forward);
-        let iv_b = StrandedBed3::new(1, 100, 200, Strand::Forward);
-        let iv_c = StrandedBed3::new(1, 100, 200, Strand::Reverse);
-        let iv_d = StrandedBed3::new(1, 100, 160, Strand::Forward);
-        let iv_e = StrandedBed3::new(1, 100, 160, Strand::Reverse);
-        let iv_f = StrandedBed3::new(1, 150, 200, Strand::Forward);
-        let iv_g = StrandedBed3::new(1, 150, 200, Strand::Reverse);
+        let iv_a = bed3![1, 150, 160, Strand::Forward];
+        let iv_b = bed3![1, 100, 200, Strand::Forward];
+        let iv_c = bed3![1, 100, 200, Strand::Reverse];
+        let iv_d = bed3![1, 100, 160, Strand::Forward];
+        let iv_e = bed3![1, 100, 160, Strand::Reverse];
+        let iv_f = bed3![1, 150, 200, Strand::Forward];
+        let iv_g = bed3![1, 150, 200, Strand::Reverse];
         assert!(iv_a.stranded_during(&iv_b));
         assert!(!iv_a.stranded_during(&iv_c));
         assert!(!iv_a.stranded_during(&iv_d));
@@ -329,13 +329,13 @@ mod testing {
 
     #[test]
     fn test_same_contains() {
-        let iv_a = StrandedBed3::new(1, 100, 200, Strand::Forward);
-        let iv_b = StrandedBed3::new(1, 150, 160, Strand::Forward);
-        let iv_c = StrandedBed3::new(1, 150, 160, Strand::Reverse);
-        let iv_d = StrandedBed3::new(1, 100, 160, Strand::Forward);
-        let iv_e = StrandedBed3::new(1, 100, 160, Strand::Reverse);
-        let iv_f = StrandedBed3::new(1, 150, 200, Strand::Forward);
-        let iv_g = StrandedBed3::new(1, 150, 200, Strand::Reverse);
+        let iv_a = bed3![1, 100, 200, Strand::Forward];
+        let iv_b = bed3![1, 150, 160, Strand::Forward];
+        let iv_c = bed3![1, 150, 160, Strand::Reverse];
+        let iv_d = bed3![1, 100, 160, Strand::Forward];
+        let iv_e = bed3![1, 100, 160, Strand::Reverse];
+        let iv_f = bed3![1, 150, 200, Strand::Forward];
+        let iv_g = bed3![1, 150, 200, Strand::Reverse];
         let in_set = [iv_b, iv_d, iv_f];
         let out_set = [iv_c, iv_e, iv_g];
         for iv in in_set {
@@ -348,13 +348,13 @@ mod testing {
 
     #[test]
     fn test_same_contained_by() {
-        let iv_a = StrandedBed3::new(1, 150, 160, Strand::Forward);
-        let iv_b = StrandedBed3::new(1, 100, 200, Strand::Forward);
-        let iv_c = StrandedBed3::new(1, 100, 200, Strand::Reverse);
-        let iv_d = StrandedBed3::new(1, 100, 160, Strand::Forward);
-        let iv_e = StrandedBed3::new(1, 100, 160, Strand::Reverse);
-        let iv_f = StrandedBed3::new(1, 150, 200, Strand::Forward);
-        let iv_g = StrandedBed3::new(1, 150, 200, Strand::Reverse);
+        let iv_a = bed3![1, 150, 160, Strand::Forward];
+        let iv_b = bed3![1, 100, 200, Strand::Forward];
+        let iv_c = bed3![1, 100, 200, Strand::Reverse];
+        let iv_d = bed3![1, 100, 160, Strand::Forward];
+        let iv_e = bed3![1, 100, 160, Strand::Reverse];
+        let iv_f = bed3![1, 150, 200, Strand::Forward];
+        let iv_g = bed3![1, 150, 200, Strand::Reverse];
         assert!(iv_a.stranded_contained_by(&iv_b));
         assert!(!iv_a.stranded_contained_by(&iv_c));
         assert!(iv_a.stranded_contained_by(&iv_d));
@@ -365,19 +365,19 @@ mod testing {
 
     #[test]
     fn test_same_borders() {
-        let iv_a = StrandedBed3::new(1, 100, 200, Strand::Forward);
-        let iv_b = StrandedBed3::new(1, 200, 300, Strand::Forward);
-        let iv_c = StrandedBed3::new(1, 200, 300, Strand::Reverse);
-        let iv_d = StrandedBed3::new(1, 50, 100, Strand::Forward);
-        let iv_e = StrandedBed3::new(1, 50, 100, Strand::Reverse);
-        let iv_f = StrandedBed3::new(1, 199, 300, Strand::Forward);
-        let iv_g = StrandedBed3::new(1, 199, 300, Strand::Reverse);
-        let iv_h = StrandedBed3::new(1, 50, 101, Strand::Forward);
-        let iv_i = StrandedBed3::new(1, 50, 101, Strand::Reverse);
-        let iv_j = StrandedBed3::new(1, 201, 300, Strand::Forward);
-        let iv_k = StrandedBed3::new(1, 201, 300, Strand::Reverse);
-        let iv_l = StrandedBed3::new(1, 50, 99, Strand::Forward);
-        let iv_m = StrandedBed3::new(1, 50, 99, Strand::Reverse);
+        let iv_a = bed3![1, 100, 200, Strand::Forward];
+        let iv_b = bed3![1, 200, 300, Strand::Forward];
+        let iv_c = bed3![1, 200, 300, Strand::Reverse];
+        let iv_d = bed3![1, 50, 100, Strand::Forward];
+        let iv_e = bed3![1, 50, 100, Strand::Reverse];
+        let iv_f = bed3![1, 199, 300, Strand::Forward];
+        let iv_g = bed3![1, 199, 300, Strand::Reverse];
+        let iv_h = bed3![1, 50, 101, Strand::Forward];
+        let iv_i = bed3![1, 50, 101, Strand::Reverse];
+        let iv_j = bed3![1, 201, 300, Strand::Forward];
+        let iv_k = bed3![1, 201, 300, Strand::Reverse];
+        let iv_l = bed3![1, 50, 99, Strand::Forward];
+        let iv_m = bed3![1, 50, 99, Strand::Reverse];
         let in_set = [iv_b, iv_d];
         let out_set = [iv_c, iv_e, iv_f, iv_g, iv_h, iv_i, iv_j, iv_k, iv_l, iv_m];
         for iv in in_set {

@@ -477,7 +477,7 @@ where
 mod testing {
     use crate::{
         bed3, traits::errors::SetError, types::StrandMethod, BaseInterval, IntervalContainer,
-        Strand, StrandedBed3,
+        Strand,
     };
 
     #[test]
@@ -841,14 +841,14 @@ mod testing {
     #[test]
     fn bsearch_chr_upstream_a_stranded() {
         let intervals = vec![
-            StrandedBed3::new(1, 0, 300, Strand::Forward),
-            StrandedBed3::new(2, 0, 300, Strand::Forward),
-            StrandedBed3::new(2, 16, 316, Strand::Forward), // <- closest
-            StrandedBed3::new(2, 16, 316, Strand::Reverse), // <- wrong strand
-            StrandedBed3::new(2, 16, 316, Strand::Unknown), // <- wrong strand
-            StrandedBed3::new(3, 53, 353, Strand::Forward),
+            bed3![1, 0, 300, Strand::Forward],
+            bed3![2, 0, 300, Strand::Forward],
+            bed3![2, 16, 316, Strand::Forward], // <- closest
+            bed3![2, 16, 316, Strand::Reverse], // <- wrong strand
+            bed3![2, 16, 316, Strand::Unknown], // <- wrong strand
+            bed3![3, 53, 353, Strand::Forward],
         ];
-        let query = StrandedBed3::new(2, 100, 300, Strand::Forward);
+        let query = bed3![2, 100, 300, Strand::Forward];
         let set = IntervalContainer::from_unsorted(intervals);
         let method = StrandMethod::MatchStrand;
         let bound = set.bound_upstream(&query, method).unwrap();
@@ -858,12 +858,12 @@ mod testing {
     #[test]
     fn bsearch_chr_upstream_b_stranded() {
         let intervals = vec![
-            StrandedBed3::new(1, 0, 300, Strand::Forward),
-            StrandedBed3::new(2, 0, 300, Strand::Forward), // <- closest
-            StrandedBed3::new(2, 16, 316, Strand::Reverse), // <- wrong strand
-            StrandedBed3::new(3, 53, 353, Strand::Forward),
+            bed3![1, 0, 300, Strand::Forward],
+            bed3![2, 0, 300, Strand::Forward],  // <- closest
+            bed3![2, 16, 316, Strand::Reverse], // <- wrong strand
+            bed3![3, 53, 353, Strand::Forward],
         ];
-        let query = StrandedBed3::new(2, 100, 300, Strand::Forward);
+        let query = bed3![2, 100, 300, Strand::Forward];
         let set = IntervalContainer::from_unsorted(intervals);
         let method = StrandMethod::MatchStrand;
         let bound = set.bound_upstream(&query, method).unwrap();
@@ -873,11 +873,11 @@ mod testing {
     #[test]
     fn bsearch_chr_upstream_c_stranded() {
         let intervals = vec![
-            StrandedBed3::new(1, 0, 300, Strand::Forward),
-            StrandedBed3::new(2, 16, 316, Strand::Reverse), // <- wrong strand
-            StrandedBed3::new(3, 53, 353, Strand::Forward),
+            bed3![1, 0, 300, Strand::Forward],
+            bed3![2, 16, 316, Strand::Reverse], // <- wrong strand
+            bed3![3, 53, 353, Strand::Forward],
         ];
-        let query = StrandedBed3::new(2, 100, 300, Strand::Forward);
+        let query = bed3![2, 100, 300, Strand::Forward];
         let set = IntervalContainer::from_unsorted(intervals);
         let method = StrandMethod::MatchStrand;
         let bound = set.bound_upstream(&query, method).unwrap();
@@ -887,12 +887,12 @@ mod testing {
     #[test]
     fn bsearch_chr_upstream_d_stranded() {
         let intervals = vec![
-            StrandedBed3::new(1, 0, 300, Strand::Forward),
-            StrandedBed3::new(2, 0, 300, Strand::Reverse), // <- wrong strand
-            StrandedBed3::new(2, 16, 316, Strand::Forward), // <- min
-            StrandedBed3::new(3, 53, 353, Strand::Forward),
+            bed3![1, 0, 300, Strand::Forward],
+            bed3![2, 0, 300, Strand::Reverse],  // <- wrong strand
+            bed3![2, 16, 316, Strand::Forward], // <- min
+            bed3![3, 53, 353, Strand::Forward],
         ];
-        let query = StrandedBed3::new(2, 100, 300, Strand::Forward);
+        let query = bed3![2, 100, 300, Strand::Forward];
         let set = IntervalContainer::from_unsorted(intervals);
         let method = StrandMethod::MatchStrand;
         let bound = set.bound_upstream(&query, method).unwrap();
@@ -992,13 +992,13 @@ mod testing {
     #[test]
     fn bsearch_stranded_downstream_a() {
         let intervals = vec![
-            StrandedBed3::new(1, 0, 300, Strand::Forward),
-            StrandedBed3::new(2, 0, 300, Strand::Forward),
-            StrandedBed3::new(2, 16, 316, Strand::Forward), // <- min
-            StrandedBed3::new(2, 16, 316, Strand::Reverse), // <- wrong-strand
-            StrandedBed3::new(3, 53, 353, Strand::Forward),
+            bed3![1, 0, 300, Strand::Forward],
+            bed3![2, 0, 300, Strand::Forward],
+            bed3![2, 16, 316, Strand::Forward], // <- min
+            bed3![2, 16, 316, Strand::Reverse], // <- wrong-strand
+            bed3![3, 53, 353, Strand::Forward],
         ];
-        let query = StrandedBed3::new(2, 10, 300, Strand::Forward);
+        let query = bed3![2, 10, 300, Strand::Forward];
         let set = IntervalContainer::from_unsorted(intervals);
         let bound = set
             .bound_downstream(&query, StrandMethod::MatchStrand)
@@ -1009,13 +1009,13 @@ mod testing {
     #[test]
     fn bsearch_stranded_downstream_b() {
         let intervals = vec![
-            StrandedBed3::new(1, 0, 300, Strand::Forward),
-            StrandedBed3::new(2, 0, 300, Strand::Forward),
-            StrandedBed3::new(2, 16, 316, Strand::Reverse), // <- wrong-strand
-            StrandedBed3::new(2, 116, 316, Strand::Forward), // <- min
-            StrandedBed3::new(3, 53, 353, Strand::Forward),
+            bed3![1, 0, 300, Strand::Forward],
+            bed3![2, 0, 300, Strand::Forward],
+            bed3![2, 16, 316, Strand::Reverse],  // <- wrong-strand
+            bed3![2, 116, 316, Strand::Forward], // <- min
+            bed3![3, 53, 353, Strand::Forward],
         ];
-        let query = StrandedBed3::new(2, 10, 300, Strand::Forward);
+        let query = bed3![2, 10, 300, Strand::Forward];
         let set = IntervalContainer::from_unsorted(intervals);
         let bound = set
             .bound_downstream(&query, StrandMethod::MatchStrand)
@@ -1026,14 +1026,14 @@ mod testing {
     #[test]
     fn bsearch_stranded_downstream_c() {
         let intervals = vec![
-            StrandedBed3::new(1, 0, 300, Strand::Forward),
-            StrandedBed3::new(2, 0, 300, Strand::Forward),
-            StrandedBed3::new(2, 16, 316, Strand::Reverse), // <- wrong-strand
-            StrandedBed3::new(2, 16, 316, Strand::Unknown), // <- wrong-strand
-            StrandedBed3::new(2, 116, 316, Strand::Forward), // <- min
-            StrandedBed3::new(3, 53, 353, Strand::Forward),
+            bed3![1, 0, 300, Strand::Forward],
+            bed3![2, 0, 300, Strand::Forward],
+            bed3![2, 16, 316, Strand::Reverse],  // <- wrong-strand
+            bed3![2, 16, 316, Strand::Unknown],  // <- wrong-strand
+            bed3![2, 116, 316, Strand::Forward], // <- min
+            bed3![3, 53, 353, Strand::Forward],
         ];
-        let query = StrandedBed3::new(2, 10, 300, Strand::Forward);
+        let query = bed3![2, 10, 300, Strand::Forward];
         let set = IntervalContainer::from_unsorted(intervals);
         let bound = set
             .bound_downstream(&query, StrandMethod::MatchStrand)
@@ -1044,14 +1044,14 @@ mod testing {
     #[test]
     fn bsearch_stranded_downstream_d() {
         let intervals = vec![
-            StrandedBed3::new(1, 0, 300, Strand::Forward),
-            StrandedBed3::new(2, 0, 300, Strand::Forward),
-            StrandedBed3::new(2, 16, 316, Strand::Reverse), // <- wrong-strand
-            StrandedBed3::new(2, 16, 316, Strand::Unknown), // <- wrong-strand
-            StrandedBed3::new(2, 116, 316, Strand::Reverse), // <- wrong-strand
-            StrandedBed3::new(3, 53, 353, Strand::Forward),
+            bed3![1, 0, 300, Strand::Forward],
+            bed3![2, 0, 300, Strand::Forward],
+            bed3![2, 16, 316, Strand::Reverse],  // <- wrong-strand
+            bed3![2, 16, 316, Strand::Unknown],  // <- wrong-strand
+            bed3![2, 116, 316, Strand::Reverse], // <- wrong-strand
+            bed3![3, 53, 353, Strand::Forward],
         ];
-        let query = StrandedBed3::new(2, 10, 300, Strand::Forward);
+        let query = bed3![2, 10, 300, Strand::Forward];
         let set = IntervalContainer::from_unsorted(intervals);
         let bound = set
             .bound_downstream(&query, StrandMethod::MatchStrand)
@@ -1062,13 +1062,13 @@ mod testing {
     #[test]
     fn bsearch_stranded_downstream_e() {
         let intervals = vec![
-            StrandedBed3::new(2, 0, 300, Strand::Forward), // <- wrong-chr
-            StrandedBed3::new(2, 16, 316, Strand::Reverse), // <- wrong-strand
-            StrandedBed3::new(2, 16, 316, Strand::Unknown), // <- wrong-strand
-            StrandedBed3::new(2, 116, 316, Strand::Reverse), // <- wrong-strand
-            StrandedBed3::new(3, 53, 353, Strand::Forward),
+            bed3![2, 0, 300, Strand::Forward],   // <- wrong-chr
+            bed3![2, 16, 316, Strand::Reverse],  // <- wrong-strand
+            bed3![2, 16, 316, Strand::Unknown],  // <- wrong-strand
+            bed3![2, 116, 316, Strand::Reverse], // <- wrong-strand
+            bed3![3, 53, 353, Strand::Forward],
         ];
-        let query = StrandedBed3::new(1, 10, 300, Strand::Forward);
+        let query = bed3![1, 10, 300, Strand::Forward];
         let set = IntervalContainer::from_unsorted(intervals);
         let bound = set
             .bound_downstream(&query, StrandMethod::MatchStrand)
@@ -1137,12 +1137,12 @@ mod testing {
     #[test]
     fn upstream_bound_stranded_smaller_initial_record() {
         let records = vec![
-            StrandedBed3::new(1, 10, 20, Strand::Forward),
-            StrandedBed3::new(1, 30, 40, Strand::Forward),
-            StrandedBed3::new(1, 50, 60, Strand::Forward),
+            bed3![1, 10, 20, Strand::Forward],
+            bed3![1, 30, 40, Strand::Forward],
+            bed3![1, 50, 60, Strand::Forward],
         ];
         let set = IntervalContainer::from_sorted_unchecked(records);
-        let query = StrandedBed3::new(1, 5, 25, Strand::Forward);
+        let query = bed3![1, 5, 25, Strand::Forward];
         let bound = set.bound_stranded_upstream_unchecked(&query);
         assert_eq!(bound, None);
     }
@@ -1159,12 +1159,12 @@ mod testing {
     #[test]
     fn bound_query_stranded_downstream_of_all() {
         let records = vec![
-            StrandedBed3::new(1, 10, 20, Strand::Forward),
-            StrandedBed3::new(1, 30, 40, Strand::Forward),
-            StrandedBed3::new(1, 50, 60, Strand::Forward),
+            bed3![1, 10, 20, Strand::Forward],
+            bed3![1, 30, 40, Strand::Forward],
+            bed3![1, 50, 60, Strand::Forward],
         ];
         let set = IntervalContainer::from_sorted_unchecked(records);
-        let query = StrandedBed3::new(1, 65, 75, Strand::Forward);
+        let query = bed3![1, 65, 75, Strand::Forward];
         let bound = set.bound_stranded_downstream_unchecked(&query);
         assert_eq!(bound, None);
     }
@@ -1172,12 +1172,12 @@ mod testing {
     #[test]
     fn bound_query_stranded_downstream_bound_query_upstream_of_all() {
         let records = vec![
-            StrandedBed3::new(1, 10, 20, Strand::Forward),
-            StrandedBed3::new(1, 30, 40, Strand::Forward),
-            StrandedBed3::new(1, 50, 60, Strand::Forward),
+            bed3![1, 10, 20, Strand::Forward],
+            bed3![1, 30, 40, Strand::Forward],
+            bed3![1, 50, 60, Strand::Forward],
         ];
         let set = IntervalContainer::from_sorted_unchecked(records);
-        let query = StrandedBed3::new(1, 5, 10, Strand::Forward);
+        let query = bed3![1, 5, 10, Strand::Forward];
         let bound = set.bound_stranded_downstream_unchecked(&query);
         assert_eq!(bound, Some(0));
     }
@@ -1185,12 +1185,12 @@ mod testing {
     #[test]
     fn bound_query_stranded_downstream_bound_query_upstream_of_all_no_shared_strand() {
         let records = vec![
-            StrandedBed3::new(1, 10, 20, Strand::Forward),
-            StrandedBed3::new(1, 30, 40, Strand::Forward),
-            StrandedBed3::new(1, 50, 60, Strand::Forward),
+            bed3![1, 10, 20, Strand::Forward],
+            bed3![1, 30, 40, Strand::Forward],
+            bed3![1, 50, 60, Strand::Forward],
         ];
         let set = IntervalContainer::from_sorted_unchecked(records);
-        let query = StrandedBed3::new(1, 5, 10, Strand::Reverse);
+        let query = bed3![1, 5, 10, Strand::Reverse];
         let bound = set.bound_stranded_downstream_unchecked(&query);
         assert_eq!(bound, None);
     }
@@ -1198,12 +1198,12 @@ mod testing {
     #[test]
     fn bound_query_stranded_downstream_bound_query_upstream_of_all_no_shared_chr() {
         let records = vec![
-            StrandedBed3::new(2, 10, 20, Strand::Forward),
-            StrandedBed3::new(2, 30, 40, Strand::Forward),
-            StrandedBed3::new(2, 50, 60, Strand::Forward),
+            bed3![2, 10, 20, Strand::Forward],
+            bed3![2, 30, 40, Strand::Forward],
+            bed3![2, 50, 60, Strand::Forward],
         ];
         let set = IntervalContainer::from_sorted_unchecked(records);
-        let query = StrandedBed3::new(1, 5, 10, Strand::Forward);
+        let query = bed3![1, 5, 10, Strand::Forward];
         let bound = set.bound_stranded_downstream_unchecked(&query);
         assert_eq!(bound, None);
     }

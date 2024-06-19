@@ -28,7 +28,7 @@ use serde::{Deserialize, Serialize};
 /// assert_eq!(*a.chr(), 1);
 /// assert_eq!(a.start(), 20);
 /// assert_eq!(a.end(), 30);
-/// assert_eq!(*a.name(), 10);
+/// assert_eq!(*a.metadata.name(), 10);
 ///
 /// let b = Bed4::new(1, 20, 30, 0);
 /// assert!(a.overlaps(&b));
@@ -113,60 +113,60 @@ where
 #[cfg(test)]
 #[allow(clippy::float_cmp)]
 mod testing {
-    use crate::{bed4, IntervalContainer};
+    use crate::{bed4, bed6, IntervalContainer};
 
     use super::*;
 
     #[test]
     fn test_init_chrom_numeric() {
-        let a = Bed6::new(1, 10, 20, 0, Score(None), Strand::Unknown);
+        let a = bed6![1, 10, 20, 0, Score(None), Strand::Unknown];
         assert_eq!(a.chr(), &1);
         assert_eq!(a.start(), 10);
         assert_eq!(a.end(), 20);
-        assert_eq!(a.name(), &0);
-        assert_eq!(a.score(), Score(None));
+        assert_eq!(a.metadata.name(), &0);
+        assert_eq!(*a.metadata.score(), Score(None));
         assert_eq!(a.strand().unwrap(), Strand::Unknown);
     }
 
     #[test]
     fn test_init_chrom_string() {
-        let a = Bed6::new("chr1".to_string(), 10, 20, 0, Score(None), Strand::Unknown);
+        let a = bed6!["chr1".to_string(), 10, 20, 0, Score(None), Strand::Unknown];
         assert_eq!(a.chr(), &"chr1".to_string());
         assert_eq!(a.start(), 10);
         assert_eq!(a.end(), 20);
-        assert_eq!(a.name(), &0);
-        assert_eq!(a.score(), Score(None));
+        assert_eq!(a.metadata.name(), &0);
+        assert_eq!(*a.metadata.score(), Score(None));
         assert_eq!(a.strand().unwrap(), Strand::Unknown);
     }
 
     #[test]
     fn test_init_name_numeric() {
-        let a = Bed6::new(1, 10, 20, 0, Score(None), Strand::Unknown);
-        assert_eq!(a.name(), &0);
+        let a = bed6![1, 10, 20, 0, Score(None), Strand::Unknown];
+        assert_eq!(a.metadata.name(), &0);
     }
 
     #[test]
     fn test_init_name_string() {
-        let a = Bed6::new(1, 10, 20, "name".to_string(), Score(None), Strand::Unknown);
-        assert_eq!(a.name(), &"name".to_string());
+        let a = bed6![1, 10, 20, "name".to_string(), Score(None), Strand::Unknown];
+        assert_eq!(a.metadata.name(), &"name".to_string());
     }
 
     #[test]
     fn test_init_score_discrete() {
-        let a = Bed6::new(1, 10, 20, "name".to_string(), 11.into(), Strand::Unknown);
-        assert_eq!(a.score(), 11.into());
+        let a = bed6![1, 10, 20, "name".to_string(), 11.into(), Strand::Unknown];
+        assert_eq!(*a.metadata.score(), 11.into());
     }
 
     #[test]
     fn test_init_score_continuous() {
-        let a = Bed6::new(1, 10, 20, "name".to_string(), 11.1.into(), Strand::Unknown);
-        assert_eq!(a.score(), 11.1.into());
+        let a = bed6![1, 10, 20, "name".to_string(), 11.1.into(), Strand::Unknown];
+        assert_eq!(*a.metadata.score(), 11.1.into());
     }
 
     #[test]
     fn convert_to_bed3() {
-        let a = Bed6::new(1, 10, 20, "name".to_string(), 11.1.into(), Strand::Forward);
-        let b: Bed3<i32> = a.into();
+        let a = bed6![1, 10, 20, "name".to_string(), 11.1.into(), Strand::Forward];
+        let b: Bed3<i32> = (&a).into();
         assert_eq!(b.chr(), &1);
         assert_eq!(b.start(), 10);
         assert_eq!(b.end(), 20);
@@ -174,8 +174,8 @@ mod testing {
 
     #[test]
     fn convert_to_bed4() {
-        let a = Bed6::new(1, 10, 20, "name".to_string(), 11.1.into(), Strand::Forward);
-        let b: Bed4<i32, String> = a.into();
+        let a = bed6![1, 10, 20, "name".to_string(), 11.1.into(), Strand::Forward];
+        let b: Bed4<i32, String> = (&a).into();
         assert_eq!(b.chr(), &1);
         assert_eq!(b.start(), 10);
         assert_eq!(b.end(), 20);
@@ -184,7 +184,7 @@ mod testing {
 
     #[test]
     fn convert_to_bed12() {
-        let a = Bed6::new(1, 10, 20, "name".to_string(), 11.1.into(), Strand::Forward);
+        let a = bed6![1, 10, 20, "name".to_string(), 11.1.into(), Strand::Forward];
         let b: Bed12<i32, String, i32, i32, f32, i32, i32, i32> = a.into();
         assert_eq!(b.chr(), &1);
         assert_eq!(b.start(), 10);
@@ -252,8 +252,8 @@ mod testing {
     #[test]
     fn merge_bed6() {
         let set = IntervalContainer::from_sorted_unchecked(vec![
-            Bed6::new(1, 10, 20, "name".to_string(), 0.into(), Strand::Forward),
-            Bed6::new(1, 15, 25, "name".to_string(), 0.into(), Strand::Forward),
+            bed6![1, 10, 20, "name".to_string(), 0.into(), Strand::Forward],
+            bed6![1, 15, 25, "name".to_string(), 0.into(), Strand::Forward],
         ]);
         let merged = set.merge_unchecked();
         assert_eq!(merged.len(), 1);
@@ -273,7 +273,7 @@ mod serde_testing {
 
     #[test]
     fn test_csv_serialization() -> Result<()> {
-        let a = Bed6::new(1, 20, 30, "metadata", 0.into(), Strand::Forward);
+        let a = bed6![1, 20, 30, "metadata", 0.into(), Strand::Forward];
         let mut wtr = WriterBuilder::new().has_headers(false).from_writer(vec![]);
         wtr.serialize(a)?;
         let result = String::from_utf8(wtr.into_inner()?)?;

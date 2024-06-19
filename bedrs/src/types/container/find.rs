@@ -107,7 +107,7 @@ mod testing {
         bed3,
         traits::{ChromBounds, IntervalBounds, ValueBounds},
         types::{Query, QueryMethod, StrandMethod},
-        BaseInterval, Coordinates, IntervalContainer, Strand, StrandedBed3,
+        BaseInterval, Coordinates, IntervalContainer, Strand,
     };
 
     fn validate_set<C, I>(set: &IntervalContainer<I, C>, expected: &[I])
@@ -852,21 +852,21 @@ mod testing {
 
     #[test]
     fn find_stranded_match() -> Result<()> {
-        let query = StrandedBed3::new(1, 10, 20, Strand::Forward);
+        let query = bed3![1, 10, 20, Strand::Forward];
         let set = IntervalContainer::from_sorted(vec![
-            StrandedBed3::new(1, 5, 15, Strand::Forward),
-            StrandedBed3::new(1, 5, 15, Strand::Reverse),
-            StrandedBed3::new(1, 10, 20, Strand::Forward),
-            StrandedBed3::new(1, 10, 20, Strand::Reverse),
-            StrandedBed3::new(1, 15, 25, Strand::Forward),
-            StrandedBed3::new(1, 15, 25, Strand::Reverse),
-            StrandedBed3::new(1, 30, 40, Strand::Forward),
-            StrandedBed3::new(1, 30, 40, Strand::Reverse),
+            bed3![1, 5, 15, Strand::Forward],
+            bed3![1, 5, 15, Strand::Reverse],
+            bed3![1, 10, 20, Strand::Forward],
+            bed3![1, 10, 20, Strand::Reverse],
+            bed3![1, 15, 25, Strand::Forward],
+            bed3![1, 15, 25, Strand::Reverse],
+            bed3![1, 30, 40, Strand::Forward],
+            bed3![1, 30, 40, Strand::Reverse],
         ])?;
         let expected = vec![
-            StrandedBed3::new(1, 5, 15, Strand::Forward),
-            StrandedBed3::new(1, 10, 20, Strand::Forward),
-            StrandedBed3::new(1, 15, 25, Strand::Forward),
+            bed3![1, 5, 15, Strand::Forward],
+            bed3![1, 10, 20, Strand::Forward],
+            bed3![1, 15, 25, Strand::Forward],
         ];
         let method = Query::new(QueryMethod::default(), StrandMethod::MatchStrand);
         let overlaps = set.query(&query, method)?;
@@ -876,18 +876,18 @@ mod testing {
 
     #[test]
     fn find_mininum_overlap_stranded_match() -> Result<()> {
-        let query = StrandedBed3::new(1, 10, 20, Strand::Forward);
+        let query = bed3![1, 10, 20, Strand::Forward];
         let set = IntervalContainer::from_sorted(vec![
-            StrandedBed3::new(1, 5, 15, Strand::Forward),
-            StrandedBed3::new(1, 5, 15, Strand::Reverse),
-            StrandedBed3::new(1, 10, 20, Strand::Forward),
-            StrandedBed3::new(1, 10, 20, Strand::Reverse),
-            StrandedBed3::new(1, 15, 25, Strand::Forward),
-            StrandedBed3::new(1, 15, 25, Strand::Reverse),
-            StrandedBed3::new(1, 30, 40, Strand::Forward),
-            StrandedBed3::new(1, 30, 40, Strand::Reverse),
+            bed3![1, 5, 15, Strand::Forward],
+            bed3![1, 5, 15, Strand::Reverse],
+            bed3![1, 10, 20, Strand::Forward],
+            bed3![1, 10, 20, Strand::Reverse],
+            bed3![1, 15, 25, Strand::Forward],
+            bed3![1, 15, 25, Strand::Reverse],
+            bed3![1, 30, 40, Strand::Forward],
+            bed3![1, 30, 40, Strand::Reverse],
         ])?;
-        let expected = vec![StrandedBed3::new(1, 10, 20, Strand::Forward)];
+        let expected = vec![bed3![1, 10, 20, Strand::Forward]];
         let method = Query::new(QueryMethod::CompareBy(7), StrandMethod::MatchStrand);
         let overlaps = set.query(&query, method)?;
         validate_set(&overlaps, &expected);
@@ -896,21 +896,21 @@ mod testing {
 
     #[test]
     fn find_opposite_stranded_match() -> Result<()> {
-        let query = StrandedBed3::new(1, 10, 20, Strand::Forward);
+        let query = bed3![1, 10, 20, Strand::Forward];
         let set = IntervalContainer::from_sorted(vec![
-            StrandedBed3::new(1, 5, 15, Strand::Forward),
-            StrandedBed3::new(1, 5, 15, Strand::Reverse),
-            StrandedBed3::new(1, 10, 20, Strand::Forward),
-            StrandedBed3::new(1, 10, 20, Strand::Reverse),
-            StrandedBed3::new(1, 15, 25, Strand::Forward),
-            StrandedBed3::new(1, 15, 25, Strand::Reverse),
-            StrandedBed3::new(1, 30, 40, Strand::Forward),
-            StrandedBed3::new(1, 30, 40, Strand::Reverse),
+            bed3![1, 5, 15, Strand::Forward],
+            bed3![1, 5, 15, Strand::Reverse],
+            bed3![1, 10, 20, Strand::Forward],
+            bed3![1, 10, 20, Strand::Reverse],
+            bed3![1, 15, 25, Strand::Forward],
+            bed3![1, 15, 25, Strand::Reverse],
+            bed3![1, 30, 40, Strand::Forward],
+            bed3![1, 30, 40, Strand::Reverse],
         ])?;
         let expected = vec![
-            StrandedBed3::new(1, 5, 15, Strand::Reverse),
-            StrandedBed3::new(1, 10, 20, Strand::Reverse),
-            StrandedBed3::new(1, 15, 25, Strand::Reverse),
+            bed3![1, 5, 15, Strand::Reverse],
+            bed3![1, 10, 20, Strand::Reverse],
+            bed3![1, 15, 25, Strand::Reverse],
         ];
         let method = Query::new(QueryMethod::default(), StrandMethod::OppositeStrand);
         let overlaps = set.query(&query, method)?;
@@ -920,18 +920,18 @@ mod testing {
 
     #[test]
     fn find_minimum_overlap_opposite_stranded_match() -> Result<()> {
-        let query = StrandedBed3::new(1, 10, 20, Strand::Forward);
+        let query = bed3![1, 10, 20, Strand::Forward];
         let set = IntervalContainer::from_sorted(vec![
-            StrandedBed3::new(1, 5, 15, Strand::Forward),
-            StrandedBed3::new(1, 5, 15, Strand::Reverse),
-            StrandedBed3::new(1, 10, 20, Strand::Forward),
-            StrandedBed3::new(1, 10, 20, Strand::Reverse),
-            StrandedBed3::new(1, 15, 25, Strand::Forward),
-            StrandedBed3::new(1, 15, 25, Strand::Reverse),
-            StrandedBed3::new(1, 30, 40, Strand::Forward),
-            StrandedBed3::new(1, 30, 40, Strand::Reverse),
+            bed3![1, 5, 15, Strand::Forward],
+            bed3![1, 5, 15, Strand::Reverse],
+            bed3![1, 10, 20, Strand::Forward],
+            bed3![1, 10, 20, Strand::Reverse],
+            bed3![1, 15, 25, Strand::Forward],
+            bed3![1, 15, 25, Strand::Reverse],
+            bed3![1, 30, 40, Strand::Forward],
+            bed3![1, 30, 40, Strand::Reverse],
         ])?;
-        let expected = vec![StrandedBed3::new(1, 10, 20, Strand::Reverse)];
+        let expected = vec![bed3![1, 10, 20, Strand::Reverse]];
         let method = Query::new(QueryMethod::CompareBy(7), StrandMethod::OppositeStrand);
         let overlaps = set.query(&query, method)?;
         validate_set(&overlaps, &expected);

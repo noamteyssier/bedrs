@@ -294,7 +294,7 @@ mod testing {
     use crate::{
         bed3,
         traits::{ChromBounds, Coordinates, IntervalBounds},
-        BaseInterval, IntervalContainer, Strand, StrandedBed3,
+        BaseInterval, IntervalContainer, Strand,
     };
 
     fn validate_set<C, I>(set: &IntervalContainer<I, C>, expected: &[I])
@@ -430,18 +430,18 @@ mod testing {
     #[test]
     fn merge_intervals_stranded() -> Result<()> {
         let records = vec![
-            StrandedBed3::new(1, 10, 20, Strand::Forward),
-            StrandedBed3::new(1, 15, 25, Strand::Forward),
-            StrandedBed3::new(1, 20, 30, Strand::Reverse), // overlapping but wrong strand
-            StrandedBed3::new(1, 40, 50, Strand::Reverse),
-            StrandedBed3::new(1, 45, 55, Strand::Reverse),
+            bed3![1, 10, 20, Strand::Forward],
+            bed3![1, 15, 25, Strand::Forward],
+            bed3![1, 20, 30, Strand::Reverse], // overlapping but wrong strand
+            bed3![1, 40, 50, Strand::Reverse],
+            bed3![1, 45, 55, Strand::Reverse],
         ];
         let set = IntervalContainer::from_sorted(records)?;
         let merge_set = set.merge_stranded()?.unwrap();
         let expected = vec![
-            StrandedBed3::new(1, 10, 25, Strand::Forward),
-            StrandedBed3::new(1, 20, 30, Strand::Reverse),
-            StrandedBed3::new(1, 40, 55, Strand::Reverse),
+            bed3![1, 10, 25, Strand::Forward],
+            bed3![1, 20, 30, Strand::Reverse],
+            bed3![1, 40, 55, Strand::Reverse],
         ];
 
         validate_set(&merge_set, &expected);
@@ -451,17 +451,17 @@ mod testing {
     #[test]
     fn merge_intervals_stranded_interleaved() -> Result<()> {
         let records = vec![
-            StrandedBed3::new(1, 10, 20, Strand::Forward),
-            StrandedBed3::new(1, 15, 25, Strand::Forward),
-            StrandedBed3::new(1, 20, 30, Strand::Reverse), // overlapping but wrong strand
-            StrandedBed3::new(1, 22, 32, Strand::Forward), // Overlaps the n-2 interval
-            StrandedBed3::new(1, 25, 35, Strand::Reverse), // Overlaps the n-2 interval
+            bed3![1, 10, 20, Strand::Forward],
+            bed3![1, 15, 25, Strand::Forward],
+            bed3![1, 20, 30, Strand::Reverse], // overlapping but wrong strand
+            bed3![1, 22, 32, Strand::Forward], // Overlaps the n-2 interval
+            bed3![1, 25, 35, Strand::Reverse], // Overlaps the n-2 interval
         ];
         let set = IntervalContainer::from_sorted(records)?;
         let merge_set = set.merge_stranded()?.unwrap();
         let expected = vec![
-            StrandedBed3::new(1, 10, 32, Strand::Forward),
-            StrandedBed3::new(1, 20, 35, Strand::Reverse),
+            bed3![1, 10, 32, Strand::Forward],
+            bed3![1, 20, 35, Strand::Reverse],
         ];
         validate_set(&merge_set, &expected);
         Ok(())
@@ -470,19 +470,19 @@ mod testing {
     #[test]
     fn merge_intervals_stranded_interleaved_capped_fwd() -> Result<()> {
         let records = vec![
-            StrandedBed3::new(1, 10, 20, Strand::Forward),
-            StrandedBed3::new(1, 15, 25, Strand::Forward),
-            StrandedBed3::new(1, 20, 30, Strand::Reverse), // overlapping but wrong strand
-            StrandedBed3::new(1, 22, 32, Strand::Forward), // Overlaps the n-2 interval
-            StrandedBed3::new(1, 25, 35, Strand::Reverse), // Overlaps the n-2 interval
-            StrandedBed3::new(2, 10, 20, Strand::Forward), // Doesn't Overlap any previous
+            bed3![1, 10, 20, Strand::Forward],
+            bed3![1, 15, 25, Strand::Forward],
+            bed3![1, 20, 30, Strand::Reverse], // overlapping but wrong strand
+            bed3![1, 22, 32, Strand::Forward], // Overlaps the n-2 interval
+            bed3![1, 25, 35, Strand::Reverse], // Overlaps the n-2 interval
+            bed3![2, 10, 20, Strand::Forward], // Doesn't Overlap any previous
         ];
         let set = IntervalContainer::from_sorted(records)?;
         let merge_set = set.merge_stranded()?.unwrap();
         let expected = vec![
-            StrandedBed3::new(1, 10, 32, Strand::Forward),
-            StrandedBed3::new(1, 20, 35, Strand::Reverse),
-            StrandedBed3::new(2, 10, 20, Strand::Forward),
+            bed3![1, 10, 32, Strand::Forward],
+            bed3![1, 20, 35, Strand::Reverse],
+            bed3![2, 10, 20, Strand::Forward],
         ];
         validate_set(&merge_set, &expected);
         Ok(())
@@ -491,19 +491,19 @@ mod testing {
     #[test]
     fn merge_intervals_stranded_interleaved_capped_rev() -> Result<()> {
         let records = vec![
-            StrandedBed3::new(1, 10, 20, Strand::Forward),
-            StrandedBed3::new(1, 15, 25, Strand::Forward),
-            StrandedBed3::new(1, 20, 30, Strand::Reverse), // overlapping but wrong strand
-            StrandedBed3::new(1, 22, 32, Strand::Forward), // Overlaps the n-2 interval
-            StrandedBed3::new(1, 25, 35, Strand::Reverse), // Overlaps the n-2 interval
-            StrandedBed3::new(2, 10, 20, Strand::Reverse), // Doesn't Overlap any previous
+            bed3![1, 10, 20, Strand::Forward],
+            bed3![1, 15, 25, Strand::Forward],
+            bed3![1, 20, 30, Strand::Reverse], // overlapping but wrong strand
+            bed3![1, 22, 32, Strand::Forward], // Overlaps the n-2 interval
+            bed3![1, 25, 35, Strand::Reverse], // Overlaps the n-2 interval
+            bed3![2, 10, 20, Strand::Reverse], // Doesn't Overlap any previous
         ];
         let set = IntervalContainer::from_sorted(records)?;
         let merge_set = set.merge_stranded()?.unwrap();
         let expected = vec![
-            StrandedBed3::new(1, 10, 32, Strand::Forward),
-            StrandedBed3::new(1, 20, 35, Strand::Reverse),
-            StrandedBed3::new(2, 10, 20, Strand::Reverse),
+            bed3![1, 10, 32, Strand::Forward],
+            bed3![1, 20, 35, Strand::Reverse],
+            bed3![2, 10, 20, Strand::Reverse],
         ];
         validate_set(&merge_set, &expected);
         Ok(())
@@ -512,12 +512,12 @@ mod testing {
     #[test]
     fn merge_intervals_stranded_all_missing_strand_info() -> Result<()> {
         let records = vec![
-            StrandedBed3::new(1, 10, 20, Strand::Unknown),
-            StrandedBed3::new(1, 15, 25, Strand::Unknown),
-            StrandedBed3::new(1, 20, 30, Strand::Unknown),
-            StrandedBed3::new(1, 22, 32, Strand::Unknown),
-            StrandedBed3::new(1, 25, 35, Strand::Unknown),
-            StrandedBed3::new(2, 10, 20, Strand::Unknown),
+            bed3![1, 10, 20, Strand::Unknown],
+            bed3![1, 15, 25, Strand::Unknown],
+            bed3![1, 20, 30, Strand::Unknown],
+            bed3![1, 22, 32, Strand::Unknown],
+            bed3![1, 25, 35, Strand::Unknown],
+            bed3![2, 10, 20, Strand::Unknown],
         ];
         let set = IntervalContainer::from_sorted(records)?;
         let merge_set = set.merge_stranded()?;
@@ -544,21 +544,21 @@ mod testing {
     #[test]
     fn merge_intervals_stranded_skip_missing() -> Result<()> {
         let records = vec![
-            StrandedBed3::new(1, 10, 20, Strand::Forward),
-            StrandedBed3::new(1, 15, 25, Strand::Forward),
-            StrandedBed3::new(1, 20, 30, Strand::Unknown), // Missing info
-            StrandedBed3::new(1, 21, 31, Strand::Unknown), // Missing info
-            StrandedBed3::new(1, 22, 32, Strand::Forward), // Overlaps the n-2 interval
-            StrandedBed3::new(1, 25, 35, Strand::Reverse),
-            StrandedBed3::new(2, 10, 20, Strand::Reverse), // Doesn't Overlap any previous
-            StrandedBed3::new(2, 21, 31, Strand::Unknown), // Missing info
+            bed3![1, 10, 20, Strand::Forward],
+            bed3![1, 15, 25, Strand::Forward],
+            bed3![1, 20, 30, Strand::Unknown], // Missing info
+            bed3![1, 21, 31, Strand::Unknown], // Missing info
+            bed3![1, 22, 32, Strand::Forward], // Overlaps the n-2 interval
+            bed3![1, 25, 35, Strand::Reverse],
+            bed3![2, 10, 20, Strand::Reverse], // Doesn't Overlap any previous
+            bed3![2, 21, 31, Strand::Unknown], // Missing info
         ];
         let set = IntervalContainer::from_sorted(records)?;
         let merge_set = set.merge_stranded()?.unwrap();
         let expected = vec![
-            StrandedBed3::new(1, 10, 32, Strand::Forward),
-            StrandedBed3::new(1, 25, 35, Strand::Reverse),
-            StrandedBed3::new(2, 10, 20, Strand::Reverse),
+            bed3![1, 10, 32, Strand::Forward],
+            bed3![1, 25, 35, Strand::Reverse],
+            bed3![2, 10, 20, Strand::Reverse],
         ];
         validate_set(&merge_set, &expected);
         Ok(())
@@ -567,16 +567,16 @@ mod testing {
     #[test]
     fn merge_intervals_specific_strand_fwd() -> Result<()> {
         let set = IntervalContainer::from_sorted(vec![
-            StrandedBed3::new(1, 10, 20, Strand::Forward),
-            StrandedBed3::new(1, 15, 25, Strand::Forward),
-            StrandedBed3::new(1, 20, 30, Strand::Reverse),
-            StrandedBed3::new(1, 22, 32, Strand::Forward),
-            StrandedBed3::new(1, 25, 35, Strand::Reverse),
-            StrandedBed3::new(2, 10, 20, Strand::Forward),
+            bed3![1, 10, 20, Strand::Forward],
+            bed3![1, 15, 25, Strand::Forward],
+            bed3![1, 20, 30, Strand::Reverse],
+            bed3![1, 22, 32, Strand::Forward],
+            bed3![1, 25, 35, Strand::Reverse],
+            bed3![2, 10, 20, Strand::Forward],
         ])?;
         let expected = vec![
-            StrandedBed3::new(1, 10, 32, Strand::Forward),
-            StrandedBed3::new(2, 10, 20, Strand::Forward),
+            bed3![1, 10, 32, Strand::Forward],
+            bed3![2, 10, 20, Strand::Forward],
         ];
         let merge_set = set.merge_specific_strand(Strand::Forward)?.unwrap();
         validate_set(&merge_set, &expected);
@@ -586,14 +586,14 @@ mod testing {
     #[test]
     fn merge_intervals_specific_strand_rev() -> Result<()> {
         let set = IntervalContainer::from_sorted(vec![
-            StrandedBed3::new(1, 10, 20, Strand::Forward),
-            StrandedBed3::new(1, 15, 25, Strand::Forward),
-            StrandedBed3::new(1, 20, 30, Strand::Reverse),
-            StrandedBed3::new(1, 22, 32, Strand::Forward),
-            StrandedBed3::new(1, 25, 35, Strand::Reverse),
-            StrandedBed3::new(2, 10, 20, Strand::Forward),
+            bed3![1, 10, 20, Strand::Forward],
+            bed3![1, 15, 25, Strand::Forward],
+            bed3![1, 20, 30, Strand::Reverse],
+            bed3![1, 22, 32, Strand::Forward],
+            bed3![1, 25, 35, Strand::Reverse],
+            bed3![2, 10, 20, Strand::Forward],
         ])?;
-        let expected = vec![StrandedBed3::new(1, 20, 35, Strand::Reverse)];
+        let expected = vec![bed3![1, 20, 35, Strand::Reverse]];
         let merge_set = set.merge_specific_strand(Strand::Reverse)?.unwrap();
         validate_set(&merge_set, &expected);
         Ok(())
@@ -602,12 +602,12 @@ mod testing {
     #[test]
     fn merge_intervals_specific_strand_unknown() -> Result<()> {
         let set = IntervalContainer::from_sorted(vec![
-            StrandedBed3::new(1, 10, 20, Strand::Unknown),
-            StrandedBed3::new(1, 15, 25, Strand::Unknown),
-            StrandedBed3::new(1, 20, 30, Strand::Unknown),
-            StrandedBed3::new(1, 22, 32, Strand::Unknown),
-            StrandedBed3::new(1, 25, 35, Strand::Unknown),
-            StrandedBed3::new(2, 10, 20, Strand::Unknown),
+            bed3![1, 10, 20, Strand::Unknown],
+            bed3![1, 15, 25, Strand::Unknown],
+            bed3![1, 20, 30, Strand::Unknown],
+            bed3![1, 22, 32, Strand::Unknown],
+            bed3![1, 25, 35, Strand::Unknown],
+            bed3![2, 10, 20, Strand::Unknown],
         ])?;
         let merge_set = set.merge_specific_strand(Strand::Unknown);
         assert!(merge_set.is_err());
@@ -617,12 +617,12 @@ mod testing {
     #[test]
     fn merge_intervals_specific_strand_unknown_strand_fwd() -> Result<()> {
         let set = IntervalContainer::from_sorted(vec![
-            StrandedBed3::new(1, 10, 20, Strand::Unknown),
-            StrandedBed3::new(1, 15, 25, Strand::Unknown),
-            StrandedBed3::new(1, 20, 30, Strand::Unknown),
-            StrandedBed3::new(1, 22, 32, Strand::Unknown),
-            StrandedBed3::new(1, 25, 35, Strand::Unknown),
-            StrandedBed3::new(2, 10, 20, Strand::Unknown),
+            bed3![1, 10, 20, Strand::Unknown],
+            bed3![1, 15, 25, Strand::Unknown],
+            bed3![1, 20, 30, Strand::Unknown],
+            bed3![1, 22, 32, Strand::Unknown],
+            bed3![1, 25, 35, Strand::Unknown],
+            bed3![2, 10, 20, Strand::Unknown],
         ])?;
         let merge_set = set.merge_specific_strand(Strand::Forward)?;
         assert!(merge_set.is_none());
@@ -632,12 +632,12 @@ mod testing {
     #[test]
     fn merge_intervals_specific_strand_unknown_strand_rev() -> Result<()> {
         let set = IntervalContainer::from_sorted(vec![
-            StrandedBed3::new(1, 10, 20, Strand::Unknown),
-            StrandedBed3::new(1, 15, 25, Strand::Unknown),
-            StrandedBed3::new(1, 20, 30, Strand::Unknown),
-            StrandedBed3::new(1, 22, 32, Strand::Unknown),
-            StrandedBed3::new(1, 25, 35, Strand::Unknown),
-            StrandedBed3::new(2, 10, 20, Strand::Unknown),
+            bed3![1, 10, 20, Strand::Unknown],
+            bed3![1, 15, 25, Strand::Unknown],
+            bed3![1, 20, 30, Strand::Unknown],
+            bed3![1, 22, 32, Strand::Unknown],
+            bed3![1, 25, 35, Strand::Unknown],
+            bed3![2, 10, 20, Strand::Unknown],
         ])?;
         let merge_set = set.merge_specific_strand(Strand::Reverse)?;
         assert!(merge_set.is_none());

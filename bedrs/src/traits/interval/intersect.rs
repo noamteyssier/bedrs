@@ -41,9 +41,9 @@ where
     /// ```
     /// use bedrs::{Coordinates, Intersect, StrandedBed3, Strand};
     ///
-    /// let a = StrandedBed3::new(1, 10, 20, Strand::Forward);
-    /// let b = StrandedBed3::new(1, 15, 25, Strand::Forward);
-    /// let c = StrandedBed3::new(1, 15, 25, Strand::Reverse);
+    /// let a = bed3![1, 10, 20, Strand::Forward];
+    /// let b = bed3![1, 15, 25, Strand::Forward];
+    /// let c = bed3![1, 15, 25, Strand::Reverse];
     ///
     /// let ix = a.stranded_intersect(&b).unwrap();
     /// assert_eq!(ix.start(), 15);
@@ -66,7 +66,7 @@ where
 #[allow(clippy::many_single_char_names)]
 mod testing {
     use super::Intersect;
-    use crate::{bed3, BaseInterval, Coordinates, Strand, StrandedBed3};
+    use crate::{bed3, BaseInterval, Coordinates, Strand};
 
     #[test]
     ///       x-------y
@@ -94,11 +94,11 @@ mod testing {
 
     #[test]
     fn intersection_case_a_stranded() {
-        let a = StrandedBed3::new(1, 20, 30, Strand::Forward);
-        let b = StrandedBed3::new(1, 15, 25, Strand::Forward);
-        let c = StrandedBed3::new(1, 15, 25, Strand::Reverse);
-        let d = StrandedBed3::new(2, 15, 25, Strand::Forward);
-        let e = StrandedBed3::new(2, 15, 25, Strand::Reverse);
+        let a = bed3![1, 20, 30, Strand::Forward];
+        let b = bed3![1, 15, 25, Strand::Forward];
+        let c = bed3![1, 15, 25, Strand::Reverse];
+        let d = bed3![2, 15, 25, Strand::Forward];
+        let e = bed3![2, 15, 25, Strand::Reverse];
         let ix = a.stranded_intersect(&b).unwrap();
         assert_eq!(ix.start(), 20);
         assert_eq!(ix.end(), 25);
@@ -134,11 +134,11 @@ mod testing {
 
     #[test]
     fn intersection_case_b_stranded() {
-        let a = StrandedBed3::new(1, 20, 30, Strand::Forward);
-        let b = StrandedBed3::new(1, 25, 35, Strand::Forward);
-        let c = StrandedBed3::new(1, 25, 35, Strand::Reverse);
-        let d = StrandedBed3::new(2, 25, 35, Strand::Forward);
-        let e = StrandedBed3::new(2, 25, 35, Strand::Reverse);
+        let a = bed3![1, 20, 30, Strand::Forward];
+        let b = bed3![1, 25, 35, Strand::Forward];
+        let c = bed3![1, 25, 35, Strand::Reverse];
+        let d = bed3![2, 25, 35, Strand::Forward];
+        let e = bed3![2, 25, 35, Strand::Reverse];
         let ix = a.stranded_intersect(&b).unwrap();
         assert_eq!(ix.start(), 25);
         assert_eq!(ix.end(), 30);
@@ -174,11 +174,11 @@ mod testing {
 
     #[test]
     fn intersection_case_c_stranded() {
-        let a = StrandedBed3::new(1, 20, 40, Strand::Forward);
-        let b = StrandedBed3::new(1, 25, 35, Strand::Forward);
-        let c = StrandedBed3::new(1, 25, 35, Strand::Reverse);
-        let d = StrandedBed3::new(2, 25, 35, Strand::Forward);
-        let e = StrandedBed3::new(2, 25, 35, Strand::Reverse);
+        let a = bed3![1, 20, 40, Strand::Forward];
+        let b = bed3![1, 25, 35, Strand::Forward];
+        let c = bed3![1, 25, 35, Strand::Reverse];
+        let d = bed3![2, 25, 35, Strand::Forward];
+        let e = bed3![2, 25, 35, Strand::Reverse];
         let ix = a.stranded_intersect(&b).unwrap();
         assert_eq!(ix.start(), 25);
         assert_eq!(ix.end(), 35);
@@ -214,11 +214,11 @@ mod testing {
 
     #[test]
     fn intersection_case_d_stranded() {
-        let a = StrandedBed3::new(1, 25, 35, Strand::Forward);
-        let b = StrandedBed3::new(1, 20, 40, Strand::Forward);
-        let c = StrandedBed3::new(1, 20, 40, Strand::Reverse);
-        let d = StrandedBed3::new(2, 20, 40, Strand::Forward);
-        let e = StrandedBed3::new(2, 20, 40, Strand::Reverse);
+        let a = bed3![1, 25, 35, Strand::Forward];
+        let b = bed3![1, 20, 40, Strand::Forward];
+        let c = bed3![1, 20, 40, Strand::Reverse];
+        let d = bed3![2, 20, 40, Strand::Forward];
+        let e = bed3![2, 20, 40, Strand::Reverse];
         let ix = a.stranded_intersect(&b).unwrap();
         assert_eq!(ix.start(), 25);
         assert_eq!(ix.end(), 35);
@@ -254,11 +254,11 @@ mod testing {
 
     #[test]
     fn intersection_case_e_stranded() {
-        let a = StrandedBed3::new(1, 20, 40, Strand::Forward);
-        let b = StrandedBed3::new(1, 20, 40, Strand::Forward);
-        let c = StrandedBed3::new(1, 20, 40, Strand::Reverse);
-        let d = StrandedBed3::new(2, 20, 40, Strand::Forward);
-        let e = StrandedBed3::new(2, 20, 40, Strand::Reverse);
+        let a = bed3![1, 20, 40, Strand::Forward];
+        let b = bed3![1, 20, 40, Strand::Forward];
+        let c = bed3![1, 20, 40, Strand::Reverse];
+        let d = bed3![2, 20, 40, Strand::Forward];
+        let e = bed3![2, 20, 40, Strand::Reverse];
         let ix = a.stranded_intersect(&b).unwrap();
         assert_eq!(ix.start(), 20);
         assert_eq!(ix.end(), 40);
@@ -291,11 +291,11 @@ mod testing {
 
     #[test]
     fn intersection_case_none_stranded() {
-        let a = StrandedBed3::new(1, 10, 15, Strand::Forward);
-        let b = StrandedBed3::new(1, 20, 25, Strand::Forward);
-        let c = StrandedBed3::new(1, 20, 25, Strand::Reverse);
-        let d = StrandedBed3::new(2, 20, 25, Strand::Forward);
-        let e = StrandedBed3::new(2, 20, 25, Strand::Reverse);
+        let a = bed3![1, 10, 15, Strand::Forward];
+        let b = bed3![1, 20, 25, Strand::Forward];
+        let c = bed3![1, 20, 25, Strand::Reverse];
+        let d = bed3![2, 20, 25, Strand::Forward];
+        let e = bed3![2, 20, 25, Strand::Reverse];
         assert!(a.stranded_intersect(&b).is_none());
         assert!(a.stranded_intersect(&c).is_none());
         assert!(a.stranded_intersect(&d).is_none());
