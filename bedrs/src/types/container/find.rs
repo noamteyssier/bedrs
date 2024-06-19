@@ -144,7 +144,7 @@ mod testing {
             .iter()
             .zip(ends.iter())
             .map(|(s, e)| BaseInterval::new(*s, *e))
-            .collect::<Vec<BaseInterval<u32>>>();
+            .collect::<Vec<BaseInterval>>();
         let set = IntervalContainer::from_unsorted(records);
         let method = Query::default();
         let overlaps = set.query(&query, method).unwrap();
@@ -160,7 +160,7 @@ mod testing {
             .iter()
             .zip(ends.iter())
             .map(|(s, e)| BaseInterval::new(*s, *e))
-            .collect::<Vec<BaseInterval<u32>>>();
+            .collect::<Vec<BaseInterval>>();
         let set = IntervalContainer::from_unsorted(records);
         let method = Query::default();
         let overlaps = set.query_iter_owned(query, method).unwrap();
@@ -195,7 +195,7 @@ mod testing {
             .iter()
             .zip(ends.iter())
             .map(|(s, e)| BaseInterval::new(*s, *e))
-            .collect::<Vec<BaseInterval<u32>>>();
+            .collect::<Vec<BaseInterval>>();
         let set = IntervalContainer::from_unsorted(records);
         let method = Query::new_predicate(QueryMethod::CompareBy(5));
         let overlaps = set.query(&query, method).unwrap();
@@ -211,7 +211,7 @@ mod testing {
             .iter()
             .zip(ends.iter())
             .map(|(s, e)| BaseInterval::new(*s, *e))
-            .collect::<Vec<BaseInterval<u32>>>();
+            .collect::<Vec<BaseInterval>>();
         let set = IntervalContainer::from_unsorted(records);
         let method = Query::new_predicate(QueryMethod::CompareExact(7));
         let overlaps = set.query(&query, method).unwrap();
@@ -227,7 +227,7 @@ mod testing {
             .iter()
             .zip(ends.iter())
             .map(|(s, e)| BaseInterval::new(*s, *e))
-            .collect::<Vec<BaseInterval<u32>>>();
+            .collect::<Vec<BaseInterval>>();
         let set = IntervalContainer::from_unsorted(records);
         let num_overlaps = set.query_iter(&query, Query::default()).unwrap().count();
         assert_eq!(num_overlaps, 1);
@@ -242,7 +242,7 @@ mod testing {
             .iter()
             .zip(ends.iter())
             .map(|(s, e)| BaseInterval::new(*s, *e))
-            .collect::<Vec<BaseInterval<u32>>>();
+            .collect::<Vec<BaseInterval>>();
         let set = IntervalContainer::from_unsorted(records);
         let num_overlaps = set.query_iter(&query, Query::default()).unwrap().count();
         assert_eq!(num_overlaps, 1);
@@ -257,7 +257,7 @@ mod testing {
             .iter()
             .zip(ends.iter())
             .map(|(s, e)| BaseInterval::new(*s, *e))
-            .collect::<Vec<BaseInterval<u32>>>();
+            .collect::<Vec<BaseInterval>>();
         let set = IntervalContainer::from_unsorted(records);
         let num_overlaps = set.query_iter(&query, Query::default()).unwrap().count();
         assert_eq!(num_overlaps, 1);
@@ -272,7 +272,7 @@ mod testing {
             .iter()
             .zip(ends.iter())
             .map(|(s, e)| BaseInterval::new(*s, *e))
-            .collect::<Vec<BaseInterval<u32>>>();
+            .collect::<Vec<BaseInterval>>();
         let set = IntervalContainer::from_unsorted(records);
         let num_overlaps = set.query_iter(&query, Query::default()).unwrap().count();
         assert_eq!(num_overlaps, 1);
@@ -287,7 +287,7 @@ mod testing {
             .iter()
             .zip(ends.iter())
             .map(|(s, e)| BaseInterval::new(*s, *e))
-            .collect::<Vec<BaseInterval<u32>>>();
+            .collect::<Vec<BaseInterval>>();
         let set = IntervalContainer::from_iter(records);
         let overlaps = set.query_iter(&query, Query::default());
         assert!(overlaps.is_err());
@@ -302,7 +302,7 @@ mod testing {
             .iter()
             .zip(ends.iter())
             .map(|(s, e)| BaseInterval::new(*s, *e))
-            .collect::<Vec<BaseInterval<u32>>>();
+            .collect::<Vec<BaseInterval>>();
         let set = IntervalContainer::from_unsorted(records);
         let overlaps = set
             .query_iter(&query, Query::new_predicate(QueryMethod::CompareBy(5)))
@@ -320,7 +320,7 @@ mod testing {
             .iter()
             .zip(ends.iter())
             .map(|(s, e)| BaseInterval::new(*s, *e))
-            .collect::<Vec<BaseInterval<u32>>>();
+            .collect::<Vec<BaseInterval>>();
         let set = IntervalContainer::from_unsorted(records);
         let overlaps = set
             .query_iter(&query, Query::new_predicate(QueryMethod::CompareExact(7)))
@@ -338,7 +338,7 @@ mod testing {
             .iter()
             .zip(ends.iter())
             .map(|(s, e)| BaseInterval::new(*s, *e))
-            .collect::<Vec<BaseInterval<u32>>>();
+            .collect::<Vec<BaseInterval>>();
         let set = IntervalContainer::from_unsorted(records);
         let overlaps = set
             .query_iter(&query, Query::new_predicate(QueryMethod::CompareBy(5)))
@@ -356,7 +356,7 @@ mod testing {
             .iter()
             .zip(ends.iter())
             .map(|(s, e)| BaseInterval::new(*s, *e))
-            .collect::<Vec<BaseInterval<u32>>>();
+            .collect::<Vec<BaseInterval>>();
         let set = IntervalContainer::from_unsorted(records);
         let overlaps = set
             .query_iter(&query, Query::new_predicate(QueryMethod::CompareExact(7)))

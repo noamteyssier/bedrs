@@ -1,8 +1,8 @@
 use bedrs::{types::StrandMethod, BaseInterval, IntervalContainer};
 use criterion::Criterion;
 
-const N: usize = 10000;
-const SIZE: usize = 100;
+const N: i32 = 10000;
+const SIZE: i32 = 100;
 
 pub fn lower_bound(c: &mut Criterion) {
     let records = (0..N)

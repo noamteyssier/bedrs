@@ -100,7 +100,7 @@ mod testing {
         let expected = [BaseInterval::new(1, 6), BaseInterval::new(7, 12)];
         let interval_iter = intervals.into_iter();
         let merge_iter = MergeIter::new(interval_iter);
-        let result: Vec<BaseInterval<u32>> = merge_iter.collect();
+        let result: Vec<BaseInterval> = merge_iter.collect();
         assert_eq!(result.len(), expected.len());
         for (res, exp) in result.iter().zip(expected.iter()) {
             assert!(res.eq(exp));
@@ -125,7 +125,7 @@ mod testing {
         ];
         let interval_iter = intervals.into_iter();
         let merge_iter = MergeIter::new(interval_iter);
-        let result: Vec<Bed3<u32, u32>> = merge_iter.collect();
+        let result: Vec<Bed3<u32>> = merge_iter.collect();
         assert_eq!(result.len(), expected.len());
         for (res, exp) in result.iter().zip(expected.iter()) {
             assert!(Coordinates::eq(res, exp));

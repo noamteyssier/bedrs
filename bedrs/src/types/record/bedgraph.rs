@@ -32,35 +32,32 @@ use serde::{Deserialize, Serialize};
 /// ```
 #[derive(Debug, Default, Clone, Copy, Coordinates, Getters, Setters, CopyGetters, new)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct BedGraph<C, T>
+pub struct BedGraph<C>
 where
     C: ChromBounds,
-    T: ValueBounds,
 {
     chr: C,
-    start: T,
-    end: T,
+    start: i32,
+    end: i32,
     #[getset(get_copy = "pub", set = "pub")]
     score: f64,
 }
 
-impl<C, T> From<BedGraph<C, T>> for Bed3<C, T>
+impl<C> From<BedGraph<C>> for Bed3<C>
 where
     C: ChromBounds,
-    T: ValueBounds,
 {
-    fn from(bed: BedGraph<C, T>) -> Self {
+    fn from(bed: BedGraph<C>) -> Self {
         Self::new(bed.chr, bed.start, bed.end)
     }
 }
 
-impl<C, T, N> From<BedGraph<C, T>> for Bed6<C, T, N>
+impl<C, N> From<BedGraph<C>> for Bed6<C, N>
 where
     C: ChromBounds,
-    T: ValueBounds,
     N: MetaBounds + std::convert::From<f64>,
 {
-    fn from(bed: BedGraph<C, T>) -> Self {
+    fn from(bed: BedGraph<C>) -> Self {
         Self::new(
             bed.chr,
             bed.start,
@@ -72,18 +69,18 @@ where
     }
 }
 
-impl<C, T, N, Ts, Te, R, Si, St> From<BedGraph<C, T>> for Bed12<C, T, N, Ts, Te, R, Si, St>
+impl<C, N, Ts, Te, R, T, Si, St> From<BedGraph<C>> for Bed12<C, N, Ts, Te, R, T, Si, St>
 where
     C: ChromBounds,
-    T: ValueBounds,
     N: MetaBounds + From<f64>,
     Ts: ValueBounds,
     Te: ValueBounds,
     R: MetaBounds,
+    T: ValueBounds,
     Si: MetaBounds,
     St: MetaBounds,
 {
-    fn from(bed: BedGraph<C, T>) -> Self {
+    fn from(bed: BedGraph<C>) -> Self {
         Self::new(
             bed.chr,
             bed.start,
@@ -137,7 +134,7 @@ mod testing {
     #[test]
     fn convert_to_bed3() {
         let b = BedGraph::new(1, 10, 20, 66.6);
-        let b3: Bed3<_, _> = b.into();
+        let b3: Bed3<_> = b.into();
         assert_eq!(b3.chr(), &1);
         assert_eq!(b3.start(), 10);
         assert_eq!(b3.end(), 20);
@@ -146,7 +143,7 @@ mod testing {
     #[test]
     fn convert_to_bed4() {
         let b = BedGraph::new(1, 10, 20, 66.6);
-        let b4: Bed6<_, _, f64> = b.into();
+        let b4: Bed6<_, f64> = b.into();
         assert_eq!(b4.chr(), &1);
         assert_eq!(b4.start(), 10);
         assert_eq!(b4.end(), 20);
@@ -156,7 +153,7 @@ mod testing {
     #[test]
     fn convert_to_bed6() {
         let b = BedGraph::new(1, 10, 20, 66.6);
-        let b6: Bed6<i32, i32, f64> = b.into();
+        let b6: Bed6<i32, f64> = b.into();
         assert_eq!(b6.chr(), &1);
         assert_eq!(b6.start(), 10);
         assert_eq!(b6.end(), 20);
@@ -168,7 +165,7 @@ mod testing {
     #[test]
     fn convert_to_bed12() {
         let b = BedGraph::new(1, 10, 20, 66.6);
-        let b12: Bed12<i32, i32, f64, i32, i32, i32, i32, i32> = b.into();
+        let b12: Bed12<i32, f64, i32, i32, i32, i32, i32, i32> = b.into();
         assert_eq!(b12.chr(), &1);
         assert_eq!(b12.start(), 10);
         assert_eq!(b12.end(), 20);
@@ -186,7 +183,7 @@ mod testing {
     #[test]
     fn from_bed3() {
         let b3 = Bed3::new(1, 10, 20);
-        let bg: BedGraph<_, _> = b3.into();
+        let bg: BedGraph<_> = b3.into();
         assert_eq!(bg.chr(), &1);
         assert_eq!(bg.start(), 10);
         assert_eq!(bg.end(), 20);
@@ -196,7 +193,7 @@ mod testing {
     #[test]
     fn from_bed4() {
         let b4 = Bed4::new(1, 10, 20, 66.6);
-        let bg: BedGraph<_, _> = b4.into();
+        let bg: BedGraph<_> = b4.into();
         assert_eq!(bg.chr(), &1);
         assert_eq!(bg.start(), 10);
         assert_eq!(bg.end(), 20);
@@ -206,7 +203,7 @@ mod testing {
     #[test]
     fn from_bed6() {
         let b6 = Bed6::new(1, 10, 20, 66.6, 30.into(), Strand::Unknown);
-        let bg: BedGraph<_, _> = b6.into();
+        let bg: BedGraph<_> = b6.into();
         assert_eq!(bg.chr(), &1);
         assert_eq!(bg.start(), 10);
         assert_eq!(bg.end(), 20);
@@ -229,7 +226,7 @@ mod testing {
             80,
             90,
         );
-        let bg: BedGraph<_, _> = b12.into();
+        let bg: BedGraph<_> = b12.into();
         assert_eq!(bg.chr(), &1);
         assert_eq!(bg.start(), 10);
         assert_eq!(bg.end(), 20);
@@ -267,7 +264,7 @@ mod serde_testing {
             .has_headers(false)
             .from_reader(a.as_bytes());
         let mut iter = rdr.deserialize();
-        let b: BedGraph<String, i32> = iter.next().unwrap()?;
+        let b: BedGraph<String> = iter.next().unwrap()?;
         assert_eq!(b.chr(), "chr1");
         assert_eq!(b.start(), 20);
         assert_eq!(b.end(), 30);

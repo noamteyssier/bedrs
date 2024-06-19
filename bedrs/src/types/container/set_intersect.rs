@@ -17,6 +17,7 @@ where
     /// # Panics
     /// Panics if the intersection of two intervals fails to be computed (like from unsorted
     /// containers)
+    #[must_use]
     pub fn ix_set_target<Iv>(
         &'a self,
         other: &'a IntervalContainer<Iv, C>,
@@ -47,6 +48,7 @@ where
     /// # Panics
     /// Panics if the intersection of two intervals fails to be computed (like from unsorted
     /// containers)
+    #[must_use]
     pub fn ix_set_query<Iv>(
         &'a self,
         other: &'a IntervalContainer<Iv, C>,

@@ -86,9 +86,10 @@ where
             Some(0)
         } else if self.chr() != other.chr() {
             None
+        } else if self.gt(other) {
+            Some(other.end() - self.start())
         } else {
-            // always signed
-            Some(self.start() - other.end())
+            Some(other.start() - self.end())
         }
     }
 }

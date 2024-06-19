@@ -57,6 +57,7 @@ where
         }
     }
 
+    #[must_use]
     pub fn complement_unchecked(self) -> ComplementIterOwned<I, C> {
         ComplementIter::new(self.into_iter())
     }

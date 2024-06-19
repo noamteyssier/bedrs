@@ -238,7 +238,7 @@ mod testing {
 
     #[test]
     fn closest_empty() {
-        let intervals: Vec<Bed3<i32, i32>> = vec![];
+        let intervals: Vec<Bed3<i32>> = vec![];
         let query = Bed3::new(1, 22, 23);
         let set = IntervalContainer::from_unsorted(intervals);
         assert!(set.closest(&query, StrandMethod::Ignore).is_err());

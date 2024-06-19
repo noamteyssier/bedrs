@@ -1,5 +1,5 @@
 use crate::{
-    traits::{ChromBounds, MetaBounds, ValueBounds},
+    traits::{ChromBounds, MetaBounds},
     types::{enums::Frame, Score},
     Bed3, Coordinates, Strand,
 };
@@ -47,10 +47,9 @@ use serde::{Deserialize, Serialize};
 #[allow(clippy::too_many_arguments)]
 #[derive(Debug, Clone, Copy, Default, Coordinates, Getters, Setters, CopyGetters, new)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct Gtf<C, T, N>
+pub struct Gtf<C, N>
 where
     C: ChromBounds,
-    T: ValueBounds,
     N: MetaBounds,
 {
     chr: C,
@@ -58,8 +57,8 @@ where
     source: N,
     #[getset(get = "pub", set = "pub")]
     feature: N,
-    start: T,
-    end: T,
+    start: i32,
+    end: i32,
     #[getset(get_copy = "pub", set = "pub")]
     score: Score,
     strand: Strand,
@@ -69,13 +68,12 @@ where
     attributes: N,
 }
 
-impl<C, T, N> From<Gtf<C, T, N>> for Bed3<C, T>
+impl<C, N> From<Gtf<C, N>> for Bed3<C>
 where
     C: ChromBounds,
-    T: ValueBounds,
     N: MetaBounds,
 {
-    fn from(record: Gtf<C, T, N>) -> Self {
+    fn from(record: Gtf<C, N>) -> Self {
         Self::new(record.chr, record.start, record.end)
     }
 }
@@ -148,7 +146,7 @@ mod testing {
 
     #[test]
     fn test_collect() {
-        let set: IntervalContainer<Gtf<usize, usize, usize>, _, _> =
+        let set: IntervalContainer<Gtf<usize, usize>, _> =
             IntervalContainer::from_iter(vec![Gtf::empty(); 10]);
         assert_eq!(set.len(), 10);
     }
@@ -166,7 +164,7 @@ mod testing {
             0.into(),
             "some_attr",
         );
-        let bed3: Bed3<_, _> = record.into();
+        let bed3: Bed3<_> = record.into();
         assert_eq!(bed3.chr(), &1);
         assert_eq!(bed3.start(), 10);
         assert_eq!(bed3.end(), 30);
@@ -207,7 +205,7 @@ mod serde_testing {
             .has_headers(false)
             .from_reader(a.as_bytes());
         let mut iter = rdr.deserialize();
-        let b: Gtf<String, i32, String> = iter.next().unwrap()?;
+        let b: Gtf<String, String> = iter.next().unwrap()?;
         assert_eq!(b.chr(), "chr1");
         assert_eq!(b.source(), "Ensembl");
         assert_eq!(b.feature(), "gene");

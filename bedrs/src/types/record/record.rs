@@ -35,7 +35,7 @@ where
     }
 }
 
-impl<C, M> Coordinates<C, i32> for Record<C, M>
+impl<C, M> Coordinates<C> for Record<C, M>
 where
     C: ChromBounds,
     M: RecordMetadata,
@@ -64,7 +64,7 @@ where
     fn update_strand(&mut self, strand: Option<crate::Strand>) {
         self.metadata.update_strand(strand);
     }
-    fn from<Iv: Coordinates<C, i32>>(iv: &Iv) -> Self {
+    fn from<Iv: Coordinates<C>>(iv: &Iv) -> Self {
         let mut new = Self::default();
         new.update_chr(iv.chr());
         new.update_start(&iv.start());

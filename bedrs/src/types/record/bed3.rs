@@ -4,6 +4,7 @@ use crate::{
     Bed12, Bed4, Bed6, BedGraph, Coordinates, Strand,
 };
 use bedrs_derive::Coordinates;
+use derive_new::new;
 use num_traits::zero;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
@@ -26,56 +27,42 @@ use serde::{Deserialize, Serialize};
 /// let b = Bed3::new(1, 20, 30);
 /// assert!(a.overlaps(&b));
 /// ```
-#[derive(Debug, Default, Clone, Copy, Coordinates)]
+#[derive(Debug, Default, Clone, Copy, Coordinates, new)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct Bed3<C, T>
+pub struct Bed3<C>
 where
     C: ChromBounds,
-    T: ValueBounds,
 {
     chr: C,
-    start: T,
-    end: T,
+    start: i32,
+    end: i32,
 }
 
-impl<C, T> Bed3<C, T>
+impl<C, N> From<Bed3<C>> for Bed4<C, N>
 where
     C: ChromBounds,
-    T: ValueBounds,
-{
-    pub fn new(chr: C, start: T, end: T) -> Self {
-        Self { chr, start, end }
-    }
-}
-
-impl<C, T, N> From<Bed3<C, T>> for Bed4<C, T, N>
-where
-    C: ChromBounds,
-    T: ValueBounds,
     N: MetaBounds,
 {
-    fn from(bed: Bed3<C, T>) -> Self {
+    fn from(bed: Bed3<C>) -> Self {
         Self::new(bed.chr, bed.start, bed.end, N::default())
     }
 }
 
-impl<C, T> From<Bed3<C, T>> for BedGraph<C, T>
+impl<C> From<Bed3<C>> for BedGraph<C>
 where
     C: ChromBounds,
-    T: ValueBounds,
 {
-    fn from(bed: Bed3<C, T>) -> Self {
+    fn from(bed: Bed3<C>) -> Self {
         Self::new(bed.chr, bed.start, bed.end, f64::default())
     }
 }
 
-impl<C, T, N> From<Bed3<C, T>> for Bed6<C, T, N>
+impl<C, N> From<Bed3<C>> for Bed6<C, N>
 where
     C: ChromBounds,
-    T: ValueBounds,
     N: MetaBounds,
 {
-    fn from(bed: Bed3<C, T>) -> Self {
+    fn from(bed: Bed3<C>) -> Self {
         Self::new(
             bed.chr,
             bed.start,
@@ -87,18 +74,18 @@ where
     }
 }
 
-impl<C, T, N, Ts, Te, R, Si, St> From<Bed3<C, T>> for Bed12<C, T, N, Ts, Te, R, Si, St>
+impl<C, N, Ts, Te, R, T, Si, St> From<Bed3<C>> for Bed12<C, N, Ts, Te, R, T, Si, St>
 where
     C: ChromBounds,
-    T: ValueBounds,
     N: MetaBounds,
     Ts: ValueBounds,
     Te: ValueBounds,
     R: MetaBounds,
+    T: ValueBounds,
     Si: MetaBounds,
     St: MetaBounds,
 {
-    fn from(bed: Bed3<C, T>) -> Self {
+    fn from(bed: Bed3<C>) -> Self {
         Self::new(
             bed.chr,
             bed.start,
@@ -139,7 +126,7 @@ mod testing {
     #[test]
     fn convert_to_bed4() {
         let a = Bed3::new("chr1", 20, 30);
-        let b: Bed4<_, _, i32> = a.into();
+        let b: Bed4<_, i32> = a.into();
         assert_eq!(*b.chr(), "chr1");
         assert_eq!(b.start(), 20);
         assert_eq!(b.end(), 30);
@@ -149,7 +136,7 @@ mod testing {
     #[test]
     fn convert_to_bed6() {
         let a = Bed3::new("chr1", 20, 30);
-        let b: Bed6<_, _, i32> = a.into();
+        let b: Bed6<_, i32> = a.into();
         assert_eq!(*b.chr(), "chr1");
         assert_eq!(b.start(), 20);
         assert_eq!(b.end(), 30);
@@ -161,7 +148,7 @@ mod testing {
     #[test]
     fn convert_to_bed12() {
         let a = Bed3::new("chr1", 20, 30);
-        let b: Bed12<_, _, i32, i32, i32, i32, i32, i32> = a.into();
+        let b: Bed12<_, i32, i32, i32, i32, i32, i32, i32> = a.into();
         assert_eq!(*b.chr(), "chr1");
         assert_eq!(b.start(), 20);
         assert_eq!(b.end(), 30);
@@ -179,7 +166,7 @@ mod testing {
     #[test]
     fn from_bed4() {
         let a = Bed4::new("chr1", 20, 30, 40);
-        let b: Bed3<_, _> = a.into();
+        let b: Bed3<_> = a.into();
         assert_eq!(*b.chr(), "chr1");
         assert_eq!(b.start(), 20);
         assert_eq!(b.end(), 30);
@@ -188,7 +175,7 @@ mod testing {
     #[test]
     fn from_bed6() {
         let a = Bed6::new("chr1", 20, 30, 40, 50.into(), Strand::Forward);
-        let b: Bed3<_, _> = a.into();
+        let b: Bed3<_> = a.into();
         assert_eq!(*b.chr(), "chr1");
         assert_eq!(b.start(), 20);
         assert_eq!(b.end(), 30);
@@ -210,7 +197,7 @@ mod testing {
             100,
             110,
         );
-        let b: Bed3<_, _> = a.into();
+        let b: Bed3<_> = a.into();
         assert_eq!(*b.chr(), "chr1");
         assert_eq!(b.start(), 20);
         assert_eq!(b.end(), 30);
@@ -241,7 +228,7 @@ mod serde_testing {
             .has_headers(false)
             .from_reader(a.as_bytes());
         let mut iter = rdr.deserialize();
-        let r1: Bed3<String, i32> = iter.next().unwrap()?;
+        let r1: Bed3<String> = iter.next().unwrap()?;
         assert_eq!(*r1.chr(), "chr1");
         assert_eq!(r1.start(), 20);
         assert_eq!(r1.end(), 30);

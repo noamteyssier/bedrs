@@ -1,5 +1,5 @@
 use crate::{
-    traits::{ChromBounds, MetaBounds, ValueBounds},
+    traits::{ChromBounds, MetaBounds},
     Bed3, Coordinates, Strand,
 };
 use bedrs_derive::Coordinates;
@@ -30,26 +30,24 @@ use serde::{Deserialize, Serialize};
 /// ```
 #[derive(Debug, Default, Clone, Copy, Coordinates, Getters, Setters, new)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct MetaInterval<C, T, M>
+pub struct MetaInterval<C, M>
 where
     C: ChromBounds,
-    T: ValueBounds,
     M: MetaBounds,
 {
     chr: C,
-    start: T,
-    end: T,
+    start: i32,
+    end: i32,
     #[getset(get = "pub", set = "pub")]
     meta: M,
 }
 
-impl<C, T, M> From<MetaInterval<C, T, M>> for Bed3<C, T>
+impl<C, M> From<MetaInterval<C, M>> for Bed3<C>
 where
     C: ChromBounds,
-    T: ValueBounds,
     M: MetaBounds,
 {
-    fn from(bed: MetaInterval<C, T, M>) -> Self {
+    fn from(bed: MetaInterval<C, M>) -> Self {
         Self::new(bed.chr, bed.start, bed.end)
     }
 }
@@ -79,7 +77,7 @@ mod testing {
     #[test]
     fn test_bed3_conversion() {
         let a = MetaInterval::new("chr1", 20, 30, "metadata");
-        let b: Bed3<_, _> = a.into();
+        let b: Bed3<_> = a.into();
         assert_eq!(*b.chr(), "chr1");
         assert_eq!(b.start(), 20);
         assert_eq!(b.end(), 30);
@@ -110,7 +108,7 @@ mod serde_testing {
             .has_headers(false)
             .from_reader(a.as_bytes());
         let mut iter = rdr.deserialize();
-        let b: MetaInterval<String, i32, String> = iter.next().unwrap()?;
+        let b: MetaInterval<String, String> = iter.next().unwrap()?;
         assert_eq!(b.chr(), "chr1");
         assert_eq!(b.start(), 20);
         assert_eq!(b.end(), 30);

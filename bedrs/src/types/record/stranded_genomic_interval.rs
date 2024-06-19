@@ -1,5 +1,5 @@
 use crate::{
-    traits::{ChromBounds, Coordinates, ValueBounds},
+    traits::{ChromBounds, Coordinates},
     Strand,
 };
 use bedrs_derive::Coordinates;
@@ -28,14 +28,13 @@ use serde::{Deserialize, Serialize};
 /// ```
 #[derive(Debug, Default, Clone, Copy, Coordinates, new)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct StrandedBed3<C, T>
+pub struct StrandedBed3<C>
 where
     C: ChromBounds,
-    T: ValueBounds,
 {
     chr: C,
-    start: T,
-    end: T,
+    start: i32,
+    end: i32,
     strand: Strand,
 }
 
@@ -139,7 +138,7 @@ mod testing {
     #[test]
     fn test_from() {
         let a = StrandedBed3::new(1, 5, 100, Strand::Reverse);
-        let b: StrandedBed3<_, _> = Coordinates::from(&a);
+        let b: StrandedBed3<_> = Coordinates::from(&a);
         assert!(a.eq(&b));
     }
 
@@ -148,12 +147,12 @@ mod testing {
     fn stranded_genomic_interval_serde() {
         let a = StrandedBed3::new(1, 5, 100, Strand::Reverse);
         let serialized = serialize(&a).unwrap();
-        let deserialized: StrandedBed3<_, _> = deserialize(&serialized).unwrap();
+        let deserialized: StrandedBed3<_> = deserialize(&serialized).unwrap();
         assert!(a.eq(&deserialized));
     }
 
     #[allow(clippy::needless_pass_by_value)]
-    fn function_generic_reference<C: Coordinates<usize, usize>>(iv: C) {
+    fn function_generic_reference<C: Coordinates<usize>>(iv: C) {
         assert_eq!(*iv.chr(), 1);
         assert_eq!(iv.start(), 10);
         assert_eq!(iv.end(), 100);
@@ -193,7 +192,7 @@ mod serde_testing {
             .has_headers(false)
             .from_reader(a.as_bytes());
         let mut iter = rdr.deserialize();
-        let b: StrandedBed3<i32, i32> = iter.next().unwrap()?;
+        let b: StrandedBed3<i32> = iter.next().unwrap()?;
         assert_eq!(b.chr(), &1);
         assert_eq!(b.start(), 20);
         assert_eq!(b.end(), 30);

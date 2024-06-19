@@ -1,8 +1,8 @@
 use bedrs::types::{BaseInterval, Bed3, IntervalContainer, Query};
 use criterion::Criterion;
 
-const N: usize = 10000;
-const SIZE: usize = 100;
+const N: i32 = 10000;
+const SIZE: i32 = 100;
 
 pub fn find_base(c: &mut Criterion) {
     let records = (0..N)

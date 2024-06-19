@@ -127,7 +127,7 @@ mod testing {
     use super::*;
     use crate::{Bed3, Coordinates, Overlap};
 
-    fn validate_segments(observed: &[Bed3<i32, i32>], expected: &[Bed3<i32, i32>]) {
+    fn validate_segments(observed: &[Bed3<i32>], expected: &[Bed3<i32>]) {
         println!("Expected:");
         for exp in expected {
             println!("{exp:?}");

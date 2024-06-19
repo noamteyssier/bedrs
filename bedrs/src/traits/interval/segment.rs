@@ -149,7 +149,7 @@ mod testing {
     use super::*;
     use crate::Bed3;
 
-    fn validate_segments(observed: &[Bed3<i32, i32>], expected: &[Bed3<i32, i32>]) {
+    fn validate_segments(observed: &[Bed3<i32>], expected: &[Bed3<i32>]) {
         assert_eq!(observed.len(), expected.len());
 
         println!("Expected:");

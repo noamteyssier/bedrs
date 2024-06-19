@@ -91,7 +91,7 @@ mod testing {
     use super::*;
     use crate::{Bed3, Coordinates};
 
-    type ClusterTuple = (Bed3<u32, u32>, usize);
+    type ClusterTuple = (Bed3<u32>, usize);
     fn validate_clusters(observed: &[ClusterTuple], expected: &[ClusterTuple]) {
         println!("Expected:");
         for exp in expected {

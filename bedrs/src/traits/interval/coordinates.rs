@@ -366,6 +366,7 @@ where
     /// assert_eq!(iv.f_len(0.3), 3);
     /// assert_eq!(iv.f_len(2.0), 20);
     /// ```
+    #[allow(clippy::cast_possible_truncation)]
     fn f_len(&self, frac: f64) -> i32 {
         let len_f: f64 = self.len().to_f64().unwrap();
         let n = len_f * frac;

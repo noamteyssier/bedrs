@@ -541,7 +541,7 @@ mod testing {
         let subset = set
             .subtract_from(&span)
             .unwrap()
-            .collect::<IntervalContainer<BaseInterval<usize>, usize>>();
+            .collect::<IntervalContainer<BaseInterval, i32>>();
         assert_eq!(subset.len(), 2);
         assert!(subset.records()[0].eq(&exp1));
         assert!(subset.records()[1].eq(&exp2));

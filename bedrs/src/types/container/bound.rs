@@ -1078,7 +1078,7 @@ mod testing {
 
     #[test]
     fn empty_set_bound() {
-        let records: Vec<BaseInterval<_>> = Vec::new();
+        let records: Vec<BaseInterval> = Vec::new();
         let set = IntervalContainer::from_sorted_unchecked(records);
         let query = BaseInterval::new(10, 20);
         let bound = set.lower_bound(&query);

@@ -40,20 +40,20 @@ use serde::{Deserialize, Serialize};
 #[allow(clippy::too_many_arguments)]
 #[derive(Debug, Default, Clone, Copy, Coordinates, Getters, Setters, CopyGetters, new)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct Bed12<C, T, N, Ts, Te, R, Si, St>
+pub struct Bed12<C, N, Ts, Te, R, T, Si, St>
 where
     C: ChromBounds,
-    T: ValueBounds,
     N: MetaBounds,
     Ts: ValueBounds,
     Te: ValueBounds,
     R: MetaBounds,
+    T: ValueBounds,
     Si: MetaBounds,
     St: MetaBounds,
 {
     chr: C,
-    start: T,
-    end: T,
+    start: i32,
+    end: i32,
     #[getset(get = "pub", set = "pub")]
     name: N,
     #[getset(get_copy = "pub", set = "pub")]
@@ -73,67 +73,67 @@ where
     block_starts: St,
 }
 
-impl<C, T, N, Ts, Te, R, Si, St> From<Bed12<C, T, N, Ts, Te, R, Si, St>> for Bed3<C, T>
+impl<C, N, Ts, Te, R, T, Si, St> From<Bed12<C, N, Ts, Te, R, T, Si, St>> for Bed3<C>
 where
     C: ChromBounds,
-    T: ValueBounds,
     N: MetaBounds,
     Ts: ValueBounds,
     Te: ValueBounds,
     R: MetaBounds,
+    T: ValueBounds,
     Si: MetaBounds,
     St: MetaBounds,
 {
-    fn from(bed: Bed12<C, T, N, Ts, Te, R, Si, St>) -> Self {
+    fn from(bed: Bed12<C, N, Ts, Te, R, T, Si, St>) -> Self {
         Bed3::new(bed.chr, bed.start, bed.end)
     }
 }
 
-impl<C, T, N, Ts, Te, R, Si, St> From<Bed12<C, T, N, Ts, Te, R, Si, St>> for Bed4<C, T, N>
+impl<C, N, Ts, Te, R, T, Si, St> From<Bed12<C, N, Ts, Te, R, T, Si, St>> for Bed4<C, N>
 where
     C: ChromBounds,
-    T: ValueBounds,
     N: MetaBounds,
     Ts: ValueBounds,
     Te: ValueBounds,
     R: MetaBounds,
+    T: ValueBounds,
     Si: MetaBounds,
     St: MetaBounds,
 {
-    fn from(bed: Bed12<C, T, N, Ts, Te, R, Si, St>) -> Self {
+    fn from(bed: Bed12<C, N, Ts, Te, R, T, Si, St>) -> Self {
         Bed4::new(bed.chr, bed.start, bed.end, bed.name)
     }
 }
 
-impl<C, T, N, Ts, Te, R, Si, St> From<Bed12<C, T, N, Ts, Te, R, Si, St>> for BedGraph<C, T>
+impl<C, N, Ts, Te, R, T, Si, St> From<Bed12<C, N, Ts, Te, R, T, Si, St>> for BedGraph<C>
 where
     C: ChromBounds,
-    T: ValueBounds,
     N: MetaBounds,
     Ts: ValueBounds,
     Te: ValueBounds,
     R: MetaBounds,
+    T: ValueBounds,
     Si: MetaBounds,
     St: MetaBounds,
     f64: From<N>,
 {
-    fn from(bed: Bed12<C, T, N, Ts, Te, R, Si, St>) -> Self {
+    fn from(bed: Bed12<C, N, Ts, Te, R, T, Si, St>) -> Self {
         Self::new(bed.chr, bed.start, bed.end, bed.name.into())
     }
 }
 
-impl<C, T, N, Ts, Te, R, Si, St> From<Bed12<C, T, N, Ts, Te, R, Si, St>> for Bed6<C, T, N>
+impl<C, N, Ts, Te, R, T, Si, St> From<Bed12<C, N, Ts, Te, R, T, Si, St>> for Bed6<C, N>
 where
     C: ChromBounds,
-    T: ValueBounds,
     N: MetaBounds,
     Ts: ValueBounds,
     Te: ValueBounds,
     R: MetaBounds,
+    T: ValueBounds,
     Si: MetaBounds,
     St: MetaBounds,
 {
-    fn from(bed: Bed12<C, T, N, Ts, Te, R, Si, St>) -> Self {
+    fn from(bed: Bed12<C, N, Ts, Te, R, T, Si, St>) -> Self {
         Bed6::new(bed.chr, bed.start, bed.end, bed.name, bed.score, bed.strand)
     }
 }
@@ -403,7 +403,7 @@ mod testing {
             vec![1],
             vec![1],
         );
-        let b: Bed3<String, i32> = a.into();
+        let b: Bed3<String> = a.into();
         assert_eq!(b.chr(), "chr1");
         assert_eq!(b.start(), 10);
         assert_eq!(b.end(), 20);
@@ -425,7 +425,7 @@ mod testing {
             vec![1],
             vec![1],
         );
-        let b: Bed4<String, i32, String> = a.into();
+        let b: Bed4<String, String> = a.into();
         assert_eq!(b.chr(), "chr1");
         assert_eq!(b.start(), 10);
         assert_eq!(b.end(), 20);
@@ -448,7 +448,7 @@ mod testing {
             vec![1],
             vec![1],
         );
-        let b: Bed6<String, i32, String> = a.into();
+        let b: Bed6<String, String> = a.into();
         assert_eq!(b.chr(), "chr1");
         assert_eq!(b.start(), 10);
         assert_eq!(b.end(), 20);
@@ -460,7 +460,7 @@ mod testing {
     #[test]
     fn from_bed3() {
         let a = Bed3::new("chr1".to_string(), 10, 20);
-        let b: Bed12<String, i32, String, i32, i32, String, Vec<i32>, Vec<i32>> = a.into();
+        let b: Bed12<String, String, i32, i32, String, i32, Vec<i32>, Vec<i32>> = a.into();
         assert_eq!(b.chr(), "chr1");
         assert_eq!(b.start(), 10);
         assert_eq!(b.end(), 20);
@@ -478,7 +478,7 @@ mod testing {
     #[test]
     fn from_bed4() {
         let a = Bed4::new("chr1".to_string(), 10, 20, "name".to_string());
-        let b: Bed12<String, i32, String, i32, i32, String, Vec<i32>, Vec<i32>> = a.into();
+        let b: Bed12<String, String, i32, i32, String, i32, Vec<i32>, Vec<i32>> = a.into();
         assert_eq!(b.chr(), "chr1");
         assert_eq!(b.start(), 10);
         assert_eq!(b.end(), 20);
@@ -503,7 +503,7 @@ mod testing {
             1.1.into(),
             Strand::Forward,
         );
-        let b: Bed12<String, i32, String, i32, i32, String, Vec<i32>, Vec<i32>> = a.into();
+        let b: Bed12<String, String, i32, i32, String, i32, Vec<i32>, Vec<i32>> = a.into();
         assert_eq!(b.chr(), "chr1");
         assert_eq!(b.start(), 10);
         assert_eq!(b.end(), 20);
@@ -560,7 +560,7 @@ mod serde_testing {
             .delimiter(b'\t')
             .from_reader(a.as_bytes());
         let mut iter = rdr.deserialize();
-        let b: Bed12<String, i32, String, i32, i32, String, String, String> =
+        let b: Bed12<String, String, i32, i32, String, i32, String, String> =
             iter.next().unwrap()?;
         assert_eq!(b.chr(), "chr1");
         assert_eq!(b.start(), 20);
