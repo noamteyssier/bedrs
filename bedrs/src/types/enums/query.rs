@@ -1,24 +1,21 @@
 use super::{QueryMethod, StrandMethod};
-use crate::traits::{ChromBounds, IntervalBounds, SetError, ValueBounds};
+use crate::traits::{ChromBounds, IntervalBounds, SetError};
 
 #[derive(Debug, Default, Clone, Copy)]
-pub struct Query<T: ValueBounds> {
-    predicate: QueryMethod<T>,
+pub struct Query {
+    predicate: QueryMethod,
     strandedness: StrandMethod,
 }
-impl<T> Query<T>
-where
-    T: ValueBounds,
-{
+impl Query {
     #[must_use]
-    pub fn new(predicate: QueryMethod<T>, strandedness: StrandMethod) -> Self {
+    pub fn new(predicate: QueryMethod, strandedness: StrandMethod) -> Self {
         Self {
             predicate,
             strandedness,
         }
     }
     #[must_use]
-    pub fn new_predicate(predicate: QueryMethod<T>) -> Self {
+    pub fn new_predicate(predicate: QueryMethod) -> Self {
         Self {
             predicate,
             strandedness: StrandMethod::default(),
@@ -38,8 +35,8 @@ where
     /// using a specific overlap method
     pub fn predicate<I, Iv, C>(&self, target: &I, query: &Iv) -> bool
     where
-        I: IntervalBounds<C, T>,
-        Iv: IntervalBounds<C, T>,
+        I: IntervalBounds<C>,
+        Iv: IntervalBounds<C>,
         C: ChromBounds,
     {
         match self.strandedness {
@@ -50,8 +47,8 @@ where
     }
     fn ignored_strand<I, Iv, C>(&self, target: &I, query: &Iv) -> bool
     where
-        I: IntervalBounds<C, T>,
-        Iv: IntervalBounds<C, T>,
+        I: IntervalBounds<C>,
+        Iv: IntervalBounds<C>,
         C: ChromBounds,
     {
         match self.predicate {
@@ -88,8 +85,8 @@ where
     }
     fn bounded_strand<I, Iv, C>(&self, target: &I, query: &Iv) -> bool
     where
-        I: IntervalBounds<C, T>,
-        Iv: IntervalBounds<C, T>,
+        I: IntervalBounds<C>,
+        Iv: IntervalBounds<C>,
         C: ChromBounds,
     {
         match self.predicate {
@@ -126,8 +123,8 @@ where
     }
     fn unbounded_strand<I, Iv, C>(&self, target: &I, query: &Iv) -> bool
     where
-        I: IntervalBounds<C, T>,
-        Iv: IntervalBounds<C, T>,
+        I: IntervalBounds<C>,
+        Iv: IntervalBounds<C>,
         C: ChromBounds,
     {
         match self.predicate {
@@ -179,7 +176,7 @@ mod testing {
     #[test]
     fn validate_query_compare() {
         for sm in &STRAND_METHODS {
-            let query: Query<usize> = Query::new(QueryMethod::Compare, *sm);
+            let query: Query = Query::new(QueryMethod::Compare, *sm);
             assert!(query.validate().is_ok());
         }
     }
@@ -187,10 +184,10 @@ mod testing {
     #[test]
     fn validate_query_compare_by() {
         for sm in &STRAND_METHODS {
-            let query: Query<usize> = Query::new(QueryMethod::CompareBy(10), *sm);
+            let query: Query = Query::new(QueryMethod::CompareBy(10), *sm);
             assert!(query.validate().is_ok());
 
-            let query: Query<usize> = Query::new(QueryMethod::CompareBy(0), *sm);
+            let query: Query = Query::new(QueryMethod::CompareBy(0), *sm);
             assert!(query.validate().is_err());
         }
     }
@@ -198,9 +195,9 @@ mod testing {
     #[test]
     fn validate_query_compare_exact() {
         for sm in &STRAND_METHODS {
-            let query: Query<usize> = Query::new(QueryMethod::CompareExact(10), *sm);
+            let query: Query = Query::new(QueryMethod::CompareExact(10), *sm);
             assert!(query.validate().is_ok());
-            let query: Query<usize> = Query::new(QueryMethod::CompareExact(0), *sm);
+            let query: Query = Query::new(QueryMethod::CompareExact(0), *sm);
             assert!(query.validate().is_err());
         }
     }
@@ -208,15 +205,15 @@ mod testing {
     #[test]
     fn validate_query_compare_by_query_fraction() {
         for sm in &STRAND_METHODS {
-            let query: Query<usize> = Query::new(QueryMethod::CompareByQueryFraction(0.5), *sm);
+            let query: Query = Query::new(QueryMethod::CompareByQueryFraction(0.5), *sm);
             assert!(query.validate().is_ok());
-            let query: Query<usize> = Query::new(QueryMethod::CompareByQueryFraction(1.0), *sm);
+            let query: Query = Query::new(QueryMethod::CompareByQueryFraction(1.0), *sm);
             assert!(query.validate().is_ok());
-            let query: Query<usize> = Query::new(QueryMethod::CompareByQueryFraction(0.0), *sm);
+            let query: Query = Query::new(QueryMethod::CompareByQueryFraction(0.0), *sm);
             assert!(query.validate().is_err());
-            let query: Query<usize> = Query::new(QueryMethod::CompareByQueryFraction(-0.1), *sm);
+            let query: Query = Query::new(QueryMethod::CompareByQueryFraction(-0.1), *sm);
             assert!(query.validate().is_err());
-            let query: Query<usize> = Query::new(QueryMethod::CompareByQueryFraction(2.0), *sm);
+            let query: Query = Query::new(QueryMethod::CompareByQueryFraction(2.0), *sm);
             assert!(query.validate().is_err());
         }
     }
@@ -224,15 +221,15 @@ mod testing {
     #[test]
     fn validate_query_compare_by_target_fraction() {
         for sm in &STRAND_METHODS {
-            let query: Query<usize> = Query::new(QueryMethod::CompareByTargetFraction(0.5), *sm);
+            let query: Query = Query::new(QueryMethod::CompareByTargetFraction(0.5), *sm);
             assert!(query.validate().is_ok());
-            let query: Query<usize> = Query::new(QueryMethod::CompareByTargetFraction(1.0), *sm);
+            let query: Query = Query::new(QueryMethod::CompareByTargetFraction(1.0), *sm);
             assert!(query.validate().is_ok());
-            let query: Query<usize> = Query::new(QueryMethod::CompareByTargetFraction(0.0), *sm);
+            let query: Query = Query::new(QueryMethod::CompareByTargetFraction(0.0), *sm);
             assert!(query.validate().is_err());
-            let query: Query<usize> = Query::new(QueryMethod::CompareByTargetFraction(-0.1), *sm);
+            let query: Query = Query::new(QueryMethod::CompareByTargetFraction(-0.1), *sm);
             assert!(query.validate().is_err());
-            let query: Query<usize> = Query::new(QueryMethod::CompareByTargetFraction(2.0), *sm);
+            let query: Query = Query::new(QueryMethod::CompareByTargetFraction(2.0), *sm);
             assert!(query.validate().is_err());
         }
     }
@@ -240,39 +237,31 @@ mod testing {
     #[test]
     fn validate_query_compare_reciprocal_fraction_and() {
         for sm in &STRAND_METHODS {
-            let query: Query<usize> =
-                Query::new(QueryMethod::CompareReciprocalFractionAnd(0.5, 0.5), *sm);
+            let query: Query = Query::new(QueryMethod::CompareReciprocalFractionAnd(0.5, 0.5), *sm);
             assert!(query.validate().is_ok());
-            let query: Query<usize> =
-                Query::new(QueryMethod::CompareReciprocalFractionAnd(1.0, 1.0), *sm);
+            let query: Query = Query::new(QueryMethod::CompareReciprocalFractionAnd(1.0, 1.0), *sm);
             assert!(query.validate().is_ok());
-            let query: Query<usize> =
-                Query::new(QueryMethod::CompareReciprocalFractionAnd(0.0, 0.0), *sm);
+            let query: Query = Query::new(QueryMethod::CompareReciprocalFractionAnd(0.0, 0.0), *sm);
             assert!(query.validate().is_err());
-            let query: Query<usize> =
+            let query: Query =
                 Query::new(QueryMethod::CompareReciprocalFractionAnd(-0.1, -0.1), *sm);
             assert!(query.validate().is_err());
-            let query: Query<usize> =
-                Query::new(QueryMethod::CompareReciprocalFractionAnd(2.0, 2.0), *sm);
+            let query: Query = Query::new(QueryMethod::CompareReciprocalFractionAnd(2.0, 2.0), *sm);
             assert!(query.validate().is_err());
 
-            let query: Query<usize> =
-                Query::new(QueryMethod::CompareReciprocalFractionAnd(0.5, 0.0), *sm);
+            let query: Query = Query::new(QueryMethod::CompareReciprocalFractionAnd(0.5, 0.0), *sm);
             assert!(query.validate().is_err());
-            let query: Query<usize> =
-                Query::new(QueryMethod::CompareReciprocalFractionAnd(0.0, 0.5), *sm);
+            let query: Query = Query::new(QueryMethod::CompareReciprocalFractionAnd(0.0, 0.5), *sm);
             assert!(query.validate().is_err());
-            let query: Query<usize> =
+            let query: Query =
                 Query::new(QueryMethod::CompareReciprocalFractionAnd(-0.1, 0.5), *sm);
             assert!(query.validate().is_err());
-            let query: Query<usize> =
+            let query: Query =
                 Query::new(QueryMethod::CompareReciprocalFractionAnd(0.5, -0.1), *sm);
             assert!(query.validate().is_err());
-            let query: Query<usize> =
-                Query::new(QueryMethod::CompareReciprocalFractionAnd(2.0, 0.5), *sm);
+            let query: Query = Query::new(QueryMethod::CompareReciprocalFractionAnd(2.0, 0.5), *sm);
             assert!(query.validate().is_err());
-            let query: Query<usize> =
-                Query::new(QueryMethod::CompareReciprocalFractionAnd(0.5, 2.0), *sm);
+            let query: Query = Query::new(QueryMethod::CompareReciprocalFractionAnd(0.5, 2.0), *sm);
             assert!(query.validate().is_err());
         }
     }
@@ -280,38 +269,28 @@ mod testing {
     #[test]
     fn validate_query_compare_reciprocal_fraction_or() {
         for sm in &STRAND_METHODS {
-            let query: Query<usize> =
-                Query::new(QueryMethod::CompareReciprocalFractionOr(0.5, 0.5), *sm);
+            let query: Query = Query::new(QueryMethod::CompareReciprocalFractionOr(0.5, 0.5), *sm);
             assert!(query.validate().is_ok());
-            let query: Query<usize> =
-                Query::new(QueryMethod::CompareReciprocalFractionOr(1.0, 1.0), *sm);
+            let query: Query = Query::new(QueryMethod::CompareReciprocalFractionOr(1.0, 1.0), *sm);
             assert!(query.validate().is_ok());
-            let query: Query<usize> =
-                Query::new(QueryMethod::CompareReciprocalFractionOr(0.0, 0.0), *sm);
+            let query: Query = Query::new(QueryMethod::CompareReciprocalFractionOr(0.0, 0.0), *sm);
             assert!(query.validate().is_err());
-            let query: Query<usize> =
+            let query: Query =
                 Query::new(QueryMethod::CompareReciprocalFractionOr(-0.1, -0.1), *sm);
             assert!(query.validate().is_err());
-            let query: Query<usize> =
-                Query::new(QueryMethod::CompareReciprocalFractionOr(2.0, 2.0), *sm);
+            let query: Query = Query::new(QueryMethod::CompareReciprocalFractionOr(2.0, 2.0), *sm);
             assert!(query.validate().is_err());
-            let query: Query<usize> =
-                Query::new(QueryMethod::CompareReciprocalFractionOr(0.5, 0.0), *sm);
+            let query: Query = Query::new(QueryMethod::CompareReciprocalFractionOr(0.5, 0.0), *sm);
             assert!(query.validate().is_err());
-            let query: Query<usize> =
-                Query::new(QueryMethod::CompareReciprocalFractionOr(0.0, 0.5), *sm);
+            let query: Query = Query::new(QueryMethod::CompareReciprocalFractionOr(0.0, 0.5), *sm);
             assert!(query.validate().is_err());
-            let query: Query<usize> =
-                Query::new(QueryMethod::CompareReciprocalFractionOr(-0.1, 0.5), *sm);
+            let query: Query = Query::new(QueryMethod::CompareReciprocalFractionOr(-0.1, 0.5), *sm);
             assert!(query.validate().is_err());
-            let query: Query<usize> =
-                Query::new(QueryMethod::CompareReciprocalFractionOr(0.5, -0.1), *sm);
+            let query: Query = Query::new(QueryMethod::CompareReciprocalFractionOr(0.5, -0.1), *sm);
             assert!(query.validate().is_err());
-            let query: Query<usize> =
-                Query::new(QueryMethod::CompareReciprocalFractionOr(2.0, 0.5), *sm);
+            let query: Query = Query::new(QueryMethod::CompareReciprocalFractionOr(2.0, 0.5), *sm);
             assert!(query.validate().is_err());
-            let query: Query<usize> =
-                Query::new(QueryMethod::CompareReciprocalFractionOr(0.5, 2.0), *sm);
+            let query: Query = Query::new(QueryMethod::CompareReciprocalFractionOr(0.5, 2.0), *sm);
             assert!(query.validate().is_err());
         }
     }

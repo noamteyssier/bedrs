@@ -1,16 +1,15 @@
 // use super::Container;
 use crate::{
-    traits::{ChromBounds, IntervalBounds, SetError, ValueBounds},
+    traits::{ChromBounds, IntervalBounds, SetError},
     IntervalContainer,
 };
 
-impl<I, C, T> IntervalContainer<I, C, T>
+impl<I, C> IntervalContainer<I, C>
 where
-    I: IntervalBounds<C, T>,
+    I: IntervalBounds<C>,
     C: ChromBounds,
-    T: ValueBounds,
 {
-    fn grow_cluster(span: &mut I, iv: &I, endpoints: &mut Vec<T>, n_iv: &mut usize) {
+    fn grow_cluster(span: &mut I, iv: &I, endpoints: &mut Vec<i32>, n_iv: &mut usize) {
         // Update the span
         let new_min = span.start().min(iv.start());
         let new_max = span.end().max(iv.end());
@@ -23,7 +22,7 @@ where
         *n_iv += 1;
     }
 
-    fn process_starts(reference: &I, endpoints: &[T], num_iv: usize, segments: &mut Vec<I>) {
+    fn process_starts(reference: &I, endpoints: &[i32], num_iv: usize, segments: &mut Vec<I>) {
         for idx in 0..num_iv - 1 {
             let a = endpoints[idx];
             let b = endpoints[idx + 1];
@@ -37,7 +36,7 @@ where
         }
     }
 
-    fn process_center(reference: &I, endpoints: &[T], num_iv: usize, segments: &mut Vec<I>) {
+    fn process_center(reference: &I, endpoints: &[i32], num_iv: usize, segments: &mut Vec<I>) {
         let a = &endpoints[num_iv - 1];
         let b = &endpoints[num_iv];
         if a >= b {
@@ -49,7 +48,7 @@ where
         segments.push(inner_segment);
     }
 
-    fn process_ends(reference: &I, endpoints: &[T], num_iv: usize, segments: &mut Vec<I>) {
+    fn process_ends(reference: &I, endpoints: &[i32], num_iv: usize, segments: &mut Vec<I>) {
         for idx in 0..num_iv - 1 {
             let a = endpoints[num_iv + idx];
             let b = endpoints[num_iv + idx + 1];
@@ -63,7 +62,7 @@ where
         }
     }
 
-    fn segment_cluster(reference: &I, endpoints: &mut [T], n_iv: usize, segments: &mut Vec<I>) {
+    fn segment_cluster(reference: &I, endpoints: &mut [i32], n_iv: usize, segments: &mut Vec<I>) {
         endpoints.sort_unstable();
         Self::process_starts(reference, endpoints, n_iv, segments);
         Self::process_center(reference, endpoints, n_iv, segments);
@@ -71,7 +70,7 @@ where
     }
 
     /// Resets the cluster with the new interval
-    fn init_cluster(span: &mut I, interval: &I, endpoints: &mut Vec<T>, n_iv: &mut usize) {
+    fn init_cluster(span: &mut I, interval: &I, endpoints: &mut Vec<i32>, n_iv: &mut usize) {
         // Reset the span with the new interval
         span.update_all_from(interval);
 
@@ -128,7 +127,7 @@ mod testing {
     use super::*;
     use crate::{Bed3, Coordinates, Overlap};
 
-    fn validate_segments<T: ValueBounds>(observed: &[Bed3<i32, T>], expected: &[Bed3<i32, T>]) {
+    fn validate_segments(observed: &[Bed3<i32, i32>], expected: &[Bed3<i32, i32>]) {
         println!("Expected:");
         for exp in expected {
             println!("{exp:?}");

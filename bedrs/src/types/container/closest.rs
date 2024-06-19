@@ -1,20 +1,19 @@
 use crate::{
-    traits::{ChromBounds, IntervalBounds, SetError, ValueBounds},
+    traits::{ChromBounds, IntervalBounds, SetError},
     types::StrandMethod,
     Distance, IntervalContainer, Strand,
 };
 use anyhow::Result;
 
-impl<I, C, T> IntervalContainer<I, C, T>
+impl<I, C> IntervalContainer<I, C>
 where
-    I: IntervalBounds<C, T>,
+    I: IntervalBounds<C>,
     C: ChromBounds,
-    T: ValueBounds,
 {
     /// Returns the closest interval to the query interval.
     pub fn closest<Iv>(&self, query: &Iv, method: StrandMethod) -> Result<Option<&I>, SetError>
     where
-        Iv: IntervalBounds<C, T>,
+        Iv: IntervalBounds<C>,
     {
         if self.is_sorted() {
             if self.records().is_empty() {
@@ -32,7 +31,7 @@ where
         method: StrandMethod,
     ) -> Result<Option<&I>, SetError>
     where
-        Iv: IntervalBounds<C, T>,
+        Iv: IntervalBounds<C>,
     {
         if self.is_sorted() {
             if self.records().is_empty() {
@@ -56,7 +55,7 @@ where
         method: StrandMethod,
     ) -> Result<Option<&I>, SetError>
     where
-        Iv: IntervalBounds<C, T>,
+        Iv: IntervalBounds<C>,
     {
         if self.is_sorted() {
             if self.records().is_empty() {
@@ -76,13 +75,13 @@ where
 
     pub fn closest_unchecked<Iv>(&self, query: &Iv, method: StrandMethod) -> Option<&I>
     where
-        Iv: IntervalBounds<C, T>,
+        Iv: IntervalBounds<C>,
     {
         let bound = match self.bound_upstream_unchecked(query, method) {
             Some(bound) => bound,
             None => self.bound_downstream_unchecked(query, method)?,
         };
-        let mut current_dist = T::max_value();
+        let mut current_dist = i32::MAX;
         let mut current_lowest = bound;
         let mut position = bound;
         loop {
@@ -107,7 +106,7 @@ where
 
     pub fn closest_upstream_unchecked<Iv>(&self, query: &Iv, method: StrandMethod) -> Option<&I>
     where
-        Iv: IntervalBounds<C, T>,
+        Iv: IntervalBounds<C>,
     {
         let bound_fn = match method {
             StrandMethod::Ignore => Self::bound_igstrand_upstream_unchecked::<Iv>,
@@ -115,7 +114,7 @@ where
             StrandMethod::OppositeStrand => Self::bound_unstranded_upstream_unchecked::<Iv>,
         };
         if let Some(bound) = bound_fn(self, query) {
-            let mut current_dist = T::max_value();
+            let mut current_dist = i32::MAX;
             let mut current_lowest = bound;
             let mut position = bound;
             loop {
@@ -161,7 +160,7 @@ where
 
     pub fn closest_downstream_unchecked<Iv>(&self, query: &Iv, method: StrandMethod) -> Option<&I>
     where
-        Iv: IntervalBounds<C, T>,
+        Iv: IntervalBounds<C>,
     {
         let bound_fn = match method {
             StrandMethod::Ignore => Self::bound_igstrand_downstream_unchecked::<Iv>,
@@ -169,7 +168,7 @@ where
             StrandMethod::OppositeStrand => Self::bound_unstranded_downstream_unchecked::<Iv>,
         };
         if let Some(bound) = bound_fn(self, query) {
-            let mut current_dist = T::max_value();
+            let mut current_dist = i32::MAX;
             let mut current_lowest = bound;
             let mut position = bound;
             loop {
@@ -239,7 +238,7 @@ mod testing {
 
     #[test]
     fn closest_empty() {
-        let intervals: Vec<Bed3<_, _>> = vec![];
+        let intervals: Vec<Bed3<i32, i32>> = vec![];
         let query = Bed3::new(1, 22, 23);
         let set = IntervalContainer::from_unsorted(intervals);
         assert!(set.closest(&query, StrandMethod::Ignore).is_err());

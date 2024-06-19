@@ -1,15 +1,14 @@
 // use super::Container;
 use crate::{
-    traits::{errors::SetError, ChromBounds, IntervalBounds, ValueBounds},
+    traits::{errors::SetError, ChromBounds, IntervalBounds},
     IntervalContainer, Strand,
 };
 
 /// A trait to merge overlapping interval regions within a container
-impl<I, C, T> IntervalContainer<I, C, T>
+impl<I, C> IntervalContainer<I, C>
 where
-    I: IntervalBounds<C, T>,
+    I: IntervalBounds<C>,
     C: ChromBounds,
-    T: ValueBounds,
 {
     /// Merges overlapping intervals within a container
     ///
@@ -293,15 +292,14 @@ mod testing {
     use anyhow::Result;
 
     use crate::{
-        traits::{ChromBounds, Coordinates, IntervalBounds, ValueBounds},
+        traits::{ChromBounds, Coordinates, IntervalBounds},
         BaseInterval, Bed3, IntervalContainer, Strand, StrandedBed3,
     };
 
-    fn validate_set<C, I, T>(set: &IntervalContainer<I, C, T>, expected: &[I])
+    fn validate_set<C, I>(set: &IntervalContainer<I, C>, expected: &[I])
     where
-        I: IntervalBounds<C, T> + Debug,
+        I: IntervalBounds<C> + Debug,
         C: ChromBounds,
-        T: ValueBounds,
     {
         println!("\nExpected:");
         for iv in expected {

@@ -1,5 +1,5 @@
 use crate::{
-    traits::{ChromBounds, IntervalBounds, SetError, ValueBounds},
+    traits::{ChromBounds, IntervalBounds, SetError},
     Coordinates, IntervalIterOwned, IntervalIterRef,
 };
 use anyhow::{bail, Result};
@@ -12,25 +12,23 @@ use std::marker::PhantomData;
 
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct IntervalContainer<I, C, T>
+pub struct IntervalContainer<I, C>
 where
-    I: IntervalBounds<C, T>,
+    I: IntervalBounds<C>,
     C: ChromBounds,
-    T: ValueBounds,
 {
     records: Vec<I>,
     is_sorted: bool,
-    max_len: Option<T>,
+    max_len: Option<i32>,
     _phantom_c: PhantomData<C>,
 }
-impl<I, C, T> FromIterator<I> for IntervalContainer<I, C, T>
+impl<I, C> FromIterator<I> for IntervalContainer<I, C>
 where
-    I: IntervalBounds<C, T>,
+    I: IntervalBounds<C>,
     C: ChromBounds,
-    T: ValueBounds,
 {
     fn from_iter<It: IntoIterator<Item = I>>(iter: It) -> Self {
-        let mut max_len = zero::<T>();
+        let mut max_len = zero::<i32>();
         let records = iter
             .into_iter()
             .map(|iv| {
@@ -38,7 +36,7 @@ where
                 iv
             })
             .collect();
-        let max_len = if max_len == zero::<T>() {
+        let max_len = if max_len == zero::<i32>() {
             None
         } else {
             Some(max_len)
@@ -52,11 +50,10 @@ where
     }
 }
 
-impl<I, C, T> IntervalContainer<I, C, T>
+impl<I, C> IntervalContainer<I, C>
 where
-    I: IntervalBounds<C, T>,
+    I: IntervalBounds<C>,
     C: ChromBounds,
-    T: ValueBounds,
 {
     #[must_use]
     pub fn new(records: Vec<I>) -> Self {
@@ -96,10 +93,10 @@ where
     pub fn sorted_mut(&mut self) -> &mut bool {
         &mut self.is_sorted
     }
-    pub fn max_len(&self) -> Option<T> {
+    pub fn max_len(&self) -> Option<i32> {
         self.max_len
     }
-    pub fn max_len_mut(&mut self) -> &mut Option<T> {
+    pub fn max_len_mut(&mut self) -> &mut Option<i32> {
         &mut self.max_len
     }
     /// Returns the span of the interval set
@@ -125,11 +122,11 @@ where
         Ok(iv)
     }
     #[allow(clippy::iter_without_into_iter)]
-    pub fn iter(&self) -> IntervalIterRef<I, C, T> {
+    pub fn iter(&self) -> IntervalIterRef<I, C> {
         IntervalIterRef::new(self.records())
     }
     #[allow(clippy::should_implement_trait)]
-    pub fn into_iter(self) -> IntervalIterOwned<I, C, T> {
+    pub fn into_iter(self) -> IntervalIterOwned<I, C> {
         IntervalIterOwned::new(self.records_owned())
     }
 
@@ -160,14 +157,13 @@ where
 
     /// Updates the maximum length of the intervals in the container
     /// if the new interval is longer than the current maximum length.
-    pub fn update_max_len<Iv, Co, To>(&mut self, interval: &Iv)
+    pub fn update_max_len<Iv, Co>(&mut self, interval: &Iv)
     where
-        Iv: IntervalBounds<Co, To>,
+        Iv: IntervalBounds<Co>,
         Co: ChromBounds,
-        To: ValueBounds + Into<T>,
     {
         if let Some(max_len) = self.max_len() {
-            if interval.len().into() > max_len {
+            if interval.len() > max_len {
                 *self.max_len_mut() = Some(interval.len().into());
             }
         } else {
@@ -301,7 +297,7 @@ mod testing {
         let records = vec![BaseInterval::new(10, 100); n_intervals];
         let set = IntervalContainer::new(records);
         let serialized = serialize(&set).unwrap();
-        let deserialized: IntervalContainer<BaseInterval<usize>, usize, usize> =
+        let deserialized: IntervalContainer<BaseInterval<usize>, usize> =
             deserialize(&serialized).unwrap();
         for (iv1, iv2) in set.records().iter().zip(deserialized.records().iter()) {
             assert!(iv1.eq(iv2));
@@ -390,7 +386,7 @@ mod testing {
         let records = vec![Bed3::new(1, 10, 100); n_intervals];
         let set = IntervalContainer::new(records);
         let serialized = serialize(&set).unwrap();
-        let deserialized: IntervalContainer<Bed3<usize, usize>, usize, usize> =
+        let deserialized: IntervalContainer<Bed3<usize, usize>, usize> =
             deserialize(&serialized).unwrap();
 
         for (iv1, iv2) in set.records().iter().zip(deserialized.records().iter()) {
@@ -472,8 +468,7 @@ mod testing {
 
     #[test]
     fn test_span_empty() {
-        let set: IntervalContainer<StrandedBed3<u32, u32>, u32, u32> =
-            IntervalContainer::new(vec![]);
+        let set: IntervalContainer<StrandedBed3<u32, u32>, u32> = IntervalContainer::new(vec![]);
         let span = set.span();
         assert!(span.is_err());
     }
@@ -549,7 +544,7 @@ mod testing {
         let records = vec![StrandedBed3::new(1, 10, 100, Strand::Reverse); n_intervals];
         let set = IntervalContainer::new(records);
         let serialized = serialize(&set).unwrap();
-        let deserialized: IntervalContainer<StrandedBed3<usize, usize>, usize, usize> =
+        let deserialized: IntervalContainer<StrandedBed3<usize, usize>, usize> =
             deserialize(&serialized).unwrap();
 
         for (iv1, iv2) in set.records().iter().zip(deserialized.records().iter()) {

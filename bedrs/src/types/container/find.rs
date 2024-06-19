@@ -1,16 +1,15 @@
 // use super::Container;
 use crate::{
-    traits::{errors::SetError, ChromBounds, IntervalBounds, ValueBounds},
+    traits::{errors::SetError, ChromBounds, IntervalBounds},
     types::{FindIter, FindIterEnumerate, FindIterOwned, IntervalContainer, Query},
 };
 use anyhow::Result;
 
 /// A trait to query set overlaps through a container
-impl<I, C, T> IntervalContainer<I, C, T>
+impl<I, C> IntervalContainer<I, C>
 where
-    I: IntervalBounds<C, T>,
+    I: IntervalBounds<C>,
     C: ChromBounds,
-    T: ValueBounds,
 {
     /// Find all intervals that overlap a query interval
     /// and return an iterator over the intervals.
@@ -19,10 +18,10 @@ where
     pub fn query_iter<'a, Iv>(
         &'a self,
         query: &'a Iv,
-        method: Query<T>,
-    ) -> Result<FindIter<'_, C, T, I, Iv>, SetError>
+        method: Query,
+    ) -> Result<FindIter<'_, C, I, Iv>, SetError>
     where
-        Iv: IntervalBounds<C, T>,
+        Iv: IntervalBounds<C>,
     {
         if self.is_sorted() {
             method.validate()?;
@@ -45,10 +44,10 @@ where
     pub fn query_iter_enumerate<'a, Iv>(
         &'a self,
         query: &'a Iv,
-        method: Query<T>,
-    ) -> Result<FindIterEnumerate<'_, C, T, I, Iv>, SetError>
+        method: Query,
+    ) -> Result<FindIterEnumerate<'_, C, I, Iv>, SetError>
     where
-        Iv: IntervalBounds<C, T>,
+        Iv: IntervalBounds<C>,
     {
         if self.is_sorted() {
             method.validate()?;
@@ -69,10 +68,10 @@ where
     pub fn query_iter_owned<Iv>(
         &self,
         query: Iv,
-        method: Query<T>,
-    ) -> Result<FindIterOwned<'_, C, T, I, Iv>, SetError>
+        method: Query,
+    ) -> Result<FindIterOwned<'_, C, I, Iv>, SetError>
     where
-        Iv: IntervalBounds<C, T>,
+        Iv: IntervalBounds<C>,
     {
         if self.is_sorted() {
             let bound = self.lower_bound_unchecked(&query);
@@ -89,10 +88,10 @@ where
     pub fn query<'a, Iv>(
         &'a self,
         query: &'a Iv,
-        method: Query<T>,
-    ) -> Result<IntervalContainer<I, C, T>, SetError>
+        method: Query,
+    ) -> Result<IntervalContainer<I, C>, SetError>
     where
-        Iv: IntervalBounds<C, T>,
+        Iv: IntervalBounds<C>,
     {
         self.query_iter(query, method)
             .map(|iter| iter.cloned().collect())
@@ -110,11 +109,10 @@ mod testing {
         BaseInterval, Bed3, Coordinates, IntervalContainer, Strand, StrandedBed3,
     };
 
-    fn validate_set<C, I, T>(set: &IntervalContainer<I, C, T>, expected: &[I])
+    fn validate_set<C, I>(set: &IntervalContainer<I, C>, expected: &[I])
     where
-        I: IntervalBounds<C, T>,
+        I: IntervalBounds<C>,
         C: ChromBounds,
-        T: ValueBounds,
     {
         for idx in 0..expected.len() {
             let c1 = &set.records()[idx];
@@ -123,11 +121,11 @@ mod testing {
         }
     }
 
-    fn validate_iter<I, C, T>(iter: impl Iterator<Item = I>, expected: &[I])
+    fn validate_iter<I, C>(iter: impl Iterator<Item = I>, expected: &[I])
     where
-        I: IntervalBounds<C, T>,
+        I: IntervalBounds<C>,
         C: ChromBounds,
-        T: ValueBounds,
+        i32: ValueBounds,
     {
         let observed = iter.collect::<Vec<I>>();
         for idx in 0..expected.len() {

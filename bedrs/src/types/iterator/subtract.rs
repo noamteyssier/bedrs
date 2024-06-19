@@ -1,29 +1,26 @@
 use crate::{
-    traits::{ChromBounds, IntervalBounds, ValueBounds},
+    traits::{ChromBounds, IntervalBounds},
     IntervalContainer, Subtract,
 };
 use std::marker::PhantomData;
 
-pub struct SubtractIter<'a, I, Iv, C, T>
+pub struct SubtractIter<'a, I, Iv, C>
 where
-    I: IntervalBounds<C, T> + 'a,
-    Iv: IntervalBounds<C, T> + 'a,
+    I: IntervalBounds<C> + 'a,
+    Iv: IntervalBounds<C> + 'a,
     C: ChromBounds + 'a,
-    T: ValueBounds + 'a,
 {
     inner: &'a Vec<I>,
     query: &'a Iv,
     remainder: Option<I>,
     offset: usize,
-    phantom_t: PhantomData<T>,
     phantom_c: PhantomData<C>,
 }
-impl<'a, I, Iv, C, T> SubtractIter<'a, I, Iv, C, T>
+impl<'a, I, Iv, C> SubtractIter<'a, I, Iv, C>
 where
-    I: IntervalBounds<C, T>,
-    Iv: IntervalBounds<C, T>,
+    I: IntervalBounds<C>,
+    Iv: IntervalBounds<C>,
     C: ChromBounds,
-    T: ValueBounds,
 {
     pub fn new(inner: &'a Vec<I>, query: &'a Iv) -> Self {
         Self {
@@ -31,17 +28,15 @@ where
             query,
             remainder: None,
             offset: 0,
-            phantom_t: PhantomData,
             phantom_c: PhantomData,
         }
     }
 }
-impl<'a, I, Iv, C, T> Iterator for SubtractIter<'a, I, Iv, C, T>
+impl<'a, I, Iv, C> Iterator for SubtractIter<'a, I, Iv, C>
 where
-    I: IntervalBounds<C, T>,
-    Iv: IntervalBounds<C, T>,
+    I: IntervalBounds<C>,
+    Iv: IntervalBounds<C>,
     C: ChromBounds,
-    T: ValueBounds,
 {
     type Item = I;
     fn next(&mut self) -> Option<Self::Item> {
@@ -79,45 +74,40 @@ where
     }
 }
 
-pub struct SubtractFromIter<I, Iv, C, T>
+pub struct SubtractFromIter<I, Iv, C>
 where
-    I: IntervalBounds<C, T>,
-    Iv: IntervalBounds<C, T>,
+    I: IntervalBounds<C>,
+    Iv: IntervalBounds<C>,
     C: ChromBounds,
-    T: ValueBounds,
 {
-    inner: IntervalContainer<I, C, T>,
+    inner: IntervalContainer<I, C>,
     remainder: Iv,
     send_remainder: bool,
     offset: usize,
-    phantom_t: PhantomData<T>,
     phantom_c: PhantomData<C>,
 }
-impl<C, T, I, Iv> SubtractFromIter<I, Iv, C, T>
+impl<C, I, Iv> SubtractFromIter<I, Iv, C>
 where
-    I: IntervalBounds<C, T>,
-    Iv: IntervalBounds<C, T>,
+    I: IntervalBounds<C>,
+    Iv: IntervalBounds<C>,
     C: ChromBounds,
-    T: ValueBounds,
 {
-    pub fn new(container: &IntervalContainer<I, C, T>, query: &Iv) -> Self {
+    pub fn new(container: &IntervalContainer<I, C>, query: &Iv) -> Self {
         let merged_container = container.merge_unchecked();
         Self {
             inner: merged_container,
             remainder: query.clone(),
             offset: 0,
             send_remainder: true,
-            phantom_t: PhantomData,
             phantom_c: PhantomData,
         }
     }
 }
-impl<I, Iv, C, T> Iterator for SubtractFromIter<I, Iv, C, T>
+impl<I, Iv, C> Iterator for SubtractFromIter<I, Iv, C>
 where
-    I: IntervalBounds<C, T>,
-    Iv: IntervalBounds<C, T>,
+    I: IntervalBounds<C>,
+    Iv: IntervalBounds<C>,
     C: ChromBounds,
-    T: ValueBounds,
 {
     type Item = I;
     fn next(&mut self) -> Option<Self::Item> {

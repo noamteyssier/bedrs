@@ -1,4 +1,4 @@
-use crate::traits::{ChromBounds, IntervalBounds, ValueBounds};
+use crate::traits::{ChromBounds, IntervalBounds};
 use std::{collections::VecDeque, marker::PhantomData};
 
 /// An iterator over a vector of interval records.
@@ -49,36 +49,31 @@ use std::{collections::VecDeque, marker::PhantomData};
 ///    println!("{:?}", interval);
 /// }
 /// ```
-pub struct IntervalIterOwned<I, C, T>
+pub struct IntervalIterOwned<I, C>
 where
-    I: IntervalBounds<C, T>,
+    I: IntervalBounds<C>,
     C: ChromBounds,
-    T: ValueBounds,
 {
     internal: VecDeque<I>,
     phantom_c: PhantomData<C>,
-    phantom_t: PhantomData<T>,
 }
-impl<I, C, T> IntervalIterOwned<I, C, T>
+impl<I, C> IntervalIterOwned<I, C>
 where
-    I: IntervalBounds<C, T>,
+    I: IntervalBounds<C>,
     C: ChromBounds,
-    T: ValueBounds,
 {
     #[must_use]
     pub fn new(records: Vec<I>) -> Self {
         Self {
             internal: records.into(),
             phantom_c: PhantomData,
-            phantom_t: PhantomData,
         }
     }
 }
-impl<I, C, T> Iterator for IntervalIterOwned<I, C, T>
+impl<I, C> Iterator for IntervalIterOwned<I, C>
 where
-    I: IntervalBounds<C, T>,
+    I: IntervalBounds<C>,
     C: ChromBounds,
-    T: ValueBounds,
 {
     type Item = I;
     fn next(&mut self) -> Option<Self::Item> {
@@ -140,37 +135,32 @@ where
 /// // The container is still usable after the iteration
 /// assert_eq!(set.len(), 3);
 /// ```
-pub struct IntervalIterRef<'a, I, C, T>
+pub struct IntervalIterRef<'a, I, C>
 where
-    I: IntervalBounds<C, T>,
+    I: IntervalBounds<C>,
     C: ChromBounds,
-    T: ValueBounds,
 {
     internal: &'a [I],
     phantom_c: PhantomData<C>,
-    phantom_t: PhantomData<T>,
     state: usize,
 }
-impl<'a, I, C, T> IntervalIterRef<'a, I, C, T>
+impl<'a, I, C> IntervalIterRef<'a, I, C>
 where
-    I: IntervalBounds<C, T>,
+    I: IntervalBounds<C>,
     C: ChromBounds,
-    T: ValueBounds,
 {
     pub fn new(records: &'a [I]) -> Self {
         Self {
             internal: records,
             phantom_c: PhantomData,
-            phantom_t: PhantomData,
             state: 0,
         }
     }
 }
-impl<'a, I, C, T> Iterator for IntervalIterRef<'a, I, C, T>
+impl<'a, I, C> Iterator for IntervalIterRef<'a, I, C>
 where
-    I: IntervalBounds<C, T>,
+    I: IntervalBounds<C>,
     C: ChromBounds,
-    T: ValueBounds,
 {
     type Item = &'a I;
     fn next(&mut self) -> Option<Self::Item> {

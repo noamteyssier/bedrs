@@ -1,29 +1,26 @@
-use crate::traits::{ChromBounds, IntervalBounds, ValueBounds};
+use crate::traits::{ChromBounds, IntervalBounds};
 use std::{fmt::Debug, marker::PhantomData};
 
 /// An iterator over the complement of a set of interval records.
 ///
 /// This iterator expects the input to be sorted and pre-merged and will
 /// panic if this is not the case.
-pub struct ComplementIter<It, I, C, T>
+pub struct ComplementIter<It, I, C>
 where
     It: Iterator<Item = I>,
-    I: IntervalBounds<C, T>,
+    I: IntervalBounds<C>,
     C: ChromBounds,
-    T: ValueBounds,
 {
     iter: It,
     current: Option<I>,
     last: Option<I>,
     phantom_c: PhantomData<C>,
-    phantom_t: PhantomData<T>,
 }
-impl<It, I, C, T> ComplementIter<It, I, C, T>
+impl<It, I, C> ComplementIter<It, I, C>
 where
     It: Iterator<Item = I>,
-    I: IntervalBounds<C, T>,
+    I: IntervalBounds<C>,
     C: ChromBounds,
-    T: ValueBounds,
 {
     pub fn new(iter: It) -> Self {
         Self {
@@ -31,7 +28,6 @@ where
             current: None,
             last: None,
             phantom_c: PhantomData,
-            phantom_t: PhantomData,
         }
     }
     fn populate(&mut self) {
@@ -43,12 +39,11 @@ where
         }
     }
 }
-impl<It, I, C, T> Iterator for ComplementIter<It, I, C, T>
+impl<It, I, C> Iterator for ComplementIter<It, I, C>
 where
     It: Iterator<Item = I>,
-    I: IntervalBounds<C, T> + Debug,
+    I: IntervalBounds<C> + Debug,
     C: ChromBounds,
-    T: ValueBounds,
 {
     type Item = I;
     fn next(&mut self) -> Option<Self::Item> {
@@ -76,15 +71,14 @@ where
 mod testing {
     use super::ComplementIter;
     use crate::{
-        traits::{ChromBounds, IntervalBounds, ValueBounds},
+        traits::{ChromBounds, IntervalBounds},
         BaseInterval, Bed3,
     };
 
-    fn validate_records<I, C, T>(obs: &[I], exp: &[I])
+    fn validate_records<I, C>(obs: &[I], exp: &[I])
     where
-        I: IntervalBounds<C, T>,
+        I: IntervalBounds<C>,
         C: ChromBounds,
-        T: ValueBounds,
     {
         assert_eq!(obs.len(), exp.len());
         for (obs, exp) in obs.iter().zip(exp.iter()) {

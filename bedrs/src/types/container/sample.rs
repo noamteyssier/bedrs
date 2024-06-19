@@ -1,16 +1,15 @@
 use crate::{
-    traits::{ChromBounds, IntervalBounds, SetError, ValueBounds},
+    traits::{ChromBounds, IntervalBounds, SetError},
     IntervalContainer,
 };
 use rand::{seq::SliceRandom, RngCore, SeedableRng};
 use rand_chacha::ChaChaRng;
 
 /// Utility functions for random sampling within a container.
-impl<I, C, T> IntervalContainer<I, C, T>
+impl<I, C> IntervalContainer<I, C>
 where
-    I: IntervalBounds<C, T>,
+    I: IntervalBounds<C>,
     C: ChromBounds,
-    T: ValueBounds,
 {
     /// Shuffles the elements of the container in place using the given random number generator.
     ///

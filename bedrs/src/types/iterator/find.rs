@@ -1,47 +1,42 @@
 use crate::{
-    traits::{ChromBounds, IntervalBounds, ValueBounds},
+    traits::{ChromBounds, IntervalBounds},
     types::Query,
 };
 use std::marker::PhantomData;
 
-pub struct FindIter<'a, C, T, I, Iv>
+pub struct FindIter<'a, C, I, Iv>
 where
-    I: IntervalBounds<C, T> + 'a,
-    Iv: IntervalBounds<C, T> + 'a,
+    I: IntervalBounds<C> + 'a,
+    Iv: IntervalBounds<C> + 'a,
     C: ChromBounds + 'a,
-    T: ValueBounds + 'a,
 {
     inner: &'a Vec<I>,
     query: &'a Iv,
     offset: usize,
-    phantom_t: PhantomData<T>,
     phantom_c: PhantomData<C>,
-    method: Query<T>,
+    method: Query,
 }
-impl<'a, C, T, I, Iv> FindIter<'a, C, T, I, Iv>
+impl<'a, C, I, Iv> FindIter<'a, C, I, Iv>
 where
-    I: IntervalBounds<C, T>,
-    Iv: IntervalBounds<C, T>,
+    I: IntervalBounds<C>,
+    Iv: IntervalBounds<C>,
     C: ChromBounds,
-    T: ValueBounds,
 {
-    pub fn new(inner: &'a Vec<I>, query: &'a Iv, offset: usize, method: Query<T>) -> Self {
+    pub fn new(inner: &'a Vec<I>, query: &'a Iv, offset: usize, method: Query) -> Self {
         Self {
             inner,
             query,
             offset,
-            phantom_t: PhantomData,
             phantom_c: PhantomData,
             method,
         }
     }
 }
-impl<'a, C, T, I, Iv> Iterator for FindIter<'a, C, T, I, Iv>
+impl<'a, C, I, Iv> Iterator for FindIter<'a, C, I, Iv>
 where
-    I: IntervalBounds<C, T>,
-    Iv: IntervalBounds<C, T>,
+    I: IntervalBounds<C>,
+    Iv: IntervalBounds<C>,
     C: ChromBounds,
-    T: ValueBounds,
 {
     type Item = &'a I;
     fn next(&mut self) -> Option<Self::Item> {
@@ -58,44 +53,39 @@ where
     }
 }
 
-pub struct FindIterEnumerate<'a, C, T, I, Iv>
+pub struct FindIterEnumerate<'a, C, I, Iv>
 where
-    I: IntervalBounds<C, T> + 'a,
-    Iv: IntervalBounds<C, T> + 'a,
+    I: IntervalBounds<C> + 'a,
+    Iv: IntervalBounds<C> + 'a,
     C: ChromBounds + 'a,
-    T: ValueBounds + 'a,
 {
     inner: &'a Vec<I>,
     query: &'a Iv,
     offset: usize,
-    phantom_t: PhantomData<T>,
     phantom_c: PhantomData<C>,
-    method: Query<T>,
+    method: Query,
 }
-impl<'a, C, T, I, Iv> FindIterEnumerate<'a, C, T, I, Iv>
+impl<'a, C, I, Iv> FindIterEnumerate<'a, C, I, Iv>
 where
-    I: IntervalBounds<C, T>,
-    Iv: IntervalBounds<C, T>,
+    I: IntervalBounds<C>,
+    Iv: IntervalBounds<C>,
     C: ChromBounds,
-    T: ValueBounds,
 {
-    pub fn new(inner: &'a Vec<I>, query: &'a Iv, offset: usize, method: Query<T>) -> Self {
+    pub fn new(inner: &'a Vec<I>, query: &'a Iv, offset: usize, method: Query) -> Self {
         Self {
             inner,
             query,
             offset,
-            phantom_t: PhantomData,
             phantom_c: PhantomData,
             method,
         }
     }
 }
-impl<'a, C, T, I, Iv> Iterator for FindIterEnumerate<'a, C, T, I, Iv>
+impl<'a, C, I, Iv> Iterator for FindIterEnumerate<'a, C, I, Iv>
 where
-    I: IntervalBounds<C, T>,
-    Iv: IntervalBounds<C, T>,
+    I: IntervalBounds<C>,
+    Iv: IntervalBounds<C>,
     C: ChromBounds,
-    T: ValueBounds,
 {
     type Item = (usize, &'a I);
     fn next(&mut self) -> Option<Self::Item> {
@@ -112,44 +102,39 @@ where
     }
 }
 
-pub struct FindIterOwned<'a, C, T, I, Iv>
+pub struct FindIterOwned<'a, C, I, Iv>
 where
-    I: IntervalBounds<C, T> + 'a,
-    Iv: IntervalBounds<C, T> + 'a,
+    I: IntervalBounds<C> + 'a,
+    Iv: IntervalBounds<C> + 'a,
     C: ChromBounds + 'a,
-    T: ValueBounds + 'a,
 {
     inner: &'a Vec<I>,
     query: Iv,
     offset: usize,
-    phantom_t: PhantomData<T>,
     phantom_c: PhantomData<C>,
-    method: Query<T>,
+    method: Query,
 }
-impl<'a, C, T, I, Iv> FindIterOwned<'a, C, T, I, Iv>
+impl<'a, C, I, Iv> FindIterOwned<'a, C, I, Iv>
 where
-    I: IntervalBounds<C, T>,
-    Iv: IntervalBounds<C, T>,
+    I: IntervalBounds<C>,
+    Iv: IntervalBounds<C>,
     C: ChromBounds,
-    T: ValueBounds,
 {
-    pub fn new(inner: &'a Vec<I>, query: Iv, offset: usize, method: Query<T>) -> Self {
+    pub fn new(inner: &'a Vec<I>, query: Iv, offset: usize, method: Query) -> Self {
         Self {
             inner,
             query,
             offset,
-            phantom_t: PhantomData,
             phantom_c: PhantomData,
             method,
         }
     }
 }
-impl<'a, C, T, I, Iv> Iterator for FindIterOwned<'a, C, T, I, Iv>
+impl<'a, C, I, Iv> Iterator for FindIterOwned<'a, C, I, Iv>
 where
-    I: IntervalBounds<C, T>,
-    Iv: IntervalBounds<C, T>,
+    I: IntervalBounds<C>,
+    Iv: IntervalBounds<C>,
     C: ChromBounds,
-    T: ValueBounds,
 {
     type Item = &'a I;
     fn next(&mut self) -> Option<Self::Item> {

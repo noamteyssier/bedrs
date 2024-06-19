@@ -1,4 +1,4 @@
-use crate::traits::{ChromBounds, IntervalBounds, ValueBounds};
+use crate::traits::{ChromBounds, IntervalBounds};
 use std::marker::PhantomData;
 
 /// An iterator that determines overlapping intervals
@@ -7,26 +7,23 @@ use std::marker::PhantomData;
 ///
 /// Expects sorted intervals.
 /// Undefined behavior if the intervals are not sorted.
-pub struct ClusterIter<It, I, C, T>
+pub struct ClusterIter<It, I, C>
 where
     It: Iterator<Item = I>,
-    I: IntervalBounds<C, T>,
+    I: IntervalBounds<C>,
     C: ChromBounds,
-    T: ValueBounds,
 {
     iter: It,
     span: I,
     init: bool,
     current_id: usize,
-    phantom_t: PhantomData<T>,
     phantom_c: PhantomData<C>,
 }
-impl<It, I, C, T> ClusterIter<It, I, C, T>
+impl<It, I, C> ClusterIter<It, I, C>
 where
     It: Iterator<Item = I>,
-    I: IntervalBounds<C, T>,
+    I: IntervalBounds<C>,
     C: ChromBounds,
-    T: ValueBounds,
 {
     pub fn new(iter: It) -> Self {
         Self {
@@ -34,7 +31,6 @@ where
             span: I::empty(),
             init: false,
             current_id: 0,
-            phantom_t: PhantomData,
             phantom_c: PhantomData,
         }
     }
@@ -68,12 +64,11 @@ where
         self.init = true;
     }
 }
-impl<It, I, C, T> Iterator for ClusterIter<It, I, C, T>
+impl<It, I, C> Iterator for ClusterIter<It, I, C>
 where
     It: Iterator<Item = I>,
-    I: IntervalBounds<C, T>,
+    I: IntervalBounds<C>,
     C: ChromBounds,
-    T: ValueBounds,
 {
     type Item = (I, usize);
     fn next(&mut self) -> Option<Self::Item> {

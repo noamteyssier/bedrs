@@ -1,12 +1,12 @@
 use anyhow::{bail, Result};
 
 use crate::{
-    traits::{ChromBounds, IntervalBounds, SetError, ValueBounds},
+    traits::{ChromBounds, IntervalBounds, SetError},
     types::{iterator::ComplementIter, IntervalIterOwned},
     IntervalContainer,
 };
 
-type ComplementIterOwned<I, C, T> = ComplementIter<IntervalIterOwned<I, C, T>, I, C, T>;
+type ComplementIterOwned<I, C> = ComplementIter<IntervalIterOwned<I, C>, I, C>;
 
 /// A trait for interval containers that generates an iterator over the
 /// complement of the intervals in the container.
@@ -44,13 +44,12 @@ type ComplementIterOwned<I, C, T> = ComplementIter<IntervalIterOwned<I, C, T>, I
 ///    assert!(obs.eq(exp));
 /// }
 /// ```
-impl<I, C, T> IntervalContainer<I, C, T>
+impl<I, C> IntervalContainer<I, C>
 where
-    I: IntervalBounds<C, T>,
+    I: IntervalBounds<C>,
     C: ChromBounds,
-    T: ValueBounds,
 {
-    pub fn complement(self) -> Result<ComplementIterOwned<I, C, T>> {
+    pub fn complement(self) -> Result<ComplementIterOwned<I, C>> {
         if self.is_sorted() {
             Ok(self.complement_unchecked())
         } else {
@@ -58,7 +57,7 @@ where
         }
     }
 
-    pub fn complement_unchecked(self) -> ComplementIterOwned<I, C, T> {
+    pub fn complement_unchecked(self) -> ComplementIterOwned<I, C> {
         ComplementIter::new(self.into_iter())
     }
 }
@@ -66,15 +65,14 @@ where
 #[cfg(test)]
 mod testing {
     use crate::{
-        traits::{ChromBounds, IntervalBounds, ValueBounds},
+        traits::{ChromBounds, IntervalBounds},
         BaseInterval, Bed3, IntervalContainer,
     };
 
-    fn validate_records<I, C, T>(obs: &[I], exp: &[I])
+    fn validate_records<I, C>(obs: &[I], exp: &[I])
     where
-        I: IntervalBounds<C, T>,
+        I: IntervalBounds<C>,
         C: ChromBounds,
-        T: ValueBounds,
     {
         assert_eq!(obs.len(), exp.len());
         for (obs, exp) in obs.iter().zip(exp.iter()) {

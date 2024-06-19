@@ -1,5 +1,5 @@
 use crate::{
-    traits::{ChromBounds, IntervalBounds, ValueBounds},
+    traits::{ChromBounds, IntervalBounds},
     types::Query,
     Intersect,
 };
@@ -18,28 +18,26 @@ use std::{collections::VecDeque, fmt::Debug, marker::PhantomData};
 /// Works by keeping two queues of intervals, one for each iterator. The
 /// intervals are popped from the queue and compared. This will consume
 /// all target intervals that precede or overlap the query interval.
-pub struct IntersectIter<It, I, C, T>
+pub struct IntersectIter<It, I, C>
 where
     It: Iterator<Item = I>,
-    I: IntervalBounds<C, T>,
+    I: IntervalBounds<C>,
     C: ChromBounds,
-    T: ValueBounds,
 {
     iter_left: It,
     iter_right: It,
     queue_left: VecDeque<I>,
     queue_right: VecDeque<I>,
     queue_right_matched: VecDeque<I>,
-    method: Query<T>,
+    method: Query,
     phantom_c: PhantomData<C>,
     is_new: bool,
 }
-impl<It, I, C, T> IntersectIter<It, I, C, T>
+impl<It, I, C> IntersectIter<It, I, C>
 where
     It: Iterator<Item = I>,
-    I: IntervalBounds<C, T>,
+    I: IntervalBounds<C>,
     C: ChromBounds,
-    T: ValueBounds,
 {
     pub fn new(iter_left: It, iter_right: It) -> Self {
         Self {
@@ -54,7 +52,7 @@ where
         }
     }
 
-    pub fn new_with_method(iter_left: It, iter_right: It, method: Query<T>) -> Self {
+    pub fn new_with_method(iter_left: It, iter_right: It, method: Query) -> Self {
         Self {
             iter_left,
             iter_right,
@@ -108,12 +106,11 @@ where
     }
 }
 
-impl<It, I, C, T> Iterator for IntersectIter<It, I, C, T>
+impl<It, I, C> Iterator for IntersectIter<It, I, C>
 where
     It: Iterator<Item = I>,
-    I: IntervalBounds<C, T> + Debug,
+    I: IntervalBounds<C> + Debug,
     C: ChromBounds,
-    T: ValueBounds,
 {
     type Item = I;
     fn next(&mut self) -> Option<Self::Item> {
@@ -162,16 +159,15 @@ where
 mod testing {
     use super::IntersectIter;
     use crate::{
-        traits::{ChromBounds, IntervalBounds, ValueBounds},
+        traits::{ChromBounds, IntervalBounds},
         types::{Query, QueryMethod, StrandMethod},
         BaseInterval, Bed3,
     };
 
-    fn validate_records<I, C, T>(obs: &[I], exp: &[I])
+    fn validate_records<I, C>(obs: &[I], exp: &[I])
     where
-        I: IntervalBounds<C, T>,
+        I: IntervalBounds<C>,
         C: ChromBounds,
-        T: ValueBounds,
     {
         assert_eq!(obs.len(), exp.len());
         for (obs, exp) in obs.iter().zip(exp.iter()) {

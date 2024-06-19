@@ -1,14 +1,13 @@
 use crate::{
-    traits::{ChromBounds, IntervalBounds, ValueBounds},
+    traits::{ChromBounds, IntervalBounds},
     types::Query,
     Intersect, IntervalContainer,
 };
 
-impl<'a, I, C, T> IntervalContainer<I, C, T>
+impl<'a, I, C> IntervalContainer<I, C>
 where
-    I: IntervalBounds<C, T>,
+    I: IntervalBounds<C>,
     C: ChromBounds,
-    T: ValueBounds,
 {
     /// Find the intersection of two sets of intervals.
     ///
@@ -20,12 +19,12 @@ where
     /// containers)
     pub fn ix_set_target<Iv>(
         &'a self,
-        other: &'a IntervalContainer<Iv, C, T>,
-        method: Query<T>,
+        other: &'a IntervalContainer<Iv, C>,
+        method: Query,
     ) -> Box<dyn Iterator<Item = Iv> + 'a>
     where
-        Iv: IntervalBounds<C, T> + 'a,
-        &'a Iv: Intersect<C, T>,
+        Iv: IntervalBounds<C> + 'a,
+        &'a Iv: Intersect<C>,
     {
         let ix_iter = self.records().iter().flat_map(move |iv| {
             let overlaps = other
@@ -50,11 +49,11 @@ where
     /// containers)
     pub fn ix_set_query<Iv>(
         &'a self,
-        other: &'a IntervalContainer<Iv, C, T>,
-        method: Query<T>,
+        other: &'a IntervalContainer<Iv, C>,
+        method: Query,
     ) -> Box<dyn Iterator<Item = I> + 'a>
     where
-        Iv: IntervalBounds<C, T> + 'a,
+        Iv: IntervalBounds<C> + 'a,
     {
         let ix_iter = self.records().iter().flat_map(move |iv| {
             let overlaps = other
