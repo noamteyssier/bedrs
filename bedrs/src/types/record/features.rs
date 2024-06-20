@@ -5,12 +5,12 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, Clone, Copy, new)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct Coordinate<C: ChromBounds> {
+pub struct Features<C: ChromBounds> {
     chr: C,
     start: i32,
     end: i32,
 }
-impl<C: ChromBounds> Coordinate<C> {
+impl<C: ChromBounds> Features<C> {
     pub fn chr(&self) -> &C {
         &self.chr
     }

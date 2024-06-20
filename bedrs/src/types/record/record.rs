@@ -1,4 +1,4 @@
-use super::Coordinate;
+use super::Features;
 use crate::{traits::ChromBounds, types::meta::RecordMetadata, Coordinates};
 use coitrees::GenericInterval;
 use derive_new::new;
@@ -13,7 +13,7 @@ where
     M: RecordMetadata,
 {
     #[cfg_attr(feature = "serde", serde(flatten))]
-    pub coordinates: Coordinate<C>,
+    pub coordinates: Features<C>,
     #[cfg_attr(feature = "serde", serde(flatten))]
     pub metadata: M,
 }
