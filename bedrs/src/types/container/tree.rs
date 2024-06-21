@@ -38,6 +38,7 @@ where
     I: IntervalBounds<C>,
     C: ChromBounds,
 {
+    #[must_use]
     pub fn new() -> Self {
         Self {
             map: Map::new(),
@@ -45,6 +46,7 @@ where
         }
     }
 
+    #[must_use]
     pub fn from_map(map: Map<I, C>) -> Self {
         Self {
             map,
@@ -52,6 +54,7 @@ where
         }
     }
 
+    #[must_use]
     pub fn map(&self) -> &Map<I, C> {
         &self.map
     }
@@ -60,6 +63,7 @@ where
         &mut self.map
     }
 
+    #[must_use]
     pub fn is_sorted(&self) -> bool {
         self.is_sorted
     }
@@ -74,8 +78,9 @@ where
     }
 
     /// Number of total intervals in all subtrees
+    #[must_use]
     pub fn len(&self) -> usize {
-        self.map.values().map(|x| x.len()).sum()
+        self.map.values().map(Subtree::len).sum()
     }
 
     /// Retrieve a specific subtree
@@ -94,20 +99,24 @@ where
     }
 
     /// Number of subtrees in the tree
+    #[must_use]
     pub fn num_subtrees(&self) -> usize {
         self.map.len()
     }
 
+    #[must_use]
     pub fn subtree_names(&self) -> Vec<&C> {
         self.map.keys().collect()
     }
 
+    #[must_use]
     pub fn subtree_names_sorted(&self) -> Vec<&C> {
         let mut names = self.subtree_names();
         names.sort_unstable();
         names
     }
 
+    #[must_use]
     pub fn is_empty(&self) -> bool {
         self.map.is_empty()
     }
@@ -135,7 +144,11 @@ where
         if !self.map.contains_key(record.chr()) {
             self.map.insert(record.chr().clone(), Subtree::empty());
         }
-        self.map.get_mut(record.chr()).unwrap().insert(record);
+        if let Some(subtree) = self.map.get_mut(record.chr()) {
+            subtree.insert(record);
+        } else {
+            unreachable!("This should not happen");
+        }
     }
 
     pub fn insert_subtree(&mut self, name: C, subtree: Subtree<I, C>) {

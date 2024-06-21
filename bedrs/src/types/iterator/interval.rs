@@ -74,8 +74,11 @@ where
         let mut queue = VecDeque::new();
         let names: Vec<_> = inner.subtree_names_sorted().into_iter().cloned().collect();
         for n in names {
-            let subtree = inner.subtree_owned(&n).unwrap();
-            queue.extend(subtree.into_iter());
+            if let Some(subtree) = inner.subtree_owned(&n) {
+                queue.extend(subtree.into_iter());
+            } else {
+                unreachable!("This should not happen");
+            }
         }
         Self {
             queue,

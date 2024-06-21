@@ -582,6 +582,7 @@ mod testing {
     }
 
     #[test]
+    #[allow(clippy::unnecessary_wraps)]
     fn merge_intervals_specific_strand_unknown() -> Result<()> {
         let set = Subtree::from_sorted(vec![
             bed3![1, 10, 20, Strand::Unknown],

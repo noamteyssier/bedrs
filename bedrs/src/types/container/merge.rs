@@ -127,7 +127,6 @@ mod testing {
         assert_eq!(merge_set.len(), 2);
 
         let records = Vec::from(merge_set);
-        println!("{:?}", records);
         let iv1 = records[0];
         let iv2 = records[1];
 

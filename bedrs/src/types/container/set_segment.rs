@@ -84,6 +84,10 @@ where
         Self::grow_cluster(span, interval, endpoints, n_iv);
     }
 
+    /// Segments the cluster and stores the segments
+    ///
+    /// # Panics
+    /// does not check if the set is impty and will panic if the set is empty
     #[must_use]
     pub fn segment_unchecked(&self) -> Self {
         let mut segments = Vec::with_capacity(self.len());
@@ -94,13 +98,13 @@ where
         for interval in self.iter() {
             // Case where intervals are part of the same span
             if span.overlaps(interval) || span.borders(interval) {
-                Self::grow_cluster(&mut span, &interval, &mut endpoints, &mut n_iv);
+                Self::grow_cluster(&mut span, interval, &mut endpoints, &mut n_iv);
             // Case where intervals are not part of the same span
             } else {
                 // Segment the cluster
-                Self::segment_cluster(&interval, &mut endpoints, n_iv, &mut segments);
+                Self::segment_cluster(interval, &mut endpoints, n_iv, &mut segments);
                 // Initialize a new cluster
-                Self::init_cluster(&mut span, &interval, &mut endpoints, &mut n_iv);
+                Self::init_cluster(&mut span, interval, &mut endpoints, &mut n_iv);
             }
         }
 

@@ -186,6 +186,7 @@ where
         self.data.span(name)
     }
 
+    #[must_use]
     pub fn to_vec(&self) -> Vec<I> {
         Vec::from(self)
     }

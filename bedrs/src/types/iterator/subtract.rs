@@ -83,6 +83,10 @@ where
     Iv: IntervalBounds<C>,
     C: ChromBounds,
 {
+    /// Create a new iterator that subtracts intervals from the query
+    ///
+    /// # Panics
+    /// Will panic if the set cannot be merged
     pub fn new(container: &IntervalContainer<I, C>, query: &Iv) -> Self {
         let inner = container.merge().unwrap();
         let names = inner.subtree_names_sorted().into_iter().cloned().collect();
