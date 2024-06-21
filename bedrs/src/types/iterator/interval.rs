@@ -25,8 +25,11 @@ use crate::{
 ///     BaseInterval::new(3, 30),
 /// ];
 ///
+/// // create an interval set
+/// let set = IntervalContainer::new(intervals);
+///
 /// // build an iterator over the vector
-/// let iter = IntervalIterOwned::new(intervals);
+/// let iter = IntervalIterOwned::new(set);
 ///
 /// // iterate on the iterator
 /// for interval in iter {
@@ -97,31 +100,6 @@ where
 /// and does not require the records to be owned / cloned.
 ///
 /// This will not drain the slice of records.
-///
-/// # Example
-///
-/// ## Using a vector of interval records
-///
-/// ```
-/// use bedrs::prelude::*;
-///
-/// let intervals = vec![
-///     BaseInterval::new(1, 10),
-///     BaseInterval::new(2, 20),
-///     BaseInterval::new(3, 30),
-/// ];
-///
-/// // build an iterator over the vector
-/// let iter = IntervalIterRef::new(&intervals);
-///
-/// // iterate on the iterator
-/// for interval in iter {
-///    println!("{:?}", interval);
-/// }
-///
-/// // The vector is still usable after the iteration
-/// assert_eq!(intervals.len(), 3);
-/// ```
 ///
 /// ## Iterating on a container of interval records
 ///

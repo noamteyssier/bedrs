@@ -4,7 +4,7 @@ pub mod iterator;
 pub mod macros;
 pub mod meta;
 pub mod record;
-pub use container::IntervalContainer;
+pub use container::{IntervalContainer, Subtree};
 pub use enums::{Frame, Query, QueryMethod, Score, Strand, StrandMethod};
 pub use iterator::{
     ClusterIter, FindIter, FindIterEnumerate, FindIterOwned, IntersectIter, IntervalIterOwned,

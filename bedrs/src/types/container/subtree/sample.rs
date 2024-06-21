@@ -23,7 +23,7 @@ where
     ///     BaseInterval::new(30, 300),
     ///     BaseInterval::new(40, 400),
     /// ];
-    /// let mut set = Subtree::from_sorted(intervals).unwrap();
+    /// let mut set = Subtree::from_sorted(intervals);
     /// set.shuffle_rng(&mut thread_rng());
     /// ```
     pub fn shuffle_rng(&mut self, rng: &mut impl RngCore) {
@@ -43,7 +43,7 @@ where
     ///    BaseInterval::new(30, 300),
     ///    BaseInterval::new(40, 400),
     /// ];
-    /// let mut set = Subtree::from_sorted(intervals).unwrap();
+    /// let mut set = Subtree::from_sorted(intervals);
     /// set.shuffle();
     /// ```
     pub fn shuffle(&mut self) {
@@ -63,7 +63,7 @@ where
     ///    BaseInterval::new(30, 300),
     ///    BaseInterval::new(40, 400),
     /// ];
-    /// let mut set = Subtree::from_sorted(intervals).unwrap();
+    /// let mut set = Subtree::from_sorted(intervals);
     /// set.shuffle_seed(42);
     /// ```
     pub fn shuffle_seed(&mut self, seed: u64) {
@@ -83,7 +83,7 @@ where
     ///     BaseInterval::new(30, 300),
     ///     BaseInterval::new(40, 400),
     /// ];
-    /// let set = Subtree::from_sorted(intervals).unwrap();
+    /// let set = Subtree::from_sorted(intervals);
     /// let mut rng = rand::thread_rng();
     /// let shuffled_set = set.sample_rng(2, &mut rng).unwrap();
     /// assert_eq!(shuffled_set.len(), 2);
@@ -110,7 +110,7 @@ where
     ///     BaseInterval::new(30, 300),
     ///     BaseInterval::new(40, 400),
     /// ];
-    /// let set = Subtree::from_sorted(intervals).unwrap();
+    /// let set = Subtree::from_sorted(intervals);
     /// let shuffled_set = set.sample(2).unwrap();
     /// assert_eq!(shuffled_set.len(), 2);
     /// ```
@@ -134,7 +134,7 @@ where
     ///     BaseInterval::new(30, 300),
     ///     BaseInterval::new(40, 400),
     /// ];
-    /// let set = Subtree::from_sorted(intervals).unwrap();
+    /// let set = Subtree::from_sorted(intervals);
     /// let shuffled_set_a = set.sample_seed(2, 42).unwrap();
     /// let shuffled_set_b = set.sample_seed(2, 42).unwrap();
     /// assert_eq!(shuffled_set_a.len(), 2);
@@ -161,7 +161,7 @@ where
     ///    BaseInterval::new(30, 300),
     ///    BaseInterval::new(40, 400),
     /// ];
-    /// let set = Subtree::from_sorted(intervals).unwrap();
+    /// let set = Subtree::from_sorted(intervals);
     /// let mut rng = rand::thread_rng();
     /// let shuffled_iter = set.sample_iter_rng(2, &mut rng).unwrap();
     /// assert_eq!(shuffled_iter.count(), 2);
@@ -190,7 +190,7 @@ where
     ///    BaseInterval::new(30, 300),
     ///    BaseInterval::new(40, 400),
     /// ];
-    /// let set = Subtree::from_sorted(intervals).unwrap();
+    /// let set = Subtree::from_sorted(intervals);
     /// let shuffled_iter = set.sample_iter(2).unwrap();
     /// assert_eq!(shuffled_iter.count(), 2);
     pub fn sample_iter<'a>(
@@ -217,7 +217,7 @@ where
     ///    BaseInterval::new(30, 300),
     ///    BaseInterval::new(40, 400),
     /// ];
-    /// let set = Subtree::from_sorted(intervals).unwrap();
+    /// let set = Subtree::from_sorted(intervals);
     /// let shuffled_iter = set.sample_iter_seed(2, 42).unwrap();
     /// assert_eq!(shuffled_iter.count(), 2);
     /// ```
