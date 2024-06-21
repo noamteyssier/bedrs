@@ -1,20 +1,20 @@
+use super::Subtree;
 use crate::{
     traits::{errors::SetError, ChromBounds, IntervalBounds},
     types::StrandMethod,
-    IntervalContainer,
 };
 use std::cmp::Ordering;
 
-/// Identifies the lower bound on a [`IntervalContainer`] via a binary tree search
-impl<I, C> IntervalContainer<I, C>
+/// Identifies the lower bound on a [`Subtree`] via a binary tree search
+impl<I, C> Subtree<I, C>
 where
     I: IntervalBounds<C>,
     C: ChromBounds,
 {
-    /// Identifies the lower bound on the [`IntervalContainer`] via a binary tree search
+    /// Identifies the lower bound on the [`Subtree`] via a binary tree search
     /// for a provided query.
     ///
-    /// This first checks if the [`IntervalContainer`] is sorted
+    /// This first checks if the [`Subtree`] is sorted
     ///
     /// Then, it performs a binary tree search for the lower bound
     /// but performs a biased comparison to search for the lower bound
@@ -34,7 +34,7 @@ where
     ///     BaseInterval::new(50, 60),
     /// ];
     /// let query = BaseInterval::new(17, 27);
-    /// let mut set = IntervalContainer::new(records);
+    /// let mut set = Subtree::new(records);
     /// set.sort();
     /// let bound = set.lower_bound(&query);
     /// assert_eq!(bound, Ok(1));
@@ -53,7 +53,7 @@ where
     ///     bed3![3, 30, 20],
     ///     bed3![4, 10, 20],
     /// ];
-    /// let mut set = IntervalContainer::new(records);
+    /// let mut set = Subtree::new(records);
     /// set.sort();
     /// let query = bed3![3, 10, 20];
     /// let bound = set.lower_bound(&query);
@@ -64,7 +64,7 @@ where
         Iv: IntervalBounds<C>,
     {
         if self.is_sorted() {
-            if self.records().is_empty() {
+            if self.data().is_empty() {
                 return Err(SetError::EmptySet);
             } else if self.max_len().is_none() {
                 return Err(SetError::MissingMaxLen);
@@ -75,7 +75,7 @@ where
         }
     }
 
-    /// Identifies the lower bound on the [`IntervalContainer`] via a binary tree search
+    /// Identifies the lower bound on the [`Subtree`] via a binary tree search
     /// for a provided query.
     ///
     /// Does not perform a check if it is sorted beforehand.
@@ -95,7 +95,7 @@ where
     ///     BaseInterval::new(50, 60),
     /// ];
     /// let query = BaseInterval::new(17, 27);
-    /// let set = IntervalContainer::new(records);
+    /// let set = Subtree::new(records);
     /// let bound = set.lower_bound_unchecked(&query);
     /// assert_eq!(bound, 1);
     /// ```
@@ -113,14 +113,14 @@ where
     ///     bed3![3, 30, 20],
     ///     bed3![4, 10, 20],
     /// ];
-    /// let set = IntervalContainer::new(records);
+    /// let set = Subtree::new(records);
     /// let query = bed3![3, 10, 20];
     /// let bound = set.lower_bound_unchecked(&query);
     /// assert_eq!(bound, 2);
     /// ```
     ///
     /// ## Panics
-    /// This will panic if the [`IntervalContainer`] is empty or if the `max_len` is None.
+    /// This will panic if the [`Subtree`] is empty or if the `max_len` is None.
     pub fn lower_bound_unchecked<Iv>(&self, query: &Iv) -> usize
     where
         Iv: IntervalBounds<C>,
@@ -128,7 +128,7 @@ where
         let max_len = self
             .max_len()
             .expect("max_len is None - is this an empty set?");
-        self.records()
+        self.data()
             .binary_search_by(|iv| {
                 if iv.biased_lt(query, max_len) {
                     Ordering::Less
@@ -139,14 +139,14 @@ where
             .unwrap_or_else(|x| x)
     }
 
-    /// Finds the earliest record in the [`IntervalContainer`] that shares a chromosome
-    /// with the query. Can result in an error if the [`IntervalContainer`] is not sorted.
+    /// Finds the earliest record in the [`Subtree`] that shares a chromosome
+    /// with the query. Can result in an error if the [`Subtree`] is not sorted.
     pub fn chr_bound<Iv>(&self, query: &Iv) -> Result<Option<usize>, SetError>
     where
         Iv: IntervalBounds<C>,
     {
         if self.is_sorted() {
-            if self.records().is_empty() {
+            if self.data().is_empty() {
                 return Err(SetError::EmptySet);
             }
             Ok(self.chr_bound_unchecked(query))
@@ -155,8 +155,8 @@ where
         }
     }
 
-    /// Finds the latest record in the [`IntervalContainer`] that shares a chromosome
-    /// with the query and is upstream. Can result in an error if the [`IntervalContainer`]
+    /// Finds the latest record in the [`Subtree`] that shares a chromosome
+    /// with the query and is upstream. Can result in an error if the [`Subtree`]
     /// is not sorted.
     ///
     /// Will return `None` if no record shares a chromosome with the query and is
@@ -170,7 +170,7 @@ where
         Iv: IntervalBounds<C>,
     {
         if self.is_sorted() {
-            if self.records().is_empty() {
+            if self.data().is_empty() {
                 return Err(SetError::EmptySet);
             }
             match method {
@@ -183,8 +183,8 @@ where
         }
     }
 
-    /// Finds the latest record in the [`IntervalContainer`] that shares a chromosome
-    /// with the query and is upstream. Can result in an error if the [`IntervalContainer`]
+    /// Finds the latest record in the [`Subtree`] that shares a chromosome
+    /// with the query and is upstream. Can result in an error if the [`Subtree`]
     /// is not sorted.
     ///
     /// Will return `None` if no record shares a chromosome with the query and is
@@ -200,8 +200,8 @@ where
         }
     }
 
-    /// Finds the earliest record in the [`IntervalContainer`] that shares a chromosome
-    /// with the query and is downstream. Can result in an error if the [`IntervalContainer`]
+    /// Finds the earliest record in the [`Subtree`] that shares a chromosome
+    /// with the query and is downstream. Can result in an error if the [`Subtree`]
     /// is not sorted.
     ///
     /// Will return `None` if no record shares a chromosome with the query and is
@@ -215,7 +215,7 @@ where
         Iv: IntervalBounds<C>,
     {
         if self.is_sorted() {
-            if self.records().is_empty() {
+            if self.data().is_empty() {
                 return Err(SetError::EmptySet);
             }
             match method {
@@ -230,8 +230,8 @@ where
         }
     }
 
-    /// Finds the earliest record in the [`IntervalContainer`] that shares a chromosome
-    /// with the query and is downstream. Can result in an error if the [`IntervalContainer`]
+    /// Finds the earliest record in the [`Subtree`] that shares a chromosome
+    /// with the query and is downstream. Can result in an error if the [`Subtree`]
     /// is not sorted.
     ///
     /// Will return `None` if no record shares a chromosome with the query and is
@@ -247,7 +247,7 @@ where
         }
     }
 
-    /// Finds the earliest record in the [`IntervalContainer`] that shares a chromosome
+    /// Finds the earliest record in the [`Subtree`] that shares a chromosome
     /// with the query. Does not perform a check if it is sorted beforehand.
     /// Use at your own risk.
     pub fn chr_bound_unchecked<Iv>(&self, query: &Iv) -> Option<usize>
@@ -255,13 +255,13 @@ where
         Iv: IntervalBounds<C>,
     {
         // Find the partition point for the chromosome
-        let bound = self.records().partition_point(|iv| iv.chr() < query.chr());
+        let bound = self.data().partition_point(|iv| iv.chr() < query.chr());
 
         // if the partition point is 0, then the first record is the
         // earliest record that shares a chromosome with the query or
         // there are no records that share a chromosome with the query.
         if bound == 0 {
-            if self.records()[0].chr() == query.chr() {
+            if self.data()[0].chr() == query.chr() {
                 Some(0)
             } else {
                 None
@@ -276,7 +276,7 @@ where
         }
     }
 
-    /// Finds the latest record in the [`IntervalContainer`] that shares a chromosome
+    /// Finds the latest record in the [`Subtree`] that shares a chromosome
     /// and is upstream of the query. Does not perform a check if it is
     /// sorted beforehand. Use at your own risk.
     pub fn bound_igstrand_upstream_unchecked<Iv>(&self, query: &Iv) -> Option<usize>
@@ -286,7 +286,7 @@ where
         // partition point returns the first index in the slice for which
         // the predicate fails (i.e. the index of the first record that is
         // greater than the query).
-        let low = self.records().partition_point(|iv| iv.lt(query));
+        let low = self.data().partition_point(|iv| iv.lt(query));
 
         // If the low index is 0, then the query is potentially less than
         // all records in the set.
@@ -300,7 +300,7 @@ where
 
             // If the record at the index has the same chromosome as the
             // query, then return the index.
-            if self.records()[idx].chr() == query.chr() {
+            if self.data()[idx].chr() == query.chr() {
                 Some(idx)
 
             // Otherwise, the query is less than all records in the set
@@ -321,7 +321,7 @@ where
         //
         // We subtract 1 to get the index of the last record that is less
         // than the query.
-        let low = self.records().partition_point(|iv| iv.lt(query));
+        let low = self.data().partition_point(|iv| iv.lt(query));
 
         if low == 0 {
             None
@@ -329,7 +329,7 @@ where
             let low = low - 1;
             // Start from the upper bound and iterate backwards until we find
             // the first record that shares a strand with the query.
-            let strand_bound = self.records()[..=low]
+            let strand_bound = self.data()[..=low]
                 .iter()
                 .rev()
                 .enumerate()
@@ -338,9 +338,7 @@ where
                 .0;
 
             let bound = low - strand_bound;
-            if self.records()[bound].chr() == query.chr()
-                && self.records()[bound].bounded_strand(query)
-            {
+            if self.data()[bound].chr() == query.chr() && self.data()[bound].bounded_strand(query) {
                 Some(bound)
             } else {
                 None
@@ -355,7 +353,7 @@ where
         // partition point returns the first index in the slice for which
         // the predicate fails (i.e. the index of the first record that is
         // greater than the query).
-        let low = self.records().partition_point(|iv| iv.lt(query));
+        let low = self.data().partition_point(|iv| iv.lt(query));
 
         if low == 0 {
             None
@@ -363,7 +361,7 @@ where
             let low = low - 1;
             // Start from the upper bound and iterate backwards until we find
             // the first record that doesn't share a strand with the query.
-            let strand_bound = self.records()[..=low]
+            let strand_bound = self.data()[..=low]
                 .iter()
                 .rev()
                 .enumerate()
@@ -372,8 +370,7 @@ where
                 .0;
 
             let bound = low - strand_bound;
-            if self.records()[bound].chr() == query.chr()
-                && !self.records()[bound].bounded_strand(query)
+            if self.data()[bound].chr() == query.chr() && !self.data()[bound].bounded_strand(query)
             {
                 Some(bound)
             } else {
@@ -382,7 +379,7 @@ where
         }
     }
 
-    /// Finds the earliest record in the [`IntervalContainer`] that shares a chromosome
+    /// Finds the earliest record in the [`Subtree`] that shares a chromosome
     /// and is downstream of the query. Does not perform a check if it is
     /// sorted beforehand. Use at your own risk.
     pub fn bound_igstrand_downstream_unchecked<Iv>(&self, query: &Iv) -> Option<usize>
@@ -392,7 +389,7 @@ where
         // partition point returns the first index in the slice for which
         // the predicate fails (i.e. the index of the first record that is
         // greater than the query).
-        let low = self.records().partition_point(|iv| iv.lt(query));
+        let low = self.data().partition_point(|iv| iv.lt(query));
 
         // If the low index is the length of the set, then the query is
         // greater than all records in the set.
@@ -404,7 +401,7 @@ where
         } else if low == 0 {
             // If the first record in the set has the same chromosome as the
             // query, then return 0.
-            if self.records()[0].chr() == query.chr() {
+            if self.data()[0].chr() == query.chr() {
                 Some(0)
 
             // Otherwise, the query is less than all records in the set.
@@ -420,7 +417,7 @@ where
         }
     }
 
-    /// Finds the earliest record in the [`IntervalContainer`] that shares a chromosome
+    /// Finds the earliest record in the [`Subtree`] that shares a chromosome
     /// and is downstream of the query and shares a strand. Does not perform a check if it is
     /// sorted beforehand. Use at your own risk.
     pub fn bound_stranded_downstream_unchecked<Iv>(&self, query: &Iv) -> Option<usize>
@@ -430,13 +427,13 @@ where
         // partition point returns the first index in the slice for which
         // the predicate fails (i.e. the index of the first record that is
         // greater than the query).
-        let lt_bound = self.records().partition_point(|iv| iv.lt(query));
+        let lt_bound = self.data().partition_point(|iv| iv.lt(query));
 
         // Iterate from the low bound to the end of the set and find the first
         // record that shares a strand with the query.
         // This will short-circuit on the first record that does not share a
         // chromosome and return None.
-        let strand_bound = self.records()[lt_bound..]
+        let strand_bound = self.data()[lt_bound..]
             .iter()
             .enumerate()
             .take_while(|(_, iv)| iv.bounded_chr(query))
@@ -446,7 +443,7 @@ where
         Some(lt_bound + strand_bound)
     }
 
-    /// Finds the earliest record in the [`IntervalContainer`] that shares a chromosome
+    /// Finds the earliest record in the [`Subtree`] that shares a chromosome
     /// and is downstream of the query and opposes its strand. Does not perform a check if it is
     /// sorted beforehand. Use at your own risk.
     pub fn bound_unstranded_downstream_unchecked<Iv>(&self, query: &Iv) -> Option<usize>
@@ -456,13 +453,13 @@ where
         // partition point returns the first index in the slice for which
         // the predicate fails (i.e. the index of the first record that is
         // greater than the query).
-        let lt_bound = self.records().partition_point(|iv| iv.lt(query));
+        let lt_bound = self.data().partition_point(|iv| iv.lt(query));
 
         // Iterate from the low bound to the end of the set and find the first
         // record that shares a strand with the query.
         // This will short-circuit on the first record that does not share a
         // chromosome and return None.
-        let strand_bound = self.records()[lt_bound..]
+        let strand_bound = self.data()[lt_bound..]
             .iter()
             .enumerate()
             .take_while(|(_, iv)| iv.bounded_chr(query))
@@ -475,15 +472,13 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::{
-        bed3, traits::errors::SetError, types::StrandMethod, BaseInterval, IntervalContainer,
-        Strand,
-    };
+    use super::*;
+    use crate::{bed3, traits::errors::SetError, types::StrandMethod, BaseInterval, Strand};
 
     #[test]
     fn bsearch_base_low() {
         let records = (0..500).map(|x| BaseInterval::new(x, x + 50)).collect();
-        let mut set = IntervalContainer::new(records);
+        let mut set = Subtree::new(records);
         set.sort();
         let query = BaseInterval::new(10, 20);
         let bound = set.lower_bound(&query);
@@ -493,7 +488,7 @@ mod testing {
     #[test]
     fn bsearch_base_high() {
         let records = (0..500).map(|x| BaseInterval::new(x, x + 50)).collect();
-        let mut set = IntervalContainer::new(records);
+        let mut set = Subtree::new(records);
         set.sort();
         let query = BaseInterval::new(300, 320);
         let bound = set.lower_bound(&query);
@@ -503,7 +498,7 @@ mod testing {
     #[test]
     fn bsearch_base_mid() {
         let records = (0..500).map(|x| BaseInterval::new(x, x + 50)).collect();
-        let mut set = IntervalContainer::new(records);
+        let mut set = Subtree::new(records);
         set.sort();
         let query = BaseInterval::new(200, 220);
         let bound = set.lower_bound(&query);
@@ -513,7 +508,7 @@ mod testing {
     #[test]
     fn bsearch_base_containing() {
         let records = (0..500).map(|x| BaseInterval::new(x, x + 50)).collect();
-        let mut set = IntervalContainer::new(records);
+        let mut set = Subtree::new(records);
         set.sort();
         let query = BaseInterval::new(0, 500);
         let bound = set.lower_bound(&query);
@@ -530,7 +525,7 @@ mod testing {
             bed3![3, 30, 20],
             bed3![4, 10, 20],
         ];
-        let mut set = IntervalContainer::new(records);
+        let mut set = Subtree::new(records);
         set.sort();
         let query = bed3![3, 10, 20];
         let bound = set.lower_bound(&query);
@@ -547,7 +542,7 @@ mod testing {
             bed3![3, 30, 40],
             bed3![4, 10, 20],
         ];
-        let mut set = IntervalContainer::new(records);
+        let mut set = Subtree::new(records);
         set.sort();
         let query = bed3![3, 25, 20];
         let bound = set.lower_bound(&query);
@@ -557,7 +552,7 @@ mod testing {
     #[test]
     fn bsearch_unsorted() {
         let records = (0..500).map(|x| BaseInterval::new(x, x + 50)).collect();
-        let set = IntervalContainer::new(records);
+        let set = Subtree::new(records);
         let query = BaseInterval::new(10, 20);
         let bound = set.lower_bound(&query);
         assert_eq!(bound, Err(SetError::UnsortedSet));
@@ -573,7 +568,7 @@ mod testing {
             BaseInterval::new(50, 60),
         ];
         let query = BaseInterval::new(20, 25);
-        let set = IntervalContainer::new(records);
+        let set = Subtree::new(records);
         let bound = set.lower_bound_unchecked(&query);
         assert_eq!(bound, 1);
     }
@@ -589,7 +584,7 @@ mod testing {
             BaseInterval::new(50, 60),
         ];
         let query = BaseInterval::new(5, 20);
-        let set = IntervalContainer::new(records);
+        let set = Subtree::new(records);
         let bound = set.lower_bound_unchecked(&query);
         assert_eq!(bound, 0);
     }
@@ -606,7 +601,7 @@ mod testing {
             BaseInterval::new(50, 60),
         ];
         let query = BaseInterval::new(5, 20);
-        let set = IntervalContainer::new(records);
+        let set = Subtree::new(records);
         let bound = set.lower_bound_unchecked(&query);
         assert_eq!(bound, 0);
     }
@@ -621,7 +616,7 @@ mod testing {
             bed3![2, 53, 353],
             bed3![2, 204, 504],
         ];
-        let set = IntervalContainer::new(intervals);
+        let set = Subtree::new(intervals);
         let bound = set.lower_bound_unchecked(&query);
         assert_eq!(bound, 1);
     }
@@ -629,7 +624,7 @@ mod testing {
     #[test]
     fn bsearch_no_max_len() {
         let records = (0..500).map(|x| BaseInterval::new(x, x + 50)).collect();
-        let mut set = IntervalContainer::from_sorted(records).unwrap();
+        let mut set = Subtree::from_sorted(records);
         let query = BaseInterval::new(10, 20);
         set.max_len_mut().take();
         let bound = set.lower_bound(&query);
@@ -641,7 +636,7 @@ mod testing {
     #[allow(clippy::should_panic_without_expect)]
     fn bsearch_no_max_len_unchecked_panic() {
         let records = (0..500).map(|x| BaseInterval::new(x, x + 50)).collect();
-        let mut set = IntervalContainer::from_sorted(records).unwrap();
+        let mut set = Subtree::from_sorted(records);
         let query = BaseInterval::new(10, 20);
         set.max_len_mut().take();
         set.lower_bound_unchecked(&query);
@@ -656,7 +651,7 @@ mod testing {
             bed3![3, 53, 353],
         ];
         let query = bed3![2, 100, 300];
-        let set = IntervalContainer::from_unsorted(intervals);
+        let set = Subtree::from_unsorted(intervals);
         let bound = set.chr_bound(&query).unwrap();
         assert_eq!(bound, Some(1));
     }
@@ -670,7 +665,7 @@ mod testing {
             bed3![4, 53, 353],
         ];
         let query = bed3![1, 100, 300];
-        let set = IntervalContainer::from_unsorted(intervals);
+        let set = Subtree::from_unsorted(intervals);
         let bound = set.chr_bound(&query).unwrap();
         assert_eq!(bound, Some(0));
     }
@@ -684,7 +679,7 @@ mod testing {
             bed3![3, 53, 353], // <- min
         ];
         let query = bed3![3, 100, 300];
-        let set = IntervalContainer::from_unsorted(intervals);
+        let set = Subtree::from_unsorted(intervals);
         let bound = set.chr_bound(&query).unwrap();
         assert_eq!(bound, Some(3));
     }
@@ -699,7 +694,7 @@ mod testing {
             bed3![3, 53, 353],
         ];
         let query = bed3![4, 100, 300];
-        let set = IntervalContainer::from_unsorted(intervals);
+        let set = Subtree::from_unsorted(intervals);
         let bound = set.chr_bound(&query).unwrap();
         assert_eq!(bound, None);
     }
@@ -714,7 +709,7 @@ mod testing {
             bed3![5, 53, 353],
         ];
         let query = bed3![1, 100, 300];
-        let set = IntervalContainer::from_unsorted(intervals);
+        let set = Subtree::from_unsorted(intervals);
         let bound = set.chr_bound(&query).unwrap();
         assert_eq!(bound, None);
     }
@@ -728,7 +723,7 @@ mod testing {
             bed3![3, 53, 353],
         ];
         let query = bed3![2, 100, 300];
-        let set = IntervalContainer::from_unsorted(intervals);
+        let set = Subtree::from_unsorted(intervals);
         let method = StrandMethod::Ignore;
         let bound = set.bound_upstream(&query, method).unwrap();
         assert_eq!(bound, Some(2));
@@ -743,7 +738,7 @@ mod testing {
             bed3![3, 53, 353],
         ];
         let query = bed3![2, 18, 300];
-        let set = IntervalContainer::from_unsorted(intervals);
+        let set = Subtree::from_unsorted(intervals);
         let method = StrandMethod::Ignore;
         let bound = set.bound_upstream(&query, method).unwrap();
         assert_eq!(bound, Some(2));
@@ -758,7 +753,7 @@ mod testing {
             bed3![3, 53, 353],
         ];
         let query = bed3![2, 53, 300];
-        let set = IntervalContainer::from_unsorted(intervals);
+        let set = Subtree::from_unsorted(intervals);
         let method = StrandMethod::Ignore;
         let bound = set.bound_upstream(&query, method).unwrap();
         assert_eq!(bound, Some(2));
@@ -773,7 +768,7 @@ mod testing {
             bed3![3, 53, 353], // <- min
         ];
         let query = bed3![3, 54, 300];
-        let set = IntervalContainer::from_unsorted(intervals);
+        let set = Subtree::from_unsorted(intervals);
         let method = StrandMethod::Ignore;
         let bound = set.bound_upstream(&query, method).unwrap();
         assert_eq!(bound, Some(3));
@@ -788,7 +783,7 @@ mod testing {
             bed3![3, 53, 353],
         ]; // no min
         let query = bed3![3, 50, 52];
-        let set = IntervalContainer::from_unsorted(intervals);
+        let set = Subtree::from_unsorted(intervals);
         let method = StrandMethod::Ignore;
         let bound = set.bound_upstream(&query, method).unwrap();
         assert_eq!(bound, None);
@@ -803,7 +798,7 @@ mod testing {
             bed3![4, 53, 353],
         ]; // no min
         let query = bed3![1, 50, 52];
-        let set = IntervalContainer::from_unsorted(intervals);
+        let set = Subtree::from_unsorted(intervals);
         let method = StrandMethod::Ignore;
         let bound = set.bound_upstream(&query, method).unwrap();
         assert_eq!(bound, None);
@@ -817,7 +812,7 @@ mod testing {
             bed3![1, 50, 60],
         ];
         let query = bed3![1, 22, 32];
-        let set = IntervalContainer::from_unsorted(intervals);
+        let set = Subtree::from_unsorted(intervals);
         let method = StrandMethod::Ignore;
         let bound = set.bound_upstream(&query, method).unwrap();
         assert_eq!(bound, Some(0));
@@ -832,7 +827,7 @@ mod testing {
             bed3![1, 50, 60],
         ];
         let query = bed3![1, 8, 32];
-        let set = IntervalContainer::from_unsorted(intervals);
+        let set = Subtree::from_unsorted(intervals);
         let method = StrandMethod::Ignore;
         let bound = set.bound_upstream(&query, method).unwrap();
         assert_eq!(bound, None);
@@ -849,7 +844,7 @@ mod testing {
             bed3![3, 53, 353, Strand::Forward],
         ];
         let query = bed3![2, 100, 300, Strand::Forward];
-        let set = IntervalContainer::from_unsorted(intervals);
+        let set = Subtree::from_unsorted(intervals);
         let method = StrandMethod::MatchStrand;
         let bound = set.bound_upstream(&query, method).unwrap();
         assert_eq!(bound, Some(2));
@@ -864,7 +859,7 @@ mod testing {
             bed3![3, 53, 353, Strand::Forward],
         ];
         let query = bed3![2, 100, 300, Strand::Forward];
-        let set = IntervalContainer::from_unsorted(intervals);
+        let set = Subtree::from_unsorted(intervals);
         let method = StrandMethod::MatchStrand;
         let bound = set.bound_upstream(&query, method).unwrap();
         assert_eq!(bound, Some(1));
@@ -878,7 +873,7 @@ mod testing {
             bed3![3, 53, 353, Strand::Forward],
         ];
         let query = bed3![2, 100, 300, Strand::Forward];
-        let set = IntervalContainer::from_unsorted(intervals);
+        let set = Subtree::from_unsorted(intervals);
         let method = StrandMethod::MatchStrand;
         let bound = set.bound_upstream(&query, method).unwrap();
         assert_eq!(bound, None);
@@ -893,7 +888,7 @@ mod testing {
             bed3![3, 53, 353, Strand::Forward],
         ];
         let query = bed3![2, 100, 300, Strand::Forward];
-        let set = IntervalContainer::from_unsorted(intervals);
+        let set = Subtree::from_unsorted(intervals);
         let method = StrandMethod::MatchStrand;
         let bound = set.bound_upstream(&query, method).unwrap();
         assert_eq!(bound, Some(2));
@@ -908,7 +903,7 @@ mod testing {
             bed3![3, 53, 353],
         ];
         let query = bed3![2, 10, 300];
-        let set = IntervalContainer::from_unsorted(intervals);
+        let set = Subtree::from_unsorted(intervals);
         let bound = set.bound_downstream(&query, StrandMethod::Ignore).unwrap();
         assert_eq!(bound, Some(2));
     }
@@ -922,7 +917,7 @@ mod testing {
             bed3![3, 53, 353], // <- min
         ];
         let query = bed3![3, 10, 300];
-        let set = IntervalContainer::from_unsorted(intervals);
+        let set = Subtree::from_unsorted(intervals);
         let bound = set.bound_downstream(&query, StrandMethod::Ignore).unwrap();
         assert_eq!(bound, Some(3));
     }
@@ -936,7 +931,7 @@ mod testing {
             bed3![3, 53, 353],
         ]; // no min
         let query = bed3![3, 54, 300];
-        let set = IntervalContainer::from_unsorted(intervals);
+        let set = Subtree::from_unsorted(intervals);
         let bound = set.bound_downstream(&query, StrandMethod::Ignore).unwrap();
         assert_eq!(bound, None);
     }
@@ -950,7 +945,7 @@ mod testing {
             bed3![4, 53, 353],
         ]; // no min
         let query = bed3![1, 54, 300];
-        let set = IntervalContainer::from_unsorted(intervals);
+        let set = Subtree::from_unsorted(intervals);
         let bound = set.bound_downstream(&query, StrandMethod::Ignore).unwrap();
         assert_eq!(bound, None);
     }
@@ -963,7 +958,7 @@ mod testing {
             bed3![1, 154, 304],
         ];
         let query = bed3![1, 21, 71];
-        let set = IntervalContainer::from_unsorted(intervals);
+        let set = Subtree::from_unsorted(intervals);
         let bound = set.bound_downstream(&query, StrandMethod::Ignore).unwrap();
         assert_eq!(bound, Some(0));
     }
@@ -979,7 +974,7 @@ mod testing {
             .zip(ends.iter())
             .map(|((&chr, &start), &end)| bed3![chr, start, end])
             .collect::<Vec<_>>();
-        let set = IntervalContainer::from_unsorted(records);
+        let set = Subtree::from_unsorted(records);
         // set.sort();
         let query = bed3![0, 12, 15];
         let bound = set
@@ -999,7 +994,7 @@ mod testing {
             bed3![3, 53, 353, Strand::Forward],
         ];
         let query = bed3![2, 10, 300, Strand::Forward];
-        let set = IntervalContainer::from_unsorted(intervals);
+        let set = Subtree::from_unsorted(intervals);
         let bound = set
             .bound_downstream(&query, StrandMethod::MatchStrand)
             .unwrap();
@@ -1016,7 +1011,7 @@ mod testing {
             bed3![3, 53, 353, Strand::Forward],
         ];
         let query = bed3![2, 10, 300, Strand::Forward];
-        let set = IntervalContainer::from_unsorted(intervals);
+        let set = Subtree::from_unsorted(intervals);
         let bound = set
             .bound_downstream(&query, StrandMethod::MatchStrand)
             .unwrap();
@@ -1034,7 +1029,7 @@ mod testing {
             bed3![3, 53, 353, Strand::Forward],
         ];
         let query = bed3![2, 10, 300, Strand::Forward];
-        let set = IntervalContainer::from_unsorted(intervals);
+        let set = Subtree::from_unsorted(intervals);
         let bound = set
             .bound_downstream(&query, StrandMethod::MatchStrand)
             .unwrap();
@@ -1052,7 +1047,7 @@ mod testing {
             bed3![3, 53, 353, Strand::Forward],
         ];
         let query = bed3![2, 10, 300, Strand::Forward];
-        let set = IntervalContainer::from_unsorted(intervals);
+        let set = Subtree::from_unsorted(intervals);
         let bound = set
             .bound_downstream(&query, StrandMethod::MatchStrand)
             .unwrap();
@@ -1069,7 +1064,7 @@ mod testing {
             bed3![3, 53, 353, Strand::Forward],
         ];
         let query = bed3![1, 10, 300, Strand::Forward];
-        let set = IntervalContainer::from_unsorted(intervals);
+        let set = Subtree::from_unsorted(intervals);
         let bound = set
             .bound_downstream(&query, StrandMethod::MatchStrand)
             .unwrap();
@@ -1079,7 +1074,7 @@ mod testing {
     #[test]
     fn empty_set_bound() {
         let records: Vec<BaseInterval> = Vec::new();
-        let set = IntervalContainer::from_sorted_unchecked(records);
+        let set = Subtree::from_sorted(records);
         let query = BaseInterval::new(10, 20);
         let bound = set.lower_bound(&query);
         assert_eq!(bound, Err(SetError::EmptySet));
@@ -1103,7 +1098,7 @@ mod testing {
     #[test]
     fn unsorted_set_bound() {
         let records = (0..500).map(|x| BaseInterval::new(x, x + 50)).collect();
-        let set = IntervalContainer::new(records);
+        let set = Subtree::new(records);
         let query = BaseInterval::new(10, 20);
 
         let bound = set.lower_bound(&query);
@@ -1128,7 +1123,7 @@ mod testing {
     #[test]
     fn upstream_bound_smaller_initial_record() {
         let records = vec![bed3![1, 10, 20], bed3![1, 30, 40], bed3![1, 50, 60]];
-        let set = IntervalContainer::from_sorted_unchecked(records);
+        let set = Subtree::from_sorted(records);
         let query = bed3![1, 5, 25];
         let bound = set.bound_upstream_unchecked(&query, StrandMethod::Ignore);
         assert_eq!(bound, None);
@@ -1141,7 +1136,7 @@ mod testing {
             bed3![1, 30, 40, Strand::Forward],
             bed3![1, 50, 60, Strand::Forward],
         ];
-        let set = IntervalContainer::from_sorted_unchecked(records);
+        let set = Subtree::from_sorted(records);
         let query = bed3![1, 5, 25, Strand::Forward];
         let bound = set.bound_stranded_upstream_unchecked(&query);
         assert_eq!(bound, None);
@@ -1150,7 +1145,7 @@ mod testing {
     #[test]
     fn bound_query_upstream_of_all() {
         let records = vec![bed3![1, 10, 20], bed3![1, 30, 40], bed3![1, 50, 60]];
-        let set = IntervalContainer::from_sorted_unchecked(records);
+        let set = Subtree::from_sorted(records);
         let query = bed3![2, 65, 75];
         let bound = set.chr_bound_unchecked(&query);
         assert_eq!(bound, None);
@@ -1163,7 +1158,7 @@ mod testing {
             bed3![1, 30, 40, Strand::Forward],
             bed3![1, 50, 60, Strand::Forward],
         ];
-        let set = IntervalContainer::from_sorted_unchecked(records);
+        let set = Subtree::from_sorted(records);
         let query = bed3![1, 65, 75, Strand::Forward];
         let bound = set.bound_stranded_downstream_unchecked(&query);
         assert_eq!(bound, None);
@@ -1176,7 +1171,7 @@ mod testing {
             bed3![1, 30, 40, Strand::Forward],
             bed3![1, 50, 60, Strand::Forward],
         ];
-        let set = IntervalContainer::from_sorted_unchecked(records);
+        let set = Subtree::from_sorted(records);
         let query = bed3![1, 5, 10, Strand::Forward];
         let bound = set.bound_stranded_downstream_unchecked(&query);
         assert_eq!(bound, Some(0));
@@ -1189,7 +1184,7 @@ mod testing {
             bed3![1, 30, 40, Strand::Forward],
             bed3![1, 50, 60, Strand::Forward],
         ];
-        let set = IntervalContainer::from_sorted_unchecked(records);
+        let set = Subtree::from_sorted(records);
         let query = bed3![1, 5, 10, Strand::Reverse];
         let bound = set.bound_stranded_downstream_unchecked(&query);
         assert_eq!(bound, None);
@@ -1202,7 +1197,7 @@ mod testing {
             bed3![2, 30, 40, Strand::Forward],
             bed3![2, 50, 60, Strand::Forward],
         ];
-        let set = IntervalContainer::from_sorted_unchecked(records);
+        let set = Subtree::from_sorted(records);
         let query = bed3![1, 5, 10, Strand::Forward];
         let bound = set.bound_stranded_downstream_unchecked(&query);
         assert_eq!(bound, None);

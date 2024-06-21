@@ -1,5 +1,9 @@
-use crate::traits::{ChromBounds, IntervalBounds};
 use std::{collections::VecDeque, marker::PhantomData};
+
+use crate::{
+    traits::{ChromBounds, IntervalBounds},
+    IntervalContainer,
+};
 
 /// An iterator over a vector of interval records.
 ///
@@ -54,8 +58,8 @@ where
     I: IntervalBounds<C>,
     C: ChromBounds,
 {
-    internal: VecDeque<I>,
-    phantom_c: PhantomData<C>,
+    queue: VecDeque<I>,
+    _phantom: PhantomData<C>,
 }
 impl<I, C> IntervalIterOwned<I, C>
 where
@@ -63,10 +67,16 @@ where
     C: ChromBounds,
 {
     #[must_use]
-    pub fn new(records: Vec<I>) -> Self {
+    pub fn new(mut inner: IntervalContainer<I, C>) -> Self {
+        let mut queue = VecDeque::new();
+        let names: Vec<_> = inner.subtree_names_sorted().into_iter().cloned().collect();
+        for n in names {
+            let subtree = inner.subtree_owned(&n).unwrap();
+            queue.extend(subtree.into_iter());
+        }
         Self {
-            internal: records.into(),
-            phantom_c: PhantomData,
+            queue,
+            _phantom: PhantomData,
         }
     }
 }
@@ -77,7 +87,7 @@ where
 {
     type Item = I;
     fn next(&mut self) -> Option<Self::Item> {
-        self.internal.pop_front()
+        self.queue.pop_front()
     }
 }
 
@@ -140,20 +150,23 @@ where
     I: IntervalBounds<C>,
     C: ChromBounds,
 {
-    internal: &'a [I],
-    phantom_c: PhantomData<C>,
-    state: usize,
+    inner: &'a IntervalContainer<I, C>,
+    names: Vec<&'a C>,
+    name_idx: usize,
+    iv_idx: usize,
 }
 impl<'a, I, C> IntervalIterRef<'a, I, C>
 where
     I: IntervalBounds<C>,
     C: ChromBounds,
 {
-    pub fn new(records: &'a [I]) -> Self {
+    #[must_use]
+    pub fn new(inner: &'a IntervalContainer<I, C>) -> Self {
         Self {
-            internal: records,
-            phantom_c: PhantomData,
-            state: 0,
+            inner,
+            names: inner.subtree_names_sorted(),
+            name_idx: 0,
+            iv_idx: 0,
         }
     }
 }
@@ -164,13 +177,18 @@ where
 {
     type Item = &'a I;
     fn next(&mut self) -> Option<Self::Item> {
-        if self.state < self.internal.len() {
-            let item = &self.internal[self.state];
-            self.state += 1;
-            Some(item)
-        } else {
-            None
+        if self.name_idx < self.names.len() {
+            let subtree = self.inner.subtree(self.names[self.name_idx])?;
+            if self.iv_idx < subtree.len() {
+                let iv = &subtree[self.iv_idx];
+                self.iv_idx += 1;
+                return Some(iv);
+            }
+            self.iv_idx = 0;
+            self.name_idx += 1;
+            return self.next();
         }
+        None
     }
 }
 
@@ -207,5 +225,27 @@ mod testing {
         assert_eq!(iter.next().unwrap().start(), 3);
         assert!(iter.next().is_none());
         assert_eq!(set.len(), 3);
+    }
+
+    #[test]
+    fn iterator_ref_multi() {
+        let intervals = vec![
+            BaseInterval::new(1, 10),
+            BaseInterval::new(1, 20),
+            BaseInterval::new(2, 20),
+            BaseInterval::new(2, 30),
+            BaseInterval::new(3, 30),
+            BaseInterval::new(3, 40),
+        ];
+        let set = IntervalContainer::from_iter(intervals);
+        let mut iter = set.iter();
+        assert_eq!(iter.next().unwrap().start(), 1);
+        assert_eq!(iter.next().unwrap().start(), 1);
+        assert_eq!(iter.next().unwrap().start(), 2);
+        assert_eq!(iter.next().unwrap().start(), 2);
+        assert_eq!(iter.next().unwrap().start(), 3);
+        assert_eq!(iter.next().unwrap().start(), 3);
+        assert!(iter.next().is_none());
+        assert_eq!(set.len(), 6);
     }
 }

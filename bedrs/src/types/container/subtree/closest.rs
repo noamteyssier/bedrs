@@ -1,11 +1,12 @@
+use super::Subtree;
 use crate::{
     traits::{ChromBounds, IntervalBounds, SetError},
     types::StrandMethod,
-    IntervalContainer,
+    Distance, Strand,
 };
 use anyhow::Result;
 
-impl<I, C> IntervalContainer<I, C>
+impl<I, C> Subtree<I, C>
 where
     I: IntervalBounds<C>,
     C: ChromBounds,
@@ -15,13 +16,13 @@ where
     where
         Iv: IntervalBounds<C>,
     {
-        if let Some(subtree) = self.subtree(query.chr()) {
-            subtree.closest(query, method)
-        } else {
+        if self.is_sorted() {
             if self.is_empty() {
                 return Err(SetError::EmptySet);
             }
-            Ok(None)
+            Ok(self.closest_unchecked(query, method))
+        } else {
+            Err(SetError::UnsortedSet)
         }
     }
 
@@ -33,13 +34,19 @@ where
     where
         Iv: IntervalBounds<C>,
     {
-        if let Some(subtree) = self.subtree(query.chr()) {
-            subtree.closest_upstream(query, method)
-        } else {
+        if self.is_sorted() {
             if self.is_empty() {
                 return Err(SetError::EmptySet);
             }
-            Ok(None)
+            // If the query is on the reverse strand, the upstream is the downstream
+            // and vice versa.
+            if let Some(Strand::Reverse) = query.strand() {
+                Ok(self.closest_downstream_unchecked(query, method))
+            } else {
+                Ok(self.closest_upstream_unchecked(query, method))
+            }
+        } else {
+            Err(SetError::UnsortedSet)
         }
     }
 
@@ -51,28 +58,172 @@ where
     where
         Iv: IntervalBounds<C>,
     {
-        if let Some(subtree) = self.subtree(query.chr()) {
-            subtree.closest_downstream(query, method)
-        } else {
+        if self.is_sorted() {
             if self.is_empty() {
                 return Err(SetError::EmptySet);
             }
-            Ok(None)
+            // If the query is on the reverse strand, the upstream and downstream
+            // methods are reversed.
+            if let Some(Strand::Reverse) = query.strand() {
+                Ok(self.closest_upstream_unchecked(query, method))
+            } else {
+                Ok(self.closest_downstream_unchecked(query, method))
+            }
+        } else {
+            Err(SetError::UnsortedSet)
+        }
+    }
+
+    pub fn closest_unchecked<Iv>(&self, query: &Iv, method: StrandMethod) -> Option<&I>
+    where
+        Iv: IntervalBounds<C>,
+    {
+        let bound = match self.bound_upstream_unchecked(query, method) {
+            Some(bound) => bound,
+            None => self.bound_downstream_unchecked(query, method)?,
+        };
+        let mut current_dist = i32::MAX;
+        let mut current_lowest = bound;
+        let mut position = bound;
+        loop {
+            if position == self.len() {
+                break;
+            }
+            let test_iv = &self.data[position];
+            if let Some(distance) = query.distance(test_iv) {
+                if distance < current_dist {
+                    current_dist = distance;
+                    current_lowest = position;
+                } else if distance >= current_dist {
+                    break;
+                }
+            } else {
+                break;
+            }
+            position += 1;
+        }
+        Some(&self.data[current_lowest])
+    }
+
+    pub fn closest_upstream_unchecked<Iv>(&self, query: &Iv, method: StrandMethod) -> Option<&I>
+    where
+        Iv: IntervalBounds<C>,
+    {
+        let bound_fn = match method {
+            StrandMethod::Ignore => Self::bound_igstrand_upstream_unchecked::<Iv>,
+            StrandMethod::MatchStrand => Self::bound_stranded_upstream_unchecked::<Iv>,
+            StrandMethod::OppositeStrand => Self::bound_unstranded_upstream_unchecked::<Iv>,
+        };
+        if let Some(bound) = bound_fn(self, query) {
+            let mut current_dist = i32::MAX;
+            let mut current_lowest = bound;
+            let mut position = bound;
+            loop {
+                if position == self.len() {
+                    break;
+                }
+                let test_iv = &self.data[position];
+                if test_iv.gt(query) {
+                    break;
+                }
+                match method {
+                    StrandMethod::MatchStrand => {
+                        if test_iv.strand() != query.strand() {
+                            position += 1;
+                            continue;
+                        }
+                    }
+                    StrandMethod::OppositeStrand => {
+                        if test_iv.strand() == query.strand() {
+                            position += 1;
+                            continue;
+                        }
+                    }
+                    StrandMethod::Ignore => {}
+                }
+                if let Some(distance) = query.distance(test_iv) {
+                    if distance < current_dist {
+                        current_dist = distance;
+                        current_lowest = position;
+                    } else if distance >= current_dist {
+                        break;
+                    }
+                } else {
+                    break;
+                }
+                position += 1;
+            }
+            Some(&self.data[current_lowest])
+        } else {
+            None
+        }
+    }
+
+    pub fn closest_downstream_unchecked<Iv>(&self, query: &Iv, method: StrandMethod) -> Option<&I>
+    where
+        Iv: IntervalBounds<C>,
+    {
+        let bound_fn = match method {
+            StrandMethod::Ignore => Self::bound_igstrand_downstream_unchecked::<Iv>,
+            StrandMethod::MatchStrand => Self::bound_stranded_downstream_unchecked::<Iv>,
+            StrandMethod::OppositeStrand => Self::bound_unstranded_downstream_unchecked::<Iv>,
+        };
+        if let Some(bound) = bound_fn(self, query) {
+            let mut current_dist = i32::MAX;
+            let mut current_lowest = bound;
+            let mut position = bound;
+            loop {
+                if position == self.len() {
+                    break;
+                }
+                let test_iv = &self.data[position];
+                if test_iv.lt(query) {
+                    break;
+                }
+                match method {
+                    StrandMethod::MatchStrand => {
+                        if test_iv.strand() != query.strand() {
+                            position += 1;
+                            continue;
+                        }
+                    }
+                    StrandMethod::OppositeStrand => {
+                        if test_iv.strand() == query.strand() {
+                            position += 1;
+                            continue;
+                        }
+                    }
+                    StrandMethod::Ignore => {}
+                }
+                if let Some(distance) = query.distance(test_iv) {
+                    if distance < current_dist {
+                        current_dist = distance;
+                        current_lowest = position;
+                    } else if distance >= current_dist {
+                        break;
+                    }
+                } else {
+                    break;
+                }
+                position += 1;
+            }
+            Some(&self.data[current_lowest])
+        } else {
+            None
         }
     }
 }
 
 #[cfg(test)]
 mod testing {
-    use crate::{
-        bed3, types::StrandMethod, BaseInterval, Bed3, Coordinates, IntervalContainer, Strand,
-    };
+    use super::*;
+    use crate::{bed3, types::StrandMethod, BaseInterval, Bed3, Coordinates, Strand};
 
     #[test]
     fn closest_unsorted() {
         let intervals = vec![bed3![1, 10, 20], bed3![1, 30, 40], bed3![1, 50, 60]];
         let query = bed3![1, 22, 23];
-        let set = IntervalContainer::new(intervals);
+        let set = Subtree::new(intervals);
         assert!(set.closest(&query, StrandMethod::Ignore).is_err());
         assert!(set.closest_upstream(&query, StrandMethod::Ignore).is_err());
         assert!(set
@@ -84,7 +235,7 @@ mod testing {
     fn closest_empty() {
         let intervals: Vec<Bed3<i32>> = vec![];
         let query = bed3![1, 22, 23];
-        let set = IntervalContainer::from_unsorted(intervals);
+        let set = Subtree::from_unsorted(intervals);
         assert!(set.closest(&query, StrandMethod::Ignore).is_err());
         assert!(set.closest_upstream(&query, StrandMethod::Ignore).is_err());
         assert!(set
@@ -100,7 +251,7 @@ mod testing {
     fn closest_a() {
         let intervals = vec![bed3![1, 10, 20], bed3![1, 30, 40], bed3![1, 50, 60]];
         let query = bed3![1, 22, 23];
-        let set = IntervalContainer::from_unsorted(intervals);
+        let set = Subtree::from_unsorted(intervals);
         let closest = set.closest(&query, StrandMethod::Ignore).unwrap().unwrap();
         assert!(closest.eq(&bed3![1, 10, 20]));
     }
@@ -113,7 +264,7 @@ mod testing {
     fn closest_b() {
         let intervals = vec![bed3![1, 10, 20], bed3![1, 30, 40], bed3![1, 50, 60]];
         let query = bed3![1, 22, 32];
-        let set = IntervalContainer::from_unsorted(intervals);
+        let set = Subtree::from_unsorted(intervals);
         let closest = set.closest(&query, StrandMethod::Ignore).unwrap().unwrap();
         assert!(closest.eq(&bed3![1, 30, 40]));
     }
@@ -126,7 +277,7 @@ mod testing {
     fn closest_c() {
         let intervals = vec![bed3![1, 10, 20], bed3![1, 30, 40], bed3![1, 50, 60]];
         let query = bed3![1, 22, 30];
-        let set = IntervalContainer::from_unsorted(intervals);
+        let set = Subtree::from_unsorted(intervals);
         let closest = set.closest(&query, StrandMethod::Ignore).unwrap().unwrap();
         assert!(closest.eq(&bed3![1, 30, 40]));
     }
@@ -139,7 +290,7 @@ mod testing {
     fn closest_d() {
         let intervals = vec![bed3![1, 10, 20], bed3![2, 30, 40], bed3![2, 50, 60]];
         let query = bed3![2, 46, 47];
-        let set = IntervalContainer::from_unsorted(intervals);
+        let set = Subtree::from_unsorted(intervals);
         let closest = set.closest(&query, StrandMethod::Ignore).unwrap().unwrap();
         assert!(closest.eq(&bed3![2, 50, 60]));
     }
@@ -152,7 +303,7 @@ mod testing {
     fn closest_e() {
         let intervals = vec![bed3![1, 10, 20], bed3![1, 30, 40]];
         let query = bed3![2, 46, 47];
-        let set = IntervalContainer::from_unsorted(intervals);
+        let set = Subtree::from_unsorted(intervals);
         let closest = set.closest(&query, StrandMethod::Ignore).unwrap();
         assert!(closest.is_none());
     }
@@ -165,7 +316,7 @@ mod testing {
     fn closest_f() {
         let intervals = vec![bed3![1, 10, 20], bed3![1, 30, 40]];
         let query = bed3![1, 24, 26];
-        let set = IntervalContainer::from_unsorted(intervals);
+        let set = Subtree::from_unsorted(intervals);
         let closest = set.closest(&query, StrandMethod::Ignore).unwrap().unwrap();
         assert!(closest.eq(&bed3![1, 10, 20]));
     }
@@ -176,7 +327,7 @@ mod testing {
     /// ========================================
     ///           x-----y
     fn closest_g() {
-        let set = IntervalContainer::from_unsorted(vec![bed3![1, 20, 30], bed3![1, 40, 50]]);
+        let set = Subtree::from_unsorted(vec![bed3![1, 20, 30], bed3![1, 40, 50]]);
         let query = bed3![1, 10, 15];
         let closest = set.closest(&query, StrandMethod::Ignore).unwrap().unwrap();
         assert!(closest.eq(&bed3![1, 20, 30]));
@@ -194,7 +345,7 @@ mod testing {
     /// 5       501     651
     /// 5       521     671
     fn closest_h() {
-        let set = IntervalContainer::from_unsorted(vec![
+        let set = Subtree::from_unsorted(vec![
             bed3![1, 715, 865],
             bed3![2, 197, 347],
             bed3![3, 623, 773],
@@ -223,7 +374,7 @@ mod testing {
     /// 5   501 651 0   .   +
     /// 5   521 671 0   .   -
     fn closest_stranded_a() {
-        let set = IntervalContainer::from_unsorted(vec![
+        let set = Subtree::from_unsorted(vec![
             bed3![1, 715, 865, Strand::Forward],
             bed3![2, 197, 347, Strand::Reverse],
             bed3![3, 623, 773, Strand::Reverse],
@@ -251,7 +402,7 @@ mod testing {
     fn closest_upstream_a() {
         let intervals = vec![bed3![1, 10, 20], bed3![1, 30, 40], bed3![1, 50, 60]];
         let query = bed3![1, 22, 32];
-        let set = IntervalContainer::from_unsorted(intervals);
+        let set = Subtree::from_unsorted(intervals);
         let closest = set
             .closest_upstream(&query, StrandMethod::Ignore)
             .unwrap()
@@ -267,7 +418,7 @@ mod testing {
     fn closest_upstream_b() {
         let intervals = vec![bed3![1, 10, 20], bed3![2, 30, 40], bed3![2, 50, 60]];
         let query = bed3![2, 32, 55];
-        let set = IntervalContainer::from_unsorted(intervals);
+        let set = Subtree::from_unsorted(intervals);
         let closest = set
             .closest_upstream(&query, StrandMethod::Ignore)
             .unwrap()
@@ -288,7 +439,7 @@ mod testing {
             bed3![2, 50, 60],
         ];
         let query = bed3![2, 32, 55];
-        let set = IntervalContainer::from_unsorted(intervals);
+        let set = Subtree::from_unsorted(intervals);
         let closest = set
             .closest_upstream(&query, StrandMethod::Ignore)
             .unwrap()
@@ -310,8 +461,8 @@ mod testing {
         ];
         let query = bed3![1, 22, 32, Strand::Forward];
         let method = StrandMethod::MatchStrand;
-        let set = IntervalContainer::from_unsorted(intervals);
-        let closest = set.closest_upstream(&query, method).unwrap().unwrap();
+        let set = Subtree::from_unsorted(intervals);
+        let closest = set.closest_upstream_unchecked(&query, method).unwrap();
         assert!(closest.eq(&bed3![1, 5, 15, Strand::Forward]));
     }
 
@@ -329,8 +480,8 @@ mod testing {
         ];
         let query = bed3![1, 22, 32, Strand::Forward];
         let method = StrandMethod::OppositeStrand;
-        let set = IntervalContainer::from_unsorted(intervals);
-        let closest = set.closest_upstream(&query, method).unwrap().unwrap();
+        let set = Subtree::from_unsorted(intervals);
+        let closest = set.closest_upstream_unchecked(&query, method).unwrap();
         assert!(closest.eq(&bed3![1, 10, 20, Strand::Reverse]));
     }
 
@@ -342,7 +493,7 @@ mod testing {
     fn closest_downstream_a() {
         let intervals = vec![bed3![1, 10, 20], bed3![1, 30, 40], bed3![1, 50, 60]];
         let query = bed3![1, 22, 32];
-        let set = IntervalContainer::from_unsorted(intervals);
+        let set = Subtree::from_unsorted(intervals);
         let closest = set
             .closest_downstream(&query, StrandMethod::Ignore)
             .unwrap()
@@ -358,7 +509,7 @@ mod testing {
     fn closest_downstream_b() {
         let intervals = vec![bed3![1, 10, 20], bed3![2, 30, 40], bed3![2, 50, 60]];
         let query = bed3![2, 32, 55];
-        let set = IntervalContainer::from_unsorted(intervals);
+        let set = Subtree::from_unsorted(intervals);
         let closest = set
             .closest_downstream(&query, StrandMethod::Ignore)
             .unwrap()
@@ -379,7 +530,7 @@ mod testing {
             bed3![2, 70, 80],
         ];
         let query = bed3![2, 32, 55];
-        let set = IntervalContainer::from_unsorted(intervals);
+        let set = Subtree::from_unsorted(intervals);
         let closest = set
             .closest_downstream(&query, StrandMethod::Ignore)
             .unwrap()
@@ -395,7 +546,7 @@ mod testing {
             bed3![1, 154, 304],
         ];
         let query = bed3![1, 21, 71];
-        let set = IntervalContainer::from_unsorted(intervals);
+        let set = Subtree::from_unsorted(intervals);
         let closest = set
             .closest_downstream(&query, StrandMethod::Ignore)
             .unwrap()
@@ -410,7 +561,7 @@ mod testing {
         let records = (0..100)
             .map(|x| BaseInterval::new(starts[x], ends[x]))
             .collect::<Vec<_>>();
-        let intervals = IntervalContainer::from_unsorted(records);
+        let intervals = Subtree::from_unsorted(records);
         let query = BaseInterval::new(12, 15);
         let closest = intervals
             .closest_downstream(&query, StrandMethod::Ignore)
@@ -430,7 +581,7 @@ mod testing {
             .zip(ends.iter())
             .map(|((c, s), e)| bed3![*c, *s, *e])
             .collect::<Vec<_>>();
-        let intervals = IntervalContainer::from_unsorted(records);
+        let intervals = Subtree::from_unsorted(records);
         let query = bed3![1, 12, 15];
         let closest = intervals
             .closest_downstream(&query, StrandMethod::Ignore)
@@ -450,7 +601,7 @@ mod testing {
             .zip(ends.iter())
             .map(|((c, s), e)| bed3![*c, *s, *e])
             .collect::<Vec<_>>();
-        let intervals = IntervalContainer::from_unsorted(records);
+        let intervals = Subtree::from_unsorted(records);
         let query = bed3![0, 12, 15];
         let closest = intervals
             .closest_downstream(&query, StrandMethod::Ignore)
@@ -465,7 +616,7 @@ mod testing {
     /// =====================================
     /// |--->            
     fn closest_downstream_reverse_strand_a() {
-        let set = IntervalContainer::from_unsorted(vec![
+        let set = Subtree::from_unsorted(vec![
             bed3![1, 10, 20, Strand::Forward],
             bed3![1, 40, 50, Strand::Forward],
         ]);
@@ -483,7 +634,7 @@ mod testing {
     /// =====================================
     ///                  |--->
     fn closest_downstream_fwd_strand_a() {
-        let set = IntervalContainer::from_unsorted(vec![
+        let set = Subtree::from_unsorted(vec![
             bed3![1, 10, 20, Strand::Forward],
             bed3![1, 40, 50, Strand::Forward],
         ]);
@@ -501,7 +652,7 @@ mod testing {
     /// =====================================
     ///                  |--->
     fn closest_upstream_reverse_strand_a() {
-        let set = IntervalContainer::from_unsorted(vec![
+        let set = Subtree::from_unsorted(vec![
             bed3![1, 10, 20, Strand::Forward],
             bed3![1, 40, 50, Strand::Forward],
         ]);
@@ -519,7 +670,7 @@ mod testing {
     /// =====================================
     /// |--->
     fn closest_upstream_fwd_strand_a() {
-        let set = IntervalContainer::from_unsorted(vec![
+        let set = Subtree::from_unsorted(vec![
             bed3![1, 10, 20, Strand::Forward],
             bed3![1, 40, 50, Strand::Forward],
         ]);

@@ -1,5 +1,5 @@
 use num_traits::{Bounded, FromPrimitive, NumOps, ToPrimitive, Zero};
-use std::fmt::Debug;
+use std::{fmt::Debug, hash::Hash};
 
 pub mod errors;
 pub mod interval;
@@ -13,10 +13,10 @@ pub use interval::{
 /// of Chromosome coordinates
 pub trait ChromBounds
 where
-    Self: Clone + Default + Ord + Debug + Send + Sync,
+    Self: Clone + Default + Ord + Debug + Send + Sync + Hash,
 {
 }
-impl<T> ChromBounds for T where T: Clone + Default + Ord + Debug + Send + Sync {}
+impl<T> ChromBounds for T where T: Clone + Default + Ord + Debug + Send + Sync + Hash {}
 
 /// Generic bounds for values to be used for [Coordinates] in the context
 /// of numeric values

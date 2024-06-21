@@ -88,19 +88,19 @@ where
     pub fn segment_unchecked(&self) -> Self {
         let mut segments = Vec::with_capacity(self.len());
         let mut endpoints = Vec::with_capacity(self.len());
-        let mut span = I::from(&self.records()[0]);
+        let mut span = self.iter().next().unwrap().clone();
         let mut n_iv = 0;
 
-        for interval in self.records() {
+        for interval in self.iter() {
             // Case where intervals are part of the same span
             if span.overlaps(interval) || span.borders(interval) {
-                Self::grow_cluster(&mut span, interval, &mut endpoints, &mut n_iv);
+                Self::grow_cluster(&mut span, &interval, &mut endpoints, &mut n_iv);
             // Case where intervals are not part of the same span
             } else {
                 // Segment the cluster
-                Self::segment_cluster(interval, &mut endpoints, n_iv, &mut segments);
+                Self::segment_cluster(&interval, &mut endpoints, n_iv, &mut segments);
                 // Initialize a new cluster
-                Self::init_cluster(&mut span, interval, &mut endpoints, &mut n_iv);
+                Self::init_cluster(&mut span, &interval, &mut endpoints, &mut n_iv);
             }
         }
 
@@ -184,8 +184,8 @@ mod testing {
             bed3![0, 50, 60],
             bed3![0, 60, 70],
         ];
-        let observed = segments.records();
-        validate_segments(observed, &expected);
+        let observed = segments.to_vec();
+        validate_segments(&observed, &expected);
     }
 
     /// Container:
@@ -224,8 +224,8 @@ mod testing {
             bed3![0, 85, 90],
             bed3![0, 90, 95],
         ];
-        let observed = segments.records();
-        validate_segments(observed, &expected);
+        let observed = segments.to_vec();
+        validate_segments(&observed, &expected);
     }
 
     /// Container:
@@ -268,8 +268,8 @@ mod testing {
             bed3![0, 90, 95],
             bed3![0, 100, 110],
         ];
-        let observed = segments.records();
-        validate_segments(observed, &expected);
+        let observed = segments.to_vec();
+        validate_segments(&observed, &expected);
     }
 
     /// Container:
@@ -294,8 +294,8 @@ mod testing {
             bed3![0, 60, 70],
             bed3![0, 70, 500],
         ];
-        let observed = segments.records();
-        validate_segments(observed, &expected);
+        let observed = segments.to_vec();
+        validate_segments(&observed, &expected);
     }
 
     /// Container:
@@ -320,8 +320,8 @@ mod testing {
             bed3![0, 50, 70],
             bed3![0, 70, 500],
         ];
-        let observed = segments.records();
-        validate_segments(observed, &expected);
+        let observed = segments.to_vec();
+        validate_segments(&observed, &expected);
     }
 
     /// Container:
@@ -361,8 +361,8 @@ mod testing {
             bed3![0, 70, 90],
             bed3![0, 100, 120],
         ];
-        let observed = segments.records();
-        validate_segments(observed, &expected);
+        let observed = segments.to_vec();
+        validate_segments(&observed, &expected);
     }
 
     /// Container:
@@ -394,8 +394,8 @@ mod testing {
             bed3![0, 70, 90],
             bed3![0, 90, 110],
         ];
-        let observed = segments.records();
-        validate_segments(observed, &expected);
+        let observed = segments.to_vec();
+        validate_segments(&observed, &expected);
     }
 
     /// Container:
@@ -428,8 +428,8 @@ mod testing {
             bed3![0, 50, 60],
             bed3![0, 60, 110],
         ];
-        let observed = segments.records();
-        validate_segments(observed, &expected);
+        let observed = segments.to_vec();
+        validate_segments(&observed, &expected);
     }
 
     /// Container:
@@ -454,8 +454,8 @@ mod testing {
             bed3![0, 160, 180],
             bed3![0, 180, 200],
         ];
-        let observed = segments.records();
-        validate_segments(observed, &expected);
+        let observed = segments.to_vec();
+        validate_segments(&observed, &expected);
     }
 
     /// Container:
@@ -488,7 +488,7 @@ mod testing {
             bed3![0, 180, 200],
             bed3![0, 250, 270],
         ];
-        let observed = segments.records();
-        validate_segments(observed, &expected);
+        let observed = segments.to_vec();
+        validate_segments(&observed, &expected);
     }
 }

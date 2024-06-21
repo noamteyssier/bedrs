@@ -1,15 +1,11 @@
-use crate::{
-    traits::{ChromBounds, IntervalBounds, SetError},
-    IntervalContainer,
-};
-use rand::{
-    seq::{IteratorRandom, SliceRandom},
-    RngCore, SeedableRng,
-};
+use crate::traits::{ChromBounds, IntervalBounds, SetError};
+use rand::{seq::SliceRandom, RngCore, SeedableRng};
 use rand_chacha::ChaChaRng;
 
+use super::Subtree;
+
 /// Utility functions for random sampling within a container.
-impl<I, C> IntervalContainer<I, C>
+impl<I, C> Subtree<I, C>
 where
     I: IntervalBounds<C>,
     C: ChromBounds,
@@ -27,13 +23,11 @@ where
     ///     BaseInterval::new(30, 300),
     ///     BaseInterval::new(40, 400),
     /// ];
-    /// let mut set = IntervalContainer::from_sorted(intervals).unwrap();
+    /// let mut set = Subtree::from_sorted(intervals).unwrap();
     /// set.shuffle_rng(&mut thread_rng());
     /// ```
     pub fn shuffle_rng(&mut self, rng: &mut impl RngCore) {
-        for subtree in self.subtrees_mut() {
-            subtree.shuffle_rng(rng);
-        }
+        self.mut_data().shuffle(rng);
         self.set_unsorted();
     }
 
@@ -49,7 +43,7 @@ where
     ///    BaseInterval::new(30, 300),
     ///    BaseInterval::new(40, 400),
     /// ];
-    /// let mut set = IntervalContainer::from_sorted(intervals).unwrap();
+    /// let mut set = Subtree::from_sorted(intervals).unwrap();
     /// set.shuffle();
     /// ```
     pub fn shuffle(&mut self) {
@@ -69,7 +63,7 @@ where
     ///    BaseInterval::new(30, 300),
     ///    BaseInterval::new(40, 400),
     /// ];
-    /// let mut set = IntervalContainer::from_sorted(intervals).unwrap();
+    /// let mut set = Subtree::from_sorted(intervals).unwrap();
     /// set.shuffle_seed(42);
     /// ```
     pub fn shuffle_seed(&mut self, seed: u64) {
@@ -89,16 +83,16 @@ where
     ///     BaseInterval::new(30, 300),
     ///     BaseInterval::new(40, 400),
     /// ];
-    /// let set = IntervalContainer::from_sorted(intervals).unwrap();
+    /// let set = Subtree::from_sorted(intervals).unwrap();
     /// let mut rng = rand::thread_rng();
     /// let shuffled_set = set.sample_rng(2, &mut rng).unwrap();
     /// assert_eq!(shuffled_set.len(), 2);
     /// ```
     pub fn sample_rng(&self, n: usize, rng: &mut impl RngCore) -> Result<Self, SetError> {
-        if n > self.len() {
+        if n > self.data().len() {
             return Err(SetError::SampleSizeTooLarge);
         }
-        let mut records = self.to_vec();
+        let mut records = self.data().clone();
         records.shuffle(rng);
         records.truncate(n);
         Ok(Self::new(records))
@@ -116,12 +110,12 @@ where
     ///     BaseInterval::new(30, 300),
     ///     BaseInterval::new(40, 400),
     /// ];
-    /// let set = IntervalContainer::from_sorted(intervals).unwrap();
+    /// let set = Subtree::from_sorted(intervals).unwrap();
     /// let shuffled_set = set.sample(2).unwrap();
     /// assert_eq!(shuffled_set.len(), 2);
     /// ```
     pub fn sample(&self, n: usize) -> Result<Self, SetError> {
-        if n > self.len() {
+        if n > self.data().len() {
             return Err(SetError::SampleSizeTooLarge);
         }
         let mut rng = rand::thread_rng();
@@ -140,14 +134,14 @@ where
     ///     BaseInterval::new(30, 300),
     ///     BaseInterval::new(40, 400),
     /// ];
-    /// let set = IntervalContainer::from_sorted(intervals).unwrap();
+    /// let set = Subtree::from_sorted(intervals).unwrap();
     /// let shuffled_set_a = set.sample_seed(2, 42).unwrap();
     /// let shuffled_set_b = set.sample_seed(2, 42).unwrap();
     /// assert_eq!(shuffled_set_a.len(), 2);
     /// assert_eq!(shuffled_set_b.len(), 2);
     /// ```
     pub fn sample_seed(&self, n: usize, seed: u64) -> Result<Self, SetError> {
-        if n > self.len() {
+        if n > self.data().len() {
             return Err(SetError::SampleSizeTooLarge);
         }
         let mut rng = ChaChaRng::seed_from_u64(seed);
@@ -167,7 +161,7 @@ where
     ///    BaseInterval::new(30, 300),
     ///    BaseInterval::new(40, 400),
     /// ];
-    /// let set = IntervalContainer::from_sorted(intervals).unwrap();
+    /// let set = Subtree::from_sorted(intervals).unwrap();
     /// let mut rng = rand::thread_rng();
     /// let shuffled_iter = set.sample_iter_rng(2, &mut rng).unwrap();
     /// assert_eq!(shuffled_iter.count(), 2);
@@ -177,10 +171,10 @@ where
         n: usize,
         rng: &mut impl RngCore,
     ) -> Result<Box<dyn Iterator<Item = &I> + 'a>, SetError> {
-        if n > self.len() {
+        if n > self.data().len() {
             return Err(SetError::SampleSizeTooLarge);
         }
-        let iter = self.iter().choose_multiple(rng, n).into_iter();
+        let iter = self.data().choose_multiple(rng, n);
         Ok(Box::new(iter))
     }
 
@@ -196,14 +190,14 @@ where
     ///    BaseInterval::new(30, 300),
     ///    BaseInterval::new(40, 400),
     /// ];
-    /// let set = IntervalContainer::from_sorted(intervals).unwrap();
+    /// let set = Subtree::from_sorted(intervals).unwrap();
     /// let shuffled_iter = set.sample_iter(2).unwrap();
     /// assert_eq!(shuffled_iter.count(), 2);
     pub fn sample_iter<'a>(
         &'a self,
         n: usize,
     ) -> Result<Box<dyn Iterator<Item = &I> + 'a>, SetError> {
-        if n > self.len() {
+        if n > self.data().len() {
             return Err(SetError::SampleSizeTooLarge);
         }
         let mut rng = rand::thread_rng();
@@ -223,7 +217,7 @@ where
     ///    BaseInterval::new(30, 300),
     ///    BaseInterval::new(40, 400),
     /// ];
-    /// let set = IntervalContainer::from_sorted(intervals).unwrap();
+    /// let set = Subtree::from_sorted(intervals).unwrap();
     /// let shuffled_iter = set.sample_iter_seed(2, 42).unwrap();
     /// assert_eq!(shuffled_iter.count(), 2);
     /// ```
@@ -232,7 +226,7 @@ where
         n: usize,
         seed: u64,
     ) -> Result<Box<dyn Iterator<Item = &I> + 'a>, SetError> {
-        if n > self.len() {
+        if n > self.data().len() {
             return Err(SetError::SampleSizeTooLarge);
         }
         let mut rng = ChaChaRng::seed_from_u64(seed);
@@ -242,7 +236,9 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::{BaseInterval, Coordinates, IntervalContainer};
+    use crate::{BaseInterval, Coordinates};
+
+    use super::*;
 
     #[test]
     fn shuffle_rng() {
@@ -256,10 +252,13 @@ mod testing {
             BaseInterval::new(30, 300),
             BaseInterval::new(40, 400),
         ];
-        let set = IntervalContainer::new(intervals);
+        let set = Subtree::new(intervals);
         let mut shuffled_set = set.clone();
         shuffled_set.shuffle();
-        set.iter().zip(shuffled_set.iter()).all(|(a, b)| !a.eq(&b));
+        set.data()
+            .iter()
+            .zip(shuffled_set.data())
+            .all(|(a, b)| !a.eq(b));
     }
 
     #[test]
@@ -274,15 +273,16 @@ mod testing {
             BaseInterval::new(30, 300),
             BaseInterval::new(40, 400),
         ];
-        let set = IntervalContainer::new(intervals);
+        let set = Subtree::new(intervals);
         let mut shuffled_set_a = set.clone();
         let mut shuffled_set_b = set.clone();
         shuffled_set_a.shuffle_seed(0);
         shuffled_set_b.shuffle_seed(0);
         shuffled_set_a
+            .data()
             .iter()
-            .zip(shuffled_set_b.iter())
-            .all(|(a, b)| a.eq(&b));
+            .zip(shuffled_set_b.data())
+            .all(|(a, b)| a.eq(b));
     }
 
     #[test]
@@ -293,7 +293,7 @@ mod testing {
             BaseInterval::new(30, 300),
             BaseInterval::new(40, 400),
         ];
-        let mut set = IntervalContainer::from_sorted(intervals).unwrap();
+        let mut set = Subtree::from_sorted(intervals);
         assert!(set.is_sorted());
         set.shuffle();
         assert!(!set.is_sorted());
@@ -307,9 +307,9 @@ mod testing {
             BaseInterval::new(30, 300),
             BaseInterval::new(40, 400),
         ];
-        let set = IntervalContainer::from_sorted(intervals).unwrap();
+        let set = Subtree::from_sorted(intervals);
         let sampled_set = set.sample(4).unwrap();
-        assert_eq!(sampled_set.len(), 4);
+        assert_eq!(sampled_set.data().len(), 4);
         assert!(!sampled_set.is_sorted());
     }
 
@@ -321,11 +321,11 @@ mod testing {
             BaseInterval::new(30, 300),
             BaseInterval::new(40, 400),
         ];
-        let set = IntervalContainer::from_sorted(intervals).unwrap();
+        let set = Subtree::from_sorted(intervals);
         let sampled_set_a = set.sample_seed(4, 0).unwrap();
         let sampled_set_b = set.sample_seed(4, 0).unwrap();
-        for (a, b) in sampled_set_a.iter().zip(sampled_set_b.iter()) {
-            assert!(a.eq(&b));
+        for (a, b) in sampled_set_a.data().iter().zip(sampled_set_b.data()) {
+            assert!(a.eq(b));
         }
     }
 
@@ -337,7 +337,7 @@ mod testing {
             BaseInterval::new(30, 300),
             BaseInterval::new(40, 400),
         ];
-        let set = IntervalContainer::from_sorted(intervals).unwrap();
+        let set = Subtree::from_sorted(intervals);
         let sampled_set = set.sample(5);
         assert!(sampled_set.is_err());
     }
@@ -350,7 +350,7 @@ mod testing {
             BaseInterval::new(30, 300),
             BaseInterval::new(40, 400),
         ];
-        let set = IntervalContainer::from_sorted(intervals).unwrap();
+        let set = Subtree::from_sorted(intervals);
         let sampled_iter = set.sample_iter(2).unwrap();
         assert_eq!(sampled_iter.count(), 2);
     }
@@ -363,7 +363,7 @@ mod testing {
             BaseInterval::new(30, 300),
             BaseInterval::new(40, 400),
         ];
-        let set = IntervalContainer::from_sorted(intervals).unwrap();
+        let set = Subtree::from_sorted(intervals);
         let sampled_iter_a = set.sample_iter_seed(2, 0).unwrap();
         let sampled_iter_b = set.sample_iter_seed(2, 0).unwrap();
         for (a, b) in sampled_iter_a.zip(sampled_iter_b) {
@@ -379,7 +379,7 @@ mod testing {
             BaseInterval::new(30, 300),
             BaseInterval::new(40, 400),
         ];
-        let set = IntervalContainer::from_sorted(intervals).unwrap();
+        let set = Subtree::from_sorted(intervals);
         let sampled_iter = set.sample_iter(5);
         assert!(sampled_iter.is_err());
 

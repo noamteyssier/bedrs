@@ -23,21 +23,16 @@ where
     /// (i)          j---k
     /// (ii)                  l--m
     /// ```
-    pub fn internal(&self) -> Result<SubtractFromIter<I, I, C>> {
+    pub fn internal(&self, name: &C) -> Result<SubtractFromIter<I, I, C>> {
+        let Some(subtree) = self.subtree(name) else {
+            bail!(SetError::MissingSubtreeName)
+        };
         if self.is_sorted() {
-            let span = self.span()?;
-            Ok(self.internal_unchecked(&span))
+            let span = subtree.span()?;
+            Ok(SubtractFromIter::new(self, &span))
         } else {
             bail!(SetError::UnsortedSet)
         }
-    }
-
-    // Unchecked version of [internal](Self::internal).
-    //
-    // Does not check if the interval set is sorted.
-    // Span must still be valid.
-    pub fn internal_unchecked(&self, span: &I) -> SubtractFromIter<I, I, C> {
-        SubtractFromIter::new(self, span)
     }
 }
 
@@ -52,7 +47,7 @@ mod testing {
             BaseInterval::new(2, 4),
             BaseInterval::new(3, 6),
         ]);
-        assert!(set.internal().is_err());
+        assert!(set.internal(&0).is_err());
     }
 
     #[test]
@@ -64,11 +59,11 @@ mod testing {
         let set =
             IntervalContainer::from_sorted(vec![BaseInterval::new(1, 3), BaseInterval::new(6, 10)])
                 .unwrap();
-        let span = set.span().unwrap();
-        let internal_set: IntervalContainer<_, _> = set.internal_unchecked(&span).collect();
+        let internal_set: IntervalContainer<_, _> = set.internal(&0).unwrap().collect();
         assert_eq!(internal_set.len(), 1);
-        assert_eq!(internal_set.records()[0].start(), 3);
-        assert_eq!(internal_set.records()[0].end(), 6);
+        let subtree = internal_set.subtree(&0).unwrap();
+        assert_eq!(subtree[0].start(), 3);
+        assert_eq!(subtree[0].end(), 6);
     }
 
     #[test]
@@ -85,12 +80,12 @@ mod testing {
             BaseInterval::new(12, 15),
         ])
         .unwrap();
-        let span = set.span().unwrap();
-        let internal_set: IntervalContainer<_, _> = set.internal_unchecked(&span).collect();
+        let internal_set: IntervalContainer<_, _> = set.internal(&0).unwrap().collect();
         assert_eq!(internal_set.len(), 2);
-        assert_eq!(internal_set.records()[0].start(), 3);
-        assert_eq!(internal_set.records()[0].end(), 6);
-        assert_eq!(internal_set.records()[1].start(), 10);
-        assert_eq!(internal_set.records()[1].end(), 12);
+        let subtree = internal_set.subtree(&0).unwrap();
+        assert_eq!(subtree[0].start(), 3);
+        assert_eq!(subtree[0].end(), 6);
+        assert_eq!(subtree[1].start(), 10);
+        assert_eq!(subtree[1].end(), 12);
     }
 }
