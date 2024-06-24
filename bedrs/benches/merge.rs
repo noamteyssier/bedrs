@@ -32,7 +32,7 @@ pub fn merge_unchecked_base(c: &mut Criterion) {
     let mut set = IntervalContainer::new(records);
     set.sort();
     c.bench_function("merge-unchecked-base", |bench| {
-        bench.iter(|| set.merge_unchecked())
+        bench.iter(|| set.merge().unwrap())
     });
 }
 
@@ -44,6 +44,6 @@ pub fn merge_unchecked_genomic(c: &mut Criterion) {
     let mut set = IntervalContainer::new(records);
     set.sort();
     c.bench_function("merge-unchecked-genomic", |bench| {
-        bench.iter(|| set.merge_unchecked())
+        bench.iter(|| set.merge().unwrap())
     });
 }
