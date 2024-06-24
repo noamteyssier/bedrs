@@ -1,4 +1,4 @@
-use super::RecordMetadata;
+use super::{MetaBed3, RecordMetadata};
 use crate::Score;
 use derive_new::new;
 use getset::{Getters, Setters};
@@ -14,5 +14,11 @@ pub struct MetaBedGraph {
 impl RecordMetadata for MetaBedGraph {
     fn strand(&self) -> Option<crate::Strand> {
         None
+    }
+}
+
+impl From<MetaBed3> for MetaBedGraph {
+    fn from(_bed3: MetaBed3) -> Self {
+        Self::default()
     }
 }

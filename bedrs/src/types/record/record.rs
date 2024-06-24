@@ -78,6 +78,43 @@ where
     }
 }
 
+impl<'a, C, M> Coordinates<C> for &'a Record<C, M>
+where
+    C: ChromBounds,
+    M: RecordMetadata,
+{
+    fn chr(&self) -> &C {
+        self.coordinates.chr()
+    }
+    fn start(&self) -> i32 {
+        self.coordinates.start()
+    }
+    fn end(&self) -> i32 {
+        self.coordinates.end()
+    }
+    fn strand(&self) -> Option<crate::Strand> {
+        self.metadata.strand()
+    }
+    fn update_chr(&mut self, _: &C) {
+        unimplemented!()
+    }
+    fn update_start(&mut self, _: &i32) {
+        unimplemented!()
+    }
+    fn update_end(&mut self, _: &i32) {
+        unimplemented!()
+    }
+    fn update_strand(&mut self, _: Option<crate::Strand>) {
+        unimplemented!()
+    }
+    fn from<Iv: Coordinates<C>>(_: &Iv) -> Self {
+        unimplemented!()
+    }
+    fn empty() -> Self {
+        unimplemented!()
+    }
+}
+
 // ===========
 // Conversions
 // ===========
