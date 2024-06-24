@@ -27,7 +27,7 @@ where
         Iv: IntervalBounds<C> + 'a,
         &'a Iv: Intersect<C>,
     {
-        let ix_iter = self.records().iter().flat_map(move |iv| {
+        let ix_iter = self.iter().flat_map(move |iv| {
             let overlaps = other
                 .query_iter(iv, method)
                 .expect("Failed to find overlaps with provided query method")
@@ -57,7 +57,7 @@ where
     where
         Iv: IntervalBounds<C> + 'a,
     {
-        let ix_iter = self.records().iter().flat_map(move |iv| {
+        let ix_iter = self.iter().flat_map(move |iv| {
             let overlaps = other
                 .query_iter(iv, method)
                 .expect("Failed to find overlaps with provided query method");

@@ -24,6 +24,7 @@ bedrs_derive = { path = "../bedrs_derive" }
 getset = "0.1.2"
 derive-new = "0.6.0"
 coitrees = "0.4.0"
+hashbrown = "0.14.5"
 
 [features]
 serde = ["dep:serde"]

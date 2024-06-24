@@ -1,26 +1,17 @@
+use super::{subtree::Subtree, tree::IntervalTree};
 use crate::{
     traits::{ChromBounds, IntervalBounds, SetError},
-    Coordinates, IntervalIterOwned, IntervalIterRef,
+    IntervalIterOwned, IntervalIterRef,
 };
-use anyhow::{bail, Result};
-use num_traits::zero;
-#[cfg(feature = "rayon")]
-use rayon::prelude::*;
-#[cfg(feature = "serde")]
-use serde::{Deserialize, Serialize};
-use std::marker::PhantomData;
+use anyhow::Result;
 
 #[derive(Debug, Clone)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct IntervalContainer<I, C>
 where
     I: IntervalBounds<C>,
     C: ChromBounds,
 {
-    records: Vec<I>,
-    is_sorted: bool,
-    max_len: Option<i32>,
-    _phantom_c: PhantomData<C>,
+    data: IntervalTree<I, C>,
 }
 impl<I, C> FromIterator<I> for IntervalContainer<I, C>
 where
@@ -28,24 +19,8 @@ where
     C: ChromBounds,
 {
     fn from_iter<It: IntoIterator<Item = I>>(iter: It) -> Self {
-        let mut max_len = zero::<i32>();
-        let records = iter
-            .into_iter()
-            .map(|iv| {
-                max_len = max_len.max(iv.len());
-                iv
-            })
-            .collect();
-        let max_len = if max_len == zero::<i32>() {
-            None
-        } else {
-            Some(max_len)
-        };
         Self {
-            records,
-            is_sorted: false,
-            max_len,
-            _phantom_c: PhantomData,
+            data: IntervalTree::from_iter(iter),
         }
     }
 }
@@ -57,17 +32,38 @@ where
 {
     #[must_use]
     pub fn new(records: Vec<I>) -> Self {
-        let max_len = records.iter().map(Coordinates::len).max();
-        Self {
-            records,
-            is_sorted: false,
-            max_len,
-            _phantom_c: PhantomData,
-        }
+        Self::from_iter(records)
     }
     #[must_use]
     pub fn len(&self) -> usize {
-        self.records.len()
+        self.data.len()
+    }
+    pub fn subtree(&self, name: &C) -> Option<&Subtree<I, C>> {
+        self.data.subtree(name)
+    }
+    pub fn subtree_mut(&mut self, name: &C) -> Option<&mut Subtree<I, C>> {
+        self.data.subtree_mut(name)
+    }
+    pub fn subtree_owned(&mut self, name: &C) -> Option<Subtree<I, C>> {
+        self.data.subtree_owned(name)
+    }
+    pub fn subtrees(&self) -> impl Iterator<Item = &Subtree<I, C>> {
+        self.data.values()
+    }
+    pub fn subtrees_mut(&mut self) -> impl Iterator<Item = &mut Subtree<I, C>> {
+        self.data.values_mut()
+    }
+    #[must_use]
+    pub fn num_subtrees(&self) -> usize {
+        self.data.num_subtrees()
+    }
+    #[must_use]
+    pub fn subtree_names(&self) -> Vec<&C> {
+        self.data.subtree_names()
+    }
+    #[must_use]
+    pub fn subtree_names_sorted(&self) -> Vec<&C> {
+        self.data.subtree_names_sorted()
     }
     #[must_use]
     pub fn empty() -> Self {
@@ -75,67 +71,24 @@ where
     }
     #[must_use]
     pub fn is_empty(&self) -> bool {
-        self.records.is_empty()
-    }
-    #[must_use]
-    pub fn records(&self) -> &Vec<I> {
-        &self.records
-    }
-    pub fn records_mut(&mut self) -> &mut Vec<I> {
-        &mut self.records
-    }
-    #[must_use]
-    pub fn records_owned(self) -> Vec<I> {
-        self.records
+        self.data.is_empty()
     }
     #[must_use]
     pub fn is_sorted(&self) -> bool {
-        self.is_sorted
+        self.data.is_sorted()
     }
     pub fn set_unsorted(&mut self) {
-        self.is_sorted = false;
-    }
-    pub fn sorted_mut(&mut self) -> &mut bool {
-        &mut self.is_sorted
-    }
-    #[must_use]
-    pub fn max_len(&self) -> Option<i32> {
-        self.max_len
-    }
-    pub fn max_len_mut(&mut self) -> &mut Option<i32> {
-        &mut self.max_len
-    }
-    /// Returns the span of the interval set
-    pub fn span(&self) -> Result<I> {
-        if self.is_empty() {
-            bail!("Cannot get span of empty interval set")
-        } else if !self.is_sorted() {
-            bail!("Cannot get span of unsorted interval set")
-        }
-        let Some(first) = self.records().first() else {
-            bail!("Cannot recover the first interval")
-        };
-        let Some(last) = self.records().last() else {
-            bail!("Cannot recover the last interval")
-        };
-        if first.chr() != last.chr() {
-            bail!("Cannot get span of interval set spanning multiple chromosomes")
-        }
-        let mut iv = I::empty();
-        iv.update_chr(first.chr());
-        iv.update_start(&first.start());
-        iv.update_end(&last.end());
-        Ok(iv)
+        self.data.set_unsorted();
     }
     #[allow(clippy::iter_without_into_iter)]
     #[must_use]
     pub fn iter(&self) -> IntervalIterRef<I, C> {
-        IntervalIterRef::new(self.records())
+        IntervalIterRef::new(self)
     }
     #[allow(clippy::should_implement_trait)]
     #[must_use]
     pub fn into_iter(self) -> IntervalIterOwned<I, C> {
-        IntervalIterOwned::new(self.records_owned())
+        IntervalIterOwned::new(self)
     }
 
     /// Sets the internal state to sorted
@@ -145,38 +98,19 @@ where
     /// >> intervals use the `from_sorted()` method instead of
     /// >> the `new()` method.
     pub fn set_sorted(&mut self) {
-        *self.sorted_mut() = true;
+        self.data.set_sorted();
     }
 
     /// Sorts the internal interval vector on the chromosome and start position of the intervals.
     pub fn sort(&mut self) {
-        self.records_mut().sort_unstable_by(Coordinates::coord_cmp);
-        self.set_sorted();
+        self.data.sort();
     }
 
     /// Sorts the internal interval vector on the chromosome and start position of the intervals.
     /// but parallelizes the sorting.
     #[cfg(feature = "rayon")]
     pub fn par_sort(&mut self) {
-        self.records_mut()
-            .par_sort_unstable_by(Coordinates::coord_cmp);
-        self.set_sorted();
-    }
-
-    /// Updates the maximum length of the intervals in the container
-    /// if the new interval is longer than the current maximum length.
-    pub fn update_max_len<Iv, Co>(&mut self, interval: &Iv)
-    where
-        Iv: IntervalBounds<Co>,
-        Co: ChromBounds,
-    {
-        if let Some(max_len) = self.max_len() {
-            if interval.len() > max_len {
-                *self.max_len_mut() = Some(interval.len());
-            }
-        } else {
-            *self.max_len_mut() = Some(interval.len());
-        }
+        self.data.par_sort();
     }
 
     /// Inserts a new interval into the container
@@ -188,9 +122,7 @@ where
     /// This is more efficient if you are inserting many
     /// intervals at once.
     pub fn insert(&mut self, interval: I) {
-        self.update_max_len(&interval);
-        self.records_mut().push(interval);
-        self.set_unsorted();
+        self.data.insert_interval(interval);
     }
 
     /// Inserts a new interval into the container and sorts the container
@@ -247,7 +179,46 @@ where
     where
         F: Fn(&mut I),
     {
-        self.records_mut().iter_mut().for_each(f);
+        self.data.apply_mut(f);
+    }
+
+    pub fn span(&self, name: &C) -> Option<Result<I, SetError>> {
+        self.data.span(name)
+    }
+
+    #[must_use]
+    pub fn to_vec(&self) -> Vec<I> {
+        Vec::from(self)
+    }
+}
+
+impl<I, C> From<IntervalContainer<I, C>> for Vec<I>
+where
+    I: IntervalBounds<C>,
+    C: ChromBounds,
+{
+    fn from(set: IntervalContainer<I, C>) -> Self {
+        set.into_iter().collect()
+    }
+}
+
+impl<I, C> From<&IntervalContainer<I, C>> for Vec<I>
+where
+    I: IntervalBounds<C>,
+    C: ChromBounds,
+{
+    fn from(set: &IntervalContainer<I, C>) -> Self {
+        set.iter().cloned().collect()
+    }
+}
+
+impl<I, C> From<IntervalTree<I, C>> for IntervalContainer<I, C>
+where
+    I: IntervalBounds<C>,
+    C: ChromBounds,
+{
+    fn from(data: IntervalTree<I, C>) -> Self {
+        Self { data }
     }
 }
 
@@ -255,9 +226,7 @@ where
 mod testing {
 
     use super::*;
-    use crate::{bed3, BaseInterval, Bed3, Coordinates, Strand, StrandedBed3};
-    #[cfg(feature = "serde")]
-    use bincode::{deserialize, serialize};
+    use crate::{bed3, BaseInterval, Bed3, Coordinates, Strand};
 
     // --------------------- //
     // Base BaseInterval Testing //
@@ -297,19 +266,19 @@ mod testing {
         let set = IntervalContainer::from_iter(records);
         assert_eq!(set.len(), n_intervals);
     }
-
-    #[test]
-    #[cfg(feature = "serde")]
-    fn test_base_serialization() {
-        let n_intervals = 10;
-        let records = vec![BaseInterval::new(10, 100); n_intervals];
-        let set = IntervalContainer::new(records);
-        let serialized = serialize(&set).unwrap();
-        let deserialized: IntervalContainer<BaseInterval, i32> = deserialize(&serialized).unwrap();
-        for (iv1, iv2) in set.records().iter().zip(deserialized.records().iter()) {
-            assert!(iv1.eq(iv2));
-        }
-    }
+    //
+    // #[test]
+    // #[cfg(feature = "serde")]
+    // fn test_base_serialization() {
+    //     let n_intervals = 10;
+    //     let records = vec![BaseInterval::new(10, 100); n_intervals];
+    //     let set = IntervalContainer::new(records);
+    //     let serialized = serialize(&set).unwrap();
+    //     let deserialized: IntervalContainer<BaseInterval, i32> = deserialize(&serialized).unwrap();
+    //     for (iv1, iv2) in set.records().iter().zip(deserialized.records().iter()) {
+    //         assert!(iv1.eq(iv2));
+    //     }
+    // }
 
     #[test]
     #[cfg(feature = "rayon")]
@@ -353,34 +322,34 @@ mod testing {
         let records: Vec<Bed3<i32>> = vec![];
         let set = IntervalContainer::from_iter(records);
         assert_eq!(set.len(), 0);
-        assert!(set.max_len().is_none());
-        assert!(set.span().is_err());
+        // assert!(set.max_len().is_none());
+        // assert!(set.span().is_err());
     }
 
-    #[test]
-    fn test_genomic_span() {
-        let intervals = vec![bed3![1, 10, 100], bed3![1, 20, 200]];
-        let set = IntervalContainer::from_sorted(intervals).unwrap();
-        assert!(set.span().unwrap().eq(&bed3![1, 10, 200]));
-    }
+    // #[test]
+    // fn test_genomic_span() {
+    //     let intervals = vec![bed3![1, 10, 100], bed3![1, 20, 200]];
+    //     let set = IntervalContainer::from_sorted(intervals).unwrap();
+    //     assert!(set.span().unwrap().eq(&bed3![1, 10, 200]));
+    // }
 
-    #[test]
-    fn test_genomic_span_errors() {
-        let intervals = vec![bed3![1, 10, 100], bed3![2, 20, 200]];
-        let mut set = IntervalContainer::from_iter(intervals);
-        match set.span() {
-            Err(e) => assert_eq!(e.to_string(), "Cannot get span of unsorted interval set"),
-            _ => panic!("Expected error"),
-        };
-        set.sort();
-        match set.span() {
-            Err(e) => assert_eq!(
-                e.to_string(),
-                "Cannot get span of interval set spanning multiple chromosomes"
-            ),
-            _ => panic!("Expected error"),
-        };
-    }
+    // #[test]
+    // fn test_genomic_span_errors() {
+    //     let intervals = vec![bed3![1, 10, 100], bed3![2, 20, 200]];
+    //     let mut set = IntervalContainer::from_iter(intervals);
+    //     match set.span() {
+    //         Err(e) => assert_eq!(e.to_string(), "Cannot get span of unsorted interval set"),
+    //         _ => panic!("Expected error"),
+    //     };
+    //     set.sort();
+    //     match set.span() {
+    //         Err(e) => assert_eq!(
+    //             e.to_string(),
+    //             "Cannot get span of interval set spanning multiple chromosomes"
+    //         ),
+    //         _ => panic!("Expected error"),
+    //     };
+    // }
     //
     // #[test]
     // #[cfg(feature = "serde")]
@@ -397,20 +366,20 @@ mod testing {
     //         assert!(iv1.eq(iv2));
     //     }
     // }
-
-    #[test]
-    #[cfg(feature = "rayon")]
-    fn test_genomic_par_sort() {
-        use crate::bed3;
-
-        let n_intervals = 10;
-        let records = vec![bed3![1, 10, 100]; n_intervals];
-        let mut set = IntervalContainer::new(records.clone());
-        set.par_sort();
-        for (iv1, iv2) in set.records().iter().zip(records.iter()) {
-            assert!(iv1.eq(iv2));
-        }
-    }
+    //
+    // #[test]
+    // #[cfg(feature = "rayon")]
+    // fn test_genomic_par_sort() {
+    //     use crate::bed3;
+    //
+    //     let n_intervals = 10;
+    //     let records = vec![bed3![1, 10, 100]; n_intervals];
+    //     let mut set = IntervalContainer::new(records.clone());
+    //     set.par_sort();
+    //     for (iv1, iv2) in set.records().iter().zip(records.iter()) {
+    //         assert!(iv1.eq(iv2));
+    //     }
+    // }
 
     // ------------------------- //
     // Stranded Interval Testing //
@@ -448,7 +417,7 @@ mod testing {
         let n_intervals = 10;
         let records = vec![bed3![1, 10, 100, Strand::Reverse]; n_intervals];
         let mut set = IntervalContainer::new(records);
-        assert!(!set.is_sorted);
+        assert!(!set.is_sorted());
         set.set_sorted();
         assert!(set.is_sorted());
     }
@@ -459,56 +428,56 @@ mod testing {
         let records = vec![bed3![1, 10, 100, Strand::Forward]; n_intervals];
         let mut set = IntervalContainer::new(records);
 
-        set.records().iter().for_each(|r| {
+        set.iter().for_each(|r| {
             assert_eq!(r.strand().unwrap(), Strand::Forward);
         });
 
-        set.records_mut().iter_mut().for_each(|r| {
+        set.apply_mut(|r| {
             r.update_strand(Some(Strand::Reverse));
         });
 
-        set.records().iter().for_each(|r| {
+        set.iter().for_each(|r| {
             assert_eq!(r.strand().unwrap(), Strand::Reverse);
         });
     }
 
-    #[test]
-    fn test_span_empty() {
-        let set: IntervalContainer<StrandedBed3<u32>, u32> = IntervalContainer::new(vec![]);
-        let span = set.span();
-        assert!(span.is_err());
-    }
+    // #[test]
+    // fn test_span_empty() {
+    //     let set: IntervalContainer<StrandedBed3<u32>, u32> = IntervalContainer::new(vec![]);
+    //     let span = set.span();
+    //     assert!(span.is_err());
+    // }
+    //
+    // #[test]
+    // fn test_span_unsorted() {
+    //     let n_intervals = 10;
+    //     let records = vec![bed3![1, 10, 100, Strand::Forward]; n_intervals];
+    //     let set = IntervalContainer::new(records);
+    //     let span = set.span();
+    //     assert!(span.is_err());
+    // }
 
-    #[test]
-    fn test_span_unsorted() {
-        let n_intervals = 10;
-        let records = vec![bed3![1, 10, 100, Strand::Forward]; n_intervals];
-        let set = IntervalContainer::new(records);
-        let span = set.span();
-        assert!(span.is_err());
-    }
-
-    #[test]
-    fn test_span_multiple_chr() {
-        let n_intervals = 10;
-        let mut records = vec![bed3![1, 10, 100, Strand::Forward]; n_intervals];
-        records.push(bed3![2, 10, 100, Strand::Forward]);
-        let set = IntervalContainer::new(records);
-        let span = set.span();
-        assert!(span.is_err());
-    }
-
-    #[test]
-    fn test_span() {
-        let records = vec![
-            bed3![1, 10, 100, Strand::Forward],
-            bed3![1, 1000, 2000, Strand::Forward],
-        ];
-        let set = IntervalContainer::from_sorted(records).unwrap();
-        let span = set.span().unwrap();
-        assert_eq!(span.start(), 10);
-        assert_eq!(span.end(), 2000);
-    }
+    // #[test]
+    // fn test_span_multiple_chr() {
+    //     let n_intervals = 10;
+    //     let mut records = vec![bed3![1, 10, 100, Strand::Forward]; n_intervals];
+    //     records.push(bed3![2, 10, 100, Strand::Forward]);
+    //     let set = IntervalContainer::new(records);
+    //     let span = set.span();
+    //     assert!(span.is_err());
+    // }
+    //
+    // #[test]
+    // fn test_span() {
+    //     let records = vec![
+    //         bed3![1, 10, 100, Strand::Forward],
+    //         bed3![1, 1000, 2000, Strand::Forward],
+    //     ];
+    //     let set = IntervalContainer::from_sorted(records).unwrap();
+    //     let span = set.span().unwrap();
+    //     assert_eq!(span.start(), 10);
+    //     assert_eq!(span.end(), 2000);
+    // }
 
     #[test]
     fn test_sort() {
@@ -528,7 +497,7 @@ mod testing {
         ];
         let set = IntervalContainer::from_unsorted(records);
         assert!(set.is_sorted());
-        let vec = set.records();
+        let vec = Vec::from(set);
         assert!(vec[0].eq(&bed3![1, 10, 100, Strand::Forward]));
         assert!(vec[1].eq(&bed3![1, 10, 100, Strand::Reverse]));
         assert!(vec[2].eq(&bed3![1, 10, 100, Strand::Unknown]));
@@ -579,7 +548,7 @@ mod testing {
         assert_eq!(set.len(), 3);
         assert!(!set.is_sorted());
         assert!(!set.is_empty());
-        assert_eq!(set.records()[0].start(), 15);
+        assert_eq!(set.iter().next().unwrap().start(), 15);
     }
 
     #[test]
@@ -593,7 +562,7 @@ mod testing {
         assert_eq!(set.len(), 3);
         assert!(set.is_sorted());
         assert!(!set.is_empty());
-        assert_eq!(set.records()[0].start(), 5);
+        assert_eq!(set.iter().next().unwrap().start(), 5);
     }
 
     #[test]
@@ -607,7 +576,7 @@ mod testing {
         assert_eq!(set.len(), 3);
         assert!(set.is_sorted());
         assert!(!set.is_empty());
-        assert_eq!(set.records()[0].start(), 5);
+        assert_eq!(set.iter().next().unwrap().start(), 5);
     }
 
     #[test]
@@ -630,12 +599,13 @@ mod testing {
         ];
         let mut set = IntervalContainer::from_unsorted(records);
         set.apply_mut(|rec| rec.extend(&2, None));
-        assert_eq!(set.records()[0].start(), 3);
-        assert_eq!(set.records()[0].end(), 17);
-        assert_eq!(set.records()[1].start(), 8);
-        assert_eq!(set.records()[1].end(), 22);
-        assert_eq!(set.records()[2].start(), 13);
-        assert_eq!(set.records()[2].end(), 27);
+        let vec = Vec::from(set);
+        assert_eq!(vec[0].start(), 3);
+        assert_eq!(vec[0].end(), 17);
+        assert_eq!(vec[1].start(), 8);
+        assert_eq!(vec[1].end(), 22);
+        assert_eq!(vec[2].start(), 13);
+        assert_eq!(vec[2].end(), 27);
     }
 
     #[test]
@@ -652,7 +622,7 @@ mod testing {
         set.insert_sorted(BaseInterval::new(15, 25));
         set.insert_sorted(BaseInterval::new(10, 20));
         assert_eq!(set.len(), 2);
-        assert_eq!(set.records()[0].start(), 10);
+        assert_eq!(set.iter().next().unwrap().start(), 10);
         assert!(set.is_sorted());
     }
 

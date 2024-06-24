@@ -170,4 +170,5 @@ pub use traits::{
 pub use types::{
     BaseInterval, Bed12, Bed3, Bed4, Bed6, BedGraph, Frame, Gtf, IntersectIter, IntervalContainer,
     IntervalIterOwned, IntervalIterRef, MergeIter, MetaInterval, Score, Strand, StrandedBed3,
+    Subtree,
 };

@@ -1,4 +1,3 @@
-mod bound;
 mod closest;
 mod complement;
 mod find;
@@ -9,4 +8,8 @@ mod sample;
 mod set_intersect;
 mod set_segment;
 mod set_subtract;
+mod subtree;
+mod tree;
 pub use interval_container::IntervalContainer;
+pub use subtree::Subtree;
+pub use tree::IntervalTree;

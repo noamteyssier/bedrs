@@ -25,12 +25,16 @@ where
     {
         if self.is_sorted() {
             method.validate()?;
-            Ok(FindIter::new(
-                self.records(),
-                query,
-                self.lower_bound_unchecked(query),
-                method,
-            ))
+            if let Some(subtree) = self.subtree(query.chr()) {
+                Ok(FindIter::new(
+                    Some(subtree),
+                    query,
+                    subtree.lower_bound_unchecked(query),
+                    method,
+                ))
+            } else {
+                Ok(FindIter::new(None, query, 0, method))
+            }
         } else {
             Err(SetError::UnsortedSet)
         }
@@ -51,12 +55,16 @@ where
     {
         if self.is_sorted() {
             method.validate()?;
-            Ok(FindIterEnumerate::new(
-                self.records(),
-                query,
-                self.lower_bound_unchecked(query),
-                method,
-            ))
+            if let Some(subtree) = self.subtree(query.chr()) {
+                Ok(FindIterEnumerate::new(
+                    Some(subtree),
+                    query,
+                    subtree.lower_bound_unchecked(query),
+                    method,
+                ))
+            } else {
+                Ok(FindIterEnumerate::new(None, query, 0, method))
+            }
         } else {
             Err(SetError::UnsortedSet)
         }
@@ -74,8 +82,12 @@ where
         Iv: IntervalBounds<C>,
     {
         if self.is_sorted() {
-            let bound = self.lower_bound_unchecked(&query);
-            Ok(FindIterOwned::new(self.records(), query, bound, method))
+            if let Some(subtree) = self.subtree(query.chr()) {
+                let bound = subtree.lower_bound_unchecked(&query);
+                Ok(FindIterOwned::new(Some(subtree), query, bound, method))
+            } else {
+                Ok(FindIterOwned::new(None, query, 0, method))
+            }
         } else {
             Err(SetError::UnsortedSet)
         }
@@ -116,7 +128,7 @@ mod testing {
         C: ChromBounds,
     {
         for idx in 0..expected.len() {
-            let c1 = &set.records()[idx];
+            let c1 = &set.to_vec()[idx];
             let c2 = &expected[idx];
             assert!(c1.eq(c2));
         }

@@ -26,6 +26,12 @@ pub enum SetError {
 
     #[error("Cannot accept a strand input that is unknown")]
     CannotAcceptUnknownStrand,
+
+    #[error("The provided subtree name is not in the interval set")]
+    MissingSubtreeName,
+
+    #[error("No intervals in the subtree are stranded")]
+    NoStrandedIntervals,
 }
 
 #[cfg(test)]
