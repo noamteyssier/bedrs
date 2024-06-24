@@ -9,15 +9,13 @@ use serde::{Deserialize, Serialize};
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct MetaGtf<N: MetaBounds> {
     #[getset(get = "pub", set = "pub")]
-    name: N,
-    #[getset(get = "pub", set = "pub")]
     source: N,
     #[getset(get = "pub", set = "pub")]
     feature: N,
-    #[getset(get_copy = "pub", set = "pub")]
+    #[getset(get = "pub", set = "pub")]
     score: Score,
     strand: Strand,
-    #[getset(get_copy = "pub", set = "pub")]
+    #[getset(get = "pub", set = "pub")]
     frame: Frame,
     #[getset(get = "pub", set = "pub")]
     attributes: N,
