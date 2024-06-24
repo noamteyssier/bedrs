@@ -26,13 +26,13 @@ where
     #[getset(get = "pub", set = "pub")]
     score: Score,
     strand: Strand,
-    #[getset(get_copy = "pub", set = "pub")]
+    #[getset(get = "pub", set = "pub")]
     thick_start: Ts,
-    #[getset(get_copy = "pub", set = "pub")]
+    #[getset(get = "pub", set = "pub")]
     thick_end: Te,
     #[getset(get = "pub", set = "pub")]
     item_rgb: R,
-    #[getset(get_copy = "pub", set = "pub")]
+    #[getset(get = "pub", set = "pub")]
     block_count: T,
     #[getset(get = "pub", set = "pub")]
     block_sizes: Si,
