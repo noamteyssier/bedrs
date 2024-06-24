@@ -1,4 +1,4 @@
-use super::{MetaBed12, MetaBed4, MetaBed6, RecordMetadata};
+use super::{MetaBed12, MetaBed4, MetaBed6, MetaBedGraph, RecordMetadata};
 use crate::{
     traits::{MetaBounds, ValueBounds},
     Strand,
@@ -11,6 +11,12 @@ impl RecordMetadata for MetaBed3 {
         None
     }
     fn update_strand(&mut self, _strand: Option<Strand>) {}
+}
+
+impl From<MetaBedGraph> for MetaBed3 {
+    fn from(_t: MetaBedGraph) -> Self {
+        None
+    }
 }
 
 impl<N: MetaBounds> From<MetaBed4<N>> for MetaBed3 {
