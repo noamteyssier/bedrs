@@ -1,4 +1,5 @@
 mod closest;
+mod coitree_container;
 mod complement;
 mod find;
 mod internal;
@@ -10,6 +11,7 @@ mod set_segment;
 mod set_subtract;
 mod subtree;
 mod tree;
+pub use coitree_container::COITreeContainer;
 pub use interval_container::IntervalContainer;
 pub use subtree::Subtree;
 pub use tree::IntervalTree;

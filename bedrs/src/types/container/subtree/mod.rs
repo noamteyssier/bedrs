@@ -5,6 +5,7 @@ mod sample;
 
 use crate::{
     traits::{ChromBounds, IntervalBounds, SetError},
+    types::meta::RecordMetadata,
     Coordinates,
 };
 use std::{
@@ -13,6 +14,7 @@ use std::{
 };
 
 use anyhow::Result;
+use coitrees::{BasicCOITree, GenericInterval, IntervalTree};
 #[cfg(feature = "rayon")]
 use rayon::prelude::*;
 
@@ -57,6 +59,17 @@ where
     }
 }
 
+impl<M, I, C> From<Subtree<I, C>> for BasicCOITree<M, usize>
+where
+    M: RecordMetadata,
+    I: IntervalBounds<C> + GenericInterval<M>,
+    C: ChromBounds,
+{
+    fn from(subtree: Subtree<I, C>) -> Self {
+        Self::new(subtree.data())
+    }
+}
+
 impl<I, C> Subtree<I, C>
 where
     I: IntervalBounds<C>,
@@ -68,12 +81,7 @@ where
     }
     #[must_use]
     pub fn empty() -> Self {
-        Self {
-            data: Vec::new(),
-            max_len: None,
-            is_sorted: false,
-            _phantom: PhantomData,
-        }
+        Self::from_iter(Vec::new())
     }
     #[must_use]
     pub fn from_sorted(data: Vec<I>) -> Self {

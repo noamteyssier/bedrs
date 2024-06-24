@@ -55,6 +55,11 @@ where
     }
 
     #[must_use]
+    pub fn map_owned(self) -> Map<I, C> {
+        self.map
+    }
+
+    #[must_use]
     pub fn map(&self) -> &Map<I, C> {
         &self.map
     }

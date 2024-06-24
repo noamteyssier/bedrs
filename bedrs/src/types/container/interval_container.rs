@@ -1,9 +1,11 @@
-use super::{subtree::Subtree, tree::IntervalTree};
+use super::{coitree_container::COIMap, subtree::Subtree, tree::IntervalTree, COITreeContainer};
 use crate::{
     traits::{ChromBounds, IntervalBounds, SetError},
+    types::meta::RecordMetadata,
     IntervalIterOwned, IntervalIterRef,
 };
 use anyhow::Result;
+use coitrees::{BasicCOITree, GenericInterval};
 
 #[derive(Debug, Clone)]
 pub struct IntervalContainer<I, C>
@@ -189,6 +191,23 @@ where
     #[must_use]
     pub fn to_vec(&self) -> Vec<I> {
         Vec::from(self)
+    }
+}
+
+impl<I, C, M> From<IntervalContainer<I, C>> for COITreeContainer<M, C>
+where
+    I: IntervalBounds<C> + GenericInterval<M>,
+    C: ChromBounds,
+    M: RecordMetadata,
+{
+    fn from(container: IntervalContainer<I, C>) -> Self {
+        let mut inner = COIMap::new();
+        let map = container.data.map_owned();
+        for (c, v) in map {
+            let coitree: BasicCOITree<M, usize> = BasicCOITree::from(v);
+            inner.insert(c, coitree);
+        }
+        COITreeContainer::new(inner)
     }
 }
 
