@@ -10,6 +10,8 @@ pub use iterator::{
     ClusterIter, FindIter, FindIterEnumerate, FindIterOwned, IntersectIter, IntervalIterOwned,
     IntervalIterRef, MergeIter, SubtractFromIter, SubtractIter,
 };
+pub use meta::RecordMetadata;
 pub use record::{
-    BaseInterval, Bed12, Bed3, Bed4, Bed6, BedGraph, Gtf, MetaInterval, StrandedBed3,
+    BaseInterval, Bed12, Bed3, Bed4, Bed6, BedGraph, Features, Gtf, MetaInterval, Record,
+    StrandedBed3,
 };

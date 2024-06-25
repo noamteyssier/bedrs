@@ -13,7 +13,7 @@ where
     M: RecordMetadata,
 {
     #[cfg_attr(feature = "serde", serde(flatten))]
-    pub coordinates: Features<C>,
+    pub features: Features<C>,
     #[cfg_attr(feature = "serde", serde(flatten))]
     pub metadata: M,
 }
@@ -26,10 +26,10 @@ where
     M: RecordMetadata,
 {
     fn first(&self) -> i32 {
-        self.coordinates.start()
+        self.features.start()
     }
     fn last(&self) -> i32 {
-        self.coordinates.end()
+        self.features.end()
     }
     fn metadata(&self) -> &M {
         &self.metadata
@@ -42,25 +42,25 @@ where
     M: RecordMetadata,
 {
     fn chr(&self) -> &C {
-        self.coordinates.chr()
+        self.features.chr()
     }
     fn start(&self) -> i32 {
-        self.coordinates.start()
+        self.features.start()
     }
     fn end(&self) -> i32 {
-        self.coordinates.end()
+        self.features.end()
     }
     fn strand(&self) -> Option<crate::Strand> {
         self.metadata.strand()
     }
     fn update_chr(&mut self, val: &C) {
-        self.coordinates.update_chr(val);
+        self.features.update_chr(val);
     }
     fn update_start(&mut self, val: &i32) {
-        self.coordinates.update_start(val);
+        self.features.update_start(val);
     }
     fn update_end(&mut self, val: &i32) {
-        self.coordinates.update_end(val);
+        self.features.update_end(val);
     }
     fn update_strand(&mut self, strand: Option<crate::Strand>) {
         self.metadata.update_strand(strand);
@@ -84,13 +84,13 @@ where
     M: RecordMetadata,
 {
     fn chr(&self) -> &C {
-        self.coordinates.chr()
+        self.features.chr()
     }
     fn start(&self) -> i32 {
-        self.coordinates.start()
+        self.features.start()
     }
     fn end(&self) -> i32 {
-        self.coordinates.end()
+        self.features.end()
     }
     fn strand(&self) -> Option<crate::Strand> {
         self.metadata.strand()
@@ -127,7 +127,7 @@ where
 {
     fn from(rec: &Record<C, M1>) -> Self {
         Record {
-            coordinates: rec.coordinates.clone(),
+            features: rec.features.clone(),
             metadata: rec.metadata.clone().into(),
         }
     }

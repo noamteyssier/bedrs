@@ -168,7 +168,7 @@ pub use traits::{
     UnstrandedOverlap,
 };
 pub use types::{
-    BaseInterval, Bed12, Bed3, Bed4, Bed6, BedGraph, Frame, Gtf, IntersectIter, IntervalContainer,
-    IntervalIterOwned, IntervalIterRef, MergeIter, MetaInterval, Score, Strand, StrandedBed3,
-    Subtree,
+    BaseInterval, Bed12, Bed3, Bed4, Bed6, BedGraph, Features, Frame, Gtf, IntersectIter,
+    IntervalContainer, IntervalIterOwned, IntervalIterRef, MergeIter, MetaInterval, Record,
+    RecordMetadata, Score, Strand, StrandedBed3, Subtree,
 };
