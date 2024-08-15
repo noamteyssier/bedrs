@@ -6,10 +6,11 @@ use crate::{
 };
 
 /// A trait to merge overlapping interval regions within a container
-impl<I, C> Subtree<I, C>
+impl<I, C, T> Subtree<I, C, T>
 where
-    I: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
     C: ChromBounds,
+    T: Clone,
 {
     /// Merges overlapping intervals within a container
     ///
@@ -299,9 +300,9 @@ mod testing {
         BaseInterval, Strand,
     };
 
-    fn validate_set<C, I>(set: &Subtree<I, C>, expected: &[I])
+    fn validate_set<C, I>(set: &Subtree<I, C, T>, expected: &[I])
     where
-        I: IntervalBounds<C> + Debug,
+        I: IntervalBounds<C, T> + Debug,
         C: ChromBounds,
     {
         println!("\nExpected:");

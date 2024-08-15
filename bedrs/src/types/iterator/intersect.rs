@@ -18,11 +18,12 @@ use std::{collections::VecDeque, fmt::Debug, marker::PhantomData};
 /// Works by keeping two queues of intervals, one for each iterator. The
 /// intervals are popped from the queue and compared. This will consume
 /// all target intervals that precede or overlap the query interval.
-pub struct IntersectIter<It, I, C>
+pub struct IntersectIter<It, I, C, T>
 where
     It: Iterator<Item = I>,
-    I: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
     C: ChromBounds,
+    T: Clone,
 {
     iter_left: It,
     iter_right: It,
@@ -31,13 +32,15 @@ where
     queue_right_matched: VecDeque<I>,
     method: Query,
     phantom_c: PhantomData<C>,
+    phantom_t: PhantomData<T>,
     is_new: bool,
 }
-impl<It, I, C> IntersectIter<It, I, C>
+impl<It, I, C, T> IntersectIter<It, I, C, T>
 where
     It: Iterator<Item = I>,
-    I: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
     C: ChromBounds,
+    T: Clone,
 {
     pub fn new(iter_left: It, iter_right: It) -> Self {
         Self {
@@ -48,6 +51,7 @@ where
             queue_right_matched: VecDeque::new(),
             method: Query::default(),
             phantom_c: PhantomData,
+            phantom_t: PhantomData,
             is_new: true,
         }
     }
@@ -61,6 +65,7 @@ where
             queue_right_matched: VecDeque::new(),
             method,
             phantom_c: PhantomData,
+            phantom_t: PhantomData,
             is_new: true,
         }
     }
@@ -106,11 +111,12 @@ where
     }
 }
 
-impl<It, I, C> Iterator for IntersectIter<It, I, C>
+impl<It, I, C, T> Iterator for IntersectIter<It, I, C, T>
 where
     It: Iterator<Item = I>,
-    I: IntervalBounds<C> + Debug,
+    I: IntervalBounds<C, T> + Debug,
     C: ChromBounds,
+    T: Clone,
 {
     type Item = I;
     fn next(&mut self) -> Option<Self::Item> {
@@ -165,10 +171,11 @@ mod testing {
         BaseInterval,
     };
 
-    fn validate_records<I, C>(obs: &[I], exp: &[I])
+    fn validate_records<I, C, T>(obs: &[I], exp: &[I])
     where
-        I: IntervalBounds<C>,
+        I: IntervalBounds<C, T>,
         C: ChromBounds,
+        T: Clone,
     {
         assert_eq!(obs.len(), exp.len());
         for (obs, exp) in obs.iter().zip(exp.iter()) {
@@ -386,7 +393,7 @@ mod testing {
     ///   |1|    x-------y  |2|  x----y    x---y
     ///   |1|     i---j           i-j   i-j  |2|
     ///   ==================================
-    ///        i---j    
+    ///        i---j
     fn intersections_genomic_b() {
         let intervals_a = vec![bed3![1, 100, 300], bed3![2, 400, 475], bed3![2, 500, 550]];
         let intervals_b = vec![bed3![1, 120, 160], bed3![1, 460, 470], bed3![1, 490, 500]];
@@ -401,7 +408,7 @@ mod testing {
 
     #[test]
     ///   |1|               |2|  x----y    x---y
-    ///   |1|     i---j     |2|   i-j       i-j  
+    ///   |1|     i---j     |2|   i-j       i-j
     ///   =========================================
     ///                           i-j       i-j
     fn intersections_genomic_c() {
@@ -418,7 +425,7 @@ mod testing {
 
     #[test]
     ///   |1|     i---j     |2|  x----y    x---y
-    ///   |1|               |2|   i-j       i-j  
+    ///   |1|               |2|   i-j       i-j
     ///   =========================================
     ///                           i-j       i-j
     fn intersections_genomic_d() {

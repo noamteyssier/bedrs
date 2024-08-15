@@ -6,15 +6,16 @@ use crate::{
 };
 use anyhow::Result;
 
-impl<I, C> Subtree<I, C>
+impl<I, C, T> Subtree<I, C, T>
 where
-    I: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
     C: ChromBounds,
+    T: Clone,
 {
     /// Returns the closest interval to the query interval.
     pub fn closest<Iv>(&self, query: &Iv, method: StrandMethod) -> Result<Option<&I>, SetError>
     where
-        Iv: IntervalBounds<C>,
+        Iv: IntervalBounds<C, T>,
     {
         if self.is_sorted() {
             if self.is_empty() {
@@ -32,7 +33,7 @@ where
         method: StrandMethod,
     ) -> Result<Option<&I>, SetError>
     where
-        Iv: IntervalBounds<C>,
+        Iv: IntervalBounds<C, T>,
     {
         if self.is_sorted() {
             if self.is_empty() {
@@ -56,7 +57,7 @@ where
         method: StrandMethod,
     ) -> Result<Option<&I>, SetError>
     where
-        Iv: IntervalBounds<C>,
+        Iv: IntervalBounds<C, T>,
     {
         if self.is_sorted() {
             if self.is_empty() {
@@ -76,7 +77,7 @@ where
 
     pub fn closest_unchecked<Iv>(&self, query: &Iv, method: StrandMethod) -> Option<&I>
     where
-        Iv: IntervalBounds<C>,
+        Iv: IntervalBounds<C, T>,
     {
         let bound = match self.bound_upstream_unchecked(query, method) {
             Some(bound) => bound,
@@ -107,7 +108,7 @@ where
 
     pub fn closest_upstream_unchecked<Iv>(&self, query: &Iv, method: StrandMethod) -> Option<&I>
     where
-        Iv: IntervalBounds<C>,
+        Iv: IntervalBounds<C, T>,
     {
         let bound_fn = match method {
             StrandMethod::Ignore => Self::bound_igstrand_upstream_unchecked::<Iv>,
@@ -161,7 +162,7 @@ where
 
     pub fn closest_downstream_unchecked<Iv>(&self, query: &Iv, method: StrandMethod) -> Option<&I>
     where
-        Iv: IntervalBounds<C>,
+        Iv: IntervalBounds<C, T>,
     {
         let bound_fn = match method {
             StrandMethod::Ignore => Self::bound_igstrand_downstream_unchecked::<Iv>,
@@ -614,7 +615,7 @@ mod testing {
     /// |--->            |---->
     ///         <---|
     /// =====================================
-    /// |--->            
+    /// |--->
     fn closest_downstream_reverse_strand_a() {
         let set = Subtree::from_unsorted(vec![
             bed3![1, 10, 20, Strand::Forward],

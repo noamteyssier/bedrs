@@ -56,21 +56,24 @@ use crate::{
 ///    println!("{:?}", interval);
 /// }
 /// ```
-pub struct IntervalIterOwned<I, C>
+pub struct IntervalIterOwned<I, C, T>
 where
-    I: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
     C: ChromBounds,
+    T: Clone,
 {
     queue: VecDeque<I>,
-    _phantom: PhantomData<C>,
+    _phantom_c: PhantomData<C>,
+    _phantom_t: PhantomData<T>,
 }
-impl<I, C> IntervalIterOwned<I, C>
+impl<I, C, T> IntervalIterOwned<I, C, T>
 where
-    I: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
     C: ChromBounds,
+    T: Clone,
 {
     #[must_use]
-    pub fn new(mut inner: IntervalContainer<I, C>) -> Self {
+    pub fn new(mut inner: IntervalContainer<I, C, T>) -> Self {
         let mut queue = VecDeque::new();
         let names: Vec<_> = inner.subtree_names_sorted().into_iter().cloned().collect();
         for n in names {
@@ -82,14 +85,16 @@ where
         }
         Self {
             queue,
-            _phantom: PhantomData,
+            _phantom_c: PhantomData,
+            _phantom_t: PhantomData,
         }
     }
 }
-impl<I, C> Iterator for IntervalIterOwned<I, C>
+impl<I, C, T> Iterator for IntervalIterOwned<I, C, T>
 where
-    I: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
     C: ChromBounds,
+    T: Clone,
 {
     type Item = I;
     fn next(&mut self) -> Option<Self::Item> {
@@ -126,23 +131,25 @@ where
 /// // The container is still usable after the iteration
 /// assert_eq!(set.len(), 3);
 /// ```
-pub struct IntervalIterRef<'a, I, C>
+pub struct IntervalIterRef<'a, I, C, T>
 where
-    I: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
     C: ChromBounds,
+    T: Clone,
 {
-    inner: &'a IntervalContainer<I, C>,
+    inner: &'a IntervalContainer<I, C, T>,
     names: Vec<&'a C>,
     name_idx: usize,
     iv_idx: usize,
 }
-impl<'a, I, C> IntervalIterRef<'a, I, C>
+impl<'a, I, C, T> IntervalIterRef<'a, I, C, T>
 where
-    I: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
     C: ChromBounds,
+    T: Clone,
 {
     #[must_use]
-    pub fn new(inner: &'a IntervalContainer<I, C>) -> Self {
+    pub fn new(inner: &'a IntervalContainer<I, C, T>) -> Self {
         Self {
             inner,
             names: inner.subtree_names_sorted(),
@@ -151,10 +158,11 @@ where
         }
     }
 }
-impl<'a, I, C> Iterator for IntervalIterRef<'a, I, C>
+impl<'a, I, C, T> Iterator for IntervalIterRef<'a, I, C, T>
 where
-    I: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
     C: ChromBounds,
+    T: Clone,
 {
     type Item = &'a I;
     fn next(&mut self) -> Option<Self::Item> {

@@ -24,7 +24,7 @@ where
     pub fn query<F, I>(&self, query: &I, visit: F)
     where
         F: FnMut(&IntervalNode<M, usize>),
-        I: IntervalBounds<C>,
+        I: IntervalBounds<C, M>,
     {
         if let Some(coitree) = self.inner.get(query.chr()) {
             coitree.query(query.start(), query.end(), visit);
@@ -34,7 +34,7 @@ where
     pub fn query_fallible<F, E, I>(&self, query: &I, visit: F) -> Result<(), E>
     where
         F: FnMut(&IntervalNode<M, usize>) -> Result<(), E>,
-        I: IntervalBounds<C>,
+        I: IntervalBounds<C, M>,
     {
         if let Some(coitree) = self.inner.get(query.chr()) {
             coitree.query_fallible(query.start(), query.end(), visit)
@@ -44,7 +44,7 @@ where
     }
     pub fn query_count<I>(&self, query: &I) -> usize
     where
-        I: IntervalBounds<C>,
+        I: IntervalBounds<C, M>,
     {
         if let Some(coitree) = self.inner.get(query.chr()) {
             coitree.query_count(query.start(), query.end())
@@ -54,7 +54,7 @@ where
     }
     pub fn coverage<I>(&self, query: &I) -> (usize, usize)
     where
-        I: IntervalBounds<C>,
+        I: IntervalBounds<C, M>,
     {
         if let Some(coitree) = self.inner.get(query.chr()) {
             coitree.coverage(query.start(), query.end())
@@ -65,7 +65,7 @@ where
 }
 impl<I, C, M> FromIterator<I> for COITreeContainer<M, C>
 where
-    I: IntervalBounds<C> + GenericInterval<M>,
+    I: IntervalBounds<C, M> + GenericInterval<M>,
     C: ChromBounds,
     M: RecordMetadata,
 {

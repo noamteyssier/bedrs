@@ -6,10 +6,11 @@ use crate::{
 use std::cmp::Ordering;
 
 /// Identifies the lower bound on a [`Subtree`] via a binary tree search
-impl<I, C> Subtree<I, C>
+impl<I, C, T> Subtree<I, C, T>
 where
-    I: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
     C: ChromBounds,
+    T: Clone,
 {
     /// Identifies the lower bound on the [`Subtree`] via a binary tree search
     /// for a provided query.
@@ -61,7 +62,7 @@ where
     /// ```
     pub fn lower_bound<Iv>(&self, query: &Iv) -> Result<usize, SetError>
     where
-        Iv: IntervalBounds<C>,
+        Iv: IntervalBounds<C, T>,
     {
         if self.is_sorted() {
             if self.data().is_empty() {
@@ -123,7 +124,7 @@ where
     /// This will panic if the [`Subtree`] is empty or if the `max_len` is None.
     pub fn lower_bound_unchecked<Iv>(&self, query: &Iv) -> usize
     where
-        Iv: IntervalBounds<C>,
+        Iv: IntervalBounds<C, T>,
     {
         let max_len = self
             .max_len()
@@ -143,7 +144,7 @@ where
     /// with the query. Can result in an error if the [`Subtree`] is not sorted.
     pub fn chr_bound<Iv>(&self, query: &Iv) -> Result<Option<usize>, SetError>
     where
-        Iv: IntervalBounds<C>,
+        Iv: IntervalBounds<C, T>,
     {
         if self.is_sorted() {
             if self.data().is_empty() {
@@ -167,7 +168,7 @@ where
         method: StrandMethod,
     ) -> Result<Option<usize>, SetError>
     where
-        Iv: IntervalBounds<C>,
+        Iv: IntervalBounds<C, T>,
     {
         if self.is_sorted() {
             if self.data().is_empty() {
@@ -191,7 +192,7 @@ where
     /// upstream.
     pub fn bound_upstream_unchecked<Iv>(&self, query: &Iv, method: StrandMethod) -> Option<usize>
     where
-        Iv: IntervalBounds<C>,
+        Iv: IntervalBounds<C, T>,
     {
         match method {
             StrandMethod::Ignore => self.bound_igstrand_upstream_unchecked(query),
@@ -212,7 +213,7 @@ where
         method: StrandMethod,
     ) -> Result<Option<usize>, SetError>
     where
-        Iv: IntervalBounds<C>,
+        Iv: IntervalBounds<C, T>,
     {
         if self.is_sorted() {
             if self.data().is_empty() {
@@ -238,7 +239,7 @@ where
     /// downstream.
     pub fn bound_downstream_unchecked<Iv>(&self, query: &Iv, method: StrandMethod) -> Option<usize>
     where
-        Iv: IntervalBounds<C>,
+        Iv: IntervalBounds<C, T>,
     {
         match method {
             StrandMethod::Ignore => self.bound_igstrand_downstream_unchecked(query),
@@ -252,7 +253,7 @@ where
     /// Use at your own risk.
     pub fn chr_bound_unchecked<Iv>(&self, query: &Iv) -> Option<usize>
     where
-        Iv: IntervalBounds<C>,
+        Iv: IntervalBounds<C, T>,
     {
         // Find the partition point for the chromosome
         let bound = self.data().partition_point(|iv| iv.chr() < query.chr());
@@ -281,7 +282,7 @@ where
     /// sorted beforehand. Use at your own risk.
     pub fn bound_igstrand_upstream_unchecked<Iv>(&self, query: &Iv) -> Option<usize>
     where
-        Iv: IntervalBounds<C>,
+        Iv: IntervalBounds<C, T>,
     {
         // partition point returns the first index in the slice for which
         // the predicate fails (i.e. the index of the first record that is
@@ -313,7 +314,7 @@ where
 
     pub fn bound_stranded_upstream_unchecked<Iv>(&self, query: &Iv) -> Option<usize>
     where
-        Iv: IntervalBounds<C>,
+        Iv: IntervalBounds<C, T>,
     {
         // partition point returns the first index in the slice for which
         // the predicate fails (i.e. the index of the first record that is
@@ -348,7 +349,7 @@ where
 
     pub fn bound_unstranded_upstream_unchecked<Iv>(&self, query: &Iv) -> Option<usize>
     where
-        Iv: IntervalBounds<C>,
+        Iv: IntervalBounds<C, T>,
     {
         // partition point returns the first index in the slice for which
         // the predicate fails (i.e. the index of the first record that is
@@ -384,7 +385,7 @@ where
     /// sorted beforehand. Use at your own risk.
     pub fn bound_igstrand_downstream_unchecked<Iv>(&self, query: &Iv) -> Option<usize>
     where
-        Iv: IntervalBounds<C>,
+        Iv: IntervalBounds<C, T>,
     {
         // partition point returns the first index in the slice for which
         // the predicate fails (i.e. the index of the first record that is
@@ -422,7 +423,7 @@ where
     /// sorted beforehand. Use at your own risk.
     pub fn bound_stranded_downstream_unchecked<Iv>(&self, query: &Iv) -> Option<usize>
     where
-        Iv: IntervalBounds<C>,
+        Iv: IntervalBounds<C, T>,
     {
         // partition point returns the first index in the slice for which
         // the predicate fails (i.e. the index of the first record that is
@@ -448,7 +449,7 @@ where
     /// sorted beforehand. Use at your own risk.
     pub fn bound_unstranded_downstream_unchecked<Iv>(&self, query: &Iv) -> Option<usize>
     where
-        Iv: IntervalBounds<C>,
+        Iv: IntervalBounds<C, T>,
     {
         // partition point returns the first index in the slice for which
         // the predicate fails (i.e. the index of the first record that is

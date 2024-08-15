@@ -7,23 +7,26 @@ use std::marker::PhantomData;
 ///
 /// Expects sorted intervals.
 /// Undefined behavior if the intervals are not sorted.
-pub struct ClusterIter<It, I, C>
+pub struct ClusterIter<It, I, C, T>
 where
     It: Iterator<Item = I>,
-    I: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
     C: ChromBounds,
+    T: Clone,
 {
     iter: It,
     span: I,
     init: bool,
     current_id: usize,
     phantom_c: PhantomData<C>,
+    phantom_t: PhantomData<T>,
 }
-impl<It, I, C> ClusterIter<It, I, C>
+impl<It, I, C, T> ClusterIter<It, I, C, T>
 where
     It: Iterator<Item = I>,
-    I: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
     C: ChromBounds,
+    T: Clone,
 {
     pub fn new(iter: It) -> Self {
         Self {
@@ -32,6 +35,7 @@ where
             init: false,
             current_id: 0,
             phantom_c: PhantomData,
+            phantom_t: PhantomData,
         }
     }
 
@@ -64,11 +68,12 @@ where
         self.init = true;
     }
 }
-impl<It, I, C> Iterator for ClusterIter<It, I, C>
+impl<It, I, C, T> Iterator for ClusterIter<It, I, C, T>
 where
     It: Iterator<Item = I>,
-    I: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
     C: ChromBounds,
+    T: Clone,
 {
     type Item = (I, usize);
     fn next(&mut self) -> Option<Self::Item> {

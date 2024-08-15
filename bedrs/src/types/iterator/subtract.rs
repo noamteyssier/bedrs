@@ -7,25 +7,28 @@ use derive_new::new;
 use std::marker::PhantomData;
 
 #[derive(new)]
-pub struct SubtractIter<'a, I, Iv, C>
+pub struct SubtractIter<'a, I, Iv, C, T>
 where
-    I: IntervalBounds<C> + 'a,
-    Iv: IntervalBounds<C> + 'a,
+    I: IntervalBounds<C, T> + 'a,
+    Iv: IntervalBounds<C, T> + 'a,
     C: ChromBounds + 'a,
+    T: Clone,
 {
-    inner: Option<&'a Subtree<I, C>>,
+    inner: Option<&'a Subtree<I, C, T>>,
     query: &'a Iv,
     #[new(default)]
     remainder: Option<I>,
     #[new(default)]
     offset: usize,
     phantom_c: PhantomData<C>,
+    phantom_t: PhantomData<T>,
 }
-impl<'a, I, Iv, C> Iterator for SubtractIter<'a, I, Iv, C>
+impl<'a, I, Iv, C, T> Iterator for SubtractIter<'a, I, Iv, C, T>
 where
-    I: IntervalBounds<C>,
-    Iv: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
+    Iv: IntervalBounds<C, T>,
     C: ChromBounds,
+    T: Clone,
 {
     type Item = I;
     fn next(&mut self) -> Option<Self::Item> {
@@ -64,30 +67,32 @@ where
     }
 }
 
-pub struct SubtractFromIter<I, Iv, C>
+pub struct SubtractFromIter<I, Iv, C, T>
 where
-    I: IntervalBounds<C>,
-    Iv: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
+    Iv: IntervalBounds<C, T>,
     C: ChromBounds,
+    T: Clone,
 {
-    inner: IntervalContainer<I, C>,
+    inner: IntervalContainer<I, C, T>,
     remainder: Iv,
     send_remainder: bool,
     names: Vec<C>,
     name_idx: usize,
     iv_idx: usize,
 }
-impl<C, I, Iv> SubtractFromIter<I, Iv, C>
+impl<C, I, Iv, T> SubtractFromIter<I, Iv, C, T>
 where
-    I: IntervalBounds<C>,
-    Iv: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
+    Iv: IntervalBounds<C, T>,
     C: ChromBounds,
+    T: Clone,
 {
     /// Create a new iterator that subtracts intervals from the query
     ///
     /// # Panics
     /// Will panic if the set cannot be merged
-    pub fn new(container: &IntervalContainer<I, C>, query: &Iv) -> Self {
+    pub fn new(container: &IntervalContainer<I, C, T>, query: &Iv) -> Self {
         let inner = container.merge().unwrap();
         let names = inner.subtree_names_sorted().into_iter().cloned().collect();
         Self {
@@ -100,11 +105,12 @@ where
         }
     }
 }
-impl<I, Iv, C> Iterator for SubtractFromIter<I, Iv, C>
+impl<I, Iv, C, T> Iterator for SubtractFromIter<I, Iv, C, T>
 where
-    I: IntervalBounds<C>,
-    Iv: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
+    Iv: IntervalBounds<C, T>,
     C: ChromBounds,
+    T: Clone,
 {
     type Item = I;
     fn next(&mut self) -> Option<Self::Item> {

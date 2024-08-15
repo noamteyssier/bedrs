@@ -8,17 +8,19 @@ use anyhow::Result;
 use coitrees::{BasicCOITree, GenericInterval};
 
 #[derive(Debug, Clone)]
-pub struct IntervalContainer<I, C>
+pub struct IntervalContainer<I, C, T>
 where
-    I: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
     C: ChromBounds,
+    T: Clone,
 {
-    data: IntervalTree<I, C>,
+    data: IntervalTree<I, C, T>,
 }
-impl<I, C> FromIterator<I> for IntervalContainer<I, C>
+impl<I, C, T> FromIterator<I> for IntervalContainer<I, C, T>
 where
-    I: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
     C: ChromBounds,
+    T: Clone,
 {
     fn from_iter<It: IntoIterator<Item = I>>(iter: It) -> Self {
         Self {
@@ -27,10 +29,11 @@ where
     }
 }
 
-impl<I, C> IntervalContainer<I, C>
+impl<I, C, T> IntervalContainer<I, C, T>
 where
-    I: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
     C: ChromBounds,
+    T: Clone,
 {
     #[must_use]
     pub fn new(records: Vec<I>) -> Self {
@@ -40,19 +43,19 @@ where
     pub fn len(&self) -> usize {
         self.data.len()
     }
-    pub fn subtree(&self, name: &C) -> Option<&Subtree<I, C>> {
+    pub fn subtree(&self, name: &C) -> Option<&Subtree<I, C, T>> {
         self.data.subtree(name)
     }
-    pub fn subtree_mut(&mut self, name: &C) -> Option<&mut Subtree<I, C>> {
+    pub fn subtree_mut(&mut self, name: &C) -> Option<&mut Subtree<I, C, T>> {
         self.data.subtree_mut(name)
     }
-    pub fn subtree_owned(&mut self, name: &C) -> Option<Subtree<I, C>> {
+    pub fn subtree_owned(&mut self, name: &C) -> Option<Subtree<I, C, T>> {
         self.data.subtree_owned(name)
     }
-    pub fn subtrees(&self) -> impl Iterator<Item = &Subtree<I, C>> {
+    pub fn subtrees(&self) -> impl Iterator<Item = &Subtree<I, C, T>> {
         self.data.values()
     }
-    pub fn subtrees_mut(&mut self) -> impl Iterator<Item = &mut Subtree<I, C>> {
+    pub fn subtrees_mut(&mut self) -> impl Iterator<Item = &mut Subtree<I, C, T>> {
         self.data.values_mut()
     }
     #[must_use]
@@ -84,12 +87,12 @@ where
     }
     #[allow(clippy::iter_without_into_iter)]
     #[must_use]
-    pub fn iter(&self) -> IntervalIterRef<I, C> {
+    pub fn iter(&self) -> IntervalIterRef<I, C, T> {
         IntervalIterRef::new(self)
     }
     #[allow(clippy::should_implement_trait)]
     #[must_use]
-    pub fn into_iter(self) -> IntervalIterOwned<I, C> {
+    pub fn into_iter(self) -> IntervalIterOwned<I, C, T> {
         IntervalIterOwned::new(self)
     }
 
@@ -194,49 +197,52 @@ where
     }
 }
 
-impl<I, C, M> From<IntervalContainer<I, C>> for COITreeContainer<M, C>
+impl<I, C, T> From<IntervalContainer<I, C, T>> for COITreeContainer<T, C>
 where
-    I: IntervalBounds<C> + GenericInterval<M>,
+    I: IntervalBounds<C, T> + GenericInterval<T>,
     C: ChromBounds,
-    M: RecordMetadata,
+    T: RecordMetadata,
 {
-    fn from(container: IntervalContainer<I, C>) -> Self {
+    fn from(container: IntervalContainer<I, C, T>) -> Self {
         let mut inner = COIMap::new();
         let map = container.data.map_owned();
         for (c, v) in map {
-            let coitree: BasicCOITree<M, usize> = BasicCOITree::from(v);
+            let coitree: BasicCOITree<T, usize> = BasicCOITree::from(v);
             inner.insert(c, coitree);
         }
         COITreeContainer::new(inner)
     }
 }
 
-impl<I, C> From<IntervalContainer<I, C>> for Vec<I>
+impl<I, C, T> From<IntervalContainer<I, C, T>> for Vec<I>
 where
-    I: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
     C: ChromBounds,
+    T: Clone,
 {
-    fn from(set: IntervalContainer<I, C>) -> Self {
+    fn from(set: IntervalContainer<I, C, T>) -> Self {
         set.into_iter().collect()
     }
 }
 
-impl<I, C> From<&IntervalContainer<I, C>> for Vec<I>
+impl<I, C, T> From<&IntervalContainer<I, C, T>> for Vec<I>
 where
-    I: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
     C: ChromBounds,
+    T: Clone,
 {
-    fn from(set: &IntervalContainer<I, C>) -> Self {
+    fn from(set: &IntervalContainer<I, C, T>) -> Self {
         set.iter().cloned().collect()
     }
 }
 
-impl<I, C> From<IntervalTree<I, C>> for IntervalContainer<I, C>
+impl<I, C, T> From<IntervalTree<I, C, T>> for IntervalContainer<I, C, T>
 where
-    I: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
     C: ChromBounds,
+    T: Clone,
 {
-    fn from(data: IntervalTree<I, C>) -> Self {
+    fn from(data: IntervalTree<I, C, T>) -> Self {
         Self { data }
     }
 }

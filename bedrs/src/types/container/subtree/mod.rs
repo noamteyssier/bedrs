@@ -5,8 +5,7 @@ mod sample;
 
 use crate::{
     traits::{ChromBounds, IntervalBounds, SetError},
-    types::meta::RecordMetadata,
-    Coordinates,
+    GenericIntervalExt,
 };
 use std::{
     marker::PhantomData,
@@ -20,21 +19,24 @@ use rayon::prelude::*;
 
 /// A wrapper type for a vector of interval records.
 #[derive(Debug, Clone, Default)]
-pub struct Subtree<I, C>
+pub struct Subtree<I, C, T>
 where
-    I: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
     C: ChromBounds,
+    T: Clone,
 {
     data: Vec<I>,
     max_len: Option<i32>,
     is_sorted: bool,
-    _phantom: PhantomData<C>,
+    _phantom_c: PhantomData<C>,
+    _phantom_t: PhantomData<T>,
 }
 
-impl<I, C> FromIterator<I> for Subtree<I, C>
+impl<I, C, T> FromIterator<I> for Subtree<I, C, T>
 where
-    I: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
     C: ChromBounds,
+    T: Clone,
 {
     fn from_iter<It>(iter: It) -> Self
     where
@@ -54,26 +56,28 @@ where
             data,
             max_len,
             is_sorted: false,
-            _phantom: PhantomData,
+            _phantom_c: PhantomData,
+            _phantom_t: PhantomData,
         }
     }
 }
 
-impl<M, I, C> From<Subtree<I, C>> for BasicCOITree<M, usize>
+impl<I, C, T> From<Subtree<I, C, T>> for BasicCOITree<T, usize>
 where
-    M: RecordMetadata,
-    I: IntervalBounds<C> + GenericInterval<M>,
+    I: IntervalBounds<C, T> + GenericInterval<T>,
     C: ChromBounds,
+    T: Clone,
 {
-    fn from(subtree: Subtree<I, C>) -> Self {
+    fn from(subtree: Subtree<I, C, T>) -> Self {
         Self::new(subtree.data())
     }
 }
 
-impl<I, C> Subtree<I, C>
+impl<I, C, T> Subtree<I, C, T>
 where
-    I: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
     C: ChromBounds,
+    T: Clone,
 {
     #[must_use]
     pub fn new(data: Vec<I>) -> Self {
@@ -154,7 +158,7 @@ where
 
     /// Sorts the internal interval vector on the chromosome and start position of the intervals.
     pub fn sort(&mut self) {
-        self.data.sort_unstable_by(Coordinates::coord_cmp);
+        self.data.sort_unstable_by(GenericIntervalExt::coord_cmp);
         self.set_sorted();
     }
 
@@ -162,7 +166,8 @@ where
     /// but parallelizes the sorting.
     #[cfg(feature = "rayon")]
     pub fn par_sort(&mut self) {
-        self.data.par_sort_unstable_by(Coordinates::coord_cmp);
+        self.data
+            .par_sort_unstable_by(GenericIntervalExt::coord_cmp);
         self.set_sorted();
     }
 
@@ -190,10 +195,11 @@ where
     }
 }
 
-impl<I, C> Index<usize> for Subtree<I, C>
+impl<I, C, T> Index<usize> for Subtree<I, C, T>
 where
-    I: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
     C: ChromBounds,
+    T: Clone,
 {
     type Output = I;
     fn index(&self, index: usize) -> &Self::Output {
@@ -201,20 +207,22 @@ where
     }
 }
 
-impl<I, C> IndexMut<usize> for Subtree<I, C>
+impl<I, C, T> IndexMut<usize> for Subtree<I, C, T>
 where
-    I: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
     C: ChromBounds,
+    T: Clone,
 {
     fn index_mut(&mut self, index: usize) -> &mut I {
         &mut self.data[index]
     }
 }
 
-impl<I, C> IntoIterator for Subtree<I, C>
+impl<I, C, T> IntoIterator for Subtree<I, C, T>
 where
-    I: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
     C: ChromBounds,
+    T: Clone,
 {
     type Item = I;
     type IntoIter = std::vec::IntoIter<I>;

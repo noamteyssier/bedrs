@@ -5,22 +5,25 @@ use std::{fmt::Debug, marker::PhantomData};
 ///
 /// This iterator expects the input to be sorted and pre-merged and will
 /// panic if this is not the case.
-pub struct ComplementIter<It, I, C>
+pub struct ComplementIter<It, I, C, T>
 where
     It: Iterator<Item = I>,
-    I: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
     C: ChromBounds,
+    T: Clone,
 {
     iter: It,
     current: Option<I>,
     last: Option<I>,
     phantom_c: PhantomData<C>,
+    phantom_t: PhantomData<T>,
 }
-impl<It, I, C> ComplementIter<It, I, C>
+impl<It, I, C, T> ComplementIter<It, I, C, T>
 where
     It: Iterator<Item = I>,
-    I: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
     C: ChromBounds,
+    T: Clone,
 {
     pub fn new(iter: It) -> Self {
         Self {
@@ -28,6 +31,7 @@ where
             current: None,
             last: None,
             phantom_c: PhantomData,
+            phantom_t: PhantomData,
         }
     }
     fn populate(&mut self) {
@@ -39,11 +43,12 @@ where
         }
     }
 }
-impl<It, I, C> Iterator for ComplementIter<It, I, C>
+impl<It, I, C, T> Iterator for ComplementIter<It, I, C, T>
 where
     It: Iterator<Item = I>,
-    I: IntervalBounds<C> + Debug,
+    I: IntervalBounds<C, T> + Debug,
     C: ChromBounds,
+    T: Clone,
 {
     type Item = I;
     fn next(&mut self) -> Option<Self::Item> {
@@ -76,10 +81,11 @@ mod testing {
         BaseInterval,
     };
 
-    fn validate_records<I, C>(obs: &[I], exp: &[I])
+    fn validate_records<I, C, T>(obs: &[I], exp: &[I])
     where
-        I: IntervalBounds<C>,
+        I: IntervalBounds<C, T>,
         C: ChromBounds,
+        T: Clone,
     {
         assert_eq!(obs.len(), exp.len());
         for (obs, exp) in obs.iter().zip(exp.iter()) {

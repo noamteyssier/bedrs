@@ -7,22 +7,24 @@ use crate::{
 use std::marker::PhantomData;
 
 #[derive(new)]
-pub struct FindIter<'a, C, I, Iv>
+pub struct FindIter<'a, C, T, I, Iv>
 where
-    I: IntervalBounds<C> + 'a,
-    Iv: IntervalBounds<C> + 'a,
+    I: IntervalBounds<C, T> + 'a,
+    Iv: IntervalBounds<C, T> + 'a,
     C: ChromBounds + 'a,
+    T: Clone,
 {
-    inner: Option<&'a Subtree<I, C>>,
+    inner: Option<&'a Subtree<I, C, T>>,
     query: &'a Iv,
     offset: usize,
     method: Query,
 }
-impl<'a, C, I, Iv> Iterator for FindIter<'a, C, I, Iv>
+impl<'a, C, T, I, Iv> Iterator for FindIter<'a, C, T, I, Iv>
 where
-    I: IntervalBounds<C>,
-    Iv: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
+    Iv: IntervalBounds<C, T>,
     C: ChromBounds,
+    T: Clone,
 {
     type Item = &'a I;
     fn next(&mut self) -> Option<Self::Item> {
@@ -41,24 +43,26 @@ where
 }
 
 #[derive(new)]
-pub struct FindIterEnumerate<'a, C, I, Iv>
+pub struct FindIterEnumerate<'a, C, T, I, Iv>
 where
-    I: IntervalBounds<C> + 'a,
-    Iv: IntervalBounds<C> + 'a,
+    I: IntervalBounds<C, T> + 'a,
+    Iv: IntervalBounds<C, T> + 'a,
     C: ChromBounds + 'a,
+    T: Clone,
 {
-    inner: Option<&'a Subtree<I, C>>,
+    inner: Option<&'a Subtree<I, C, T>>,
 
     query: &'a Iv,
     offset: usize,
     phantom_c: PhantomData<C>,
     method: Query,
 }
-impl<'a, C, I, Iv> Iterator for FindIterEnumerate<'a, C, I, Iv>
+impl<'a, C, T, I, Iv> Iterator for FindIterEnumerate<'a, C, T, I, Iv>
 where
-    I: IntervalBounds<C>,
-    Iv: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
+    Iv: IntervalBounds<C, T>,
     C: ChromBounds,
+    T: Clone,
 {
     type Item = (usize, &'a I);
     fn next(&mut self) -> Option<Self::Item> {
@@ -77,23 +81,25 @@ where
 }
 
 #[derive(new)]
-pub struct FindIterOwned<'a, C, I, Iv>
+pub struct FindIterOwned<'a, C, T, I, Iv>
 where
-    I: IntervalBounds<C> + 'a,
-    Iv: IntervalBounds<C> + 'a,
+    I: IntervalBounds<C, T> + 'a,
+    Iv: IntervalBounds<C, T> + 'a,
     C: ChromBounds + 'a,
+    T: Clone,
 {
-    inner: Option<&'a Subtree<I, C>>,
+    inner: Option<&'a Subtree<I, C, T>>,
     query: Iv,
     offset: usize,
     phantom_c: PhantomData<C>,
     method: Query,
 }
-impl<'a, C, I, Iv> Iterator for FindIterOwned<'a, C, I, Iv>
+impl<'a, C, T, I, Iv> Iterator for FindIterOwned<'a, C, T, I, Iv>
 where
-    I: IntervalBounds<C>,
-    Iv: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
+    Iv: IntervalBounds<C, T>,
     C: ChromBounds,
+    T: Clone,
 {
     type Item = &'a I;
     fn next(&mut self) -> Option<Self::Item> {

@@ -5,10 +5,11 @@ use rand_chacha::ChaChaRng;
 use super::Subtree;
 
 /// Utility functions for random sampling within a container.
-impl<I, C> Subtree<I, C>
+impl<I, C, T> Subtree<I, C, T>
 where
-    I: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
     C: ChromBounds,
+    T: Clone,
 {
     /// Shuffles the elements of the container in place using the given random number generator.
     ///

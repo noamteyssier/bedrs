@@ -1,22 +1,27 @@
+use std::marker::PhantomData;
+
 use super::subtree::Subtree;
 use crate::traits::{ChromBounds, IntervalBounds, SetError};
 use hashbrown::HashMap;
 
-type Map<I, C> = HashMap<C, Subtree<I, C>>;
+type Map<I, C, T> = HashMap<C, Subtree<I, C, T>>;
 
 #[derive(Debug, Clone, Default)]
-pub struct IntervalTree<I, C>
+pub struct IntervalTree<I, C, T>
 where
-    I: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
     C: ChromBounds,
+    T: Clone,
 {
-    map: Map<I, C>,
+    map: Map<I, C, T>,
     is_sorted: bool,
+    phantom_t: PhantomData<T>,
 }
-impl<I, C> FromIterator<I> for IntervalTree<I, C>
+impl<I, C, T> FromIterator<I> for IntervalTree<I, C, T>
 where
-    I: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
     C: ChromBounds,
+    T: Clone,
 {
     fn from_iter<It: IntoIterator<Item = I>>(iter: It) -> Self {
         let mut map = Map::new();
@@ -29,42 +34,46 @@ where
         Self {
             map,
             is_sorted: false,
+            phantom_t: PhantomData,
         }
     }
 }
 
-impl<I, C> IntervalTree<I, C>
+impl<I, C, T> IntervalTree<I, C, T>
 where
-    I: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
     C: ChromBounds,
+    T: Clone,
 {
     #[must_use]
     pub fn new() -> Self {
         Self {
             map: Map::new(),
             is_sorted: false,
+            phantom_t: PhantomData,
         }
     }
 
     #[must_use]
-    pub fn from_map(map: Map<I, C>) -> Self {
+    pub fn from_map(map: Map<I, C, T>) -> Self {
         Self {
             map,
             is_sorted: false,
+            phantom_t: PhantomData,
         }
     }
 
     #[must_use]
-    pub fn map_owned(self) -> Map<I, C> {
+    pub fn map_owned(self) -> Map<I, C, T> {
         self.map
     }
 
     #[must_use]
-    pub fn map(&self) -> &Map<I, C> {
+    pub fn map(&self) -> &Map<I, C, T> {
         &self.map
     }
 
-    pub fn mut_map(&mut self) -> &mut Map<I, C> {
+    pub fn mut_map(&mut self) -> &mut Map<I, C, T> {
         &mut self.map
     }
 
@@ -89,17 +98,17 @@ where
     }
 
     /// Retrieve a specific subtree
-    pub fn subtree(&self, name: &C) -> Option<&Subtree<I, C>> {
+    pub fn subtree(&self, name: &C) -> Option<&Subtree<I, C, T>> {
         self.map.get(name)
     }
 
     /// Retrieve a mutable reference to a specific subtree
-    pub fn subtree_mut(&mut self, name: &C) -> Option<&mut Subtree<I, C>> {
+    pub fn subtree_mut(&mut self, name: &C) -> Option<&mut Subtree<I, C, T>> {
         self.map.get_mut(name)
     }
 
     /// Transfer ownership of a subtree
-    pub fn subtree_owned(&mut self, name: &C) -> Option<Subtree<I, C>> {
+    pub fn subtree_owned(&mut self, name: &C) -> Option<Subtree<I, C, T>> {
         self.map.remove(name)
     }
 
@@ -156,7 +165,7 @@ where
         }
     }
 
-    pub fn insert_subtree(&mut self, name: C, subtree: Subtree<I, C>) {
+    pub fn insert_subtree(&mut self, name: C, subtree: Subtree<I, C, T>) {
         self.map.insert(name, subtree);
     }
 
@@ -173,18 +182,18 @@ where
     /// Applies a mutable function to each subtree in the container
     pub fn apply_subtree_mut<F>(&mut self, f: F)
     where
-        F: Fn(&mut Subtree<I, C>),
+        F: Fn(&mut Subtree<I, C, T>),
     {
         for tree in self.map.values_mut() {
             f(tree);
         }
     }
 
-    pub fn values(&self) -> impl Iterator<Item = &Subtree<I, C>> {
+    pub fn values(&self) -> impl Iterator<Item = &Subtree<I, C, T>> {
         self.map.values()
     }
 
-    pub fn values_mut(&mut self) -> impl Iterator<Item = &mut Subtree<I, C>> {
+    pub fn values_mut(&mut self) -> impl Iterator<Item = &mut Subtree<I, C, T>> {
         self.map.values_mut()
     }
 

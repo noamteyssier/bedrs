@@ -26,27 +26,31 @@ use std::{collections::VecDeque, marker::PhantomData};
 /// let merged: Vec<_> = iter.collect();
 /// assert_eq!(merged.len(), 3);
 /// ```
-pub struct MergeIter<It, I, C>
+pub struct MergeIter<It, I, C, T>
 where
     It: Iterator<Item = I>,
-    I: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
     C: ChromBounds,
+    T: Clone,
 {
     iter: It,
     queue: VecDeque<I>,
     phantom_c: PhantomData<C>,
+    phantom_t: PhantomData<T>,
 }
-impl<It, I, C> MergeIter<It, I, C>
+impl<It, I, C, T> MergeIter<It, I, C, T>
 where
     It: Iterator<Item = I>,
-    I: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
     C: ChromBounds,
+    T: Clone,
 {
     pub fn new(iter: It) -> Self {
         Self {
             iter,
             queue: VecDeque::new(),
             phantom_c: PhantomData,
+            phantom_t: PhantomData,
         }
     }
     fn next_interval(&mut self) -> Option<I> {
@@ -60,11 +64,12 @@ where
         }
     }
 }
-impl<It, I, C> Iterator for MergeIter<It, I, C>
+impl<It, I, C, T> Iterator for MergeIter<It, I, C, T>
 where
     It: Iterator<Item = I>,
-    I: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
     C: ChromBounds,
+    T: Clone,
 {
     type Item = I;
     fn next(&mut self) -> Option<Self::Item> {

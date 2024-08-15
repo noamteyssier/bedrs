@@ -13,10 +13,11 @@ pub enum MergeCondition {
 }
 
 /// A trait to merge overlapping interval regions within a container
-impl<I, C> IntervalContainer<I, C>
+impl<I, C, T> IntervalContainer<I, C, T>
 where
-    I: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
     C: ChromBounds,
+    T: Clone,
 {
     pub fn merge(&self) -> Result<Self, SetError> {
         self.impl_merge(MergeCondition::Standard)
@@ -79,9 +80,9 @@ mod testing {
     use anyhow::Result;
     use std::fmt::Debug;
 
-    fn validate_set<C, I>(set: &IntervalContainer<I, C>, expected: &[I])
+    fn validate_set<C, I>(set: &IntervalContainer<I, C, T>, expected: &[I])
     where
-        I: IntervalBounds<C> + Debug,
+        I: IntervalBounds<C, T> + Debug,
         C: ChromBounds,
     {
         println!("\nExpected:");
