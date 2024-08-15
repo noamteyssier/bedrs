@@ -1,7 +1,6 @@
-use crate::{
-    traits::{ChromBounds, ValueBounds},
-    Coordinates, Overlap,
-};
+use crate::{traits::ChromBounds, Overlap};
+
+use super::GenericIntervalExt;
 
 /// Calculates the distance between two coordinates.
 ///
@@ -64,12 +63,12 @@ use crate::{
 /// let b = bed3![2, 10, 20];
 /// assert_eq!(a.distance(&b), None);
 /// ```
-pub trait Distance<C>: Coordinates<C> + Overlap<C>
+pub trait Distance<C, T>: GenericIntervalExt<C, T> + Overlap<C, T>
 where
     C: ChromBounds,
-    i32: ValueBounds,
+    T: Clone,
 {
-    fn distance<I: Coordinates<C>>(&self, other: &I) -> Option<i32> {
+    fn distance<I: GenericIntervalExt<C, T>>(&self, other: &I) -> Option<i32> {
         if self.overlaps(other) || self.borders(other) {
             Some(0)
         } else if self.chr() != other.chr() {
@@ -81,7 +80,7 @@ where
         }
     }
 
-    fn directed_distance<I: Coordinates<C>>(&self, other: &I) -> Option<i32> {
+    fn directed_distance<I: GenericIntervalExt<C, T>>(&self, other: &I) -> Option<i32> {
         if self.overlaps(other) || self.borders(other) {
             Some(0)
         } else if self.chr() != other.chr() {
@@ -97,7 +96,8 @@ where
 #[cfg(test)]
 #[allow(clippy::doc_markdown)]
 mod testing {
-    use crate::{bed3, traits::interval::Distance, BaseInterval};
+    use super::*;
+    use crate::prelude::*;
 
     #[test]
     ///    x-----y
