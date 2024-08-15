@@ -196,3 +196,11 @@ where
     T: Clone,
 {
 }
+
+impl<I, C, T> Segment<C, T> for I
+where
+    I: GenericIntervalExt<C, T>,
+    C: ChromBounds,
+    T: Clone,
+{
+}
