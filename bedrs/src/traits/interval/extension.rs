@@ -188,3 +188,11 @@ where
     T: Clone,
 {
 }
+
+impl<I, C, T> Subtract<C, T> for I
+where
+    I: GenericIntervalExt<C, T>,
+    C: ChromBounds,
+    T: Clone,
+{
+}
