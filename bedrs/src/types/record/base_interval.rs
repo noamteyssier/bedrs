@@ -1,7 +1,9 @@
-use crate::traits::Coordinates;
+use coitrees::GenericInterval;
 use derive_new::new;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
+
+use crate::GenericIntervalExt;
 
 /// A representation of a classic Interval.
 ///
@@ -23,7 +25,42 @@ pub struct BaseInterval {
     start: i32,
     end: i32,
 }
-impl Coordinates<i32> for BaseInterval {
+impl GenericInterval<()> for BaseInterval {
+    fn first(&self) -> i32 {
+        self.start
+    }
+    fn last(&self) -> i32 {
+        self.end
+    }
+    fn metadata(&self) -> &() {
+        &()
+    }
+}
+impl GenericInterval<()> for &BaseInterval {
+    fn first(&self) -> i32 {
+        self.start
+    }
+    fn last(&self) -> i32 {
+        self.end
+    }
+    fn metadata(&self) -> &() {
+        &()
+    }
+}
+
+impl GenericInterval<()> for &mut BaseInterval {
+    fn first(&self) -> i32 {
+        self.start
+    }
+    fn last(&self) -> i32 {
+        self.end
+    }
+    fn metadata(&self) -> &() {
+        &()
+    }
+}
+
+impl GenericIntervalExt<i32, ()> for BaseInterval {
     fn chr(&self) -> &i32 {
         &0
     }
@@ -45,11 +82,11 @@ impl Coordinates<i32> for BaseInterval {
     fn empty() -> Self {
         Self::default()
     }
-    fn from<Iv: Coordinates<i32>>(other: &Iv) -> Self {
+    fn from<Iv: GenericIntervalExt<i32, ()>>(other: &Iv) -> Self {
         Self::new(other.start(), other.end())
     }
 }
-impl Coordinates<i32> for &BaseInterval {
+impl GenericIntervalExt<i32, ()> for &BaseInterval {
     fn chr(&self) -> &i32 {
         &0
     }
@@ -71,11 +108,11 @@ impl Coordinates<i32> for &BaseInterval {
     fn empty() -> Self {
         unimplemented!("Cannot create a reference");
     }
-    fn from<Iv: Coordinates<i32>>(_other: &Iv) -> Self {
+    fn from<Iv: GenericIntervalExt<i32, ()>>(_other: &Iv) -> Self {
         unimplemented!("Cannot create a reference")
     }
 }
-impl Coordinates<i32> for &mut BaseInterval {
+impl GenericIntervalExt<i32, ()> for &mut BaseInterval {
     fn chr(&self) -> &i32 {
         &0
     }
@@ -97,14 +134,14 @@ impl Coordinates<i32> for &mut BaseInterval {
     fn empty() -> Self {
         unimplemented!("Cannot create a reference");
     }
-    fn from<Iv: Coordinates<i32>>(_other: &Iv) -> Self {
+    fn from<Iv: GenericIntervalExt<i32, ()>>(_other: &Iv) -> Self {
         unimplemented!("Cannot create a reference")
     }
 }
 
 #[cfg(test)]
 mod testing {
-    use crate::{traits::Coordinates, types::BaseInterval};
+    use super::*;
     #[cfg(feature = "serde")]
     use bincode::{deserialize, serialize};
     use std::cmp::Ordering;
@@ -159,7 +196,7 @@ mod testing {
     }
 
     #[allow(clippy::needless_pass_by_value)]
-    fn function_generic_reference<C: Coordinates<i32>>(iv: C) {
+    fn function_generic_reference<C: GenericIntervalExt<i32, ()>>(iv: C) {
         assert_eq!(*iv.chr(), 0);
         assert_eq!(iv.start(), 10);
         assert_eq!(iv.end(), 100);

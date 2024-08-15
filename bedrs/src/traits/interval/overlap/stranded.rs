@@ -1,9 +1,13 @@
-use crate::traits::{ChromBounds, Coordinates, Overlap};
+use crate::{
+    interval::GenericIntervalExt,
+    traits::{ChromBounds, Overlap},
+};
 
-pub trait StrandedOverlap<C>: Coordinates<C>
+pub trait StrandedOverlap<C, T>: GenericIntervalExt<C, T>
 where
     Self: Sized,
     C: ChromBounds,
+    T: Clone,
 {
     /// Returns true if the current interval overlaps the other
     /// and both intervals are on the same chromosome and strand.
@@ -22,7 +26,7 @@ where
     /// (Self)        <--------|
     /// (Other)   <--------|
     /// ```
-    fn stranded_overlaps<I: Coordinates<C>>(&self, other: &I) -> bool {
+    fn stranded_overlaps<I: GenericIntervalExt<C, V>, V: Clone>(&self, other: &I) -> bool {
         self.bounded_strand(other) && self.overlaps(other)
     }
 
@@ -43,19 +47,30 @@ where
     /// (Self)        <--------
     /// (Other)   <--------
     /// ```
-    fn stranded_overlaps_by<I: Coordinates<C>>(&self, other: &I, bases: i32) -> bool {
+    fn stranded_overlaps_by<I: GenericIntervalExt<C, V>, V: Clone>(
+        &self,
+        other: &I,
+        bases: i32,
+    ) -> bool {
         self.stranded_overlap_size(other)
             .map_or(false, |n| n >= bases)
     }
     /// Returns true if the current interval overlaps the other by exactly `bases`
     /// and both intervals are on the same chromosome and strand.
-    fn stranded_overlaps_by_exactly<I: Coordinates<C>>(&self, other: &I, bases: i32) -> bool {
+    fn stranded_overlaps_by_exactly<I: GenericIntervalExt<C, V>, V: Clone>(
+        &self,
+        other: &I,
+        bases: i32,
+    ) -> bool {
         self.stranded_overlap_size(other)
             .map_or(false, |n| n == bases)
     }
     /// Returns the size of the overlap between the current interval and the other
     /// if the intervals are on the same chromosome and strand.
-    fn stranded_overlap_size<I: Coordinates<C>>(&self, other: &I) -> Option<i32> {
+    fn stranded_overlap_size<I: GenericIntervalExt<C, V>, V: Clone>(
+        &self,
+        other: &I,
+    ) -> Option<i32> {
         if self.bounded_strand(other) {
             self.overlap_size(other)
         } else {
@@ -77,7 +92,7 @@ where
     /// assert!(interval1.stranded_starts(&interval2));
     /// assert!(!interval1.stranded_starts(&interval3));
     /// ```
-    fn stranded_starts<I: Coordinates<C>>(&self, other: &I) -> bool {
+    fn stranded_starts<I: GenericIntervalExt<C, V>, V: Clone>(&self, other: &I) -> bool {
         self.bounded_strand(other) && self.starts(other)
     }
 
@@ -96,7 +111,7 @@ where
     /// assert!(interval1.stranded_ends(&interval2));
     /// assert!(!interval1.stranded_ends(&interval3));
     /// ```
-    fn stranded_ends<I: Coordinates<C>>(&self, other: &I) -> bool {
+    fn stranded_ends<I: GenericIntervalExt<C, V>, V: Clone>(&self, other: &I) -> bool {
         self.bounded_strand(other) && self.ends(other)
     }
     /// Returns true if the current interval equals the other and they are on the same strand
@@ -114,7 +129,7 @@ where
     /// assert!(interval1.stranded_equals(&interval2));
     /// assert!(!interval1.stranded_equals(&interval3));
     /// ```
-    fn stranded_equals<I: Coordinates<C>>(&self, other: &I) -> bool {
+    fn stranded_equals<I: GenericIntervalExt<C, V>, V: Clone>(&self, other: &I) -> bool {
         self.bounded_strand(other) && self.equals(other)
     }
     /// Returns true if the current interval is during the other and
@@ -132,7 +147,7 @@ where
     /// assert!(interval1.stranded_during(&interval2));
     /// assert!(!interval1.stranded_during(&interval3));
     /// ```
-    fn stranded_during<I: Coordinates<C>>(&self, other: &I) -> bool {
+    fn stranded_during<I: GenericIntervalExt<C, V>, V: Clone>(&self, other: &I) -> bool {
         self.bounded_strand(other) && self.during(other)
     }
     /// Returns true if the current interval contains the other and
@@ -155,7 +170,7 @@ where
     /// assert!(interval1.stranded_contains(&interval2));
     /// assert!(!interval1.stranded_contains(&interval3));
     /// ```
-    fn stranded_contains<I: Coordinates<C>>(&self, other: &I) -> bool {
+    fn stranded_contains<I: GenericIntervalExt<C, V>, V: Clone>(&self, other: &I) -> bool {
         self.bounded_strand(other) && self.contains(other)
     }
     /// Returns true if the current interval is contained by the other and
@@ -182,7 +197,7 @@ where
     /// assert!(interval1.stranded_contained_by(&interval2));
     /// assert!(!interval1.stranded_contained_by(&interval3));
     /// ```
-    fn stranded_contained_by<I: Coordinates<C>>(&self, other: &I) -> bool {
+    fn stranded_contained_by<I: GenericIntervalExt<C, V>, V: Clone>(&self, other: &I) -> bool {
         other.stranded_contains(self)
     }
 
@@ -210,7 +225,7 @@ where
     /// assert!(interval1.stranded_borders(&interval2));
     /// assert!(!interval1.stranded_borders(&interval3));
     /// ```
-    fn stranded_borders<I: Coordinates<C>>(&self, other: &I) -> bool {
+    fn stranded_borders<I: GenericIntervalExt<C, V>, V: Clone>(&self, other: &I) -> bool {
         self.bounded_strand(other) && self.borders(other)
     }
 }

@@ -1,13 +1,15 @@
-mod coordinates;
-mod distance;
-mod intersect;
+// mod coordinates;
+// mod distance;
+// mod intersect;
+mod extension;
 mod overlap;
-mod segment;
-mod subtract;
+// mod segment;
+// mod subtract;
 
-pub use coordinates::Coordinates;
-pub use distance::Distance;
-pub use intersect::Intersect;
+// pub use coordinates::Coordinates;
+// pub use distance::Distance;
+// pub use intersect::Intersect;
+pub use extension::GenericIntervalExt;
 pub use overlap::{Overlap, StrandedOverlap, UnstrandedOverlap};
-pub use segment::Segment;
-pub use subtract::Subtract;
+// pub use segment::Segment;
+// pub use subtract::Subtract;

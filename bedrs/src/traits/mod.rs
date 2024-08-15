@@ -3,11 +3,9 @@ use std::{fmt::Debug, hash::Hash};
 
 pub mod errors;
 pub mod interval;
+
 pub use errors::SetError;
-pub use interval::{
-    Coordinates, Distance, Intersect, Overlap, Segment, StrandedOverlap, Subtract,
-    UnstrandedOverlap,
-};
+pub use interval::*;
 
 /// Generic bounds for types to be used for [Coordinates] in the context
 /// of Chromosome coordinates
@@ -37,15 +35,17 @@ where
 }
 impl<T> MetaBounds for T where T: Clone + Default + Debug + Send + Sync {}
 
-pub trait IntervalBounds<C>
+pub trait IntervalBounds<C, T>
 where
-    Self: Coordinates<C> + Clone + Overlap<C> + Send + Sync,
+    Self: GenericIntervalExt<C, T> + Clone + Overlap<C, T> + Send + Sync,
     C: ChromBounds,
+    T: Clone,
 {
 }
-impl<I, C> IntervalBounds<C> for I
+impl<I, C, T> IntervalBounds<C, T> for I
 where
-    I: Coordinates<C> + Clone + Overlap<C> + Send + Sync,
+    I: GenericIntervalExt<C, T> + Clone + Overlap<C, T> + Send + Sync,
     C: ChromBounds,
+    T: Clone,
 {
 }

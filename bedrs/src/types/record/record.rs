@@ -1,5 +1,5 @@
 use super::Features;
-use crate::{traits::ChromBounds, types::meta::RecordMetadata, Coordinates};
+use crate::{traits::ChromBounds, types::meta::RecordMetadata, GenericIntervalExt};
 use coitrees::GenericInterval;
 use derive_new::new;
 #[cfg(feature = "serde")]
@@ -34,12 +34,53 @@ where
     fn metadata(&self) -> &M {
         &self.metadata
     }
+    fn len(&self) -> i32 {
+        self.last() - self.first()
+    }
 }
 
-impl<C, M> Coordinates<C> for Record<C, M>
+impl<C, M> GenericInterval<M> for &Record<C, M>
 where
     C: ChromBounds,
     M: RecordMetadata,
+{
+    fn first(&self) -> i32 {
+        self.features.start()
+    }
+    fn last(&self) -> i32 {
+        self.features.end()
+    }
+    fn metadata(&self) -> &M {
+        &self.metadata
+    }
+    fn len(&self) -> i32 {
+        self.last() - self.first()
+    }
+}
+
+impl<C, M> GenericInterval<M> for &mut Record<C, M>
+where
+    C: ChromBounds,
+    M: RecordMetadata,
+{
+    fn first(&self) -> i32 {
+        self.features.start()
+    }
+    fn last(&self) -> i32 {
+        self.features.end()
+    }
+    fn metadata(&self) -> &M {
+        &self.metadata
+    }
+    fn len(&self) -> i32 {
+        self.last() - self.first()
+    }
+}
+
+impl<C, T> GenericIntervalExt<C, T> for Record<C, T>
+where
+    C: ChromBounds,
+    T: RecordMetadata,
 {
     fn chr(&self) -> &C {
         self.features.chr()
@@ -62,56 +103,16 @@ where
     fn update_end(&mut self, val: &i32) {
         self.features.update_end(val);
     }
-    fn update_strand(&mut self, strand: Option<crate::Strand>) {
-        self.metadata.update_strand(strand);
+    fn update_strand(&mut self, val: Option<crate::Strand>) {
+        self.metadata.update_strand(val);
     }
-    fn from<Iv: Coordinates<C>>(iv: &Iv) -> Self {
-        let mut new = Self::default();
-        new.update_chr(iv.chr());
-        new.update_start(&iv.start());
-        new.update_end(&iv.end());
-        new.update_strand(iv.strand());
-        new
+    fn from<Iv: GenericIntervalExt<C, T>>(other: &Iv) -> Self {
+        let features = Features::new(other.chr().clone(), other.start(), other.end());
+        let metadata = other.metadata().clone();
+        Self { features, metadata }
     }
     fn empty() -> Self {
         Self::default()
-    }
-}
-
-impl<'a, C, M> Coordinates<C> for &'a Record<C, M>
-where
-    C: ChromBounds,
-    M: RecordMetadata,
-{
-    fn chr(&self) -> &C {
-        self.features.chr()
-    }
-    fn start(&self) -> i32 {
-        self.features.start()
-    }
-    fn end(&self) -> i32 {
-        self.features.end()
-    }
-    fn strand(&self) -> Option<crate::Strand> {
-        self.metadata.strand()
-    }
-    fn update_chr(&mut self, _: &C) {
-        unimplemented!()
-    }
-    fn update_start(&mut self, _: &i32) {
-        unimplemented!()
-    }
-    fn update_end(&mut self, _: &i32) {
-        unimplemented!()
-    }
-    fn update_strand(&mut self, _: Option<crate::Strand>) {
-        unimplemented!()
-    }
-    fn from<Iv: Coordinates<C>>(_: &Iv) -> Self {
-        unimplemented!()
-    }
-    fn empty() -> Self {
-        unimplemented!()
     }
 }
 

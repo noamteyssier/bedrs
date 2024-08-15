@@ -33,11 +33,13 @@ impl Query {
     }
     /// Determine whether a query interval overlaps a target interval
     /// using a specific overlap method
-    pub fn predicate<I, Iv, C>(&self, target: &I, query: &Iv) -> bool
+    pub fn predicate<I, Iv, C, T, V>(&self, target: &I, query: &Iv) -> bool
     where
-        I: IntervalBounds<C>,
-        Iv: IntervalBounds<C>,
+        I: IntervalBounds<C, T>,
+        Iv: IntervalBounds<C, V>,
         C: ChromBounds,
+        T: Clone,
+        V: Clone,
     {
         match self.strandedness {
             StrandMethod::Ignore => self.ignored_strand(target, query),
@@ -45,11 +47,13 @@ impl Query {
             StrandMethod::OppositeStrand => self.unbounded_strand(target, query),
         }
     }
-    fn ignored_strand<I, Iv, C>(&self, target: &I, query: &Iv) -> bool
+    fn ignored_strand<I, Iv, C, T, V>(&self, target: &I, query: &Iv) -> bool
     where
-        I: IntervalBounds<C>,
-        Iv: IntervalBounds<C>,
+        I: IntervalBounds<C, T>,
+        Iv: IntervalBounds<C, V>,
         C: ChromBounds,
+        T: Clone,
+        V: Clone,
     {
         match self.predicate {
             QueryMethod::Compare => target.overlaps(query),
@@ -83,11 +87,13 @@ impl Query {
             }
         }
     }
-    fn bounded_strand<I, Iv, C>(&self, target: &I, query: &Iv) -> bool
+    fn bounded_strand<I, Iv, C, T, V>(&self, target: &I, query: &Iv) -> bool
     where
-        I: IntervalBounds<C>,
-        Iv: IntervalBounds<C>,
+        I: IntervalBounds<C, T>,
+        Iv: IntervalBounds<C, V>,
         C: ChromBounds,
+        T: Clone,
+        V: Clone,
     {
         match self.predicate {
             QueryMethod::Compare => target.stranded_overlaps(query),
@@ -121,11 +127,13 @@ impl Query {
             }
         }
     }
-    fn unbounded_strand<I, Iv, C>(&self, target: &I, query: &Iv) -> bool
+    fn unbounded_strand<I, Iv, C, T, V>(&self, target: &I, query: &Iv) -> bool
     where
-        I: IntervalBounds<C>,
-        Iv: IntervalBounds<C>,
+        I: IntervalBounds<C, T>,
+        Iv: IntervalBounds<C, V>,
         C: ChromBounds,
+        T: Clone,
+        V: Clone,
     {
         match self.predicate {
             QueryMethod::Compare => target.unstranded_overlaps(query),
