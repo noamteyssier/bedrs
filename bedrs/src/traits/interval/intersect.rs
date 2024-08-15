@@ -1,11 +1,13 @@
-use crate::{traits::ChromBounds, Coordinates, Overlap};
+use super::GenericIntervalExt;
+use crate::{traits::ChromBounds, Overlap};
 
 /// Calculates the intersection between two coordinates.
-pub trait Intersect<C>: Coordinates<C> + Overlap<C>
+pub trait Intersect<C, T>: GenericIntervalExt<C, T> + Overlap<C, T>
 where
     C: ChromBounds,
+    T: Clone,
 {
-    fn build_intersection_interval<I: Coordinates<C>>(&self, other: &I) -> I {
+    fn build_intersection_interval<I: GenericIntervalExt<C, T>>(&self, other: &I) -> I {
         let chr = self.chr();
         let start = self.start().max(other.start());
         let end = self.end().min(other.end());
@@ -26,7 +28,7 @@ where
     /// assert_eq!(ix.start(), 15);
     /// assert_eq!(ix.end(), 20);
     /// ```
-    fn intersect<I: Coordinates<C>>(&self, other: &I) -> Option<I> {
+    fn intersect<I: GenericIntervalExt<C, T>>(&self, other: &I) -> Option<I> {
         if self.overlaps(other) {
             let ix = self.build_intersection_interval(other);
             Some(ix)
@@ -52,7 +54,7 @@ where
     ///
     /// assert!(a.stranded_intersect(&c).is_none());
     /// ```
-    fn stranded_intersect<I: Coordinates<C>>(&self, other: &I) -> Option<I> {
+    fn stranded_intersect<I: GenericIntervalExt<C, T>>(&self, other: &I) -> Option<I> {
         if self.stranded_overlaps(other) {
             let ix = self.build_intersection_interval(other);
             Some(ix)
@@ -65,8 +67,7 @@ where
 #[cfg(test)]
 #[allow(clippy::many_single_char_names)]
 mod testing {
-    use super::Intersect;
-    use crate::{bed3, BaseInterval, Coordinates, Strand};
+    use crate::prelude::*;
 
     #[test]
     ///       x-------y

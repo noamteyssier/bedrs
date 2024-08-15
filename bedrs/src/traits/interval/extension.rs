@@ -2,7 +2,7 @@ use crate::{traits::ChromBounds, Strand};
 use coitrees::GenericInterval;
 use std::cmp::Ordering;
 
-use super::{Distance, Overlap, StrandedOverlap, UnstrandedOverlap};
+use super::*;
 
 pub trait GenericIntervalExt<C, T>: GenericInterval<T>
 where
@@ -174,6 +174,14 @@ where
 }
 
 impl<I, C, T> Distance<C, T> for I
+where
+    I: GenericIntervalExt<C, T>,
+    C: ChromBounds,
+    T: Clone,
+{
+}
+
+impl<I, C, T> Intersect<C, T> for I
 where
     I: GenericIntervalExt<C, T>,
     C: ChromBounds,
