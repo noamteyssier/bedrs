@@ -9,9 +9,9 @@ use rand::{
 use rand_chacha::ChaChaRng;
 
 /// Utility functions for random sampling within a container.
-impl<I, C> IntervalContainer<I, C>
+impl<I, C, T> IntervalContainer<I, C, T>
 where
-    I: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
     C: ChromBounds,
 {
     /// Shuffles the elements of the container in place using the given random number generator.

@@ -6,9 +6,9 @@ use crate::{
 use anyhow::Result;
 
 /// A trait to query set overlaps through a container
-impl<I, C> IntervalContainer<I, C>
+impl<I, C, T> IntervalContainer<I, C, T>
 where
-    I: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
     C: ChromBounds,
 {
     /// Find all intervals that overlap a query interval
@@ -21,7 +21,7 @@ where
         method: Query,
     ) -> Result<FindIter<'_, C, I, Iv>, SetError>
     where
-        Iv: IntervalBounds<C>,
+        Iv: IntervalBounds<C, T>,
     {
         if self.is_sorted() {
             method.validate()?;
@@ -51,7 +51,7 @@ where
         method: Query,
     ) -> Result<FindIterEnumerate<'_, C, I, Iv>, SetError>
     where
-        Iv: IntervalBounds<C>,
+        Iv: IntervalBounds<C, T>,
     {
         if self.is_sorted() {
             method.validate()?;
@@ -79,7 +79,7 @@ where
         method: Query,
     ) -> Result<FindIterOwned<'_, C, I, Iv>, SetError>
     where
-        Iv: IntervalBounds<C>,
+        Iv: IntervalBounds<C, T>,
     {
         if self.is_sorted() {
             if let Some(subtree) = self.subtree(query.chr()) {
@@ -101,9 +101,9 @@ where
         &'a self,
         query: &'a Iv,
         method: Query,
-    ) -> Result<IntervalContainer<I, C>, SetError>
+    ) -> Result<IntervalContainer<I, C, T>, SetError>
     where
-        Iv: IntervalBounds<C>,
+        Iv: IntervalBounds<C, T>,
     {
         self.query_iter(query, method)
             .map(|iter| iter.cloned().collect())
@@ -122,9 +122,9 @@ mod testing {
         BaseInterval, Coordinates, IntervalContainer, Strand,
     };
 
-    fn validate_set<C, I>(set: &IntervalContainer<I, C>, expected: &[I])
+    fn validate_set<C, I>(set: &IntervalContainer<I, C, T>, expected: &[I])
     where
-        I: IntervalBounds<C>,
+        I: IntervalBounds<C, T>,
         C: ChromBounds,
     {
         for idx in 0..expected.len() {
@@ -134,9 +134,9 @@ mod testing {
         }
     }
 
-    fn validate_iter<I, C>(iter: impl Iterator<Item = I>, expected: &[I])
+    fn validate_iter<I, C, T>(iter: impl Iterator<Item = I>, expected: &[I])
     where
-        I: IntervalBounds<C>,
+        I: IntervalBounds<C, T>,
         C: ChromBounds,
         i32: ValueBounds,
     {

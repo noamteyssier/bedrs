@@ -4,9 +4,9 @@ use crate::{
     Intersect, IntervalContainer,
 };
 
-impl<'a, I, C> IntervalContainer<I, C>
+impl<'a, I, C> IntervalContainer<I, C, T>
 where
-    I: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
     C: ChromBounds,
 {
     /// Find the intersection of two sets of intervals.
@@ -24,7 +24,7 @@ where
         method: Query,
     ) -> Box<dyn Iterator<Item = Iv> + 'a>
     where
-        Iv: IntervalBounds<C> + 'a,
+        Iv: IntervalBounds<C, T> + 'a,
         &'a Iv: Intersect<C>,
     {
         let ix_iter = self.iter().flat_map(move |iv| {
@@ -55,7 +55,7 @@ where
         method: Query,
     ) -> Box<dyn Iterator<Item = I> + 'a>
     where
-        Iv: IntervalBounds<C> + 'a,
+        Iv: IntervalBounds<C, T> + 'a,
     {
         let ix_iter = self.iter().flat_map(move |iv| {
             let overlaps = other

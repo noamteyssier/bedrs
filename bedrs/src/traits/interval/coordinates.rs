@@ -119,7 +119,7 @@ where
 
     /// Update the start coordinate of the interval.
     ///
-    ///     
+    ///
     /// # Examples
     ///
     /// ```

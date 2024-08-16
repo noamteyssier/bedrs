@@ -4,9 +4,9 @@ use crate::{
     IntervalContainer,
 };
 
-impl<I, C> IntervalContainer<I, C>
+impl<I, C, T> IntervalContainer<I, C, T>
 where
-    I: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
     C: ChromBounds,
 {
     fn grow_cluster(span: &mut I, iv: &I, endpoints: &mut Vec<i32>, n_iv: &mut usize) {

@@ -5,9 +5,9 @@ use crate::{
 };
 
 /// Performs interval subtraction at the set level.
-impl<I, C> IntervalContainer<I, C>
+impl<I, C, T> IntervalContainer<I, C, T>
 where
-    I: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
     C: ChromBounds,
 {
     /// Subtract a query interval from the set.
@@ -43,7 +43,7 @@ where
     /// ```
     pub fn subtract<'a, Iv>(&'a self, query: &'a Iv) -> Result<SubtractIter<I, Iv, C>, SetError>
     where
-        Iv: IntervalBounds<C>,
+        Iv: IntervalBounds<C, T>,
     {
         if self.is_sorted() {
             Ok(self.subtract_unchecked(query))
@@ -57,7 +57,7 @@ where
     /// Does not check if the container is sorted
     pub fn subtract_unchecked<'a, Iv>(&'a self, query: &'a Iv) -> SubtractIter<I, Iv, C>
     where
-        Iv: IntervalBounds<C>,
+        Iv: IntervalBounds<C, T>,
     {
         SubtractIter::new(self.subtree(query.chr()), query)
     }
@@ -98,7 +98,7 @@ where
         query: &'a Iv,
     ) -> Result<SubtractFromIter<I, Iv, C>, SetError>
     where
-        Iv: IntervalBounds<C>,
+        Iv: IntervalBounds<C, T>,
     {
         if self.is_sorted() {
             Ok(self.subtract_from_unchecked(query))
@@ -112,7 +112,7 @@ where
     /// Does not check if the container is sorted
     pub fn subtract_from_unchecked<'a, Iv>(&'a self, query: &'a Iv) -> SubtractFromIter<I, Iv, C>
     where
-        Iv: IntervalBounds<C>,
+        Iv: IntervalBounds<C, T>,
     {
         SubtractFromIter::new(self, query)
     }

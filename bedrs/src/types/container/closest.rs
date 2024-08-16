@@ -5,15 +5,16 @@ use crate::{
 };
 use anyhow::Result;
 
-impl<I, C> IntervalContainer<I, C>
+impl<I, C, T> IntervalContainer<I, C, T>
 where
-    I: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
     C: ChromBounds,
+    T: Clone,
 {
     /// Returns the closest interval to the query interval.
     pub fn closest<Iv>(&self, query: &Iv, method: StrandMethod) -> Result<Option<&I>, SetError>
     where
-        Iv: IntervalBounds<C>,
+        Iv: IntervalBounds<C, T>,
     {
         if let Some(subtree) = self.subtree(query.chr()) {
             subtree.closest(query, method)
@@ -31,7 +32,7 @@ where
         method: StrandMethod,
     ) -> Result<Option<&I>, SetError>
     where
-        Iv: IntervalBounds<C>,
+        Iv: IntervalBounds<C, T>,
     {
         if let Some(subtree) = self.subtree(query.chr()) {
             subtree.closest_upstream(query, method)
@@ -49,7 +50,7 @@ where
         method: StrandMethod,
     ) -> Result<Option<&I>, SetError>
     where
-        Iv: IntervalBounds<C>,
+        Iv: IntervalBounds<C, T>,
     {
         if let Some(subtree) = self.subtree(query.chr()) {
             subtree.closest_downstream(query, method)
@@ -463,7 +464,7 @@ mod testing {
     /// |--->            |---->
     ///         <---|
     /// =====================================
-    /// |--->            
+    /// |--->
     fn closest_downstream_reverse_strand_a() {
         let set = IntervalContainer::from_unsorted(vec![
             bed3![1, 10, 20, Strand::Forward],

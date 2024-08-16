@@ -6,7 +6,7 @@ use crate::{
     IntervalContainer,
 };
 
-type ComplementIterOwned<I, C> = ComplementIter<IntervalIterOwned<I, C>, I, C>;
+type ComplementIterOwned<I, C, T> = ComplementIter<IntervalIterOwned<I, C, T>, I, C>;
 
 /// A trait for interval containers that generates an iterator over the
 /// complement of the intervals in the container.
@@ -44,12 +44,12 @@ type ComplementIterOwned<I, C> = ComplementIter<IntervalIterOwned<I, C>, I, C>;
 ///    assert!(obs.eq(exp));
 /// }
 /// ```
-impl<I, C> IntervalContainer<I, C>
+impl<I, C, T> IntervalContainer<I, C, T>
 where
-    I: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
     C: ChromBounds,
 {
-    pub fn complement(self) -> Result<ComplementIterOwned<I, C>> {
+    pub fn complement(self) -> Result<ComplementIterOwned<I, C, T>> {
         if self.is_sorted() {
             Ok(self.complement_unchecked())
         } else {
@@ -58,7 +58,7 @@ where
     }
 
     #[must_use]
-    pub fn complement_unchecked(self) -> ComplementIterOwned<I, C> {
+    pub fn complement_unchecked(self) -> ComplementIterOwned<I, C, T> {
         ComplementIter::new(self.into_iter())
     }
 }
@@ -71,9 +71,9 @@ mod testing {
         BaseInterval, IntervalContainer,
     };
 
-    fn validate_records<I, C>(obs: &[I], exp: &[I])
+    fn validate_records<I, C, T>(obs: &[I], exp: &[I])
     where
-        I: IntervalBounds<C>,
+        I: IntervalBounds<C, T>,
         C: ChromBounds,
     {
         assert_eq!(obs.len(), exp.len());

@@ -6,9 +6,9 @@ use crate::{
 use anyhow::{bail, Result};
 
 /// Identifies al non-overlapping intervals within the span of the interval set
-impl<I, C> IntervalContainer<I, C>
+impl<I, C, T> IntervalContainer<I, C, T>
 where
-    I: IntervalBounds<C>,
+    I: IntervalBounds<C, T>,
     C: ChromBounds,
 {
     /// Returns all non-overlapping intervals of the interval
