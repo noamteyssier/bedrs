@@ -10,6 +10,7 @@ impl<I, C, T> IntervalContainer<I, C, T>
 where
     I: IntervalBounds<C, T>,
     C: ChromBounds,
+    T: Clone,
 {
     /// Find all intervals that overlap a query interval
     /// and return an iterator over the intervals.
@@ -19,7 +20,7 @@ where
         &'a self,
         query: &'a Iv,
         method: Query,
-    ) -> Result<FindIter<'_, C, I, Iv>, SetError>
+    ) -> Result<FindIter<'_, C, T, I, Iv>, SetError>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -49,7 +50,7 @@ where
         &'a self,
         query: &'a Iv,
         method: Query,
-    ) -> Result<FindIterEnumerate<'_, C, I, Iv>, SetError>
+    ) -> Result<FindIterEnumerate<'_, C, T, I, Iv>, SetError>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -77,7 +78,7 @@ where
         &self,
         query: Iv,
         method: Query,
-    ) -> Result<FindIterOwned<'_, C, I, Iv>, SetError>
+    ) -> Result<FindIterOwned<'_, C, T, I, Iv>, SetError>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -115,17 +116,13 @@ where
 mod testing {
     use anyhow::Result;
 
-    use crate::{
-        bed3,
-        traits::{ChromBounds, IntervalBounds, ValueBounds},
-        types::{Query, QueryMethod, StrandMethod},
-        BaseInterval, Coordinates, IntervalContainer, Strand,
-    };
+    use crate::*;
 
-    fn validate_set<C, I>(set: &IntervalContainer<I, C, T>, expected: &[I])
+    fn validate_set<I, C, T>(set: &IntervalContainer<I, C, T>, expected: &[I])
     where
         I: IntervalBounds<C, T>,
         C: ChromBounds,
+        T: Clone,
     {
         for idx in 0..expected.len() {
             let c1 = &set.to_vec()[idx];
@@ -138,7 +135,7 @@ mod testing {
     where
         I: IntervalBounds<C, T>,
         C: ChromBounds,
-        i32: ValueBounds,
+        T: Clone,
     {
         let observed = iter.collect::<Vec<I>>();
         for idx in 0..expected.len() {
