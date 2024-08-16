@@ -65,9 +65,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::{
-        bed3, types::StrandMethod, BaseInterval, Bed3, Coordinates, IntervalContainer, Strand,
-    };
+    use crate::*;
 
     #[test]
     fn closest_unsorted() {
