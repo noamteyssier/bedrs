@@ -6,7 +6,7 @@ use crate::{
     IntervalContainer,
 };
 
-type ComplementIterOwned<I, C, T> = ComplementIter<IntervalIterOwned<I, C, T>, I, C>;
+type ComplementIterOwned<I, C, T> = ComplementIter<IntervalIterOwned<I, C, T>, I, C, T>;
 
 /// A trait for interval containers that generates an iterator over the
 /// complement of the intervals in the container.
@@ -48,6 +48,7 @@ impl<I, C, T> IntervalContainer<I, C, T>
 where
     I: IntervalBounds<C, T>,
     C: ChromBounds,
+    T: Clone,
 {
     pub fn complement(self) -> Result<ComplementIterOwned<I, C, T>> {
         if self.is_sorted() {
@@ -65,16 +66,13 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::{
-        bed3,
-        traits::{ChromBounds, IntervalBounds},
-        BaseInterval, IntervalContainer,
-    };
+    use crate::*;
 
     fn validate_records<I, C, T>(obs: &[I], exp: &[I])
     where
         I: IntervalBounds<C, T>,
         C: ChromBounds,
+        T: Clone,
     {
         assert_eq!(obs.len(), exp.len());
         for (obs, exp) in obs.iter().zip(exp.iter()) {
