@@ -2,7 +2,7 @@ mod closest;
 mod coitree_container;
 mod complement;
 mod find;
-// mod internal;
+mod internal;
 mod interval_container;
 mod merge;
 // mod sample;

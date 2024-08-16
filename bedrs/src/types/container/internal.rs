@@ -10,6 +10,7 @@ impl<I, C, T> IntervalContainer<I, C, T>
 where
     I: IntervalBounds<C, T>,
     C: ChromBounds,
+    T: Clone,
 {
     /// Returns all non-overlapping intervals of the interval
     /// set within its span
@@ -23,7 +24,7 @@ where
     /// (i)          j---k
     /// (ii)                  l--m
     /// ```
-    pub fn internal(&self, name: &C) -> Result<SubtractFromIter<I, I, C>> {
+    pub fn internal(&self, name: &C) -> Result<SubtractFromIter<I, I, C, T>> {
         let Some(subtree) = self.subtree(name) else {
             bail!(SetError::MissingSubtreeName)
         };
@@ -38,7 +39,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::{BaseInterval, Coordinates, IntervalContainer};
+    use crate::*;
 
     #[test]
     fn internal_unsorted() {
@@ -59,7 +60,7 @@ mod testing {
         let set =
             IntervalContainer::from_sorted(vec![BaseInterval::new(1, 3), BaseInterval::new(6, 10)])
                 .unwrap();
-        let internal_set: IntervalContainer<_, _> = set.internal(&0).unwrap().collect();
+        let internal_set: IntervalContainer<_, _, _> = set.internal(&0).unwrap().collect();
         assert_eq!(internal_set.len(), 1);
         let subtree = internal_set.subtree(&0).unwrap();
         assert_eq!(subtree[0].start(), 3);
@@ -80,7 +81,7 @@ mod testing {
             BaseInterval::new(12, 15),
         ])
         .unwrap();
-        let internal_set: IntervalContainer<_, _> = set.internal(&0).unwrap().collect();
+        let internal_set: IntervalContainer<_, _, _> = set.internal(&0).unwrap().collect();
         assert_eq!(internal_set.len(), 2);
         let subtree = internal_set.subtree(&0).unwrap();
         assert_eq!(subtree[0].start(), 3);
