@@ -217,8 +217,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use super::*;
-    use crate::{bed3, types::StrandMethod, BaseInterval, Bed3, Coordinates, Strand};
+    use crate::*;
 
     #[test]
     fn closest_unsorted() {

@@ -163,8 +163,7 @@ where
 #[cfg(test)]
 mod testing {
 
-    use super::*;
-    use crate::{bed3, Bed3};
+    use crate::*;
 
     fn validate_segments(observed: &[Bed3<i32>], expected: &[Bed3<i32>]) {
         assert_eq!(observed.len(), expected.len());

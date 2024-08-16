@@ -72,18 +72,15 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::{
-        bed3,
-        traits::{ChromBounds, IntervalBounds, SetError},
-        BaseInterval, Coordinates, IntervalContainer, Strand,
-    };
+    use crate::*;
     use anyhow::Result;
     use std::fmt::Debug;
 
-    fn validate_set<C, I>(set: &IntervalContainer<I, C, T>, expected: &[I])
+    fn validate_set<I, C, T>(set: &IntervalContainer<I, C, T>, expected: &[I])
     where
         I: IntervalBounds<C, T> + Debug,
         C: ChromBounds,
+        T: Clone,
     {
         println!("\nExpected:");
         for iv in expected {

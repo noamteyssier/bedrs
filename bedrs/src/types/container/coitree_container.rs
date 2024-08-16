@@ -89,8 +89,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use super::*;
-    use crate::prelude::*;
+    use crate::*;
     use anyhow::bail;
     use coitrees::GenericInterval;
     use std::io::{Cursor, Write};

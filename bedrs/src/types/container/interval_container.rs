@@ -250,8 +250,7 @@ where
 #[cfg(test)]
 mod testing {
 
-    use super::*;
-    use crate::{bed3, BaseInterval, Bed3, Coordinates, Strand};
+    use crate::*;
 
     // --------------------- //
     // Base BaseInterval Testing //

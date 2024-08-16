@@ -213,7 +213,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::prelude::*;
+    use crate::*;
 
     #[test]
     ///      x-------y

@@ -90,8 +90,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use super::*;
-    use crate::{bed3, BaseInterval, Bed3, Coordinates};
+    use crate::*;
 
     #[test]
     fn merge_iter_base() {
@@ -129,7 +128,7 @@ mod testing {
         let result: Vec<Bed3<u32>> = merge_iter.collect();
         assert_eq!(result.len(), expected.len());
         for (res, exp) in result.iter().zip(expected.iter()) {
-            assert!(Coordinates::eq(res, exp));
+            assert!(GenericIntervalExt::eq(res, exp));
         }
     }
 }

@@ -74,12 +74,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use super::ComplementIter;
-    use crate::{
-        bed3,
-        traits::{ChromBounds, IntervalBounds},
-        BaseInterval,
-    };
+    use crate::*;
 
     fn validate_records<I, C, T>(obs: &[I], exp: &[I])
     where

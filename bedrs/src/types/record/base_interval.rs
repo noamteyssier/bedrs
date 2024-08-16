@@ -35,6 +35,9 @@ impl GenericInterval<()> for BaseInterval {
     fn metadata(&self) -> &() {
         &()
     }
+    fn len(&self) -> i32 {
+        self.end - self.start
+    }
 }
 impl GenericInterval<()> for &BaseInterval {
     fn first(&self) -> i32 {
@@ -45,6 +48,9 @@ impl GenericInterval<()> for &BaseInterval {
     }
     fn metadata(&self) -> &() {
         &()
+    }
+    fn len(&self) -> i32 {
+        self.end - self.start
     }
 }
 
@@ -57,6 +63,9 @@ impl GenericInterval<()> for &mut BaseInterval {
     }
     fn metadata(&self) -> &() {
         &()
+    }
+    fn len(&self) -> i32 {
+        self.end - self.start
     }
 }
 

@@ -163,13 +163,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use super::IntersectIter;
-    use crate::{
-        bed3,
-        traits::{ChromBounds, IntervalBounds},
-        types::{Query, QueryMethod, StrandMethod},
-        BaseInterval,
-    };
+    use crate::*;
 
     fn validate_records<I, C, T>(obs: &[I], exp: &[I])
     where

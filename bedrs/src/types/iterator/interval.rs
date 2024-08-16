@@ -183,7 +183,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::{BaseInterval, Coordinates, IntervalContainer};
+    use crate::*;
 
     #[test]
     fn iterator_owned() {

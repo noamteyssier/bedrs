@@ -163,13 +163,3 @@ pub mod types;
 /// Prelude for the library
 pub mod prelude;
 pub use prelude::*;
-
-// pub use traits::{
-//     Coordinates, Distance, Intersect, Overlap, Segment, StrandedOverlap, Subtract,
-//     UnstrandedOverlap,
-// };
-// pub use types::{
-//     BaseInterval, Bed12, Bed3, Bed4, Bed6, BedGraph, Features, Frame, Gtf, IntersectIter,
-//     IntervalContainer, IntervalIterOwned, IntervalIterRef, MergeIter, MetaInterval, Record,
-//     RecordMetadata, Score, Strand, StrandedBed3, Subtree,
-// };

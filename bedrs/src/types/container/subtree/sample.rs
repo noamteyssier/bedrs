@@ -237,9 +237,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::{BaseInterval, Coordinates};
-
-    use super::*;
+    use crate::*;
 
     #[test]
     fn shuffle_rng() {

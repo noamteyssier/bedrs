@@ -96,8 +96,7 @@ where
 #[cfg(test)]
 #[allow(clippy::doc_markdown)]
 mod testing {
-    use super::*;
-    use crate::prelude::*;
+    use crate::*;
 
     #[test]
     ///    x-----y

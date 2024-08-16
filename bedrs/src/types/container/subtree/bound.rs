@@ -473,8 +473,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use super::*;
-    use crate::{bed3, traits::errors::SetError, types::StrandMethod, BaseInterval, Strand};
+    use crate::*;
 
     #[test]
     fn bsearch_base_low() {
