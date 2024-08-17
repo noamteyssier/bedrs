@@ -8,6 +8,7 @@ impl<I, C, T> IntervalContainer<I, C, T>
 where
     I: IntervalBounds<C, T>,
     C: ChromBounds,
+    T: Clone,
 {
     fn grow_cluster(span: &mut I, iv: &I, endpoints: &mut Vec<i32>, n_iv: &mut usize) {
         // Update the span
@@ -128,8 +129,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use super::*;
-    use crate::{bed3, Bed3, Coordinates, Overlap};
+    use crate::*;
 
     fn validate_segments(observed: &[Bed3<i32>], expected: &[Bed3<i32>]) {
         println!("Expected:");
