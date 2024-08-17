@@ -498,7 +498,7 @@ mod testing {
     use coitrees::GenericInterval;
 
     use super::*;
-    use crate::{bed3, types::BaseInterval, Strand};
+    use crate::{bed3, bed4, types::BaseInterval, Strand};
 
     #[test]
     fn test_overlap_self() {
@@ -829,5 +829,15 @@ mod testing {
         assert!(a.bounded_strand(&b));
         assert!(a.bounded_strand(&c));
         assert!(c.bounded_strand(&a));
+    }
+
+    #[test]
+    fn overlap_mixed_type() {
+        let a = bed3![1, 10, 20];
+        let b = bed3![1, 10, 20, Strand::Forward];
+        let c = bed4![1, 10, 20, 42.0];
+        assert!(a.overlaps(&b));
+        assert!(a.overlaps(&c));
+        assert!(b.overlaps(&c));
     }
 }
