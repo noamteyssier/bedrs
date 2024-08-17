@@ -9,6 +9,7 @@ impl<I, C, T> IntervalContainer<I, C, T>
 where
     I: IntervalBounds<C, T>,
     C: ChromBounds,
+    T: Clone,
 {
     /// Subtract a query interval from the set.
     ///
@@ -19,7 +20,7 @@ where
     /// // (q)       x------y
     /// // (a)  i--j
     /// // (b)         k--l
-    /// // (c)                m--n        
+    /// // (c)                m--n
     /// // ==========================
     /// // (s1) i--j
     /// // (s2)               m--n
@@ -41,7 +42,7 @@ where
     ///
     /// assert!(subset.next().is_none());
     /// ```
-    pub fn subtract<'a, Iv>(&'a self, query: &'a Iv) -> Result<SubtractIter<I, Iv, C>, SetError>
+    pub fn subtract<'a, Iv>(&'a self, query: &'a Iv) -> Result<SubtractIter<I, Iv, C, T>, SetError>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -55,7 +56,7 @@ where
     /// Unchecked version of [subtract](Self::subtract).
     ///
     /// Does not check if the container is sorted
-    pub fn subtract_unchecked<'a, Iv>(&'a self, query: &'a Iv) -> SubtractIter<I, Iv, C>
+    pub fn subtract_unchecked<'a, Iv>(&'a self, query: &'a Iv) -> SubtractIter<I, Iv, C, T>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -96,7 +97,7 @@ where
     pub fn subtract_from<'a, Iv>(
         &'a self,
         query: &'a Iv,
-    ) -> Result<SubtractFromIter<I, Iv, C>, SetError>
+    ) -> Result<SubtractFromIter<I, Iv, C, T>, SetError>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -110,7 +111,7 @@ where
     /// Unchecked version of [`subtract_from`](Self::subtract_from).
     ///
     /// Does not check if the container is sorted
-    pub fn subtract_from_unchecked<'a, Iv>(&'a self, query: &'a Iv) -> SubtractFromIter<I, Iv, C>
+    pub fn subtract_from_unchecked<'a, Iv>(&'a self, query: &'a Iv) -> SubtractFromIter<I, Iv, C, T>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -120,7 +121,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::{BaseInterval, Coordinates, IntervalContainer};
+    use crate::*;
 
     #[test]
     fn set_subtract_unsorted() {
@@ -148,7 +149,7 @@ mod testing {
     /// (q)       x------y
     /// (a)  i--j
     /// (b)         k--l
-    /// (c)                m--n        
+    /// (c)                m--n
     /// ==========================
     /// (s1) i--j
     /// (s2)               m--n
@@ -173,7 +174,7 @@ mod testing {
     /// (q)       x------y
     /// (a)  i-------j
     /// (b)         k--l
-    /// (c)                m--n        
+    /// (c)                m--n
     /// ==========================
     /// (s1) i---x
     /// (s2)               m--n
@@ -198,7 +199,7 @@ mod testing {
     /// (q)       x------y
     /// (a)  i--j
     /// (b)         k--l
-    /// (c)            m------n        
+    /// (c)            m------n
     /// ==========================
     /// (s1) i--j
     /// (s2)             y----n
@@ -223,7 +224,7 @@ mod testing {
     /// (q)       x------y
     /// (a)  i------j
     /// (b)         k--l
-    /// (c)            m------n        
+    /// (c)            m------n
     /// ==========================
     /// (s1) i----x
     /// (s2)             y----n
@@ -279,7 +280,7 @@ mod testing {
     /// (q)       x------y
     /// (a)  i--j
     /// (b)         k--l
-    /// (c)                m--n        
+    /// (c)                m--n
     /// ==========================
     /// (s1)      x-k
     /// (s2)           l-y
@@ -304,7 +305,7 @@ mod testing {
     /// (q)       x------y
     /// (a)  i------j
     /// (b)         k--l
-    /// (c)                m--n        
+    /// (c)                m--n
     /// ==========================
     /// (s1)           l-y
     fn set_subtract_from_b() {
@@ -326,7 +327,7 @@ mod testing {
     /// (q)       x------y
     /// (a)  i------j
     /// (b)         k--l
-    /// (c)            m----n        
+    /// (c)            m----n
     /// ==========================
     /// None
     fn set_subtract_from_c() {

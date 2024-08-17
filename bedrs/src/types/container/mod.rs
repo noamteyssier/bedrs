@@ -8,7 +8,7 @@ mod merge;
 mod sample;
 mod set_intersect;
 mod set_segment;
-// mod set_subtract;
+mod set_subtract;
 mod subtree;
 mod tree;
 
