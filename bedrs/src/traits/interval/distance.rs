@@ -292,4 +292,18 @@ mod testing {
         let b = bed3![1, 10, 20];
         assert_eq!(a.directed_distance(&b), None);
     }
+
+    #[test]
+    fn distance_mixed_types() {
+        let a = bed3![1, 10, 20];
+        let b = bed4![1, 10, 20, 1.0];
+        assert_eq!(a.distance(&b), Some(0));
+    }
+
+    #[test]
+    fn directed_distance_mixed_types() {
+        let a = bed3![1, 10, 20];
+        let b = bed4![1, 10, 20, 1.0];
+        assert_eq!(a.directed_distance(&b), Some(0));
+    }
 }
