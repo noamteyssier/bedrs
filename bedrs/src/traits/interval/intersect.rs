@@ -7,11 +7,15 @@ where
     C: ChromBounds,
     T: Clone,
 {
-    fn build_intersection_interval<I: GenericIntervalExt<C, T>>(&self, other: &I) -> I {
+    fn build_intersection_interval<Iv, V>(&self, other: &Iv) -> Iv
+    where
+        Iv: GenericIntervalExt<C, V>,
+        V: Clone,
+    {
         let chr = self.chr();
         let start = self.start().max(other.start());
         let end = self.end().min(other.end());
-        let mut interval = I::from(other);
+        let mut interval = Iv::from(other);
         interval.update_all(chr, &start, &end);
         interval
     }
@@ -28,7 +32,11 @@ where
     /// assert_eq!(ix.start(), 15);
     /// assert_eq!(ix.end(), 20);
     /// ```
-    fn intersect<I: GenericIntervalExt<C, T>>(&self, other: &I) -> Option<I> {
+    fn intersect<Iv, V>(&self, other: &Iv) -> Option<Iv>
+    where
+        Iv: GenericIntervalExt<C, V>,
+        V: Clone,
+    {
         if self.overlaps(other) {
             let ix = self.build_intersection_interval(other);
             Some(ix)
@@ -54,7 +62,11 @@ where
     ///
     /// assert!(a.stranded_intersect(&c).is_none());
     /// ```
-    fn stranded_intersect<I: GenericIntervalExt<C, T>>(&self, other: &I) -> Option<I> {
+    fn stranded_intersect<Iv, V>(&self, other: &Iv) -> Option<Iv>
+    where
+        Iv: GenericIntervalExt<C, V>,
+        V: Clone,
+    {
         if self.stranded_overlaps(other) {
             let ix = self.build_intersection_interval(other);
             Some(ix)
@@ -68,6 +80,7 @@ where
 #[allow(clippy::many_single_char_names)]
 mod testing {
     use crate::*;
+    use coitrees::GenericInterval;
 
     #[test]
     ///       x-------y
@@ -301,5 +314,15 @@ mod testing {
         assert!(a.stranded_intersect(&c).is_none());
         assert!(a.stranded_intersect(&d).is_none());
         assert!(a.stranded_intersect(&e).is_none());
+    }
+
+    #[test]
+    fn intersection_mixed_type() {
+        let a = bed3![1, 10, 15];
+        let b = bed4![1, 10, 15, "foo"];
+        let ix = a.intersect(&b).unwrap();
+        assert_eq!(ix.start(), 10);
+        assert_eq!(ix.end(), 15);
+        assert_eq!(*ix.metadata().name(), "foo");
     }
 }
