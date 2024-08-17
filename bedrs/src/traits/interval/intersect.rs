@@ -325,4 +325,15 @@ mod testing {
         assert_eq!(ix.end(), 15);
         assert_eq!(*ix.metadata().name(), "foo");
     }
+
+    #[test]
+    fn stranded_intersection_mixed_type() {
+        let a = bed3![1, 10, 15, Strand::Forward];
+        let b = bed6![1, 10, 15, "foo", 1.0.into(), Strand::Forward];
+        let ix = a.stranded_intersect(&b).unwrap();
+        assert_eq!(ix.start(), 10);
+        assert_eq!(ix.end(), 15);
+        assert_eq!(*ix.metadata().name(), "foo");
+        assert_eq!(ix.strand(), Some(Strand::Forward));
+    }
 }
