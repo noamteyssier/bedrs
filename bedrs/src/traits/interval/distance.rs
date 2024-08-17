@@ -68,7 +68,11 @@ where
     C: ChromBounds,
     T: Clone,
 {
-    fn distance<I: GenericIntervalExt<C, T>>(&self, other: &I) -> Option<i32> {
+    fn distance<Iv, V>(&self, other: &Iv) -> Option<i32>
+    where
+        Iv: GenericIntervalExt<C, V>,
+        V: Clone,
+    {
         if self.overlaps(other) || self.borders(other) {
             Some(0)
         } else if self.chr() != other.chr() {
@@ -80,7 +84,11 @@ where
         }
     }
 
-    fn directed_distance<I: GenericIntervalExt<C, T>>(&self, other: &I) -> Option<i32> {
+    fn directed_distance<Iv, V>(&self, other: &Iv) -> Option<i32>
+    where
+        Iv: GenericIntervalExt<C, V>,
+        V: Clone,
+    {
         if self.overlaps(other) || self.borders(other) {
             Some(0)
         } else if self.chr() != other.chr() {

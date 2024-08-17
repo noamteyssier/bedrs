@@ -85,7 +85,11 @@ where
         n.round() as i32
     }
 
-    fn coord_cmp<I: GenericIntervalExt<C, T>>(&self, other: &I) -> Ordering {
+    fn coord_cmp<Iv, V>(&self, other: &Iv) -> Ordering
+    where
+        Iv: GenericIntervalExt<C, V>,
+        V: Clone,
+    {
         match self.chr().cmp(other.chr()) {
             Ordering::Equal => match self.start().cmp(&other.start()) {
                 Ordering::Equal => match self.end().cmp(&other.end()) {
@@ -98,7 +102,11 @@ where
         }
     }
 
-    fn biased_coord_cmp<I: GenericIntervalExt<C, T>>(&self, other: &I, bias: i32) -> Ordering {
+    fn biased_coord_cmp<Iv, V>(&self, other: &Iv, bias: i32) -> Ordering
+    where
+        Iv: GenericIntervalExt<C, V>,
+        V: Clone,
+    {
         match self.chr().cmp(other.chr()) {
             Ordering::Equal => {
                 let comp = if other.start() < bias {
@@ -122,19 +130,35 @@ where
         }
     }
 
-    fn biased_lt<I: GenericIntervalExt<C, T>>(&self, other: &I, bias: i32) -> bool {
+    fn biased_lt<Iv, V>(&self, other: &Iv, bias: i32) -> bool
+    where
+        Iv: GenericIntervalExt<C, V>,
+        V: Clone,
+    {
         self.biased_coord_cmp(other, bias) == Ordering::Less
     }
 
-    fn lt<I: GenericIntervalExt<C, T>>(&self, other: &I) -> bool {
+    fn lt<Iv, V>(&self, other: &Iv) -> bool
+    where
+        Iv: GenericIntervalExt<C, V>,
+        V: Clone,
+    {
         self.coord_cmp(other) == Ordering::Less
     }
 
-    fn gt<I: GenericIntervalExt<C, T>>(&self, other: &I) -> bool {
+    fn gt<Iv, V>(&self, other: &Iv) -> bool
+    where
+        Iv: GenericIntervalExt<C, V>,
+        V: Clone,
+    {
         self.coord_cmp(other) == Ordering::Greater
     }
 
-    fn eq<I: GenericIntervalExt<C, T>>(&self, other: &I) -> bool {
+    fn eq<Iv, V>(&self, other: &Iv) -> bool
+    where
+        Iv: GenericIntervalExt<C, V>,
+        V: Clone,
+    {
         self.coord_cmp(other) == Ordering::Equal
     }
 
