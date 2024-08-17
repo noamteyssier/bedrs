@@ -5,7 +5,7 @@ mod find;
 mod internal;
 mod interval_container;
 mod merge;
-// mod sample;
+mod sample;
 // mod set_intersect;
 // mod set_segment;
 // mod set_subtract;

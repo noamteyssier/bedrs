@@ -13,6 +13,7 @@ impl<I, C, T> IntervalContainer<I, C, T>
 where
     I: IntervalBounds<C, T>,
     C: ChromBounds,
+    T: Clone,
 {
     /// Shuffles the elements of the container in place using the given random number generator.
     ///
@@ -242,7 +243,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::{BaseInterval, Coordinates, IntervalContainer};
+    use crate::*;
 
     #[test]
     fn shuffle_rng() {
