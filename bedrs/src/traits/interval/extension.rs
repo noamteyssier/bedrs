@@ -33,7 +33,10 @@ where
         // Do nothing by default
     }
 
-    fn from<Iv: GenericIntervalExt<C, T>>(other: &Iv) -> Self;
+    fn from<Iv, V>(other: &Iv) -> Self
+    where
+        Iv: GenericIntervalExt<C, V>,
+        V: Clone + From<T> + Into<T>;
 
     fn empty() -> Self;
 

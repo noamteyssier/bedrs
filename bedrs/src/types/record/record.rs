@@ -106,9 +106,13 @@ where
     fn update_strand(&mut self, val: Option<crate::Strand>) {
         self.metadata.update_strand(val);
     }
-    fn from<Iv: GenericIntervalExt<C, T>>(other: &Iv) -> Self {
+    fn from<Iv, V>(other: &Iv) -> Self
+    where
+        Iv: GenericIntervalExt<C, V>,
+        V: Clone + From<T> + Into<T>,
+    {
         let features = Features::new(other.chr().clone(), other.start(), other.end());
-        let metadata = other.metadata().clone();
+        let metadata = other.metadata().clone().into();
         Self { features, metadata }
     }
     fn empty() -> Self {

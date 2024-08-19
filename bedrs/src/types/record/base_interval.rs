@@ -91,7 +91,11 @@ impl GenericIntervalExt<i32, ()> for BaseInterval {
     fn empty() -> Self {
         Self::default()
     }
-    fn from<Iv: GenericIntervalExt<i32, ()>>(other: &Iv) -> Self {
+    fn from<Iv, V>(other: &Iv) -> Self
+    where
+        Iv: GenericIntervalExt<i32, V>,
+        V: Clone,
+    {
         Self::new(other.start(), other.end())
     }
 }
@@ -117,7 +121,7 @@ impl GenericIntervalExt<i32, ()> for &BaseInterval {
     fn empty() -> Self {
         unimplemented!("Cannot create a reference");
     }
-    fn from<Iv: GenericIntervalExt<i32, ()>>(_other: &Iv) -> Self {
+    fn from<Iv, V>(_other: &Iv) -> Self {
         unimplemented!("Cannot create a reference")
     }
 }
@@ -143,7 +147,7 @@ impl GenericIntervalExt<i32, ()> for &mut BaseInterval {
     fn empty() -> Self {
         unimplemented!("Cannot create a reference");
     }
-    fn from<Iv: GenericIntervalExt<i32, ()>>(_other: &Iv) -> Self {
+    fn from<Iv, V>(_other: &Iv) -> Self {
         unimplemented!("Cannot create a reference")
     }
 }
