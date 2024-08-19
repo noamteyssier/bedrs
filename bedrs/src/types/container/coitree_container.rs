@@ -6,8 +6,36 @@ use coitrees::{BasicCOITree, GenericInterval, IntervalNode, IntervalTree};
 use derive_new::new;
 use hashbrown::HashMap;
 
+/// Type alias for a HashMap where the key is a chromosome and the value is a BasicCOITree.
+/// The BasicCOITree is a data structure used for efficient interval overlap queries.
 pub type COIMap<C, M> = HashMap<C, BasicCOITree<M, usize>>;
 
+/// A struct to hold coverage information.
+///
+/// This struct is used to store the number of overlaps and the total length of overlaps for a given interval.
+#[derive(Debug, Clone, Copy, Default, new)]
+pub struct Coverage {
+    pub n_overlaps: usize,
+    pub total_overlap_len: usize,
+}
+impl From<(usize, usize)> for Coverage {
+    fn from((n_overlaps, total_overlap_len): (usize, usize)) -> Self {
+        Self {
+            n_overlaps,
+            total_overlap_len,
+        }
+    }
+}
+impl From<Coverage> for (usize, usize) {
+    fn from(cov: Coverage) -> (usize, usize) {
+        (cov.n_overlaps, cov.total_overlap_len)
+    }
+}
+
+/// A container for COITrees.
+///
+/// This struct is a wrapper around a HashMap where the key is a chromosome and the value is a BasicCOITree.
+/// The BasicCOITree is a data structure used for efficient interval overlap queries.
 #[derive(Clone, new)]
 pub struct COITreeContainer<M, C>
 where
@@ -16,11 +44,15 @@ where
 {
     inner: COIMap<C, M>,
 }
+
 impl<M, C> COITreeContainer<M, C>
 where
     M: RecordMetadata,
     C: ChromBounds,
 {
+    /// Query the COITreeContainer with a given interval.
+    ///
+    /// This function will call the provided function `visit` for each interval in the COITree that overlaps with the query interval.
     pub fn query<F, I>(&self, query: &I, visit: F)
     where
         F: FnMut(&IntervalNode<M, usize>),
@@ -31,6 +63,10 @@ where
         }
     }
 
+    /// Query the COITreeContainer with a given interval, but allows for the visit function to fail.
+    ///
+    /// This function will call the provided function `visit` for each interval in the COITree that overlaps with the query interval.
+    /// If the `visit` function returns an error, this function will immediately return that error.
     pub fn query_fallible<F, E, I>(&self, query: &I, visit: F) -> Result<(), E>
     where
         F: FnMut(&IntervalNode<M, usize>) -> Result<(), E>,
@@ -42,6 +78,8 @@ where
             Ok(())
         }
     }
+
+    /// Count the number of intervals in the COITree that overlap with the query interval.
     pub fn query_count<I>(&self, query: &I) -> usize
     where
         I: IntervalBounds<C, M>,
@@ -52,17 +90,26 @@ where
             0
         }
     }
-    pub fn coverage<I>(&self, query: &I) -> (usize, usize)
+
+    /// Calculate the coverage of the query interval.
+    ///
+    /// This function returns a tuple where the first element is the number of intervals in the COITree that overlap with the query interval,
+    /// and the second element is the total length of the overlapping intervals.
+    pub fn coverage<I>(&self, query: &I) -> Coverage
     where
         I: IntervalBounds<C, M>,
     {
         if let Some(coitree) = self.inner.get(query.chr()) {
-            coitree.coverage(query.start(), query.end())
+            coitree.coverage(query.start(), query.end()).into()
         } else {
-            (0, 0)
+            Coverage::default()
         }
     }
 }
+
+/// Implement the FromIterator trait for COITreeContainer.
+///
+/// This allows for the creation of a COITreeContainer from an iterator that yields intervals.
 impl<I, C, M> FromIterator<I> for COITreeContainer<M, C>
 where
     I: IntervalBounds<C, M> + GenericInterval<M>,
@@ -179,9 +226,9 @@ mod testing {
         ]);
         let coitrees = COITreeContainer::from(set);
         let query = bed3!(1, 15, 25);
-        let (num_overlaps, total_length) = coitrees.coverage(&query);
-        assert_eq!(num_overlaps, 2);
-        assert_eq!(total_length, 11);
+        let coverage = coitrees.coverage(&query);
+        assert_eq!(coverage.n_overlaps, 2);
+        assert_eq!(coverage.total_overlap_len, 11);
     }
 
     #[test]

@@ -12,7 +12,7 @@ mod set_subtract;
 mod subtree;
 mod tree;
 
-pub use coitree_container::COITreeContainer;
+pub use coitree_container::{COITreeContainer, Coverage};
 pub use interval_container::IntervalContainer;
 pub use subtree::Subtree;
 pub use tree::IntervalTree;
