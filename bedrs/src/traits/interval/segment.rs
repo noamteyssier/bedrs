@@ -1,4 +1,4 @@
-use crate::{traits::ChromBounds, GenericIntervalExt, Intersect, Overlap, Subtract};
+use crate::prelude::{ChromBounds, GenericIntervalExt, Intersect, Overlap, Subtract};
 
 pub trait Segment<C, T>: GenericIntervalExt<C, T> + Overlap<C, T>
 where
@@ -214,7 +214,7 @@ where
 #[cfg(test)]
 mod testing {
 
-    use crate::*;
+    use crate::prelude::*;
 
     fn validate_segments(observed: &[Bed3<i32>], expected: &[Bed3<i32>]) {
         assert_eq!(observed.len(), expected.len());

@@ -1,8 +1,5 @@
 use super::{MetaBed3, MetaBed4, MetaBed6, RecordMetadata};
-use crate::{
-    traits::{MetaBounds, ValueBounds},
-    Score, Strand,
-};
+use crate::prelude::{MetaBounds, Score, Strand, ValueBounds};
 use derive_new::new;
 use getset::{Getters, Setters};
 #[cfg(feature = "serde")]

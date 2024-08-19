@@ -1,5 +1,4 @@
-use super::GenericIntervalExt;
-use crate::{traits::ChromBounds, Overlap};
+use crate::prelude::{ChromBounds, GenericIntervalExt, Overlap};
 
 /// Calculates the intersection between two coordinates.
 pub trait Intersect<C, T>: GenericIntervalExt<C, T> + Overlap<C, T>
@@ -79,7 +78,7 @@ where
 #[cfg(test)]
 #[allow(clippy::many_single_char_names)]
 mod testing {
-    use crate::*;
+    use crate::prelude::*;
     use coitrees::GenericInterval;
 
     #[test]

@@ -1,9 +1,7 @@
 use anyhow::{bail, Result};
 
-use crate::{
-    traits::{ChromBounds, IntervalBounds, SetError},
-    types::{iterator::ComplementIter, IntervalIterOwned},
-    IntervalContainer,
+use crate::prelude::{
+    ChromBounds, ComplementIter, IntervalBounds, IntervalContainer, IntervalIterOwned, SetError,
 };
 
 type ComplementIterOwned<I, C, T> = ComplementIter<IntervalIterOwned<I, C, T>, I, C, T>;
@@ -66,7 +64,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::*;
+    use crate::prelude::*;
 
     fn validate_records<I, C, T>(obs: &[I], exp: &[I])
     where

@@ -1,7 +1,4 @@
-use crate::{
-    traits::{ChromBounds, IntervalBounds, SetError},
-    IntervalContainer,
-};
+use crate::prelude::{ChromBounds, IntervalBounds, IntervalContainer, SetError};
 use rand::{
     seq::{IteratorRandom, SliceRandom},
     RngCore, SeedableRng,
@@ -243,7 +240,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::*;
+    use crate::prelude::*;
 
     #[test]
     fn shuffle_rng() {

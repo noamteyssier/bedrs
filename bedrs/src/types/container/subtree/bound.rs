@@ -1,8 +1,4 @@
-use super::Subtree;
-use crate::{
-    traits::{errors::SetError, ChromBounds, IntervalBounds},
-    types::StrandMethod,
-};
+use crate::prelude::{ChromBounds, IntervalBounds, SetError, StrandMethod, Subtree};
 use std::cmp::Ordering;
 
 /// Identifies the lower bound on a [`Subtree`] via a binary tree search
@@ -473,7 +469,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::*;
+    use crate::prelude::*;
 
     #[test]
     fn bsearch_base_low() {

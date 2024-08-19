@@ -1,8 +1,7 @@
-use super::{coitree_container::COIMap, subtree::Subtree, tree::IntervalTree, COITreeContainer};
-use crate::{
-    traits::{ChromBounds, IntervalBounds, SetError},
-    types::meta::RecordMetadata,
-    IntervalIterOwned, IntervalIterRef,
+use super::coitree_container::COIMap;
+use crate::prelude::{
+    COITreeContainer, ChromBounds, IntervalBounds, IntervalIterOwned, IntervalIterRef,
+    IntervalTree, RecordMetadata, SetError, Subtree,
 };
 use anyhow::Result;
 use coitrees::{BasicCOITree, GenericInterval};
@@ -250,7 +249,7 @@ where
 #[cfg(test)]
 mod testing {
 
-    use crate::*;
+    use crate::prelude::*;
 
     // --------------------- //
     // Base BaseInterval Testing //

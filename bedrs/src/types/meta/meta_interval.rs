@@ -1,5 +1,5 @@
 use super::RecordMetadata;
-use crate::traits::MetaBounds;
+use crate::{traits::MetaBounds, types::Strand};
 use derive_new::new;
 use getset::{Getters, Setters};
 #[cfg(feature = "serde")]
@@ -12,7 +12,7 @@ pub struct MetaMetaInterval<N: MetaBounds> {
     meta: N,
 }
 impl<N: MetaBounds> RecordMetadata for MetaMetaInterval<N> {
-    fn strand(&self) -> Option<crate::Strand> {
+    fn strand(&self) -> Option<Strand> {
         None
     }
 }

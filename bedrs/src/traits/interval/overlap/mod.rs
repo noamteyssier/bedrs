@@ -498,7 +498,7 @@ mod testing {
     use coitrees::GenericInterval;
 
     use super::*;
-    use crate::{bed3, bed4, types::BaseInterval, Strand};
+    use crate::prelude::{bed3, bed4, BaseInterval, Strand};
 
     #[test]
     fn test_overlap_self() {

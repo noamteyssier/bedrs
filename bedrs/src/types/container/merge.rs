@@ -1,8 +1,5 @@
-// use super::Container;
-use super::IntervalTree;
-use crate::{
-    traits::{errors::SetError, ChromBounds, IntervalBounds},
-    IntervalContainer, Strand,
+use crate::prelude::{
+    ChromBounds, IntervalBounds, IntervalContainer, IntervalTree, SetError, Strand,
 };
 
 #[derive(Debug, Clone, Copy)]
@@ -72,7 +69,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::*;
+    use crate::prelude::*;
     use anyhow::Result;
     use std::fmt::Debug;
 

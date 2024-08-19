@@ -90,7 +90,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::*;
+    use crate::prelude::*;
 
     #[test]
     fn merge_iter_base() {

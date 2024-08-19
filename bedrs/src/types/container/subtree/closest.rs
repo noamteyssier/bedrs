@@ -1,8 +1,5 @@
-use super::Subtree;
-use crate::{
-    traits::{ChromBounds, IntervalBounds, SetError},
-    types::StrandMethod,
-    Distance, Strand,
+use crate::prelude::{
+    ChromBounds, Distance, IntervalBounds, SetError, Strand, StrandMethod, Subtree,
 };
 use anyhow::Result;
 
@@ -217,7 +214,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::*;
+    use crate::prelude::*;
 
     #[test]
     fn closest_unsorted() {

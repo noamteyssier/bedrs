@@ -116,7 +116,7 @@ where
 mod testing {
     use anyhow::Result;
 
-    use crate::*;
+    use crate::prelude::*;
 
     fn validate_set<I, C, T>(set: &IntervalContainer<I, C, T>, expected: &[I])
     where

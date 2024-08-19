@@ -1,8 +1,4 @@
-use crate::{
-    traits::{errors::SetError, ChromBounds, IntervalBounds},
-    types::SubtractFromIter,
-    IntervalContainer,
-};
+use crate::prelude::{ChromBounds, IntervalBounds, IntervalContainer, SetError, SubtractFromIter};
 use anyhow::{bail, Result};
 
 /// Identifies al non-overlapping intervals within the span of the interval set
@@ -39,7 +35,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::*;
+    use crate::prelude::*;
 
     #[test]
     fn internal_unsorted() {

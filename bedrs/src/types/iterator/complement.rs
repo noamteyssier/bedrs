@@ -74,7 +74,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::*;
+    use crate::prelude::*;
 
     fn validate_records<I, C, T>(obs: &[I], exp: &[I])
     where

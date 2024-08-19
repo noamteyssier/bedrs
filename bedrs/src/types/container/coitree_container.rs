@@ -136,7 +136,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::*;
+    use crate::prelude::*;
     use anyhow::bail;
     use coitrees::GenericInterval;
     use std::io::{Cursor, Write};

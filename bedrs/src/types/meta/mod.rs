@@ -16,7 +16,7 @@ pub use gtf::MetaGtf;
 pub use meta_interval::MetaMetaInterval;
 pub use stranded_bed3::MetaStrandedBed3;
 
-use crate::Strand;
+use crate::types::Strand;
 
 pub trait RecordMetadata: std::fmt::Debug + Default + Clone {
     fn strand(&self) -> Option<Strand>;

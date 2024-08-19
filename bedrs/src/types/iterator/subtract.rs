@@ -1,8 +1,4 @@
-use crate::{
-    traits::{ChromBounds, IntervalBounds},
-    types::container::Subtree,
-    IntervalContainer, Subtract,
-};
+use crate::prelude::{ChromBounds, IntervalBounds, IntervalContainer, Subtract, Subtree};
 use derive_new::new;
 use std::marker::PhantomData;
 

@@ -1,6 +1,4 @@
-use crate::{traits::ChromBounds, Overlap};
-
-use super::GenericIntervalExt;
+use crate::prelude::{ChromBounds, GenericIntervalExt, Overlap};
 
 /// Calculates the distance between two coordinates.
 ///
@@ -104,7 +102,7 @@ where
 #[cfg(test)]
 #[allow(clippy::doc_markdown)]
 mod testing {
-    use crate::*;
+    use crate::prelude::*;
 
     #[test]
     ///    x-----y

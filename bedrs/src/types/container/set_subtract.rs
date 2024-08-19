@@ -1,7 +1,5 @@
-use crate::{
-    traits::{errors::SetError, ChromBounds, IntervalBounds},
-    types::{SubtractFromIter, SubtractIter},
-    IntervalContainer,
+use crate::prelude::{
+    ChromBounds, IntervalBounds, IntervalContainer, SetError, SubtractFromIter, SubtractIter,
 };
 
 /// Performs interval subtraction at the set level.
@@ -121,7 +119,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::*;
+    use crate::prelude::*;
 
     #[test]
     fn set_subtract_unsorted() {

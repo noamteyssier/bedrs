@@ -1,8 +1,4 @@
-// use super::Container;
-use crate::{
-    traits::{ChromBounds, IntervalBounds, SetError},
-    IntervalContainer,
-};
+use crate::prelude::{ChromBounds, IntervalBounds, IntervalContainer, SetError};
 
 impl<I, C, T> IntervalContainer<I, C, T>
 where
@@ -129,7 +125,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::*;
+    use crate::prelude::*;
 
     fn validate_segments(observed: &[Bed3<i32>], expected: &[Bed3<i32>]) {
         println!("Expected:");

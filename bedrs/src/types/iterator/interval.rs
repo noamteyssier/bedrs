@@ -1,9 +1,5 @@
+use crate::prelude::{ChromBounds, IntervalBounds, IntervalContainer};
 use std::{collections::VecDeque, marker::PhantomData};
-
-use crate::{
-    traits::{ChromBounds, IntervalBounds},
-    IntervalContainer,
-};
 
 /// An iterator over a vector of interval records.
 ///
@@ -183,7 +179,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::*;
+    use crate::prelude::*;
 
     #[test]
     fn iterator_owned() {

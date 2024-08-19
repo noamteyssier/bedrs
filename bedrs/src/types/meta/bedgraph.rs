@@ -1,5 +1,5 @@
 use super::{MetaBed3, RecordMetadata};
-use crate::Score;
+use crate::types::{Score, Strand};
 use derive_new::new;
 use getset::{Getters, Setters};
 #[cfg(feature = "serde")]
@@ -12,7 +12,7 @@ pub struct MetaBedGraph {
     score: Score,
 }
 impl RecordMetadata for MetaBedGraph {
-    fn strand(&self) -> Option<crate::Strand> {
+    fn strand(&self) -> Option<Strand> {
         None
     }
 }

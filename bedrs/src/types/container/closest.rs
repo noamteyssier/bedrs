@@ -1,8 +1,4 @@
-use crate::{
-    traits::{ChromBounds, IntervalBounds, SetError},
-    types::StrandMethod,
-    IntervalContainer,
-};
+use crate::prelude::{ChromBounds, IntervalBounds, IntervalContainer, SetError, StrandMethod};
 use anyhow::Result;
 
 impl<I, C, T> IntervalContainer<I, C, T>
@@ -65,7 +61,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::*;
+    use crate::prelude::*;
 
     #[test]
     fn closest_unsorted() {

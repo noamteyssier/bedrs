@@ -172,7 +172,7 @@ impl Query {
 #[cfg(test)]
 mod testing {
     use super::*;
-    use crate::{bed3, Strand};
+    use crate::prelude::{bed3, Strand};
 
     const STRAND_METHODS: [StrandMethod; 3] = [
         StrandMethod::Ignore,

@@ -93,7 +93,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::*;
+    use crate::prelude::*;
 
     type ClusterTuple = (Bed3<u32>, usize);
     fn validate_clusters(observed: &[ClusterTuple], expected: &[ClusterTuple]) {

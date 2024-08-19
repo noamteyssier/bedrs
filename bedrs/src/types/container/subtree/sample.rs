@@ -1,8 +1,6 @@
-use crate::traits::{ChromBounds, IntervalBounds, SetError};
+use crate::prelude::{ChromBounds, IntervalBounds, SetError, Subtree};
 use rand::{seq::SliceRandom, RngCore, SeedableRng};
 use rand_chacha::ChaChaRng;
-
-use super::Subtree;
 
 /// Utility functions for random sampling within a container.
 impl<I, C, T> Subtree<I, C, T>
@@ -237,7 +235,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::*;
+    use crate::prelude::*;
 
     #[test]
     fn shuffle_rng() {

@@ -1,9 +1,4 @@
-// use super::Container;
-use super::Subtree;
-use crate::{
-    traits::{errors::SetError, ChromBounds, IntervalBounds},
-    Strand,
-};
+use crate::prelude::{ChromBounds, IntervalBounds, SetError, Strand, Subtree};
 
 /// A trait to merge overlapping interval regions within a container
 impl<I, C, T> Subtree<I, C, T>
@@ -289,7 +284,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::*;
+    use crate::prelude::*;
     use anyhow::Result;
     use std::fmt::Debug;
 

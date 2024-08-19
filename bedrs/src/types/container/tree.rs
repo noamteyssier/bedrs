@@ -1,8 +1,6 @@
-use std::marker::PhantomData;
-
-use super::subtree::Subtree;
-use crate::traits::{ChromBounds, IntervalBounds, SetError};
+use crate::prelude::{ChromBounds, IntervalBounds, SetError, Subtree};
 use hashbrown::HashMap;
+use std::marker::PhantomData;
 
 type Map<I, C, T> = HashMap<C, Subtree<I, C, T>>;
 

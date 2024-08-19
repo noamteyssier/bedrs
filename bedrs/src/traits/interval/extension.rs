@@ -1,4 +1,4 @@
-use crate::{traits::ChromBounds, Strand};
+use crate::prelude::{ChromBounds, Strand};
 use coitrees::GenericInterval;
 use std::cmp::Ordering;
 

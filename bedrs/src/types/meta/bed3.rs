@@ -1,8 +1,5 @@
 use super::{MetaBed12, MetaBed4, MetaBed6, MetaBedGraph, MetaStrandedBed3, RecordMetadata};
-use crate::{
-    traits::{MetaBounds, ValueBounds},
-    Strand,
-};
+use crate::prelude::{MetaBounds, Strand, ValueBounds};
 
 /// Metadata for a BED3 record is empty
 pub type MetaBed3 = Option<()>;

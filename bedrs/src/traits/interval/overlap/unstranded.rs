@@ -1,7 +1,4 @@
-use crate::{
-    interval::GenericIntervalExt,
-    traits::{ChromBounds, Overlap},
-};
+use crate::prelude::{ChromBounds, GenericIntervalExt, Overlap};
 
 pub trait UnstrandedOverlap<C, T>: GenericIntervalExt<C, T>
 where
@@ -185,7 +182,7 @@ where
 mod testing {
 
     use super::*;
-    use crate::{bed3, Strand};
+    use crate::prelude::{bed3, Strand};
 
     #[test]
     fn test_opposite_overlaps() {

@@ -1,5 +1,4 @@
-use super::Features;
-use crate::{traits::ChromBounds, types::meta::RecordMetadata, GenericIntervalExt};
+use crate::prelude::{ChromBounds, Features, GenericIntervalExt, RecordMetadata, Strand};
 use coitrees::GenericInterval;
 use derive_new::new;
 #[cfg(feature = "serde")]
@@ -91,7 +90,7 @@ where
     fn end(&self) -> i32 {
         self.features.end()
     }
-    fn strand(&self) -> Option<crate::Strand> {
+    fn strand(&self) -> Option<Strand> {
         self.metadata.strand()
     }
     fn update_chr(&mut self, val: &C) {
@@ -103,7 +102,7 @@ where
     fn update_end(&mut self, val: &i32) {
         self.features.update_end(val);
     }
-    fn update_strand(&mut self, val: Option<crate::Strand>) {
+    fn update_strand(&mut self, val: Option<Strand>) {
         self.metadata.update_strand(val);
     }
     fn from<Iv, V>(other: &Iv) -> Self

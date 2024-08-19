@@ -1,4 +1,4 @@
-use crate::{ChromBounds, GenericIntervalExt, Overlap};
+use crate::prelude::{ChromBounds, GenericIntervalExt, Overlap};
 
 /// Trait for performing subtraction with coordinates
 pub trait Subtract<C, T>: GenericIntervalExt<C, T> + Overlap<C, T>
@@ -239,7 +239,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::*;
+    use crate::prelude::*;
 
     #[test]
     ///      x-------y

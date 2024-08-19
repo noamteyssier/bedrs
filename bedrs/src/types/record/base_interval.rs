@@ -3,7 +3,7 @@ use derive_new::new;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
-use crate::GenericIntervalExt;
+use crate::prelude::GenericIntervalExt;
 
 /// A representation of a classic Interval.
 ///

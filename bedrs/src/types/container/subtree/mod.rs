@@ -3,10 +3,7 @@ mod closest;
 mod merge;
 mod sample;
 
-use crate::{
-    traits::{ChromBounds, IntervalBounds, SetError},
-    GenericIntervalExt,
-};
+use crate::prelude::{ChromBounds, GenericIntervalExt, IntervalBounds, SetError};
 use std::{
     marker::PhantomData,
     ops::{Index, IndexMut},

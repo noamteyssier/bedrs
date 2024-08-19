@@ -162,4 +162,3 @@ pub mod types;
 
 /// Prelude for the library
 pub mod prelude;
-pub use prelude::*;

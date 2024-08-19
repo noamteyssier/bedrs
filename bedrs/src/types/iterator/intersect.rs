@@ -1,8 +1,4 @@
-use crate::{
-    traits::{ChromBounds, IntervalBounds},
-    types::Query,
-    Intersect,
-};
+use crate::prelude::{ChromBounds, Intersect, IntervalBounds, Query};
 use std::{collections::VecDeque, fmt::Debug, marker::PhantomData};
 
 /// An intersection iterator that operates on two sorted iterators
@@ -163,7 +159,7 @@ where
 
 #[cfg(test)]
 mod testing {
-    use crate::*;
+    use crate::prelude::*;
 
     fn validate_records<I, C, T>(obs: &[I], exp: &[I])
     where

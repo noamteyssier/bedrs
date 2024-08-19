@@ -1,8 +1,4 @@
-use crate::{
-    traits::{ChromBounds, IntervalBounds},
-    types::Query,
-    Intersect, IntervalContainer,
-};
+use crate::prelude::{ChromBounds, Intersect, IntervalBounds, IntervalContainer, Query};
 
 impl<'a, I, C, T> IntervalContainer<I, C, T>
 where

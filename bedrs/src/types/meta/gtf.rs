@@ -1,5 +1,5 @@
 use super::RecordMetadata;
-use crate::{traits::MetaBounds, Frame, Score, Strand};
+use crate::prelude::{Frame, MetaBounds, Score, Strand};
 use derive_new::new;
 use getset::{Getters, Setters};
 #[cfg(feature = "serde")]
