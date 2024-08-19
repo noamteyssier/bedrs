@@ -526,4 +526,18 @@ mod testing {
         let mut sub = a.subtract_iter(&b);
         assert!(sub.next().is_none());
     }
+
+    #[test]
+    ///      x-------y
+    ///   i-----j
+    /// ==================
+    ///         j----y
+    fn subtraction_case_a_mixed_type() {
+        let a = bed3![1, 20, 30];
+        let b = bed3![1, 15, 25, Strand::Forward];
+        let sub = a.subtract(&b).unwrap();
+        assert_eq!(sub.len(), 1);
+        assert_eq!(sub[0].start(), 25);
+        assert_eq!(sub[0].end(), 30);
+    }
 }
