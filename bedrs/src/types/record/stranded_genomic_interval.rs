@@ -3,7 +3,6 @@ use crate::{
     Strand,
 };
 use bedrs_derive::Coordinates;
-use bio_types::strand::ReqStrand;
 use derive_new::new;
 use rust_htslib::bam::{ext::BamRecordExtensions, Record};
 #[cfg(feature = "serde")]
@@ -115,9 +114,10 @@ impl TryFrom<Record> for StrandedBed3<i32, i64> {
                 chr: value.tid(),
                 start: value.pos(),
                 end: value.reference_end(),
-                strand: match value.strand() {
-                    ReqStrand::Forward => Strand::Forward,
-                    ReqStrand::Reverse => Strand::Reverse,
+                strand: if value.is_reverse() {
+                    Strand::Reverse
+                } else {
+                    Strand::Forward
                 },
             })
         }
