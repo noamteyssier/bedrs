@@ -103,6 +103,7 @@ where
 /// let c = StrandedBed3::try_from(t)?;
 /// # Ok::<(), SetError>(())
 /// ```
+#[cfg(feature = "htslib")]
 impl TryFrom<Record> for StrandedBed3<i32, i64> {
     type Error = SetError;
 

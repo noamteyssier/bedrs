@@ -22,12 +22,13 @@ thiserror = "1.0.58"
 bedrs_derive = "0.1.0"
 getset = "0.1.2"
 derive-new = "0.6.0"
-rust-htslib = "0.50.0"
-bio-types = "1.0.4"
+rust-htslib = { version = "0.50.0", optional = true }
 
 [features]
+default = ["serde", "rayon", "htslib"]
 serde = ["dep:serde"]
 rayon = ["dep:rayon"]
+htslib = ["dep:rust-htslib"]
 
 [dev-dependencies]
 criterion = "0.5.1"
