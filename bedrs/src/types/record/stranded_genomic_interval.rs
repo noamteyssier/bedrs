@@ -1,11 +1,17 @@
+#[cfg(feature = "htslib")]
+use crate::prelude::SetError;
 use crate::{
     traits::{ChromBounds, Coordinates, ValueBounds},
     Strand,
 };
 use bedrs_derive::Coordinates;
 use derive_new::new;
+#[cfg(feature = "htslib")]
+use rust_htslib::bam::{ext::BamRecordExtensions, Record};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "htslib")]
+use std::convert::TryFrom;
 
 /// A representation of a Genomic Interval.
 ///
@@ -37,6 +43,101 @@ where
     start: T,
     end: T,
     strand: Strand,
+}
+
+/// Implements conversion of a Rust Htslib BAM record to a `StrandedBed3` interval
+///
+/// If record is unmapped, we return an Error.
+/// If record is mapped, we use the struct's functions to populate
+/// `chr`, `start`, `end` and `strand`.
+///
+/// ```
+/// use bedrs::{Coordinates, Strand, StrandedBed3, traits::SetError};
+/// use rust_htslib::bam::Record;
+/// use rust_htslib::bam::record::{Cigar, CigarString};
+///
+/// // create a forward read with some data
+/// let mut r = Record::new();
+/// r.set_tid(9);
+/// r.set_pos(1200);
+/// r.unset_unmapped();
+/// r.set(&vec![b'r',b'e',b'a',b'd'], Some(&CigarString(vec![Cigar::Match(100)])),
+///       &vec![ b'A' as u8; 100], &vec![255 as u8; 100]);
+///
+/// // ensure we recover it after conversion
+/// let a = StrandedBed3::try_from(r)?;
+/// assert_eq!(*a.chr(), 9);
+/// assert_eq!(a.start(), 1200);
+/// assert_eq!(a.end(), 1300);
+/// assert_eq!(a.strand(), Some(Strand::Forward));
+///
+/// // create a reverse read with some data.
+/// // mark it supplementary, but this shouldn't make a difference.
+/// let mut s = Record::new();
+/// s.set_tid(5);
+/// s.set_pos(200);
+/// s.unset_unmapped();
+/// s.set_reverse();
+/// s.set_supplementary();
+/// s.set(&vec![b'r',b'e',b'a',b'd'], Some(&CigarString(vec![Cigar::Match(150)])),
+///       &vec![ b'A' as u8; 150], &vec![255 as u8; 150]);
+///
+/// // ensure we recover it after conversion
+/// let b = StrandedBed3::try_from(s)?;
+/// assert_eq!(*b.chr(), 5);
+/// assert_eq!(b.start(), 200);
+/// assert_eq!(b.end(), 350);
+/// assert_eq!(b.strand(), Some(Strand::Reverse));
+/// # Ok::<(), SetError>(())
+/// ```
+///
+/// ```should_panic
+/// use bedrs::{Coordinates, Strand, StrandedBed3, traits::SetError};
+/// use rust_htslib::bam::Record;
+/// use rust_htslib::bam::record::{Cigar, CigarString};
+///
+/// // following is an unmapped read, so we should panic
+/// let mut t = Record::new();
+/// t.set_tid(5);
+/// t.set_pos(200);
+/// t.set(&vec![b'r',b'e',b'a',b'd'], Some(&CigarString(vec![Cigar::Match(150)])),
+///       &vec![ b'A' as u8; 150], &vec![255 as u8; 150]);
+///
+/// let c = StrandedBed3::try_from(t)?;
+/// # Ok::<(), SetError>(())
+/// ```
+///
+/// ```
+/// // Load a BAM file and convert records to StrandedBed3.
+/// use bedrs::prelude::*;
+/// use rust_htslib::{bam, bam::Read};
+///
+/// let mut bam = bam::Reader::from_path(&"examples/sample.sorted.bam").unwrap();
+/// for r in bam.records() {
+///     let record = r.unwrap();
+///     let a = StrandedBed3::try_from(record).unwrap();
+/// }
+/// ```
+#[cfg(feature = "htslib")]
+impl TryFrom<Record> for StrandedBed3<i32, i64> {
+    type Error = SetError;
+
+    fn try_from(value: Record) -> Result<Self, Self::Error> {
+        if value.is_unmapped() {
+            Err(SetError::EmptySet)
+        } else {
+            Ok(StrandedBed3 {
+                chr: value.tid(),
+                start: value.pos(),
+                end: value.reference_end(),
+                strand: if value.is_reverse() {
+                    Strand::Reverse
+                } else {
+                    Strand::Forward
+                },
+            })
+        }
+    }
 }
 
 #[cfg(test)]
@@ -198,6 +299,31 @@ mod serde_testing {
         assert_eq!(b.start(), 20);
         assert_eq!(b.end(), 30);
         assert_eq!(b.strand(), Some(Strand::Forward));
+        Ok(())
+    }
+}
+
+#[cfg(feature = "htslib")]
+#[cfg(test)]
+mod htslib_testing {
+    use super::*;
+    use crate::{Coordinates, Intersect, Strand, StrandedBed3};
+    use anyhow::Result;
+    use rust_htslib::{bam, bam::Read};
+
+    #[test]
+    fn test_bam_intersect() -> Result<()> {
+        let a = StrandedBed3::new(1, 19, 70, Strand::Forward);
+        let mut bam = bam::Reader::from_path(&"examples/sample.sorted.bam").unwrap();
+        for r in bam.records() {
+            let record = r?;
+            let b = StrandedBed3::try_from(record)?;
+            if let Some(c) = a.stranded_intersect(&b) {
+                assert_eq!(c.start(), 19);
+                assert_eq!(c.end(), 59);
+                assert_eq!(c.strand(), Some(Strand::Forward));
+            }
+        }
         Ok(())
     }
 }
