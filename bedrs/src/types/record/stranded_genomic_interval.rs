@@ -1,5 +1,7 @@
+#[cfg(feature = "htslib")]
+use crate::prelude::SetError;
 use crate::{
-    traits::{ChromBounds, Coordinates, SetError, ValueBounds},
+    traits::{ChromBounds, Coordinates, ValueBounds},
     Strand,
 };
 use bedrs_derive::Coordinates;
@@ -8,6 +10,7 @@ use derive_new::new;
 use rust_htslib::bam::{ext::BamRecordExtensions, Record};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "htslib")]
 use std::convert::TryFrom;
 
 /// A representation of a Genomic Interval.

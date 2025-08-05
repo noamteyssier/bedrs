@@ -25,7 +25,7 @@ derive-new = "0.6.0"
 rust-htslib = { version = "0.50.0", optional = true }
 
 [features]
-default = ["serde", "rayon", "htslib"]
+default = ["serde", "rayon"]
 serde = ["dep:serde"]
 rayon = ["dep:rayon"]
 htslib = ["dep:rust-htslib"]
