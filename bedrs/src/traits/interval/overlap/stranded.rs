@@ -46,13 +46,12 @@ where
     /// ```
     fn stranded_overlaps_by<I: Coordinates<C, T>>(&self, other: &I, bases: T) -> bool {
         self.stranded_overlap_size(other)
-            .map_or(false, |n| n >= bases)
+            .is_some_and(|n| n >= bases)
     }
     /// Returns true if the current interval overlaps the other by exactly `bases`
     /// and both intervals are on the same chromosome and strand.
     fn stranded_overlaps_by_exactly<I: Coordinates<C, T>>(&self, other: &I, bases: T) -> bool {
-        self.stranded_overlap_size(other)
-            .map_or(false, |n| n == bases)
+        self.stranded_overlap_size(other) == Some(bases)
     }
     /// Returns the size of the overlap between the current interval and the other
     /// if the intervals are on the same chromosome and strand.

@@ -36,7 +36,7 @@ where
 {
     struct OptionFloatVisitor;
 
-    impl<'de> de::Visitor<'de> for OptionFloatVisitor {
+    impl de::Visitor<'_> for OptionFloatVisitor {
         type Value = Option<f64>;
 
         fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
