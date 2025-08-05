@@ -96,6 +96,21 @@ assert_eq!(c.start(), 30);
 assert_eq!(c.end(), 40);
 ```
 
+When compiled with the htslib feature, BAM records from the `rust_htslib`
+library can be converted to a `StrandedBed3` interval.
+
+```rust
+// Load a BAM file and convert records to StrandedBed3.
+use bedrs::prelude::*;
+use rust_htslib::{bam, bam::Read};
+
+let mut bam = bam::Reader::from_path(&"examples/sample.sorted.bam").unwrap();
+for r in bam.records() {
+    let record = r.unwrap();
+    let a = StrandedBed3::try_from(record).unwrap();
+}
+```
+
 ## Interval Operations
 
 - [`Overlap`]

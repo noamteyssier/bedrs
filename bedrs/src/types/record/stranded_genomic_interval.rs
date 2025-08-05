@@ -4,6 +4,7 @@ use crate::{
 };
 use bedrs_derive::Coordinates;
 use derive_new::new;
+#[cfg(feature = "htslib")]
 use rust_htslib::bam::{ext::BamRecordExtensions, Record};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
@@ -101,6 +102,18 @@ where
 ///
 /// let c = StrandedBed3::try_from(t)?;
 /// # Ok::<(), SetError>(())
+/// ```
+///
+/// ```
+/// // Load a BAM file and convert records to StrandedBed3.
+/// use bedrs::prelude::*;
+/// use rust_htslib::{bam, bam::Read};
+///
+/// let mut bam = bam::Reader::from_path(&"examples/sample.sorted.bam").unwrap();
+/// for r in bam.records() {
+///     let record = r.unwrap();
+///     let a = StrandedBed3::try_from(record).unwrap();
+/// }
 /// ```
 #[cfg(feature = "htslib")]
 impl TryFrom<Record> for StrandedBed3<i32, i64> {
@@ -283,6 +296,31 @@ mod serde_testing {
         assert_eq!(b.start(), 20);
         assert_eq!(b.end(), 30);
         assert_eq!(b.strand(), Some(Strand::Forward));
+        Ok(())
+    }
+}
+
+#[cfg(feature = "htslib")]
+#[cfg(test)]
+mod htslib_testing {
+    use super::*;
+    use crate::{Coordinates, Intersect, Strand, StrandedBed3};
+    use anyhow::Result;
+    use rust_htslib::{bam, bam::Read};
+
+    #[test]
+    fn test_bam_intersect() -> Result<()> {
+        let a = StrandedBed3::new(1, 19, 70, Strand::Forward);
+        let mut bam = bam::Reader::from_path(&"examples/sample.sorted.bam").unwrap();
+        for r in bam.records() {
+            let record = r?;
+            let b = StrandedBed3::try_from(record)?;
+            if let Some(c) = a.stranded_intersect(&b) {
+                assert_eq!(c.start(), 19);
+                assert_eq!(c.end(), 59);
+                assert_eq!(c.strand(), Some(Strand::Forward));
+            }
+        }
         Ok(())
     }
 }
