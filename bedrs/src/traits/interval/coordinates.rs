@@ -116,7 +116,7 @@ where
 
     /// Update the start coordinate of the interval.
     ///
-    ///     
+    ///
     /// # Examples
     ///
     /// ```
@@ -343,7 +343,7 @@ where
     ///
     /// iv.extend(&5, None);
     /// assert!(iv.eq(&Bed3::new(1, 5, 25)));
-
+    ///
     /// iv.extend(&5, Some(27));
     /// assert!(iv.eq(&Bed3::new(1, 0, 27)));
     /// ```

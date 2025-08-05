@@ -211,8 +211,9 @@ where
 
         for iv in self.records() {
             match iv.strand() {
-                // Skip all intervals that have unknown strand
-                None | Some(Strand::Unknown) => continue,
+                None | Some(Strand::Unknown) => {
+                    // Skip all intervals that have unknown strand
+                }
 
                 // Forward strand processing
                 Some(Strand::Forward) => {
