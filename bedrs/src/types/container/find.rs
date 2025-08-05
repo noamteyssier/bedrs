@@ -20,7 +20,7 @@ where
         &'a self,
         query: &'a Iv,
         method: Query<T>,
-    ) -> Result<FindIter<'_, C, T, I, Iv>, SetError>
+    ) -> Result<FindIter<'a, C, T, I, Iv>, SetError>
     where
         Iv: IntervalBounds<C, T>,
     {
@@ -46,7 +46,7 @@ where
         &'a self,
         query: &'a Iv,
         method: Query<T>,
-    ) -> Result<FindIterEnumerate<'_, C, T, I, Iv>, SetError>
+    ) -> Result<FindIterEnumerate<'a, C, T, I, Iv>, SetError>
     where
         Iv: IntervalBounds<C, T>,
     {

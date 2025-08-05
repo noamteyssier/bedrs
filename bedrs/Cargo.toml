@@ -1,6 +1,6 @@
 [package]
 name = "bedrs"
-version = "0.2.25"
+version = "0.2.26"
 edition = "2021"
 license = "MIT"
 description = "Genomic interval library in rust"
@@ -22,10 +22,13 @@ thiserror = "1.0.58"
 bedrs_derive = "0.1.0"
 getset = "0.1.2"
 derive-new = "0.6.0"
+rust-htslib = { version = "0.50.0", optional = true }
 
 [features]
+default = ["serde", "rayon"]
 serde = ["dep:serde"]
 rayon = ["dep:rayon"]
+htslib = ["dep:rust-htslib"]
 
 [dev-dependencies]
 criterion = "0.5.1"

@@ -33,9 +33,8 @@ where
         let mut max_len = zero::<T>();
         let records = iter
             .into_iter()
-            .map(|iv| {
+            .inspect(|iv| {
                 max_len = max_len.max(iv.len());
-                iv
             })
             .collect();
         let max_len = if max_len == zero::<T>() {
@@ -372,7 +371,7 @@ mod testing {
         match set.span() {
             Err(e) => assert_eq!(e.to_string(), "Cannot get span of unsorted interval set"),
             _ => panic!("Expected error"),
-        };
+        }
         set.sort();
         match set.span() {
             Err(e) => assert_eq!(
@@ -380,7 +379,7 @@ mod testing {
                 "Cannot get span of interval set spanning multiple chromosomes"
             ),
             _ => panic!("Expected error"),
-        };
+        }
     }
 
     #[test]

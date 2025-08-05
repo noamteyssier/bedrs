@@ -36,7 +36,7 @@ where
 {
     struct OptionFloatVisitor;
 
-    impl<'de> de::Visitor<'de> for OptionFloatVisitor {
+    impl de::Visitor<'_> for OptionFloatVisitor {
         type Value = Option<f64>;
 
         fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
@@ -63,6 +63,7 @@ where
 }
 
 #[cfg(feature = "serde")]
+#[allow(clippy::ref_option)]
 // Custom serializer to convert Option<f64> to string, writing None as '.'
 fn serialize_option_float<S>(option: &Option<f64>, serializer: S) -> Result<S::Ok, S::Error>
 where

@@ -36,7 +36,7 @@ where
         }
     }
 }
-impl<'a, I, Iv, C, T> Iterator for SubtractIter<'a, I, Iv, C, T>
+impl<I, Iv, C, T> Iterator for SubtractIter<'_, I, Iv, C, T>
 where
     I: IntervalBounds<C, T>,
     Iv: IntervalBounds<C, T>,

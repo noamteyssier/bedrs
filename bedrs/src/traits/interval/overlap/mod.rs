@@ -229,7 +229,7 @@ where
     /// assert!(!interval1.overlaps_by(&interval4, 50));
     /// ```
     fn overlaps_by<I: Coordinates<C, T>>(&self, other: &I, bases: T) -> bool {
-        self.overlap_size(other).map_or(false, |n| n >= bases)
+        self.overlap_size(other).is_some_and(|n| n >= bases)
     }
     /// Returns true if the current interval is overlapped by the other
     /// by the exact number of bases - considers both the interval overlap
@@ -264,7 +264,7 @@ where
     /// assert!(!interval1.overlaps_by_exactly(&interval4, 50));
     /// ```
     fn overlaps_by_exactly<I: Coordinates<C, T>>(&self, other: &I, bases: T) -> bool {
-        self.overlap_size(other).map_or(false, |n| n == bases)
+        self.overlap_size(other) == Some(bases)
     }
 
     /// Returns the number of bases overlapped by the other interval -

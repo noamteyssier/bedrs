@@ -172,7 +172,7 @@ where
         &'a self,
         n: usize,
         rng: &mut impl RngCore,
-    ) -> Result<Box<dyn Iterator<Item = &I> + 'a>, SetError> {
+    ) -> Result<Box<dyn Iterator<Item = &'a I> + 'a>, SetError> {
         if n > self.records().len() {
             return Err(SetError::SampleSizeTooLarge);
         }
@@ -198,7 +198,7 @@ where
     pub fn sample_iter<'a>(
         &'a self,
         n: usize,
-    ) -> Result<Box<dyn Iterator<Item = &I> + 'a>, SetError> {
+    ) -> Result<Box<dyn Iterator<Item = &'a I> + 'a>, SetError> {
         if n > self.records().len() {
             return Err(SetError::SampleSizeTooLarge);
         }
@@ -227,7 +227,7 @@ where
         &'a self,
         n: usize,
         seed: u64,
-    ) -> Result<Box<dyn Iterator<Item = &I> + 'a>, SetError> {
+    ) -> Result<Box<dyn Iterator<Item = &'a I> + 'a>, SetError> {
         if n > self.records().len() {
             return Err(SetError::SampleSizeTooLarge);
         }
